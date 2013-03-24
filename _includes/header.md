@@ -1,7 +1,7 @@
-<header>
+﻿<header>
   <div class="hgroup">
       <h1><a class="title" href="/">{{ site.title }}</a></h1>
-      <h3 class="description">To be or not to be, it is a problem.</h3>
+      <h3 class="description">少些,但要成熟.</h3>
     </div>
     <div class="menu">
       <ul>

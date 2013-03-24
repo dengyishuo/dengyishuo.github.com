@@ -13,7 +13,7 @@ license: true
 category_list: true
 tag_cloud: true
 links: true
-google_analytics_tracking_id: UA-34850864-1
+
 
 #Generate css
 #compass compile
