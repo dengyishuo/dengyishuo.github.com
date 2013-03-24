@@ -1,0 +1,20 @@
+root: /
+permalink: /:year-:month-:title/
+markdown: rdiscount
+pygments: true 
+paginate: 5
+excerpt_link: "阅读更多 &rarr;"
+
+title: 慎独
+author: signifox
+address: http:://shawhu.org
+subscribe_rss: /atom.xml
+license: true
+category_list: true
+tag_cloud: true
+links: true
+google_analytics_tracking_id: UA-34850864-1
+
+#Generate css
+#compass compile
+

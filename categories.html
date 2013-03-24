@@ -1,0 +1,21 @@
+---
+layout: page
+title: Categories 分类
+comments: false
+---
+<section class="categories">
+<ul class="tag_box inline">
+    {% for cat in site.categories %}
+        <li><a href="/categories.html#{{ cat[0] }}-ref" title="{{ cat[0] }}" rel="{{ cat[1].size }}">{{ cat[0] }} <sup>({{ cat[1].size }})</sup></a></li>
+    {% endfor %}
+</ul>
+</section>
+{% for cat in site.categories %} 
+  <h2 id="{{ cat[0] }}-ref">{{ cat[0] }}</h2>
+  <ul>
+    {% for post in cat[1] %}
+		<li><a href='{{ post.url }}'>{{post.title}}</a></li>
+	{% endfor %}
+  </ul>
+{% endfor %}
+
