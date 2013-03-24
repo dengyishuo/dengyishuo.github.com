@@ -1,4 +1,4 @@
-<aside>
+﻿<aside>
       <ul id="side" class="clear">
         <li class="widget">
           <h3 class="widgettitle title">分类目录</h3>
@@ -39,16 +39,15 @@
         <li class="widget">
           <h3 class="widgettitle  title">近期评论</h3>
           <ul class="comments">
-            <script type="text/javascript" src="http://shawhu.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
+            <script type="text/javascript" src="http://yishuo.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
             </script>
           </ul>
         </li>
         <li class="widget">
           <h3 class="widgettitle  title">友情链接</h3>
           <ul class='blogroll'>
-            <li><a href="http://saipingwen.org">猴子</a></li>
-            <li><a href="http://www.baidu.com">百度</a></li>
-            <li><a href="http://www.cplusplus.com/reference">CPP Reference<a></li>
+            <li><a href="http://cos.name">统计之都</a></li>
+            <li><a href="http://quantmod.com">Quantmod</a></li>
           </ul>
         </li>
       </ul>
