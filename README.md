@@ -1,4 +1,4 @@
-dengyishuo.github.com
+﻿http://yishuo.org
 =====================
 
 邓一硕的博客
