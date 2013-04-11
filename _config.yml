@@ -1,4 +1,4 @@
-﻿root: /
+root: /
 permalink: /:year-:month-:title/
 markdown: rdiscount
 pygments: true 
@@ -7,7 +7,7 @@ excerpt_link: "阅读更多 &rarr;"
 
 title: 格物堂
 author: dengyishuo
-address: http://yishuo.org
+address: http://dengyishuo.github.com
 subscribe_rss: /atom.xml
 license: true
 category_list: true
