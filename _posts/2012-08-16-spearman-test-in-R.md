@@ -19,28 +19,28 @@ tags:
 如果变量和变量相关，那么，将两者按照大小排序，则两者的顺序应该是相仿的，若两者相关性弱，则两者的顺序没有明显的一致性。
 举个简单的例子：
 
-<% highlight c %>
+{% highlight c %}
  25 40 54 58 68 
  1.6 2.9 10.7 14.8 5.7 
-<% endhighlight %>
+{% endhighlight %}
 
 上下对应，下面按照的大小进行排序，则能看到下面的结果：
 
-<% highlight c %>
+{% highlight c %}
 x排序号（秩） y排序号（秩） 序号差 
 1 1 0 
 2 2 0 
 3 4 -1 
 4 5 -1 
 5 3 2 
-<% endhighlight %>
+{% endhighlight %}
 
 构造统计量，容易知道等于1时，两者正相关，等于-1时两者负相关。设定原假设统计量为零，该统计量
 近似服从均值为0，方差为的正态分布，由此可对其进行假设检验。
 
 R中`pspearman`包中的`spearman.test`函数可以完成斯皮尔曼等级相关检验：
 
-<% highlight c %>
+{% highlight c %}
 library(pspearman)
 x=c(25,40,53,58,68)
 y=c(1.6,2.9,10.7,14.8,5.7)
@@ -52,11 +52,11 @@ data:?? x and y
  sample estimates:
  rho 
  0.7
-<% endhighlight %>
+{% endhighlight %}
 
 也可用`cor.test`函数来检验：
 
-<% highlight c %>
+{% highlight c %}
 > cor.test(x,y,method="spearman")
 Spearman's rank correlation rho
 data:?? x and y
@@ -65,5 +65,5 @@ data:?? x and y
  sample estimates:
  rho
  0.7
-<% endhighlight %>
+{% endhighlight %}
 
