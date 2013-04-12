@@ -19,14 +19,14 @@ tags:
 如果变量和变量相关，那么，将两者按照大小排序，则两者的顺序应该是相仿的，若两者相关性弱，则两者的顺序没有明显的一致性。
 举个简单的例子：
 
-<% highlight r %>
+<% highlight c %>
  25 40 54 58 68 
  1.6 2.9 10.7 14.8 5.7 
 <% endhighlight %>
 
 上下对应，下面按照的大小进行排序，则能看到下面的结果：
 
-<% highlight r %>
+<% highlight c %>
 x排序号（秩） y排序号（秩） 序号差 
 1 1 0 
 2 2 0 
@@ -40,7 +40,7 @@ x排序号（秩） y排序号（秩） 序号差
 
 R中`pspearman`包中的`spearman.test`函数可以完成斯皮尔曼等级相关检验：
 
-<% highlight r %>
+<% highlight c %>
 library(pspearman)
 x=c(25,40,53,58,68)
 y=c(1.6,2.9,10.7,14.8,5.7)
@@ -56,7 +56,7 @@ data:?? x and y
 
 也可用`cor.test`函数来检验：
 
-<% highlight r %>
+<% highlight c %>
 > cor.test(x,y,method="spearman")
 Spearman's rank correlation rho
 data:?? x and y
