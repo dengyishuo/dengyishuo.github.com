@@ -1,4 +1,4 @@
-﻿<aside>
+<aside>
       <ul id="side" class="clear">
         <li class="widget">
           <h3 class="widgettitle title">分类目录</h3>
@@ -48,6 +48,12 @@
           <ul class='blogroll'>
             <li><a href="http://cos.name">统计之都</a></li>
             <li><a href="http://quantmod.com">Quantmod</a></li>
+            <li><a href="http://yihui.name">谢益辉</a></li>
+			<li><a href="http://yanping.me">陈堰平</a></li>
+			<li><a href="http://yixuan.cos.name/">邱怡轩</a></li>
+			<li><a href="http://www.bjt.com"></a>刘思喆</li>
+			<li><a href="http://taiyun.cos.name"></a>魏太云</li>
+			<li><a href="http://www.road2stat.com/"></a>肖楠</li>
           </ul>
         </li>
       </ul>
