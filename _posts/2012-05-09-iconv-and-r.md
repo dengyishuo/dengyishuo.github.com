@@ -11,6 +11,7 @@ tags:
 ---
 
 从网上抓数据（网页是utf-8编码）时，发现读入R的数据出现了乱码。情形如下：
+
 {% highlight c %}
 
 > library(XML)
@@ -35,7 +36,7 @@ NA NA NA
 5 0.326 0.27 0.11
 6 0.321 0.27
 
-<% endhightlight %>
+{% endhighlight %}
 
 去COS咨询了一番，都说运行完我提供的代码之后没有出现乱码。当时我有些凌乱，难道R代码的运行
 结果还跟人品相关么？
@@ -51,7 +52,7 @@ NA NA NA
 
 后来，无意中见到一个人用iconv函数，看起来效果不错，我就尝试了一下：
 
-<% highlight c %>
+{% highlight c %}
 
 > rownames(tables)<-iconv(tables[,1],"UTF-8","gbk")
 > head(tables[,-1])
@@ -63,6 +64,6 @@ NA NA.1 NA.2 NA.3
 每股收益_调整后(元) 0.88 0.326 0.27 0.11
 扣除非经常性损益后的每股收益(元) 0.87 0.321 0.27 
 
-<% endhighlight %>
+{% endhighlight %}
 
-问题竟然解决了！这下真的欢欣鼓舞了，瞬间我发现：绳命是如此的灰黄。
+虽然不知道什么原理，但问题毕竟是解决了！
