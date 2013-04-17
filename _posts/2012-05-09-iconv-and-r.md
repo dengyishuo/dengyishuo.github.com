@@ -12,7 +12,7 @@ tags:
 
 从网上抓数据（网页是utf-8编码）时，发现读入R的数据出现了乱码。情形如下：
 
-{% highlight c %}
+{% highlight r %}
 
 > library(XML)
 > id="000002"
@@ -52,7 +52,7 @@ NA NA NA
 
 后来，无意中见到一个人用iconv函数，看起来效果不错，我就尝试了一下：
 
-{% highlight c %}
+{% highlight r %}
 
 > rownames(tables)<-iconv(tables[,1],"UTF-8","gbk")
 > head(tables[,-1])
