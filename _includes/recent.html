@@ -1,8 +1,0 @@
-<section id="recent-post">
-		<h3>近期文章</h3>
-		<ul class="recent">		
-		{% if page.published %}	{% for post in site.related_posts limit:5 %}<li><a href="{{site.baseurl}}{{ post.url }}" title="{{ post.title }} {{ post.date | date_to_string }}">{{ post.title }} </a>  </li>
-			{% endfor %}{% else %}{% for post in site.posts limit:5 %}
-				<li><a href="{{site.baseurl}}{{ post.url }}" title="{{ post.title }} {{ post.date | date_to_string }}">{{ post.title }} </a></li>{% endfor %}{% endif %}
-		</ul>	  
-</section>
