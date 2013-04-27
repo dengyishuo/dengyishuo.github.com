@@ -21,7 +21,7 @@ tags:
 
 制作上图的R代码为：
 
-{% highlight c %}
+{% highlight r %}
 library(quantmod)
 getSymbols("^SSEC",from="1991-01-01")
 ssec=coredata(Cl(SSEC))
@@ -48,4 +48,5 @@ lines((1:length(ssec))[ssec<=quantile(ssec,0.9)],h,col="green")
 h=fitted(l)-2*sd(residuals(l))
 lines((1:length(ssec))[ssec<=quantile(ssec,0.9)],h,col="green")
 dev.off()
-{% endhighlight c %}
+
+{% endhighlight r %}

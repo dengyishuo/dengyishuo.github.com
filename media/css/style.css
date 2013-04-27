@@ -53,10 +53,10 @@ sup,sub{position:relative;height:0;line-height:1;vertical-align:baseline;font-si
 sup{bottom:1ex;}
 sub{top:.5ex;}
 
-header{margin:2em 35px 1em 5px; padding:13px 0 0;height:px;}
-#content{background:#fff url(/media/image/sidebg.png) repeat-y;border:1px solid #e0e0e0;border-color:rgba(228,219,219,0.86);margin:0 0 20px;border-radius:5px;}
-#content article{float:right;padding:10px 35px;width:648px;}
-aside{float:left;width:240px;}
+header{margin:2em 220px 1em -25px; padding:20px 0 0 0;height:80px;}
+#content{background:#fff url(/media/image/sidebg.png) repeat-y scroll top right;border:1px solid #e0e0e0;border-color:rgba(228,219,219,0.86);margin:0 0 10px;border-radius:5px;}
+#content article{float:left;padding:10px 35px;width:648px;}
+aside{float:right;width:240px;}
 footer{clear:both;padding:0 0 9px;text-align:left;margin-bottom: 1em;}
 
 header .hgroup{float:left;display:inline-block;max-width:280px;height:65px;_zoom:1;margin-left: 2em;}
