@@ -1,0 +1,13 @@
+ <!--[if lt IE 9]>
+	 <script type="text/javascript">
+
+		var browser=navigator.appName;
+		var b_version=navigator.appVersion;
+		var version=parseFloat(b_version);
+	
+		document.getElementById('browser-warning').style.display='block';
+		{% unless page.title %}
+			alert("博主说：为保证浏览效果，建议使用Firefox或者Chrome等非IE内核的浏览器！");
+		{% endunless %}
+</script>
+<![endif]-->
