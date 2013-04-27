@@ -1,0 +1,36 @@
+<script type="text/javascript">
+	
+		function showTag(tagStr){
+			jq.getJSON("../post.json",function(data){				
+				jq('#show-tag').empty(content);				
+				var content ="<h2>分类："+ tagStr +"</h2><ul class=\"posts\">";
+				var count = 0;
+				jq.each(data,function(i,item){										
+			   		jq.each(item.tags,function(j,tag){
+						if(tag == tagStr)	{					   
+						content += "<li class=\"listing-item\"><time datetime=\""+ item.date +"\">" + item.date + "</time><a href=\""+item.url+"\">"+ item.title +"</a></li>";
+						count++;
+						}
+											
+					});					
+				});	
+				if(count>0){			
+					content +="</ul>";	
+					postNumStr = "<span>（"+count + "篇文章）</span>";					
+					jq('#show-tag').append(content);
+					jq('#show-tag>h2').append(postNumStr);	
+				}
+			});
+		}
+	</script>
+
+<script type="text/javascript">   
+	var href= window.location.href;
+	var pos = href.indexOf('?tag=');
+	var paraStr = href.substring(pos+5);
+	if(pos>0){
+		showTag(decodeURI(paraStr));
+	} else{
+		showTag("");
+	}
+</script>

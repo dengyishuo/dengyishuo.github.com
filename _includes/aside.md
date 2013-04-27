@@ -46,9 +46,10 @@
         <li class="widget">
           <h3 class="widgettitle  title">友情链接</h3>
           <ul class='blogroll'>
+		    <li><a href="http://quantmod.com">Quantmod</a></li>
             <li><a href="http://cos.name">统计之都</a></li>
-            <li><a href="http://quantmod.com">Quantmod</a></li>
             <li><a href="http://yihui.name">谢益辉</a></li>
+			<li><a href="http://linhui.org">林荟</a></li>
 			<li><a href="http://yanping.me">陈堰平</a></li>
 			<li><a href="http://yixuan.cos.name/">邱怡轩</a></li>
 			<li><a href="http://www.bjt.com"></a>刘思喆</li>
