@@ -66,7 +66,7 @@ header h1,header h1 a{color:#1b47B9;}
 header h1 a:hover{color:#000;text-decoration:underline;}
 header h3 {font-size:.95em;}
 
-header div.menu,header nav{float:left;overflow:hidden;height:25px;text-align:right;}
+header div.menu,header nav{float:left;overflow:hidden;height:25px;text-align:left;}
 header div.menu{width:560px; float:right ;margin-right: 2em;}
 header nav{width:590px;}
 header div.menu ul,header nav ul{margin:0;list-style:none;}

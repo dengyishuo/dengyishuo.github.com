@@ -1,7 +1,7 @@
 <header>
   <div class="hgroup">
       <h1><a class="title" href="/">{{ site.title }}</a></h1>
-      <h3 class="description">择善固执，纵望之愚且鲁，何足介怀？</h3>
+      <h3 class="description"> </h3>
     </div>
     <div class="menu">
       <ul>
