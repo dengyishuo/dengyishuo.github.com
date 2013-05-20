@@ -1,6 +1,6 @@
 ---
 layout: post
-title: R中的量化投资包：quantstrat
+title: R中的量化投资包：quantstrat（1）
 comments: true
 categories:
 - R
@@ -13,19 +13,17 @@ tags:
 
 ## quantstrat是什么东西？
 quantstrat是Quantitative Strategy（量化策略）的缩写，它一枚由Peter Carl、 Brian G. Peterson、Josh Ulrich、Garrett See、
-Yu Chen多位大牛联合开发的、用于量化投资的R包。
+Yu Chen等联合开发的、用于量化投资的R包。
 
 这个包为用户提供了一个测试和模拟基于信号的量化策略模型的泛型框架。它不仅可以
 帮助用户构建交易系统，还可以对构建的交易系统进行仿真测试；能够支持对多资产类别和多币种组合进行回测（backtesting）等。
 这个包在设计的过程中充分贯彻（这两个字让我意识到自己被我党文化侵润良久）了“交易导向型”
-（Transaction-oriented）原则，非常适宜用来做量化。
+（Transaction-oriented）原则。
 
+目前，这个包由Brian G. Peterson在维护，还在开发中，不过已经被很多业内人士拿来实战了。
 
-目前，这个包由Brian G. Peterson在维护，还在开发中。
-
-
-这是一个建立在xts, FinancialInstrument, blotter等包上的高级抽象包，该包帮助用户用几行简单的代码来构建和测试策略。
-
+因为quantstrat包是一个建立在xts, FinancialInstrument, blotter等包上的高级抽象包，所以，在应用quantstrat包时，
+除了除了安装quantstrat包之外，还得记得装上这三个支撑包。看起来安装有点麻烦，正式因为安装麻烦，所以，它才能使得用户用几行简单的代码就能来构建和测试策略。
 
 ## quantstrat涉及的量化策略基础知识
 ### 基于信号的策略的泛型建模
