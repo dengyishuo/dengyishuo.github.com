@@ -1,0 +1,24 @@
+---
+author: admin
+comments: true
+date: 2011-09-13 15:54:31
+layout: post
+slug: 13-3-%e6%9e%81%e5%a4%a7%e4%bc%bc%e7%84%b6%e4%bc%b0%e8%ae%a1
+title: 13.3 极大似然估计
+wordpress_id: 848
+categories:
+- R&amp;数据艺术
+tags:
+- r
+- 极大似然估计
+- 计量经济学
+---
+
+下面用极大似然方法来估计一个非线性模型的系数。假设模型形式如下：
+$latex y=aL^bK^c+\epsilon $
+$latex e^{\i \pi} + 1 = 0$
+拟合上述非线性模型的最优方法是调用nls()函数.不过，这里，我们要采用极大似然方法
+首先，我们找到对数极大似然函数（事实上，是极大似然函数的负数，这样就把球极大值转化为了球极小值），然后用nlm()函数来进行优化求解。
+Y,L，K是已知变量。a,b,c是三个待估计量。
+[code]
+> mloglik + n mlem [/code] 

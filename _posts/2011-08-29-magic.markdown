@@ -1,0 +1,37 @@
+---
+author: admin
+comments: true
+date: 2011-08-29 17:08:48
+layout: post
+slug: magic
+title: R中的魔方矩阵
+wordpress_id: 830
+categories:
+- R&amp;数据艺术
+tags:
+- r
+- 魔方矩阵
+---
+
+某个朋友去证券公司笔试（+机试），题目中竟然有一道要求用C语言完成魔方矩阵的输出。如果之前没有做过这个联系，骤然间写出来代码可是不容易的事情。下午查了一下R中的魔方矩阵，发现里面已经有一个magic包可以完成魔方矩阵的输出了，R真有点无所不包的气势。只是担心枝桠太多，有不精之嫌。
+[code]
+library(magic)
+magic.image=function(n){
+m=magic(n)
+image(m)
+for(j in 1:n){
+for(i in 1:n){
+text(1/(n-1)*i-1/(n-1),1+1/(n-1)-1/(n-1)*j,m[j,i])
+}
+}
+}
+magic.image(5)
+[/code]
+    [,1] [,2] [,3] [,4] [,5]
+[1,]    9    2   25   18   11
+[2,]    3   21   19   12   10
+[3,]   22   20   13    6    4
+[4,]   16   14    7    5   23
+[5,]   15    8    1   24   17
+
+[![](http://yishuo.org/wp-content/uploads/2011/08/12.png)](http://yishuo.org/wp-content/uploads/2011/08/12.png)
