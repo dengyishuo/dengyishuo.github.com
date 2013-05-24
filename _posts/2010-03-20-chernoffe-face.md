@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2010-03-20 14:40:37
 layout: post
-slug: chernoff%e8%84%b8%e8%b0%b1%e5%9b%be
 title: Chernoff脸谱图
-wordpress_id: 4
+comments: true
 categories:
 - 随感
 tags:
