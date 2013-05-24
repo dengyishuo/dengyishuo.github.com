@@ -1,15 +1,11 @@
 ---
-author: admin
 comments: true
-date: 2011-01-09 14:24:37
 layout: post
-slug: r%e4%b8%8e%e6%97%b6%e9%97%b4%e5%ba%8f%e5%88%97%e7%9a%84%e5%b9%b3%e7%a8%b3%e6%80%a7
 title: R与时间序列的平稳性
-wordpress_id: 475
 categories:
 - 计量经济学(R)
 tags:
-- R&amp;数据艺术
+- R
 - 平稳性
 - 计量经济学
 ---

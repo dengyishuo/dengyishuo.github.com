@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2011-04-20 21:40:31
 layout: post
-slug: '%e7%94%a8r%e8%ae%a1%e7%ae%97treynor%e7%b3%bb%e6%95%b0'
 title: 用R计算Treynor系数
-wordpress_id: 658
+comments: true
 categories:
 - 金融投资分析(R)
 tags:

@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-06-13 11:32:28
 layout: post
-slug: '%e6%88%91%e4%bb%ac%e8%83%bd%e5%b8%a6%e9%a2%86%e7%bb%9f%e8%ae%a1%e5%ad%a6%e5%88%9b%e9%80%a0%e5%8e%86%e5%8f%b2%e4%b9%88%ef%bc%9f'
 title: 我们能带领统计学创造历史么？
-wordpress_id: 754
 categories:
 - 随感
 tags:

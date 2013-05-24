@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2010-03-29 03:02:23
 layout: post
-slug: '%e5%9b%9b%e9%be%9f%e8%a1%8c%e8%b5%b0%e6%88%96%e8%bf%bd%e9%80%90%e9%97%ae%e9%a2%98'
 title: 四龟行走或追逐问题
-wordpress_id: 195
+comments: true
 categories:
 - 随感
 tags:

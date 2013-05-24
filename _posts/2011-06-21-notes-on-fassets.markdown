@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-06-21 15:04:01
 layout: post
-slug: fassets%e5%8c%85%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0
 title: fAssets包学习笔记
-wordpress_id: 761
 categories:
 - 金融投资分析(R)
 tags:

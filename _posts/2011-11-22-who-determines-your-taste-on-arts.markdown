@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-11-22 21:41:17
 layout: post
-slug: '%e4%bb%80%e4%b9%88%e5%9f%b9%e5%85%bb%e4%ba%86%e4%bd%a0%e7%9a%84%e5%93%81%e5%91%b3'
 title: 什么培养了你的品味
-wordpress_id: 886
 categories:
 - 随感
 tags:

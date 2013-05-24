@@ -1,11 +1,8 @@
 ---
-author: admin
 comments: true
 date: 2011-09-13 15:25:18
 layout: post
-slug: 13-2-haar%e5%b0%8f%e6%b3%a2%e5%8f%98%e6%8d%a2
 title: 13.2 Haar小波变换
-wordpress_id: 840
 categories:
 - R&amp;数据艺术
 tags:

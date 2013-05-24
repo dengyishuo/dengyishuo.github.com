@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2012-02-01 18:10:21
 layout: post
-slug: '%e8%b4%a7%e5%b8%81%e7%9a%84%e7%9c%81%e9%99%85%e8%b4%ac%e5%80%bc'
 title: 货币的省际贬值
-wordpress_id: 1088
+comments: true
 categories:
 - 生活中的经济学
 - 经济学

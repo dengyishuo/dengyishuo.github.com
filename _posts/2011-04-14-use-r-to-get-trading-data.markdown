@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-04-14 21:20:26
 layout: post
-slug: r%e8%8e%b7%e5%8f%96%e8%82%a1%e7%a5%a8%e6%95%b0%e6%8d%ae
 title: R获取股票数据
-wordpress_id: 620
 categories:
 - 金融投资分析(R)
 tags:

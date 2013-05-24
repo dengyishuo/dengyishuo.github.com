@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-10-27 22:44:16
 layout: post
-slug: '%e7%94%a8r%e6%a3%80%e9%aa%8c%e8%82%a1%e7%a5%a8%e7%9a%84%e5%8d%8f%e6%95%b4%e5%85%b3%e7%b3%bb'
 title: 用R检验股票的协整关系
-wordpress_id: 865
 categories:
 - R&amp;数据艺术
 tags:

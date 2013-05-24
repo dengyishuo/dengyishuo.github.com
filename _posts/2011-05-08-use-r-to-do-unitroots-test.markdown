@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-05-08 20:05:49
 layout: post
-slug: '%e5%8d%95%e4%bd%8d%e6%a0%b9%e6%a3%80%e9%aa%8c'
 title: R与单位根检验
-wordpress_id: 709
 categories:
 - 计量经济学(R)
 tags:

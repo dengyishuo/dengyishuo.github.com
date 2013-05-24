@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-06-27 21:39:15
 layout: post
-slug: '%e6%96%b0%e4%b9%a6%ef%bc%9afinancial-risk-forecasting'
 title: 新书：Financial Risk Forecasting
-wordpress_id: 773
 categories:
 - 金融投资分析(R)
 - 随感

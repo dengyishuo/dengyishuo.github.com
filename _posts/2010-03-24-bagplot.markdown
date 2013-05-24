@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2010-03-24 15:23:57
 layout: post
-slug: bagplot%e8%b6%a3%e5%91%b3%e6%a8%aa%e7%94%9f%e7%9a%84%e9%87%8e%e5%80%bc%e7%82%b9%e6%a3%80%e9%aa%8c%e6%96%b9%e6%b3%95
 title: Bagplot:趣味横生的野值点检验方法
-wordpress_id: 104
 categories:
 - 随感
 tags:

@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2011-05-02 19:53:52
 layout: post
-slug: '%e7%ac%a6%e5%8f%b7%e5%81%8f%e8%af%af%e6%a3%80%e9%aa%8c%ef%bc%88sign-bias-test%ef%bc%89'
 title: 符号偏误检验（Sign Bias Test）
-wordpress_id: 681
+comments: true
 categories:
 - 计量经济学(R)
 tags:

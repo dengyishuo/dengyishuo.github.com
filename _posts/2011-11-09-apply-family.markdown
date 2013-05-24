@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-11-09 15:33:07
 layout: post
-slug: apply%e5%87%bd%e6%95%b0%e6%97%8f%e5%85%a5%e9%97%a8
 title: apply函数族入门
-wordpress_id: 872
 categories:
 - R&amp;数据艺术
 tags:

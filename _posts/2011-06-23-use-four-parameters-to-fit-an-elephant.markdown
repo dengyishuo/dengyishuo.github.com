@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-06-23 17:20:48
 layout: post
-slug: '%e7%94%a8%e5%9b%9b%e4%b8%aa%e5%8f%82%e6%95%b0%e6%8b%9f%e5%90%88%e5%a4%a7%e8%b1%a1'
 title: 用四个参数拟合大象
-wordpress_id: 768
 categories:
 - 随感
 tags:

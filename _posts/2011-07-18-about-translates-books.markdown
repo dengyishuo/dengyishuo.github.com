@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-07-18 16:00:28
 layout: post
-slug: '%e5%a4%a7%e6%97%97%e5%a6%82%e6%9e%9c%e6%89%9b%e4%b8%8d%e5%8a%a8%ef%bc%8c%e5%b0%b1%e5%85%88%e6%8f%92%e5%9c%a8%e5%9c%b0%e4%b8%8a'
 title: 大旗如果扛不动，就先插在地上
-wordpress_id: 775
 categories:
 - 随感
 tags:

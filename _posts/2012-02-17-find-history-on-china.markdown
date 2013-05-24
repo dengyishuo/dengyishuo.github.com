@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2012-02-17 08:33:21
 layout: post
-slug: '%e8%af%bb%e6%9f%af%e6%96%87%e3%80%8a%e5%9c%a8%e4%b8%ad%e5%9b%bd%e5%8f%91%e7%8e%b0%e5%8e%86%e5%8f%b2%e3%80%8b'
 title: 读柯文《在中国发现历史》
-wordpress_id: 1127
 categories:
 - 读书笔记
 ---

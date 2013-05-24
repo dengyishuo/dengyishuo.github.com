@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2011-04-17 23:00:41
 layout: post
-slug: '%e7%94%a8r%e6%8b%9f%e5%90%88%e7%bc%ba%e9%a1%b9%e7%9a%84arima%e6%a8%a1%e5%9e%8b'
 title: 用R拟合缺项的ARIMA模型
-wordpress_id: 642
+comments: true
 categories:
 - 计量经济学(R)
 tags:

@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2012-01-16 16:44:14
 layout: post
-slug: '%e8%a7%84%e5%88%99%e8%bf%99%e4%bb%b6%e4%ba%8b%e6%83%85'
 title: 规则这件事情
-wordpress_id: 1072
+comments: true
 categories:
 - 随感
 ---

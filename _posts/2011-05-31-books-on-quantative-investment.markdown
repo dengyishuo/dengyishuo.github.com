@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2011-05-31 19:56:06
 layout: post
-slug: r%e4%b8%8e%e9%87%8f%e5%8c%96%e6%8a%95%e8%b5%84%e5%88%86%e6%9e%90%e5%85%a5%e9%97%a8%e4%b9%a6%e5%8d%95%ef%bc%88%e6%9b%b4%e6%96%b0-%ef%bc%89
 title: R与量化投资分析入门书单（更新....）
-wordpress_id: 735
+comments: true
 categories:
 - 金融投资分析(R)
 tags:

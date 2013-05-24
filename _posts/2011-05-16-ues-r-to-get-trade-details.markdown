@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-05-16 22:17:55
 layout: post
-slug: '%e6%88%91%e6%9d%a5%e4%b9%9f'
-title: 我来也
-wordpress_id: 713
+title: 获取交易明细数据
 categories:
 - 随感
 ---

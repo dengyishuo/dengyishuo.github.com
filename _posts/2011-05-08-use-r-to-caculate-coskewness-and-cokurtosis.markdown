@@ -1,11 +1,7 @@
 ---
-author: admin
-comments: true
-date: 2011-05-08 11:02:09
 layout: post
-slug: '%e7%94%a8r%e8%ae%a1%e7%ae%97%e5%8d%8f%e5%81%8f%e5%ba%a6%ef%bc%88coskewness%ef%bc%89%e5%92%8c%e5%8d%8f%e5%b3%b0%e5%ba%a6%ef%bc%88cokurtosis%ef%bc%89'
 title: 用R计算协偏度（coskewness）和协峰度（cokurtosis）
-wordpress_id: 702
+comments: true
 categories:
 - 金融投资分析(R)
 tags:

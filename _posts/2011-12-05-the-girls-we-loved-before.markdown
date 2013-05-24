@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-12-05 22:05:05
 layout: post
-slug: '%e7%83%9f%e7%81%ab%e4%bc%97%e7%94%9f'
 title: 烟火众生
-wordpress_id: 898
 categories:
 - 随感
 tags:

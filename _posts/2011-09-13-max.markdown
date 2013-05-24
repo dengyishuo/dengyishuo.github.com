@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-09-13 15:54:31
 layout: post
-slug: 13-3-%e6%9e%81%e5%a4%a7%e4%bc%bc%e7%84%b6%e4%bc%b0%e8%ae%a1
 title: 13.3 极大似然估计
-wordpress_id: 848
 categories:
 - R&amp;数据艺术
 tags:

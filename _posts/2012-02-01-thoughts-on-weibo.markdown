@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2012-02-01 09:43:04
 layout: post
-slug: weibo%e6%95%b0%e6%8d%ae%e5%bc%80%e5%8f%91%e6%80%9d%e8%b7%af
 title: weibo数据开发思路
-wordpress_id: 1084
 categories:
 - 随感
 ---
