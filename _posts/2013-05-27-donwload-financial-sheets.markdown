@@ -9,6 +9,9 @@ tags:
 - R
 ---
 
+在国内获取上市公司的财务数据，一直都叫人头疼。对于没有Wind这些终端的个人而言，只能一条路，那就是从网络上抓取。这还是有前提的：
+网上得有数据可抓。好在从sina财经找到了一个可下载财务套表的接口，不慌不忙写一段自动下载的代码。
+
 {% highlight r %}
 ####symbol:股票代码
 ####type：报表类型。BS为资产负债表；PS为利润表；CF为现金流量表
@@ -33,4 +36,10 @@ destfile=paste(file,"CashFlow_",symbol,".xls",sep="");
 }
 download.file(url, destfile);
 }
+{% endhighlight %}
+
+举个例子；
+{% highlight r%}
+# 下载000065的资产负债表，并存放在D盘
+getsheets("000065","BS","D://")
 {% endhighlight %}
