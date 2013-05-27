@@ -46,4 +46,4 @@ download.file(url, destfile);
 getsheets("000065","BS","D://")
 {% endhighlight %}
 
-D盘里面有一个叫BalanceSheet_000065.xls的文件，打开就可以看到理念的资产负债表数据。
+D盘里面有一个叫BalanceSheet_000065.xls的文件，打开就可以看到历年的资产负债表数据了。

@@ -9,7 +9,23 @@
           </ul>
         </li>
         <li class="widget">
-          <h3 class="widgettitle  title">标签云</h3>
+          
+          <h3 class="widgettitle  title">近期文章</h3>
+          <ul class="posts">
+            {% for post in site.posts limit: 5 %}
+              <li><a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        <li class="widget">
+          <h3 class="widgettitle  title">近期评论</h3>
+          <ul class="comments">
+            <script type="text/javascript" src="http://yishuo.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
+            </script>
+          </ul>
+        </li>
+        <li class="widget">
+		<h3 class="widgettitle  title">标签云</h3>
            <p>
               <div id='tag_cloud'>
                 {% for tag in site.tags %}
@@ -27,21 +43,6 @@
             $('#tag_cloud a').tagcloud();
           });
           </script>
-        </li>
-        <li class="widget">
-          <h3 class="widgettitle  title">近期文章</h3>
-          <ul class="posts">
-            {% for post in site.posts limit: 5 %}
-              <li><a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></li>
-            {% endfor %}
-          </ul>
-        </li>
-        <li class="widget">
-          <h3 class="widgettitle  title">近期评论</h3>
-          <ul class="comments">
-            <script type="text/javascript" src="http://yishuo.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
-            </script>
-          </ul>
         </li>
         <li class="widget">
           <h3 class="widgettitle  title">友情链接</h3>
