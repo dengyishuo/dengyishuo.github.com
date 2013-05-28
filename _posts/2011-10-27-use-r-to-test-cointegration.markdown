@@ -21,12 +21,15 @@ zoo包处理的对象是zoo，zoo对象与数据框（dataframe)类似，由行�
 
 
 分四个步骤：
-1.读入数据（data frame格式）
-2.将日期转化为Date对象
-3.将data frame数据转换为zoo对象
-4.合并数据
-相应的R代码：
-`
+
+* 读入数据（data frame格式）
+* 将日期转化为Date对象
+* 将data frame数据转换为zoo对象
+* 合并数据
+
+## 相应的R代码：
+
+{% highlight r%}
 library(zoo) #载入zoo包
 ##读入csv数据
 gld=read.csv("http://ichart.finance.yahoo.com/table.csv?s=GLD&ignore=.csv", stringsAsFactors=F)
@@ -43,20 +46,18 @@ t.zoo=merge(gld,gdx,all=FALSE)
 t=as.data.frame(t.zoo)
 ##返回杀数据的时间跨度
 cat("数据的时间跨度是",format(start(t.zoo)),"至",format(end(t.zoo)),"\n")
-`
-
+{% endhighlight %}
 
 ## 构建分布：
 
-
 在Ernie的书中，他先检验协整，在构建分布。在这里，我们采用相反的步骤以便于读者理解：我们先构建一个分布，然后再对分布进行单位根检验：如果没有单位根，则两个股票序列是协整的。
 构建分布：
-S=y-(\beta*X)
-\beta表示对冲比率。可以用OLS法算出来。
-y=(-\beta)*X
-估计上式即可得出\beta.
+$$ S=y-(\beta*X) $$
+$$\beta$$表示对冲比率。可以用OLS法算出来。
+$$y=(-\beta)*X$$
+估计上式即可得出$$\beta$$.
 R代码：
-`
+{% highlight r %}
 m=lm(gld~gdx+0,data=t)
 beta=coef(m)[1]
 cat("对冲比率是",beta,"\n")
@@ -65,13 +66,13 @@ sprd=t$gld-beta*t$gdx
 `
 其对应的具体数据为：
 GLD_i=\beta*GDX_i+\epsilon_i
-
+{% endhighlight %}
 
 ## 检验协整：
 
 
 可以用增广（Augmented）Diickey-Fuller检验来检验分布的单位根。R中的tseries包中的adf.test()可以实现这一过程。
-`
+{% highlight r %}
 library(tseries) #载入tseries包
 #令alternative=stationary，K=0
 ht=adf.test(sprd,alternative="stationary",k=0)
@@ -82,9 +83,9 @@ if(ht$p.valuecat("分布是均值回复的.\n")
 }else{
 cat("分布不是均值回复的.\n")
 }
-`
+{% endhighlight %}
 整合代码：
-`
+{% highlight r %}
 library(zoo)
 library(tseries)
 gld <- read.csv("http://ichart.finance.yahoo.com/table.csv?s=GLD&ignore;=.csv", stringsAsFactors=F)
@@ -102,9 +103,12 @@ if(ht$p.value cat("分布是均值回复的.\n")
 }else{
 cat("分布不是均值回复的.\n")
 }
+
 #返回结果
+
 数据的时间跨度是 2006-05-23 至 2011-10-25
 对冲比率是2.224323
 分布不是均值回复的.
-`
+{% endhighlight %}
+
 参考资料：http://quanttrader.info/public/testForCoint.html
