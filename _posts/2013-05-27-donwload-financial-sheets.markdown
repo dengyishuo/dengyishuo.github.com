@@ -1,6 +1,8 @@
 ---
 layout: post
 title: 自动下载上市公司财务套表
+author: 邓一硕
+comments：TRUE
 categories:
 - 量化投资
 - R
