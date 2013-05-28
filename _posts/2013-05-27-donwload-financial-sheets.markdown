@@ -1,5 +1,4 @@
 ---
-author: 邓一硕
 layout: post
 title: 自动下载上市公司财务套表
 comments：true
