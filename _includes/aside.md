@@ -53,9 +53,9 @@
 			<li><a href="http://linhui.org">林荟</a></li>
 			<li><a href="http://yanping.me">陈堰平</a></li>
 			<li><a href="http://yixuan.cos.name/">邱怡轩</a></li>
-			<li><a href="http://www.bjt.com"></a>刘思喆</li>
-			<li><a href="http://taiyun.cos.name"></a>魏太云</li>
-			<li><a href="http://www.road2stat.com/"></a>肖楠</li>
+			<li><a href="http://www.bjt.com">刘思喆</a></li>
+			<li><a href="http://taiyun.cos.name">魏太云</a></li>
+			<li><a href="http://www.road2stat.com/">肖楠</a></li>
           </ul>
         </li>
       </ul>
