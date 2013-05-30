@@ -53,13 +53,13 @@ sup,sub{position:relative;height:0;line-height:1;vertical-align:baseline;font-si
 sup{bottom:1ex;}
 sub{top:.5ex;}
 
-header{margin:2em 220px 1em -25px; padding:20px 0 0 0;height:80px;}
+header{margin:20px 220px 0 0; padding:20px 0 0 0;height:120px;}
 #content{background:#fff url(/media/image/sidebg.png) repeat-y scroll top right;border:1px solid #e0e0e0;border-color:rgba(228,219,219,0.86);margin:0 0 10px;border-radius:5px;}
 #content article{float:left;padding:10px 35px;width:648px;}
 aside{float:right;width:240px;}
 footer{clear:both;padding:0 0 9px;text-align:left;margin-bottom: 1em;}
 
-header .hgroup{float:left;display:inline-block;max-width:280px;height:65px;_zoom:1;margin-left: 2em;}
+header .hgroup{float:left;display:inline-block;max-width:280px;_zoom:1;margin-left: 2em;}
 header h1,header .description{text-align:left;}
 header h1{float:left;overflow:hidden;display:inline;line-height:1;font-size:55px;}
 header h1,header h1 a{color:#1b47B9;}
@@ -69,8 +69,8 @@ header h3 {font-size:.95em;}
 header div.menu,header nav{float:left;overflow:hidden;height:25px;text-align:right;}
 header div.menu{width:560px; float:left; margin-right: 2em;}
 header nav{width:590px;}
-header div.menu ul,header nav ul{margin:0;list-style:none;}
-header .menu{margin:0;padding:0 10px 0 20px;}
+header div.menu ul,header nav ul{margin:0;list-style:none;float:left}
+header .menu{margin:0;padding:10px 0 0 0;}
 header .menu li{display:inline-block;margin:0 5px;padding:0 6px;line-height:21px;color:#666;_zoom:1;font-size: 1.2em;}
 header .menu li a{color:#333;}
 header .menu li a:hover{color:#08c;text-decoration:none;}
@@ -84,6 +84,8 @@ header .menu li ul li{display:block;margin:0 4px;padding:0;text-align:left;}
 header .menu li ul ul{margin:-24px 0 0 143px;}
 header .menu li ul a{display:block;margin:0 -3px;padding:1px 7px;border-radius:7px;}
 header .menu li ul a:hover{border:1px solid #aecff7;padding:0 6px;}
+header .site-title{height:55px}
+header .description{margin-top: 10px;height:18px} 
 
 .entry h1,.entry h2,.entry h3,.entry h4,.entry h5,.entry h6{margin:0 0 .9em;line-height:1.5em;}
 .entry h1,.entry h2{color:#222}

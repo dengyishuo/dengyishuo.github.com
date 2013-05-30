@@ -1,8 +1,11 @@
 <header>
-  <div class="hgroup">
-      <h1><a class="title" href="/">{{ site.title }}</a></h1>
-      <h3 class="description"> </h3>
+    <div class="hgroup">
+      <div class="site-title"><h1><a class="title" href="/">{{ site.title }}</a></h1></div>
+      <div class="description">
+        <h3>{{ site.description }} </h3>
+      </div>
     </div>
+    <div class="clear"></div>
     <div class="menu">
       <ul>
         <li class="page_item"><a href="/" title="首页">首页</a></li>
