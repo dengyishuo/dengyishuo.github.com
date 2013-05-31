@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<section class="page hentry">
+    <div class="title">
+      <h2>{{ page.title }}</h2>
+    </div>
+    <div class="entry">
+      {{ content }}
+    </div>
+</section>
+{% if page.comments %}
+  <div class="comment">
+  		{% include comments.md %}
+  </div>
+{% endif %}
+
+

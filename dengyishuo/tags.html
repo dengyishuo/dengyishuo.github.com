@@ -1,0 +1,36 @@
+---
+layout: page
+title: Tags 标签
+comments: false
+---
+
+<section class="tags">
+<ul class="tag_box inline">
+  <p>
+    <div id='tag_cloud'>
+      {% for tag in site.tags %}
+            <a href="/tags.html#{{ tag[0] }}-ref" title="{{ tag[0] }}" rel="{{ tag[1].size }}">{{ tag[0] }} 
+              <sup>({{ tag[1].size }})</sup>
+            </a>
+      {% endfor %}
+    </div>
+  </p>
+  <script language="javascript">
+    $.fn.tagcloud.defaults = {
+         size: {start: 1, end: 1.5, unit: 'em'}
+    };
+    $(function () {
+        $('#tag_cloud a').tagcloud();
+    });
+  </script>
+</ul>
+</section>
+{% for tag in site.tags %} 
+  <h2 id="{{ tag[0] }}-ref">{{ tag[0] }}</h2>
+  <ul>
+    {% for post in tag[1] %}
+		  <li><a href='{{ post.url }}'>{{post.title}}</a></li>
+	  {% endfor %}
+  </ul>
+{% endfor %}
+
