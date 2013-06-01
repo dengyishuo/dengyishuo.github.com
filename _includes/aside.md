@@ -9,13 +9,7 @@
           </ul>
         </li>
         <li class="widget">
-          <h3 class="widgettitle  title">近期评论</h3>
-          <ul class="comments">
-            <script type="text/javascript" src="http://yishuo.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
-            </script>
-          </ul>
-        </li>
-        <li class="widget">
+        
           <h3 class="widgettitle title">分类目录</h3>
           <ul class="categories">
               {% for cat in site.categories %}
@@ -24,7 +18,13 @@
           </ul>
         </li>
         <li class="widget">
-          
+            <h3 class="widgettitle  title">近期评论</h3>
+          <ul class="comments">
+            <script type="text/javascript" src="http://yishuo.disqus.com/recent_comments_widget.js?num_items=5&hide_avatars=0&avatar_size=32&excerpt_length=50">
+            </script>
+          </ul>
+        </li>
+        <li class="widget">
           <h3 class="widgettitle  title">友情链接</h3>
           <ul class='blogroll'>
 		    <li><a href="http://quantmod.com">Quantmod</a></li>
