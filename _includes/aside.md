@@ -25,26 +25,6 @@
           </ul>
         </li>
         <li class="widget">
-		<h3 class="widgettitle  title">标签云</h3>
-           <p>
-              <div id='tag_cloud'>
-                {% for tag in site.tags %}
-                <a href="/tags.html#{{ tag[0] }}-ref" title="{{ tag[0] }}" rel="{{ tag[1].size }}">{{ tag[0] }} 
-                <sup>({{ tag[1].size }})</sup>
-                </a>
-                {% endfor %}
-            </div>
-          </p>
-          <script language="javascript">
-             $.fn.tagcloud.defaults = {
-              size: {start: 1, end: 1.5, unit: 'em'}
-            };
-          $(function () {
-            $('#tag_cloud a').tagcloud();
-          });
-          </script>
-        </li>
-        <li class="widget">
           <h3 class="widgettitle  title">友情链接</h3>
           <ul class='blogroll'>
 		    <li><a href="http://quantmod.com">Quantmod</a></li>
