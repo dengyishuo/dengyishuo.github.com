@@ -1,16 +1,7 @@
 <aside>
       <ul id="side" class="clear">
         <li class="widget">
-          <h3 class="widgettitle title">分类目录</h3>
-          <ul class="categories">
-              {% for cat in site.categories %}
-                <li><a href="/categories.html#{{ cat[0] }}-ref" title="{{ cat[0] }}" rel="{{ cat[1].size }}">{{ cat[0] }} <sup>({{ cat[1].size }})</sup></a></li>
-              {% endfor %}
-          </ul>
-        </li>
-        <li class="widget">
-          
-          <h3 class="widgettitle  title">近期文章</h3>
+		<h3 class="widgettitle  title">近期文章</h3>
           <ul class="posts">
             {% for post in site.posts limit: 5 %}
               <li><a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></li>
@@ -25,6 +16,15 @@
           </ul>
         </li>
         <li class="widget">
+          <h3 class="widgettitle title">分类目录</h3>
+          <ul class="categories">
+              {% for cat in site.categories %}
+                <li><a href="/categories.html#{{ cat[0] }}-ref" title="{{ cat[0] }}" rel="{{ cat[1].size }}">{{ cat[0] }} <sup>({{ cat[1].size }})</sup></a></li>
+              {% endfor %}
+          </ul>
+        </li>
+        <li class="widget">
+          
           <h3 class="widgettitle  title">友情链接</h3>
           <ul class='blogroll'>
 		    <li><a href="http://quantmod.com">Quantmod</a></li>
