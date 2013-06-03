@@ -42,7 +42,9 @@ source(file.choose())
 dat=read.table(file.choose(),header=TRUE)
 {% endhighlight r %}
 
+然后，R会弹出一个`Select File`的小窗口，挥动鼠标就可以对各个盘符和文件夹进行选择了。
 
-
+参考资料：
+Ko-Kang Wang.R for Windows Users
 
 
