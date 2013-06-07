@@ -185,6 +185,6 @@ img.alignleft,img.alignright,img.aligncenter{margin-top:2em;margin-bottom:1.5em;
 .gallery br+br{display:none;}
 
 .tag-link{margin-right: 8px;}
-code{margin: 0 2px; padding: 0px 5px; background-color: #FEE9CC; border-radius: 3px;}
+code{margin: 0 2px; padding: 0px 5px; background-color: #F8F8FF; border-radius: 3px;}
 pre code, .highlight code{margin: 0; padding: 0; background-color: transparent; border: none;}
 .clearline{margin:.2em .2em .5em .2em;clear:both;background-color:#ccc;border-bottom: 1px solid #6D6E70;}
