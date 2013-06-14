@@ -2,10 +2,10 @@
  
  Info|内容
  -------|----------------------------------
- Author:|[邓一硕](http://weibo.com/dengyishuo)
- Blog:|[格物堂](http://yishuo.org)
+ 作者:|[邓一硕](http://weibo.com/dengyishuo)
+ 博客:|[格物堂](http://yishuo.org)
  Email:|[yishuo.deng@gmail.com](mailto:yishuo.deng@gmail.com)
- Date:|April 14, 2013
+ 更新日期:|April 14, 2013
 
 ---------------
 
