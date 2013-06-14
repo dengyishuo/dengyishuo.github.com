@@ -9,17 +9,11 @@ tags:
 - R
 ---
 
-作者：邓一硕
+## 1.获取数据
 
-网站：http://yishuo.org
+### 1.1 获取股票数据
 
-邮箱：dengyishuo@163.com
-
-##  1.获取数据
-
-### 获取股票数据
-
-#### 从网络获取股票数据
+#### 1.1.1 从网络获取股票数据
 
 [quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取股票日交易数据。我们用`args()`函数看一下它的基本用法：
 
@@ -72,7 +66,7 @@ auto.assign|结果是否自动载入工作环境。
 file.path|文件路径。
 ...|其它参数。 
 
-##### 获取上证指数
+##### 1.1.1.1获取上证指数
 
 上证指数的符号是^SSEC,获取上证指数的代码如下：
 
@@ -86,7 +80,7 @@ getSymbols("^SSEC")
 getSymbols("000001.ss")
 ```
 
-#### 获取上证A股指数
+##### 1.1.1.2 获取上证A股指数
 
 上证A股指数的代码为000002.ss。
 值得指出的是，由于上证A股指数没有自己的符号，因此为了使用数据的方便，需要动用setSymbolLookup函数。
@@ -95,14 +89,14 @@ setSymbolLookup(A.Share.index=list(name="000002.ss",src="yahoo"))
 getSymbols("A.Share.index")
 
 
-获取上证B股指数}
+##### 1.1.1.3 获取上证B股指数
 上证B股指数的代码为000003.ss。
 
 setSymbolLookup(B.Share.index=list(name="000003.ss",src="yahoo"))
 getSymbols("B.Share.index")
 
 
-获取上证综合指数}
+##### 1.1.1.4 获取上证综合指数
 上证综合指数的代码为000008.ss。
 
 setSymbolLookup(Conglomerate.index=list(name="000008.ss",src="yahoo"))
