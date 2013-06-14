@@ -1,8 +1,6 @@
-## 1.获取数据
+# 1 获取数据
 
-## 1 获取股票数据
-
-### 1.1  从网络获取数据
+## 1.1 从网络获取数据
 
 [quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取股票日交易数据。我们用`args()`函数看一下它的基本用法：
 
@@ -198,7 +196,7 @@ showSymbols(env=.GlobalEnv)
 "yahoo"   "yahoo" 
 }
 
-## 从内存中移除股票数据
+## 1.3 从内存中移除股票数据
 
 
 RemoveSymbols("CHL")
