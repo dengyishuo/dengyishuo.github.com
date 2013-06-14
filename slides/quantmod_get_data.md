@@ -28,7 +28,7 @@ auto.assign|结果是否自动载入工作环境。
 file.path|文件路径。
 ...|其它参数。 
 
-#### 1.1.1 获取股票数据
+### 1.1.1 获取股票数据
 
 上证指数的符号是^SSEC,获取上证指数的代码如下：
 
@@ -60,40 +60,48 @@ setSymbolLookup(B.Share.index=list(name="000003.ss",src="yahoo"))
 getSymbols("B.Share.index")
 ```
 
-##### 1.1.1.4 获取上证综合指数
+```
+例3：获取上证综合指数
 上证综合指数的代码为000008.ss。
 
 setSymbolLookup(Conglomerate.index=list(name="000008.ss",src="yahoo"))
 getSymbols("Conglomerate.index")
+```
 
-获取沪深300指数}
+```
+例4：获取沪深300指数
 沪深300指数的代码为000300.ss。
 
 setSymbolLookup(CSI300=list(name="000300.ss",src="yahoo"))
 getSymbols("CSI300")
 CSI300
+```
 
-深圳成指}
+```
+例5：深圳成指
 深证成指的代码为399001.sz，其中.sz代表该指数从属于深交所。
 
 setSymbolLookup(component.index=list(name="399001.sz",src="yahoo"))
 getSymbols("component.index")
 component.index
+```
 
-获取中国移动公司数据}
+```
+例6：获取中国移动公司数据
 中国移动公司的符号是CHL。
 
 getSymbols("CHL")
 
+例7：获取三一重工数据
 
-获取三一重工数据}
 三一重工的股票代码为600030.ss。
 
 setSymbolLookup(SANY.HEAVY=list(name="600030.ss",src="yahoo"))
 getSymbols("SANY.HEAVY")
 SANY.HEAVY
+```
 
-获取上市公司股息数据
+### 1.1.3 获取上市公司股息数据
 getDividends()函数可以获取上市公司的股息数据。
 
 getDividends("CHL")
@@ -108,12 +116,12 @@ head(CHLL.a <- adjustOHLC(CHL))
 head(CHL.uA <- adjustOHLC(CHL, use.Adjusted=TRUE))
 
 
-获取股票分割数据
+### 1.1.4 获取股票分割数据
 getSplits()函数可以获取上市公司的股票分割数据。
 
 getSplits("MSFT")
 
-从网络获取期权交易数据
+### 1.1.5 从网络获取期权交易数据
 
 AAPL.OPT <- getOptionChain("AAPL")
 AAPL.OPTS <- getOptionChain("AAPL", NULL)
@@ -125,8 +133,20 @@ options.expiry(AAPL)
 futures.expiry(AAPL)
 AAPL[options.expiry(AAPL)]
 
+### 1.1.6 获取和查看上市公司的财务报表
+获取财务报表的函数是：getFinancials}或者getFin}函数。
 
-从网络获取汇市数据
+getFinancials('CHL')
+
+结果：
+
+[1] "CHL.f"
+
+用view.Fin()函数查看财务报表数据
+
+view.Fin(CHL.f)
+
+### 1.1.7 从网络获取汇市数据
 getFX()函数可以获取汇率数据。
 
 getFX("USD/JPY")
@@ -137,13 +157,13 @@ getFX("EUR/USD",from="2005-01-01")
 getSymbols("USD/EUR",src="oanda")
 getSymbols("USD/EUR",src="oanda",from="2005-01-01")
 
-获取重金属交易数据
+### 1.1.8 获取重金属交易数据
 getMetals()函数可以获取重金属的交易数据。
 
 getFX(c("gold","XPD"))
 getFX("plat",from="2005-01-01")
 
-获取美联储经济数据
+### 1.1.9 获取美联储经济数据
 
 getSymbols.FRED()函数可以获取美联储主页上的美国经济数据。
 
@@ -163,41 +183,20 @@ getSymbols('CPIAUCNS')
 \textcolor{blue}{getSymbols.csv()}：从csv文件读取OHLC数据
 用args()函数查看\textcolor{blue}{getSymbols.csv()}的用法：
 
-
-
 getSymbols.MySQL()：从MySQL数据库读取数据
 getSymbols.SQLite()：从SQLite数据库读取数据
 getSymbols.rda()：读取以.r格式存储的数据
 
-获取和查看上市公司的财务报表}
-获取财务报表的函数是：getFinancials}或者getFin}函数。
+## 1.3 查看和移除股票数据
 
-getFinancials('CHL')
-
-结果：
-
-[1] "CHL.f"
-
-用view.Fin()函数查看财务报表数据
-
-view.Fin(CHL.f)
-
-
-
-其它函数
-查看内存中的股票数据
+### 1.3.1 查看股票数据
 
 getSymbols("CHL","000023.ss")
 showSymbols(env=.GlobalEnv)
 
 结果如下：
-\textcolor{blue}{
-3.SS       CHL
-"yahoo"   "yahoo" 
-}
 
-## 1.3 从内存中移除股票数据
-
+### 1.3.2 移除股票数据
 
 RemoveSymbols("CHL")
 showSymbols(env=.GlobalEnv)
