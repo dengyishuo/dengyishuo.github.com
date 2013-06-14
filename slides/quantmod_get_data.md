@@ -1,5 +1,7 @@
 # 1 获取数据
 
+
+
 ## 1.1 从网络获取数据
 
 [quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取股票日交易数据。我们用`args()`函数看一下它的基本用法：
@@ -28,7 +30,7 @@ auto.assign|结果是否自动载入工作环境。
 file.path|文件路径。
 ...|其它参数。 
 
-### 1.1.1 获取股票数据
+### 1.1.1 获取股票日交易数据
 
 上证指数的符号是^SSEC,获取上证指数的代码如下：
 
@@ -61,9 +63,8 @@ getSymbols("B.Share.index")
 ```
 
 ```
-例3：获取上证综合指数
+## 例3：获取上证综合指数
 上证综合指数的代码为000008.ss。
-
 setSymbolLookup(Conglomerate.index=list(name="000008.ss",src="yahoo"))
 getSymbols("Conglomerate.index")
 ```
@@ -92,6 +93,8 @@ component.index
 
 getSymbols("CHL")
 
+```
+```
 例7：获取三一重工数据
 
 三一重工的股票代码为600030.ss。
@@ -106,8 +109,8 @@ getDividends()函数可以获取上市公司的股息数据。
 
 getDividends("CHL")
 
-
 根据股息调整股票价格
+
 adjustOHLC()函数可以对股票数据进行除息调整。
 
 getSymbols("CHL", from="1990-01-01", src="yahoo")
@@ -126,25 +129,30 @@ getSplits("MSFT")
 AAPL.OPT <- getOptionChain("AAPL")
 AAPL.OPTS <- getOptionChain("AAPL", NULL)
 
-
-
 getSymbols("AAPL")
 options.expiry(AAPL)
 futures.expiry(AAPL)
 AAPL[options.expiry(AAPL)]
 
 ### 1.1.6 获取和查看上市公司的财务报表
-获取财务报表的函数是：getFinancials}或者getFin}函数。
 
+[quantmod](http://www.quantmod.com)中`getFinancials()`函数和`getFin()`函数可以获取上市公司的财务报表数据。看看两个函数的用法：
+```
+args(getFinancials)
+args(getFin)
+```
+
+例子：获取中国移动公司的财务数据
+
+```
 getFinancials('CHL')
+```
 
-结果：
+获取数据之后，可以通过`view.Fin`函数查看财务报表数据:
 
-[1] "CHL.f"
-
-用view.Fin()函数查看财务报表数据
-
+```
 view.Fin(CHL.f)
+```
 
 ### 1.1.7 从网络获取汇市数据
 getFX()函数可以获取汇率数据。
@@ -174,8 +182,6 @@ getSymbols('CPIAUCNS',src='FRED')
 
 setSymbolLookup(CPIAUCNS='FRED')
 getSymbols('CPIAUCNS')
-
-
 
 ## 1.2 从数据库获取股票数据
 
