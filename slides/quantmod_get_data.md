@@ -185,13 +185,11 @@ getSymbols('CPIAUCNS')
 
 ## 1.2 从数据库获取股票数据
 
-除了能从网站上直接获取股票数据外，quantmod包还提供了一系列从现有文件或者数据库读取OHLC股票数据的函数，列出如下：
-\textcolor{blue}{getSymbols.csv()}：从csv文件读取OHLC数据
-用args()函数查看\textcolor{blue}{getSymbols.csv()}的用法：
-
-getSymbols.MySQL()：从MySQL数据库读取数据
-getSymbols.SQLite()：从SQLite数据库读取数据
-getSymbols.rda()：读取以.r格式存储的数据
+除了能从网站上直接获取股票数据外，[quantmod](http://www.quantmod.com)包还提供了一系列从现有文件或者数据库读取OHLC股票数据的函数，列出如下：
+* getSymbols.csv()：从csv文件读取OHLC数据
+* getSymbols.MySQL()：从MySQL数据库读取数据
+* getSymbols.SQLite()：从SQLite数据库读取数据
+* getSymbols.rda()：读取以.r格式存储的数据
 
 ## 1.3 查看和移除股票数据
 
