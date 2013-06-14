@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title: 安装mgarch包终极解决方案
 comments: true
@@ -9,6 +9,7 @@ tags:
 - R
 - Rtools
 ---
+
 
 `mgarch`包是一个可以拟合和诊断`BEKK`模型的`R`包。包中的主函数很少，只有`mvBEKK.sim`，`mvBEKK.diag`，`mvBEKK.est`三个。这三个函数各司其职，分别用来模拟`BEKK`数据、诊断`BEKK`模型、拟合`BEKK`模型。照常理说，这样的包很好啦。就只有一样不好，作者自从2009年更新一次之后，再也不提供更新的`.zip`包了。很多需要拟合`BEKK`模型的同学记得团团转就是不知道怎么安装和使用这个包。这里提供三个方案：
 
