@@ -1,3 +1,11 @@
+% supstat系列资料（2）：
+% \href{mailto:yishuo.deng@gmail.com}{邓一硕}
+% April 14, 2013
+
+```{r setup, include = FALSE, tidy = TRUE}
+opts_chunk$set(dev='pdf', fig.width=3, fig.height=3, fig.align = 'center', cache = F, warning = T, error = T) 
+```
+
 #### TTR简介？
  * 功能众多
    * 超过50个技术分析指标
