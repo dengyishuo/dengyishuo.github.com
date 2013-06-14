@@ -2,7 +2,7 @@
 
 % \href{mailto:yishuo.deng@gmail.com}{@邓一硕}
 
-% \href{http://yishuo.org}{格物堂}
+% \href{http://yishuo.org} {格物堂}
 
 % April 14, 2013
 
