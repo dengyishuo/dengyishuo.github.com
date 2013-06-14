@@ -1,10 +1,8 @@
-% supstat系列资料（2）：基于TTR包的技术分析
-
-% \href{mailto:yishuo.deng@gmail.com}{@邓一硕}
-
-% \href{http://yishuo.org} {格物堂}
-
-% April 14, 2013
+# 基于TTR包的技术分析
+ Author:[邓一硕](http://weibo.com/dengyishuo)
+ Blog:[格物堂](http://yishuo.org)
+ Email:[yishuo.deng@gmail.com](mailto:yishuo.deng@gmail.com)
+ Date:April 14, 2013
 
 ```{r setup, include = FALSE, tidy = TRUE}
 opts_chunk$set(dev='pdf', fig.width=3, fig.height=3, fig.align = 'center', cache = F, warning = T, error = T) 
