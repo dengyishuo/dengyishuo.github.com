@@ -7,7 +7,7 @@
 [quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取股票日交易数据。我们用`args()`函数看一下它的基本用法：
 
 
-```r
+```{r}
 install.packages("quantmod")
 require(quantmod)
 ```
