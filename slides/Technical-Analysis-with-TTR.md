@@ -1,5 +1,7 @@
-% supstat系列资料（2）：
+% supstat系列资料（2）：基于TTR包的技术分析
+
 % \href{mailto:yishuo.deng@gmail.com}{邓一硕}
+
 % April 14, 2013
 
 ```{r setup, include = FALSE, tidy = TRUE}
