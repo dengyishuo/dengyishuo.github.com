@@ -1,5 +1,5 @@
 # 基于TTR包的技术分析
- -------|--------
+ 
  Author:|[邓一硕](http://weibo.com/dengyishuo)
  
  Blog:|[格物堂](http://yishuo.org)
