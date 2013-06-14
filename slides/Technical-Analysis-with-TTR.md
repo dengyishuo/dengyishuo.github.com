@@ -1,10 +1,11 @@
 # 基于TTR包的技术分析
  
+ Info|内容
+ -------|----------------------------------
  Author:|[邓一硕](http://weibo.com/dengyishuo)
- -------|--------------------------------------------
  Blog:|[格物堂](http://yishuo.org)
  Email:|[yishuo.deng@gmail.com](mailto:yishuo.deng@gmail.com)
-  Date:|April 14, 2013
+ Date:|April 14, 2013
 
 
 #### TTR简介？
