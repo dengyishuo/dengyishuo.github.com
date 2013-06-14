@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title: quantmod:R中的金融分析包
 comments: true
@@ -9,6 +9,7 @@ tags:
 - R
 ---
 
+<<<<<<< HEAD
 ## 1.获取数据
 
 ### 1.1 获取股票数据
@@ -603,26 +604,24 @@ specifyModel(formula, na.rm=TRUE)
 specifyModel(Next(OpCL(CHL))~Lag(OpHi(CHL),0:3)+Hi(CHL))
 
 ### 4.3 估计模型参数
+=======
+>>>>>>> 081a160f8d82ee2bb4311aba7b7658b8c95f3c00
 
-fittedModel(x.lm)
+##  1.导入、导出及删除数据
 
-### 4.4 模型结果分析
+要想用[quantmod](http://www.quantmod.com)进行数据分析，第一步自然是得把数据导入到R里面。将数据导入R里面的最著名的教程是[数据导入与导出]（）。里面对大部分关于导入和导出数据的内容都讲的很明晰，读者可以直接去看，这里不在赘述。下面只说一下针对[quantmod](http://www.quantmod.com)特有的一些数据导入和导出的做法。
 
-x <- specifyModel(Next(OpCl(DIA)) ~ OpCl(VIX))
-x.lm <- buildModel(x,method='lm',training.per=c('2001-01-01','2001-04-01'))
+[quantmod](http://www.quantmod.com)中从外部获取数据的途径有三种：
 
-fittedModel(x.lm)
+* 基于`getSymobls()`函数从网络上抓取
+* 基于`getSymbols.csv()`函数从`.csv`的文件中读取
+* 基于`read.table`、`read.csv`等函数读取数据并转化为quantmod可适应的格式
 
-coef(fittedModel(x.lm))
-coef(x.lm)                  # same
+`getSymbols`是quantmod包中主函数之一。主要作用是从外部读取数据。
 
-vcov(fittedModel(x.lm))
-vcov(x.lm)                  # same
+{% highlight r%}
+ ?getSymbols
+{% endhighlight %}
 
-### 模型应用
 
-my.model <- specifyModel(Next(OpCl(QQQQ)) ~ Lag(Cl(NDX),0:5))
-getModelData(my.model)
-modelSignal()
-tradeModel()
 
