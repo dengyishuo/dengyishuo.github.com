@@ -44,15 +44,14 @@ getSymbols("^SSEC")
 getSymbols("000001.ss")
 ```
 
-```
-例1：获取上证A股指数
+>例1：获取上证A股指数
 
 上证A股指数的代码为000002.ss。
 值得指出的是，由于上证A股指数没有自己的符号，因此为了使用数据的方便，需要动用setSymbolLookup函数。
 
 setSymbolLookup(A.Share.index=list(name="000002.ss",src="yahoo"))
 getSymbols("A.Share.index")
-```
+
 
 ```
 例2：获取上证B股指数
