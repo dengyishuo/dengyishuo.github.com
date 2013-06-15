@@ -49,6 +49,8 @@ file.path|指定文件路径的字符串。
 * FRED
 * oanda
 
+从上面几个数据库中，我们可以获取上市公司的股票日交易数据、股息数据、拆股数据、财务报表数据、汇市数据、重金属交易数据以及美联储官网公布的一些经济数据。
+
 ### 1.1.1 获取股票日交易数据
 
 上证指数的符号是^SSEC,获取上证指数的代码如下：
@@ -206,15 +208,16 @@ getSymbols('CPIAUCNS')
 
 [quantmod](http://www.quantmod.com)除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括：
 
-* mysql
+* MySQL
+* SQLite
 * csv
 * RData
 
 对应的函数有以下几个：
 
-* getSymbols.csv()：从csv文件读取OHLC数据
 * getSymbols.MySQL()：从MySQL数据库读取数据
 * getSymbols.SQLite()：从SQLite数据库读取数据
+* getSymbols.csv()：从csv文件读取OHLC数据
 * getSymbols.rda()：读取以.r格式存储的数据
 
 
