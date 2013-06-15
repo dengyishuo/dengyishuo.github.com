@@ -1,40 +1,56 @@
 # 1 获取数据
 
-要想用quantmod进行数据分析，第一步自然得把数据导入到R里面。将数据导入R里面的最著名的教程是[数据导入与导出]（http://cran.r-project.org/doc/manuals/r-release/R-data.pdf）。里面对大部分关于导入和导出数据的内容都讲的很明晰，读者可以直接去看，这里不在赘述。下面只说一下针对quantmod特有的一些数据导入和导出的做法。
+要想用[quantmod](http://www.quantmod.com)进行数据分析，第一步自然得把数据导入到R里面。将数据导入[R](http://r-project.org)里面的著名的教程是[数据导入与导出](http://cran.r-project.org/doc/manuals/r-release/R-data.pdf)。里面对大部分关于导入和导出数据的内容都讲的很明晰，读者可以直接去看，这里不再赘述。下面只说一下针对[quantmod](http://www.quantmod.com)特有的一些数据导入和导出的做法。
 
-quantmod中从外部获取数据的途径有三种：
+[quantmod](http://www.quantmod.com)中从外部获取数据的途径有三种：
 
-基于getSymobls()函数从网络上抓取
-基于getSymbols.csv()函数从.csv的文件中读取
-基于read.table、read.csv等函数读取数据并转化为quantmod可适应的格式
+* 从网络上获取数据
+* 从数据库读入数据
+* 基于`read.table`、`read.csv`等函数读取数据并转化为[quantmod](http://www.quantmod.com)可适应的格式
 
 ## 1.1 从网络获取数据
 
-[quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取股票日交易数据。我们用`args()`函数看一下它的基本用法：
+[quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取数据。我们用`args()`函数看一下它的基本用法。
 
 
 ```{r}
+# 安装并载入quantmod包
 install.packages("quantmod")
 require(quantmod)
 ```
 
 ```r
-args(getSymbols)
+> args(getSymbols)
+function (Symbols = NULL, env = parent.frame(), reload.Symbols = FALSE, 
+    verbose = FALSE, warnings = TRUE, src = "yahoo", symbol.lookup = TRUE, 
+    auto.assign = getOption("getSymbols.auto.assign", TRUE), 
+    ...) 
+NULL
 ```
 
-`getSymbols()`函数各参数的意义如下：
+`getSymbols()`函数各主要参数的意义如下：
 
 参数|用途
-----|-------
+-------|-------
 Symbols|指定股票符号或者代码。
-env|指定数据的存储位置。
-reload.Symbols|是否重新载入数据到指定环境，缺省设置为FALSE。
-warnings|是否打开警告提醒，缺省设置为TRUE。
-src|获取股票数据的网址，缺省设置为yahoo，也可以选择google。
-symbol.lookup|重设股票代码名称等。
-auto.assign|结果是否自动载入工作环境。
-file.path|文件路径。
+env|指定对象的创建位置。
+reload.Symbols|是否在指定环境中重新载入数据，缺省设置为FALSE。
+warnings|是否输出警告信息，缺省设置为TRUE。
+src|指定抓取数据的网址，缺省设置为yahoo，也可以选择google。
+symbol.lookup|从外部查找检索股票代码的路径。
+auto.assign|是否将函数结构自动载入到工作环境。
+file.path|指定文件路径的字符串。
 ...|其它参数。 
+
+基于`getSymbols()`函数，我们可以从网络上常用的金融数据库中抓取各种金融数据，当然也支持从本地数据库读入数据。目前`getSymbols()`函数支持的数据库包括：
+
+* yahoo
+* google
+* MySQL
+* FRED
+* csv
+* RData
+* oanda
 
 ### 1.1.1 获取股票日交易数据
 
