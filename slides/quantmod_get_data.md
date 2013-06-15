@@ -1,6 +1,12 @@
 # 1 获取数据
 
+要想用quantmod进行数据分析，第一步自然得把数据导入到R里面。将数据导入R里面的最著名的教程是[数据导入与导出]（http://cran.r-project.org/doc/manuals/r-release/R-data.pdf）。里面对大部分关于导入和导出数据的内容都讲的很明晰，读者可以直接去看，这里不在赘述。下面只说一下针对quantmod特有的一些数据导入和导出的做法。
 
+quantmod中从外部获取数据的途径有三种：
+
+基于getSymobls()函数从网络上抓取
+基于getSymbols.csv()函数从.csv的文件中读取
+基于read.table、read.csv等函数读取数据并转化为quantmod可适应的格式
 
 ## 1.1 从网络获取数据
 
