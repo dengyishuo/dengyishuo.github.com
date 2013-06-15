@@ -42,7 +42,7 @@ auto.assign|是否将函数结构自动载入到工作环境。
 file.path|指定文件路径的字符串。
 ...|其它参数。 
 
-基于`getSymbols()`函数，我们可以从网络上常用的金融数据库中抓取各种金融数据，当然也支持从本地数据库读入数据。目前`getSymbols()`函数支持的数据库包括：
+基于`getSymbols()`函数，我们可以从网络上常用的金融数据库中抓取各种金融数据，。目前`getSymbols()`函数支持的数据库包括：
 
 * yahoo
 * google
@@ -207,7 +207,10 @@ getSymbols('CPIAUCNS')
 
 ## 1.2 从数据库获取股票数据
 
-除了能从网站上直接获取股票数据外，[quantmod](http://www.quantmod.com)包还提供了一系列从现有文件或者数据库读取OHLC股票数据的函数，列出如下：
+[quantmod](http://www.quantmod.com)除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括
+
+
+除了能从网站上直接获取股票数据外，包还提供了一系列从现有文件或者数据库读取OHLC股票数据的函数，列出如下：
 * getSymbols.csv()：从csv文件读取OHLC数据
 * getSymbols.MySQL()：从MySQL数据库读取数据
 * getSymbols.SQLite()：从SQLite数据库读取数据
