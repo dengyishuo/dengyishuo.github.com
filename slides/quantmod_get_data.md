@@ -46,10 +46,7 @@ file.path|指定文件路径的字符串。
 
 * yahoo
 * google
-* MySQL
 * FRED
-* csv
-* RData
 * oanda
 
 ### 1.1.1 获取股票日交易数据
@@ -207,14 +204,19 @@ getSymbols('CPIAUCNS')
 
 ## 1.2 从数据库获取股票数据
 
-[quantmod](http://www.quantmod.com)除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括
+[quantmod](http://www.quantmod.com)除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括：
 
+* mysql
+* csv
+* RData
 
-除了能从网站上直接获取股票数据外，包还提供了一系列从现有文件或者数据库读取OHLC股票数据的函数，列出如下：
+对应的函数有以下几个：
+
 * getSymbols.csv()：从csv文件读取OHLC数据
 * getSymbols.MySQL()：从MySQL数据库读取数据
 * getSymbols.SQLite()：从SQLite数据库读取数据
 * getSymbols.rda()：读取以.r格式存储的数据
+
 
 ## 1.3 查看和移除股票数据
 
@@ -229,7 +231,6 @@ showSymbols(env=.GlobalEnv)
 
 RemoveSymbols("CHL")
 showSymbols(env=.GlobalEnv)
-
 
 getQuote("AAPL")
 getQuote("QQQQ;SPY;^VXN",what=yahooQF(c("Bid","Ask")))
