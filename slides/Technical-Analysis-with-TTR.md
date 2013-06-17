@@ -1,3 +1,14 @@
+# 基于TTR包的技术分析
+ 
+ Info|内容
+ -------|----------------------------------
+ 作者:|[邓一硕](http://weibo.com/dengyishuo)
+ 博客:|[格物堂](http://yishuo.org)
+ Email:|[yishuo.deng@gmail.com](mailto:yishuo.deng@gmail.com)
+ 更新日期:|April 14, 2013
+
+---------------
+
 #### TTR简介？
  * 功能众多
    * 超过50个技术分析指标
