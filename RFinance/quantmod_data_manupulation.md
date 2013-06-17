@@ -118,72 +118,63 @@ OpOp(x):等同于Delt(Op(x))
 
 计算收益率的主要函数有：
 
-periodReturn(x,
-             period='monthly',
-             subset=NULL,
-             type='arithmetic',
-             leading=TRUE,
-             ...)
-dailyReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-weeklyReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-monthlyReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-quarterlyReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-annualReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-yearlyReturn(x, subset=NULL, type='arithmetic',
-           leading=TRUE, ...)
-allReturns(x, subset=NULL, type='arithmetic',
-           leading=TRUE)
-求日收益率
+* periodReturn()
+* dailyReturn()
+* weeklyReturn)
+* monthlyReturn()
+* quarterlyReturn()
+* annualReturn()
+* yearlyReturn()
+* allReturns()
 
+```
+#求日收益率
 periodReturn(x,period='daily')
-
-或者
-
+#或者
 dailyReturn(x)
+```
 
-求周收益率
-
+~~~
+#求周收益率
 periodReturn(x,period='weekly')
-
-或者
-
+#或者
 weeklyReturn(x)
+```
 
-求月收益率
-
+```
+#求月收益率
 periodReturn(x,period='monthly')
-
-或者
-
+#或者
 monthlyReturn(x)
+```
 
-
-求年度收益率
-
+```
+#求季度度收益率
 periodReturn(x,period='quarterly')
-
-或者
-
+#或者
 quarterlyReturn(x)
-
+```
 ### 2.5 其它函数
+
+#### 2.5.1 跨期变换函数
 
 * Lag(x,k):求滞后k期
 * Next(x, k = 1)：求k期后
 * first(x,k)：求前k个
 * last(x,k):求后k个
 
+#### 2.5.2 峰值、峰谷函数
+
 * findPeaks(x, thresh=0)：找峰值
 * findValleys(x, thresh=0)：找谷底值
+
+#### 2.5.3 差分阈值函数
 
 * seriesIncr(x, thresh=0, diff.=1L)：差分后大于限值的点
 * seriesDecr(x, thresh=0, diff.=1L)：差分后小于限值的点
 * endpoints()：寻找节点
+
+### 2.5.4 日期转换函数
 
 * to.weekly()：将OHLC数据转化为周数据
 * to.monthly():将PHLC数据转化为月数据
