@@ -133,46 +133,46 @@ getSymbols("399001.sz")
 getSymbols("600030.ss")
 ```
 
-值得指出的是，由于上证A股指数没有自己的符号，因此为了使用数据的方便，需要动用setSymbolLookup函数。
+### 1.1.2 日交易数据的重命名
 
-```
+用前文说过的方法可以方便的获取各种指数和上市公司的日交易数据。然而，由于将`symbols`参数等于股票或者指数代码的时候，没有给数据命名。因此，对其引用时十分困难。为了使用数据的方便，我们可以借助`setSymbolLookup()`函数对数据进行重命名。
+
+```r
 #例子
 setSymbolLookup(A.Share.index=list(name="000002.ss",src="yahoo"))
 getSymbols("A.Share.index")
 ```
 
-```
+```r
 #例子
 setSymbolLookup(B.Share.index=list(name="000003.ss",src="yahoo"))
 getSymbols("B.Share.index")
 ```
 
-```
+```r
 #例子
 setSymbolLookup(Conglomerate.index=list(name="000008.ss",src="yahoo"))
 getSymbols("Conglomerate.index")
 ```
 
-```
+```r
 #例子
 setSymbolLookup(CSI300=list(name="000300.ss",src="yahoo"))
 getSymbols("CSI300")
 ```
 
-```
+```r
 #例子
 setSymbolLookup(component.index=list(name="399001.sz",src="yahoo"))
 getSymbols("component.index")
 component.index
 ```
 
-```
+```r
 #例子
 setSymbolLookup(SANY.HEAVY=list(name="600030.ss",src="yahoo"))
 getSymbols("SANY.HEAVY")
 ```
-
-
 
 
 ### 1.1.3 获取上市公司股息数据
