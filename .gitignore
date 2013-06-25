@@ -1,4 +1,3 @@
-_site
-.git
-
-
+.DS_Store
+_drafts/
+_site/

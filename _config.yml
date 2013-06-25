@@ -1,21 +1,10 @@
-root: /
-permalink: /:year-:month-:title/
-markdown: kramdown
-pygments: true 
-paginate: 5
-excerpt_link: "阅读更多 &rarr;"
+safe:        false
+auto:        false
 
-title: 格物堂
-description: Statistics, Literature and Fantasy
-author: dengyishuo
-address: http://yishuo.org
-subscribe_rss: /atom.xml
-license: true
-category_list: true
-tag_cloud: true
-links: true
+source:      .
+destination: ./_site
+plugins:     ./_plugins
 
-
-#Generate css
-#compass compile
-
+future:      true
+lsi:         false
+pygments:    false

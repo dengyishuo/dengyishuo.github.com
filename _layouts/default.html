@@ -1,70 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
-  <meta name="author" content="{{ site.author }}">
-  {% if page.keywords %}
-    <meta name="keywords" content="{{ page.keywords }}">
-  {% endif %}
-  {% if page.description  %}
-    <meta name="description " content="{{ page.description  }}">
-  {% endif %}
-  <link rel="stylesheet" href="/media/css/style.css">
-  <link rel="stylesheet" href="/media/css/highlight.css">
-  <link rel="icon" href="/media/image/favicon.ico">
-  <script type="text/javascript" src="/media/js/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript" src="/media/js/jquery.tagcloud.js"></script>
-  <link href="/atom.xml" rel="alternate" title="{{site.title}}" type="application/atom+xml">
-  <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-  
-  <!-- mathjax config similar to math.stackexchange -->
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"  />
+<meta name="description" content="Dan Hixon Codes" />
+<meta name="keywords" content="life,code,software,development,photography" />
+<meta name="author" content="Dan Hixon" />
+<link rel="stylesheet" type="text/css" href="/css/default.css" />
+<link rel="stylesheet" type="text/css" href="/css/pretty_code.css" />
+<link rel="alternate" type="application/atom+xml" href="http://danhixon.github.com/atom.xml" />
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      	inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-    	displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-<script type="text/javascript"
-   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-    
+<title>über duper - dan's tech blog</title>
 </head>
-<body class="single">
-  {% include header.md %}
-  <hr/>
-  <div id="content">
-    <article>
-        {{ content }}
-    </article>
-    {% include aside.md %}
-    <div class="clear"></div>
-  </div>
-  {% include footer.md %}
-  {% include analysis.md %}
+
+<body>
+<div id="wrap">
+	<div id="header">
+		<p id="toplinks">
+
+		</p>
+
+		<h1><a href="/"><div id="logo"></div>über<span class="fade">duper</span></a></h1>
+		<div class="slogan">
+				<a href="/code.html" class="pink">code{web}</a> :|: 
+				<a href="/os.html" class="green">software{apple}</a> :|: 
+				<a href="/life.html" class="orange">life{me}</a>
+		</div>
+
+</div>
+
+<div id="content">  
+  {{ content }}
+</div>
+
+<div id="footer">
+
+    Keep in touch with family:<a href="http://www.spokt.com">spokt.com</a> ||
+    <a href="http://shotbydan.com">shot by dan photograpy</a> ||
+    <a href="http://communicatopia.com">personal blog</a> ||
+    <a href="http://twitter.com/danhixon">twitter</a>
+
+<p>&copy; 2010 <a href="/about.html">Dan Hixon</a>
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-4105222-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
 </body>
 </html>
+
