@@ -78,7 +78,7 @@ div#wrapper {
 	margin:0 auto 50px;
 	padding:20px;
 	/*text-shadow:0 1px 0 #FFFFFF;*/
-	width:700px;
+	width:800px;
 }
 
 #content a {
@@ -256,10 +256,10 @@ pre {
 	-webkit-border-radius:5px;
 	border-radius:5px;
 	-moz-box-shadow:0 -1px 0 #444444;
-	background-color:#222222;
-	color:#FFFFFF;
+	background-color:#009999;
+	color:#EEEEEE;
 	font-size:13px;
-	margin:0 0 0 -40px;
+	margin:0 0 0 0px;
 	padding:20px;
 	text-shadow:0 1px 0 #000000;
 	white-space:pre-wrap;
