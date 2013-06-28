@@ -1,0 +1,54 @@
+R中的代码如下：
+#####################################################
+##################画乌龟的程序#######################
+#####变量解释:
+#####cx乌龟位置的横坐标
+#####cy乌龟位置的纵坐标
+#####u控制乌龟的大小
+#################函数主体############################
+turtle=function(cx,cy,u=1,height=20,width=20,col="grey"){
+polygon(
+c(cx-5*u,cx-3.75*u,cx-3*u,cx-1*u,cx+1*u,cx+3*u,cx+3.5*u,cx+4.5*u,
+  cx+5*u,cx+5.5*u,cx+5.5*u,cx+4*u,cx+3*u,cx+3*u,cx+1.5*u,cx+2*u,cx-2*u,cx-3*u,cx-4*u,cx-3*u),
+c(cy,cy+0.5*u,cy+2*u,cy+4*u,cy+4*u,cy+2*u,cy+1*u,cy+4*u,cy+4*u,cy+3*u,cy+2*u,
+                     cy,cy,cy-1*u,cy-2*u,cy,cy,cy-2*u,cy-2.5*u,cy),col=col,border=col)
+points(cx+5*u,cy+3*u,cex=max(1,u/5))
+}
+####################################################
+##############模拟四龟行走代码######################
+delta_t&lt;-0.01;n=110
+x&lt;-matrix(0, nrow=5, ncol=n); x[,1]&lt;-c(0,1,1,0,0)
+y&lt;-matrix(0, nrow=5, ncol=n); y[,1]&lt;-c(1,1,0,0,1)
+d&lt;-c(0,0,0,0)
+for (j in 1:(n-1)){
+for (i in 1:4){
+d[i]&lt;-sqrt((x[i+1,j]-x[i,j])^2+(y[i+1, j]-y[i,j])^2)
+x[i,j+1]&lt;-x[i,j]+delta_t*(x[i+1,j]-x[i,j])/d[i]
+y[i,j+1]&lt;-y[i,j]+delta_t*(y[i+1,j]-y[i,j])/d[i]
+}
+x[5,j+1]&lt;-x[1, j+1]; y[5, j+1]&lt;-y[1, j+1]
+}
+#####################动画代码########################
+library(animation)
+saveMovie(
+for(i in seq(from=1,to=110,by=5)) {
+##画不敬
+plot(c(0,1,1,0), c(0,0,1,1), xlab="",ylab=" ",axes=F,sub="by Yishuo")
+box()
+text(0,1,"turtle1",adj=c(0.3,1.3))
+text(1,1,"turtle2",adj=c(1.5,0.5))
+text(1,0,"turtle3",adj=c(0.3,-0.8))
+text(0,0,"turtle4",adj=c(-0.5,0.1))
+points(0.5,0.5); text(0,0,labels="O",adj=c(-1.0,0.3))
+##画乌龟##
+turtle(x[1,i],y[1,i],u=0.005,col="red")
+turtle(x[2,i],y[2,i],u=-0.005,col="green")
+turtle(x[3,i],y[3,i],u=-0.005,col="yellow")
+turtle(x[4,i],y[4,i],u=0.005,col="blue")
+##画轨迹##
+lines(x[1,1:i],y[1,1:i],col="grey")
+lines(x[2,1:i],y[2,1:i],col="grey")
+lines(x[3,1:i],y[3,1:i],col="grey")
+lines(x[4,1:i],y[4,1:i],col="grey")
+},interval=0.5)
+#########################Over#######################
