@@ -164,6 +164,7 @@ install.packages("packagename",repos="http://R-Forge.R-project.org")
 
 * 数据基本描述
 *	数据检验
+
 　* 正态性检验
   * 自相关检验
   * 异方差性检验——LM检验或检验
