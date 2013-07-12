@@ -1,8 +1,9 @@
 # GARCH族模型及其在R中的实现
 
-Author：邓一硕
-
-Update：2010年4月
+信息|内容
+----|------
+Author|邓一硕
+Update|2010年4月
 
 
 ## 序言
@@ -138,7 +139,7 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 * ccgarch: http://cran.r-project.org/web/packages/ccgarch/index.html
 * fGarch: http://cran.r-project.org/web/packages/fGarch/index.html
 * fOptions：http://cran.r-project.org/web/packages/fOptions/index.html
-*rgarch: http://rgarch.r-forge.r-project.org/
+* rgarch: http://rgarch.r-forge.r-project.org/
 
 ## 3.2 rgarch:GARCH模型的乐园
 
@@ -148,28 +149,29 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 
 ### 3.2.2 rgarch的安装
 
-与众多R包一样，rgarch有两种安装方式：
+1. 与众多R包一样，rgarch有两种安装方式：
 
 在R中下载pkg，运行R软件，键入如下代码：
 
->install.packages("packagename",repos="http://R-Forge.R-project.org")
->
+```
+install.packages("packagename",repos="http://R-Forge.R-project.org")
+```
 
 2. 手动下载，打链接http://r-forge.r-project.org/projects/rgarch/， 看到下载界面：
 选择适合的下载类型，手动安装即可。
 
 ### 3.2.3 一个完整的模型拟合过程
 
-数据基本描述
-2、	数据检验
-（1）	正态性检验
-（2）	自相关检验
-（3）	异方差性检验——LM检验或检验
-3、	模型定阶
-4、	模型参数估计
-5、	条件方差的估计
-6、	适应性检验
-7、	条件方差的预测
+* 数据基本描述
+*	数据检验
+　* 正态性检验
+  * 自相关检验
+  * 异方差性检验——LM检验或检验
+* 模型定阶
+* 模型参数估计
+* 条件方差的估计
+* 适应性检验
+* 条件方差的预测
 
 
 # 4.礼节性的总结
