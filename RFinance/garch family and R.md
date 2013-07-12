@@ -150,7 +150,7 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 
 与众多R包一样，rgarch有两种安装方式：
 
-1. 在R中下载pkg，运行R软件，键入如下代码：
+在R中下载pkg，运行R软件，键入如下代码：
 
 >install.packages("packagename",repos="http://R-Forge.R-project.org")
 >
@@ -159,7 +159,8 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 选择适合的下载类型，手动安装即可。
 
 ### 3.2.3 一个完整的模型拟合过程
-1、	数据基本描述
+
+数据基本描述
 2、	数据检验
 （1）	正态性检验
 （2）	自相关检验
