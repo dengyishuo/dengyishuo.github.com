@@ -149,7 +149,7 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 
 ### 3.2.2 rgarch的安装
 
-1. 与众多R包一样，rgarch有两种安装方式：
+* 与众多R包一样，rgarch有两种安装方式：
 
 在R中下载pkg，运行R软件，键入如下代码：
 
@@ -157,7 +157,7 @@ $$ V(\epsilon_{t}|\phi_{t-1})=h_t^2 $$
 install.packages("packagename",repos="http://R-Forge.R-project.org")
 ```
 
-2. 手动下载，打链接http://r-forge.r-project.org/projects/rgarch/， 看到下载界面：
+* 手动下载，打链接http://r-forge.r-project.org/projects/rgarch/， 看到下载界面：
 选择适合的下载类型，手动安装即可。
 
 ### 3.2.3 一个完整的模型拟合过程
