@@ -1,6 +1,6 @@
 ## 3.图形分析
 
-### 3.1 两个基本的画图函数
+### 3.1 基本画图函数
 
 #### chartSeries
 
@@ -42,69 +42,143 @@ lineChart(CHL,theme="white")
 require(TTR)
 ```
 * 平均趋向指标ADX
+
 ```
 addADX()
 ```
 
 * 平均真实波幅指标ATR
+
+```
 addATR()
+```
 
 * 布林线指标BBands
+
+```
 addBBands()
+```
 
 * 顺势指标CCI
+
+```
 addCCI()
+```
 
 * Chaikin资金流量指标CMF
+
+```
 addCMF()
+```
 
 * Chande动量摆动指标CMO
+
+```
 addCMO()
+```
 
 * 指数平均数指标EMA
+
+```
 addEMA()
+```
 
 * 包络线指标Envelope
+
+```
 addEnvelope()
+```
 
 * 弹性成交量加权移动平均线指标EVWMA
+
+```
 addEVWMA ()
+```
 
 * 移动平均收敛发散指标MACD
+
+```
 addMACD ()
+```
 
 * 动量指标Momentum
+
+```
 addMomentum ()
+```
 
 * 合约终止线Expiry
+
+```
 addExpiry()
+```
 
 * 抛物线指标SAR
+
+```
 addSAR()
+```
 
 * 简单移动平均指标SMA
+
+```
 addSMA()
+```
 
 * 随机动量指标SMI
-* addSMI()
 
-双指数移动平均指标DEMA
-* addDEMA()
+```
+addSMI()
+```
+
+* 双指数移动平均指标DEMA
+
+```
+addDEMA()
+```
 
 * 区间震荡线DPO
+
+```
 addDPO()
+```
+
 * 变动率指标ROC
+
+```
 addROC ()
+```
+
 * 相对强弱指标RSI
+
+```
 addRSI()
+```
+
 * 交易量指标Vo
+
+```
 addVo()
+```
+
 * 加权移动平均线指标WMA
+
+```
 addWMA()
+```
+
 * 威廉指标WPR
+
+```
 addWPR()
+```
+
 * 零滞后指数移动平均ZLEMA
+
+```
 addZLEMA()
+```
+
 * 辅助函数
   * addTA()
   * newTA()
@@ -136,14 +210,17 @@ addZLEMA()
 * dn.dn.border:down after down bar/candle border color
 * dn.up.border:down after up bar/candle border color 
 
-### 3.5 图形缩放和存储
+### 3.5 图形缩放
 
 #### 图形缩放
+
 ```
 zooom(n=1, eps=2)
 zoomChart(subset, yrange=NULL)
 ```
-#### 图形存储
+
+### 3.6  图形存储
+
 ```
 getSymbols("AAPL")
 chartSeries(AAPL)
