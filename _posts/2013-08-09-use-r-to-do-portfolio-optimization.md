@@ -20,7 +20,7 @@ tags:
 require(quantmod) 
 # 下载 QQQ/SPY/YHOO 交易数据
 getSymbols(c('QQQ','SPY','YHOO')) 
-{% end highlight %}
+{% endhighlight %}
 
 第二步，将交易数据处理为收益率数据。这一步可以用 dailyReturn 函数来完成。
 
@@ -29,13 +29,13 @@ getSymbols(c('QQQ','SPY','YHOO'))
 QQQ_ret=dailyReturn(QQQ)  
 SPY_ret=dailyReturn(SPY)
 YHOO_ret=dailyReturn(YHOO)
-{% end highlight %}
+{% endhighlight %}
 
 第三步，合并收益率序列。
 
 {% highlight r %}
 dat=merge(QQQ_ret,SPY_ret,YHOO_ret)
-{% end highlight %}
+{% endhighlight %}
 
 第四步，计算投资组合的有效前沿。这一步使用 portfolioFrontier 函数来完成。由于 portfolioFrontier 函数的输入必须是 timeSeries 类，因而，得将数据类型进行转化。
 
@@ -86,4 +86,4 @@ Target Return and Risks:
 Description:
  Fri Aug 09 11:21:31 2013 by user: Owner 
 
-{% end highlight %}
+{% endhighlight %}
