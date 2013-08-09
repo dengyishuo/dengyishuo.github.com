@@ -248,13 +248,13 @@ hr {
 }
 code, pre {
 	font-family:"Monaco","Monaco",monospace;
-	font-size:13px;
+	font-size:15px;
 	line-height:150%;
 }
 pre {
 	-moz-border-radius:5px 5px 5px 5px;
 	-webkit-border-radius:5px;
-	border-radius:5px;
+	border-radius:3px;
 	-moz-box-shadow:0 -1px 0 #FFFFF;
 	background-color:#000000;
 	color:#000000;
