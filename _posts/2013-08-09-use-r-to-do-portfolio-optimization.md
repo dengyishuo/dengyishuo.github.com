@@ -1,12 +1,10 @@
 ---
 layout: post
-title: 使用 R 语言构造投资组合的有效前沿
+title: 使用R语言构造投资组合的有效前沿
 comments: true
 categories:
 - R语言
 tags:
-- 投资组合
-— 有效前沿
 - portfolio
 - frontier
 ---
