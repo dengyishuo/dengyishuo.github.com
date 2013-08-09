@@ -1,33 +1,20 @@
 ---
 author: admin
 comments: true
-date: 2011-08-03 21:26:05
 layout: post
-slug: a-powerful-tool-to-draw-circle-with-r
 title: draw.circle，R中的绘圆利器
-wordpress_id: 803
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
-- r
 - 圆
 - 绘图
 ---
 
 R用户经常要在图形中绘圆，如果你是其中的一员的话，你就不得不了解一下plotrix包中的draw.circle()函数。draw.circle()函数的优点有：
-
-
-
 	
   * 任意指定位置
-
-	
   * 随意设定圆内的颜色
-
-	
   * 随意设定圆的线型
-
-	
   * 随意设定圆线的颜色
 
 

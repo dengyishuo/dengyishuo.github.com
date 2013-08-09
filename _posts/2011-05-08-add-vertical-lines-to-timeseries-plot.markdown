@@ -1,11 +1,8 @@
 ---
 author: admin
 comments: true
-date: 2011-05-08 14:41:51
 layout: post
-slug: '%e5%9c%a8%e6%97%b6%e9%97%b4%e5%ba%8f%e5%88%97%e7%9a%84%e7%ba%bf%e5%9b%be%e4%b8%8a%e6%b7%bb%e5%8a%a0%e5%9e%82%e7%ba%bf'
 title: 在时间序列的线图上添加垂线
-wordpress_id: 705
 categories:
 - 计量经济学(R)
 tags:

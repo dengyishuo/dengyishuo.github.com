@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 大旗如果扛不动，就先插在地上
 categories:
-- 随感
+- 生活
 tags:
 - COS
 - 出书

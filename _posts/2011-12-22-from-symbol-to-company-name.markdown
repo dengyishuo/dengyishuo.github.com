@@ -1,13 +1,11 @@
 ---
 author: admin
 comments: true
-date: 2011-12-22 21:31:28
 layout: post
-slug: from-symbol-to-company-name
 title: 从股票代码到公司名
 wordpress_id: 1020
 categories:
-- 随感
+- R语言
 tags:
 - quantmod
 - yahoo

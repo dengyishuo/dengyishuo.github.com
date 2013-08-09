@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 有用但不易被发现的R函数（1）：file.choose
+title: 有用但不易被发现的R函数：file.choose
 comments: true
 categories:
-- R
+- R语言
 tags:
 - file.choose
 - R

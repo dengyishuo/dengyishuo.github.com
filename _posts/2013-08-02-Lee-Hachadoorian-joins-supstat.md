@@ -3,7 +3,7 @@ layout: post
 title: Lee Hachadoorian 加入 Supstat
 comments: true
 categories:
-- 商业
+- 生活
 tags:
 - supstat
 ---

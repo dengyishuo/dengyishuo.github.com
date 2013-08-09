@@ -1,13 +1,10 @@
 ---
 author: admin
 comments: true
-date: 2012-02-03 21:45:53
 layout: post
-slug: rand-questions-in-financial-timeseries-analysing
 title: R与金融时间序列分析常见问题集
 wordpress_id: 1095
 categories:
-- R&amp;数据艺术
 - 金融投资分析(R)
 tags:
 - EVT

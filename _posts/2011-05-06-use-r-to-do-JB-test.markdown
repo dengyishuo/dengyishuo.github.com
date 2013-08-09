@@ -1,9 +1,6 @@
 ---
-author: admin
 comments: true
-date: 2011-05-06 20:21:55
 layout: post
-slug: '%e6%ad%a3%e6%80%81%e6%80%a7%e6%a3%80%e9%aa%8cjarque-bera%e6%a3%80%e9%aa%8c%e5%9c%a8r%e8%bd%af%e4%bb%b6%e4%b8%ad%e7%9a%84%e5%ae%9e%e7%8e%b0'
 title: 用R进行Jarque Bera检验
 wordpress_id: 690
 categories:
@@ -11,7 +8,6 @@ categories:
 tags:
 - jarque bera检验
 - jb检验
-- R&amp;数据艺术
 - 正态性检验
 ---
 

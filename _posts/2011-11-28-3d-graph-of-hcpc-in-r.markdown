@@ -7,7 +7,7 @@ slug: 3d-graph-of-hcpc-in-r
 title: R中的3维HCPC图
 wordpress_id: 891
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - 3D
 - r

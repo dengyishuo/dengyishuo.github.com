@@ -7,7 +7,7 @@ slug: cpi-i-am-true
 title: CPI:我是真的?
 wordpress_id: 522
 categories:
-- 随感
+- 经济学
 tags:
 - CPI
 - 意识形态

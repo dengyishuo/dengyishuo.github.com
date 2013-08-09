@@ -7,7 +7,6 @@ categories:
 tags:
 - cokurtosis
 - coskewness
-- R&amp;数据艺术
 - 协偏度
 - 协峰度
 ---

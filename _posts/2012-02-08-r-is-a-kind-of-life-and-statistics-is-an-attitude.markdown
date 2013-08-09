@@ -1,14 +1,13 @@
 ---
 author: admin
 comments: true
-date: 2012-02-08 10:12:12
 layout: post
-slug: r-is-a-kind-of-life-and-statistics-is-an-attitude
 title: R是一种生活，统计是一种态度(讲稿)
 wordpress_id: 1109
 categories:
-- R&amp;数据艺术
-- 随感
+- R语言
+tags:
+- 演讲稿
 ---
 
 提示：本文归格物堂所有，转载请注明出处！

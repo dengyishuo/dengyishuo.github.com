@@ -7,12 +7,10 @@ slug: predict-rs-future-based-on-the-change-of-tsays-book
 title: 从Tsay的书看R的未来
 wordpress_id: 587
 categories:
-- 随感
+- R语言
 tags:
-- r
 - Tasy
 - 书籍
-- 未来
 - 金融时间序列分析
 ---
 

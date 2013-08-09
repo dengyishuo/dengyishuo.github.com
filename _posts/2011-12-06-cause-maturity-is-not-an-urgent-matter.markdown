@@ -7,7 +7,7 @@ slug: cause-maturity-is-not-an-urgent-matter
 title: 伪情书：因为成熟不是一件急迫的事情
 wordpress_id: 914
 categories:
-- 随感
+- 生活
 tags:
 - 情书
 - 成长

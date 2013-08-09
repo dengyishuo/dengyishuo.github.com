@@ -1,13 +1,10 @@
 ---
-author: admin
 comments: true
-date: 2011-08-27 22:26:28
 layout: post
 slug: venn
 title: R语言绘制维恩图
-wordpress_id: 816
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - r
 - 韦恩图

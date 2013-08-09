@@ -1,13 +1,10 @@
 ---
 author: admin
 comments: true
-date: 2012-01-19 20:39:44
 layout: post
-slug: how-to-learn-r-by-reading-books
 title: R语言书籍的学习路线图
-wordpress_id: 1075
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - ggobi
 - ggplot2

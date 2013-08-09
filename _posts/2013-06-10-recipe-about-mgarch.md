@@ -3,7 +3,7 @@ layout: post
 title: 安装mgarch包终极解决方案
 comments: true
 categories:
-- R
+- R语言
 tags:
 - mgarch
 - R

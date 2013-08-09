@@ -1,16 +1,11 @@
 ---
-author: admin
 comments: true
-date: 2011-04-10 20:43:41
 layout: post
-slug: notes-on-quantmod
 title: quantmod：R中的金融分析包
-wordpress_id: 598
 categories:
-- 随感
+- R语言
 tags:
 - quantmod
-- R&amp;数据艺术
 - 笔记
 - 金融分析
 ---

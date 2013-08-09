@@ -7,9 +7,9 @@ slug: support-vector-machine
 title: 关于支持向量机
 wordpress_id: 379
 categories:
-- 随感
+- R语言
 tags:
-- R&amp;数据艺术
+- 机器学习
 - Support Vector Machine
 - svm
 - 支持向量机

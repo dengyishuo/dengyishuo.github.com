@@ -3,11 +3,10 @@ layout: post
 title: 用R拟合缺项的ARIMA模型
 comments: true
 categories:
-- 计量经济学(R)
+- 计量经济学
 tags:
 - ARIMA
 - ARMA
-- R&amp;数据艺术
 - 缺项
 ---
 

@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: apply函数族入门
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - apply
 - r

@@ -3,7 +3,7 @@ layout: post
 title: Chernoff脸谱图
 comments: true
 categories:
-- 随感
+- R语言
 tags:
 - Chernoff
 - faces

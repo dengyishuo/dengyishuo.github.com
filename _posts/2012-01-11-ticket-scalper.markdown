@@ -1,13 +1,10 @@
 ---
-author: admin
 comments: true
-date: 2012-01-11 22:01:07
 layout: post
 slug: ticket-scalper
 title: 黄牛党：价格管制体制下的需求调节器
 wordpress_id: 1051
 categories:
-- 生活中的经济学
 - 经济学
 tags:
 - 供给

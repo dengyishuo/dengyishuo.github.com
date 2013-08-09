@@ -6,7 +6,6 @@ categories:
 - 计量经济学(R)
 tags:
 - Augmented Dickey-Fuller test
-- R&amp;数据艺术
 - unit root test
 - 单位根检验
 ---

@@ -3,7 +3,7 @@ layout: post
 title: 棘手的R乱码和给力的iconv函数
 comments: true
 categories:
-- R
+- R语言
 tags:
 - R
 - 乱码

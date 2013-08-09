@@ -1,10 +1,9 @@
 ---
 comments: true
-date: 2011-09-13 15:25:18
 layout: post
 title: 13.2 Haar小波变换
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - Haar
 - r

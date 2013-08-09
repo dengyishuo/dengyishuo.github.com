@@ -1,23 +1,15 @@
 ---
-author: admin
 comments: true
-date: 2011-08-27 21:50:59
 layout: post
-slug: matrix-operations
 title: R与矩阵运算总结
-wordpress_id: 814
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
-- r
 - 总结
 - 矩阵运算
 ---
 
 # 1 矩阵基本操作
-
-
-
 
 ## 1.1创建向量
 

@@ -3,8 +3,7 @@ layout: post
 title: 获取上市公司主要财务指标
 comments: true
 categories:
-- 金融
-- R 
+- R语言
 tags:
 - 抓数据
 - 财务指标

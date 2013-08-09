@@ -1,15 +1,15 @@
 ---
 author: admin
 comments: true
-date: 2011-12-07 10:28:31
 layout: post
-slug: '%e5%b0%8a%e4%b8%a5%e6%98%af%e4%ba%ba%e7%9a%84%e5%9b%ba%e5%ae%9a%e6%88%90%e6%9c%ac%ef%bc%88%e4%b9%9e%e8%ae%a8%e7%9a%84%e7%bb%8f%e6%b5%8e%e5%ad%a6%e5%88%86%e6%9e%90%ef%bc%89'
 title: 尊严是人的固定成本（乞讨的经济学分析）
-wordpress_id: 919
 categories:
-- 随感
+- 经济学
 tags:
-- 尊严;经济学;成本;乞讨
+- 尊严
+- 经济学
+- 成本
+- 乞讨
 ---
 
 昨天吃午饭的时候，几个人谈到[“西单磕头王”](http://www.baidu.com/baidu?wd=%BF%C4%CD%B7%CD%F5&tn=monline_dg)都“羡慕”不已，因为据说这个人在北京拥有四辆车和数套房产。这些财富在我们看来，短时间内是可望而不可及的，而他竟然通过“磕头乞讨”就得到了。

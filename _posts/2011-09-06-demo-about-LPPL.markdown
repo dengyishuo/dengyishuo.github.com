@@ -1,13 +1,10 @@
 ---
-author: admin
 comments: true
-date: 2011-09-06 16:21:25
 layout: post
-slug: r%e7%a4%ba%e4%be%8b%ef%bc%9alppl
 title: R示例：LPPL
 wordpress_id: 836
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - LPPL
 - r

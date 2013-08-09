@@ -1,15 +1,11 @@
 ---
-author: admin
 comments: true
-date: 2011-04-10 22:26:49
 layout: post
-slug: use-r-to-fit-vasicek-model
 title: 用R拟合Vasicek模型
-wordpress_id: 610
 categories:
-- 随感
+- R语言
 tags:
-- R&amp;数据艺术
+- 利率模型
 - Vasicek
 ---
 

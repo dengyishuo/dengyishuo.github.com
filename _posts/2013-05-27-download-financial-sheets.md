@@ -3,8 +3,7 @@ layout: post
 title: 自动下载财务套表
 comments: true
 categories:
-- 投资
-- R
+- R语言
 tags:
 - 财务报表
 - R

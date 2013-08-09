@@ -1,13 +1,11 @@
 ---
 author: admin
 comments: true
-date: 2012-02-09 10:59:54
 layout: post
-slug: italo-calvino-lonely
 title: 伊塔洛·卡尔维诺《孤独》，荒诞的黑色幽默
 wordpress_id: 1116
 categories:
-- 随感
+- 生活
 tags:
 - 卡尔维诺
 - 孤独

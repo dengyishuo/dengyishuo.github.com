@@ -7,7 +7,7 @@ slug: r-data-analysis-examples
 title: R数据分析实例
 wordpress_id: 1023
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
 - Logistic回归
 - 稳健回归

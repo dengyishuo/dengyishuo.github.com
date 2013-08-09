@@ -3,7 +3,7 @@ layout: post
 title: R中的线性模型
 comments: true
 categories:
-- R
+- R语言
 tags:
 - 线性模型
 - R

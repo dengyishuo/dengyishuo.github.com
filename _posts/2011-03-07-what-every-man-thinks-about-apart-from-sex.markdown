@@ -1,13 +1,11 @@
 ---
 author: admin
 comments: true
-date: 2011-03-07 01:34:35
 layout: post
-slug: what-every-man-thinks-about-apart-from-sex
 title: What Every Man Thinks About Apart From Sex
 wordpress_id: 557
 categories:
-- 随感
+- 未分类
 tags:
 - 书
 - 商业思维

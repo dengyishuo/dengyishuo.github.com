@@ -5,7 +5,6 @@ comments: true
 categories:
 - 金融投资分析(R)
 tags:
-- R&amp;数据艺术
 - Treynor指数
 - 基金
 ---

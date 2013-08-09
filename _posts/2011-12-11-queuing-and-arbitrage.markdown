@@ -1,15 +1,13 @@
 ---
 author: admin
 comments: true
-date: 2011-12-11 20:30:12
 layout: post
-slug: queuing-and-arbitrage
 title: 套利与排队
-wordpress_id: 923
 categories:
-- 生活中的经济学
+- 经济学
 tags:
-- 排队，套利
+- 排队
+- 套利
 ---
 
 ![](http://t3.baidu.com/it/u=3485686516,3005242334&fm=0&gp=0.jpg)某次跟同事吃饭遇到排队，便聊到排队这件事情中个体应当如何选择自己的最佳行为。聊到最后愕然发现，“排队现象”其实与金融是很相像的。两者中最重要的一个概念都是“套利”。为了简便起见，我们虚构一个故事：假如A到一个餐厅，该餐厅有三个窗口，每个窗口都有若干人排队，问A应该去哪个队？

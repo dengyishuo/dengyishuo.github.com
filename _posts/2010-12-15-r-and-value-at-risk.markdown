@@ -7,10 +7,9 @@ slug: r-and-value-at-risk
 title: R与VaR计算
 wordpress_id: 447
 categories:
-- 计量经济学(R)
-- 金融投资分析(R)
+- 金融投资分析
 tags:
-- r
+- R语言
 - Value at Risk
 - 风险
 - 风险度量

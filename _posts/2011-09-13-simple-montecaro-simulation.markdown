@@ -1,13 +1,10 @@
 ---
-author: admin
 comments: true
-date: 2011-09-13 15:46:53
 layout: post
-slug: 13-1-%e8%92%99%e7%89%b9%e5%8d%a1%e6%b4%9b%e6%a8%a1%e6%8b%9f
 title: 13.1 蒙特卡洛模拟
 wordpress_id: 846
 categories:
-- 随感
+- R语言
 tags:
 - r
 - 模拟

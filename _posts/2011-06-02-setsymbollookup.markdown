@@ -1,16 +1,11 @@
 ---
-author: admin
 comments: true
-date: 2011-06-02 12:50:58
 layout: post
-slug: setsymbollookup
 title: setSymbolLookup
-wordpress_id: 742
 categories:
 - 金融投资分析(R)
 tags:
 - quantmod
-- R&amp;数据艺术
 - 指定名称
 - 股票数据
 ---

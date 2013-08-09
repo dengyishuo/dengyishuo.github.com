@@ -3,7 +3,7 @@ layout: post
 title: 安装mgarchBEKK包
 comments: true
 categories:
-- R
+- R语言
 tags:
 - mgarchBEKK
 - R

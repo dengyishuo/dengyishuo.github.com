@@ -1,14 +1,10 @@
 ---
 author: admin
 comments: true
-date: 2012-01-14 10:48:30
 layout: post
-slug: sas-anti-r
 title: 为对抗新兴软件R,SAS或对国内高校免费
-wordpress_id: 1066
 categories:
-- R&amp;数据艺术
-- 随感
+- 生活
 tags:
 - anti
 - free

@@ -7,7 +7,7 @@ slug: house-price
 title: 2010年各地房价排行榜揭晓
 wordpress_id: 483
 categories:
-- 随感
+- 经济学
 tags:
 - 地图
 - 房价

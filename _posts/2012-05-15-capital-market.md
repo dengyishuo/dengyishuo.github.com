@@ -3,8 +3,7 @@ layout: post
 title: 资本市场的先知先觉
 comments: true
 categories:
-- 金融
-- 量化投资
+- 金融投资分析（R）
 tags:
 - 事件冲击
 - 资本市场

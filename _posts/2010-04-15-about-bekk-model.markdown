@@ -7,11 +7,10 @@ slug: about-bekk-model
 title: 关于BEKK模型
 wordpress_id: 324
 categories:
-- 随感
+- R语言
 tags:
 - BEKK
 - mgarch
-- R&amp;数据艺术
 - 多元garch模型
 ---
 

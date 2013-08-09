@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: R与时间序列的平稳性
 categories:
-- 计量经济学(R)
+- 计量经济学
 tags:
 - R
 - 平稳性

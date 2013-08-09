@@ -11,7 +11,6 @@ tags:
 - NSBT
 - Positive Sign Bias Test
 - PSBT
-- R&amp;数据艺术
 - SBT
 - Sign Bias Test
 - 正符号偏误检验

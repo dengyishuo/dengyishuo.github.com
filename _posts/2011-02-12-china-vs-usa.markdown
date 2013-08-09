@@ -7,7 +7,7 @@ slug: china-vs-usa
 title: 2010年中国与美国之终极对比
 wordpress_id: 504
 categories:
-- 随感
+- 未分类
 tags:
 - 中国
 - 图形

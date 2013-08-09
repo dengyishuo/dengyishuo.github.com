@@ -1,15 +1,15 @@
 ---
 author: admin
-comments: false
-date: 2011-12-19 13:06:59
+comments: TRUE
 layout: post
-slug: r-data-analysis-examples-robust-regression
 title: R数据分析实例：稳健回归
-wordpress_id: 951
 categories:
-- R软件数据分析实例
+- R语言
 tags:
-- R;数据分析;实例;稳健回归;Robust Regression
+- 数据分析
+- 实例
+- 稳健回归
+- Robust Regression
 ---
 
 **按语：**当数据含有离群点（Outliar）或者强影响点（influential observation）时，稳健回归（Robust Regression）会比普通最小二乘法(OLS)的表现要更优异。稳健回归也可以用来检测数据中的强影响点。

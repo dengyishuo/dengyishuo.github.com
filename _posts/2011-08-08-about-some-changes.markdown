@@ -1,13 +1,9 @@
 ---
-author: admin
 comments: true
-date: 2011-08-08 21:29:24
 layout: post
-slug: about-some-changes
-title: 杂感
-wordpress_id: 809
+title: 杂
 categories:
-- 随感
+- 生活
 ---
 
 我发现中国的青年人有所改变。念初中高中的时候，我们这一批人大都很厌恶鲁迅。当然，这不只是鲁迅的责任，而是归咎于教育部，教育部以鲁迅的名义压给我们很多背诵的负担。

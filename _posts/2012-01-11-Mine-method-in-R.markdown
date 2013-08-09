@@ -1,13 +1,12 @@
 ---
 author: admin
 comments: true
-date: 2012-01-11 22:50:37
 layout: post
-slug: r%e4%b8%ad%e7%9a%84mine%e6%96%b9%e6%b3%95
 title: R中的MINE方法
-wordpress_id: 1058
 categories:
-- 随感
+- R语言
+tags：
+- MINE方法
 ---
 
 提示：本文归格物堂所有，转载请注明出处！

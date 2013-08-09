@@ -3,7 +3,6 @@ layout: post
 title: 货币的省际贬值
 comments: true
 categories:
-- 生活中的经济学
 - 经济学
 ---
 

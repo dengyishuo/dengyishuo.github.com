@@ -1,15 +1,12 @@
 ---
-author: admin
 comments: true
-date: 2011-08-29 17:08:48
 layout: post
 slug: magic
 title: R中的魔方矩阵
 wordpress_id: 830
 categories:
-- R&amp;数据艺术
+- R语言
 tags:
-- r
 - 魔方矩阵
 ---
 

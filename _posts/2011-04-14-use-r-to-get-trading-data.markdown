@@ -3,10 +3,9 @@ comments: true
 layout: post
 title: R获取股票数据
 categories:
-- 金融投资分析(R)
+- R语言
 tags:
 - quantmod
-- r
 - yahoo
 - 数据
 - 股票

@@ -3,7 +3,7 @@ layout: post
 title: R中的关于极值理论的包
 comments: true
 categories:
-- R 
+- R语言
 tags:
 - EVT
 - POT

@@ -1,13 +1,10 @@
 ---
 author: admin
 comments: true
-date: 2011-11-29 20:58:18
 layout: post
-slug: the-low-of-one-price
 title: 一价定律（The Low of One Price）
-wordpress_id: 893
 categories:
-- 随感
+- 经济学
 tags:
 - 一价定律
 - 弗里德曼
