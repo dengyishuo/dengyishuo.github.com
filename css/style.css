@@ -248,7 +248,7 @@ hr {
 }
 code, pre {
 	font-family:"Monaco","Monaco",monospace;
-	font-size:12px;
+	font-size:13px;
 	line-height:150%;
 }
 pre {
@@ -256,7 +256,7 @@ pre {
 	-webkit-border-radius:5px;
 	border-radius:5px;
 	-moz-box-shadow:0 -1px 0 #FFFFF;
-	background-color:#CCCCCC;
+	background-color:#000000;
 	color:#000000;
 	font-size:13px;
 	margin:0 0 0 0px;
