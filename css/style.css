@@ -247,7 +247,7 @@ hr {
 	margin: 0 -20px;
 }
 code, pre {
-	font-family:"Monaco","Courier New",monospace;
+	font-family:"Monaco","Monaco",monospace;
 	font-size:12px;
 	line-height:150%;
 }
