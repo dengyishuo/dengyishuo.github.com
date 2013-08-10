@@ -1,9 +1,9 @@
----
+﻿---
 layout: post
 title: 从历史数据看今日股市
 comments: true
 categories:
-- 金融投资分析（R）
+- 金融投资分析(R)
 tags:
 - 潜在合理增长线
 - 投资

@@ -7,7 +7,7 @@ slug: r-and-value-at-risk
 title: R与VaR计算
 wordpress_id: 447
 categories:
-- 金融投资分析
+- 金融投资分析(R)
 tags:
 - R语言
 - Value at Risk

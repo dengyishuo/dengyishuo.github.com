@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 用四个参数拟合大象
 categories:
-- 未分类
+- R语言
 tags:
 - 参数
 - 大象
