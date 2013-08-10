@@ -397,18 +397,17 @@ span.balloon {
     width: 950px;
     margin: 20px auto;
     height: 80px;
-    background: url("/image/js.jpg") no-repeat scroll 0% 0% / 950px auto transparent;
+    background: transparent;
 }
 
 #logo h1 a {
     font-weight: bold;
     font-size: 45px;
-    color: rgb(200, 5, 5);
+    color: rgb(250, 250, 150);
     letter-spacing: 3px;
     padding-left: 30px;
-    padding-top: 200px;
     line-height: 70px;
-}letter-spacing:3px;
+    letter-spacing:3px;
 }
 
 #content .cnt p {
