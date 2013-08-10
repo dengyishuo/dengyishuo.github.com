@@ -394,8 +394,10 @@ span.balloon {
 }
 
 #logo {
-	width:740px;
-	margin:20px auto;
+    width: 950px;
+    margin: 20px auto;
+    height: 80px;
+    background: url("/image/js.jpg") no-repeat scroll 0% 0% / 950px auto transparent;
 }
 
 #logo h1 a{
