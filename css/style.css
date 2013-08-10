@@ -256,14 +256,14 @@ pre {
 	-webkit-border-radius:5px;
 	border-radius:3px;
 	-moz-box-shadow:0 -1px 0 #FFFFF;
-	background-color:#FFCC99;
+	background-color:#C8C8C8;
 	color:#000000;
 	font-size:13px;
 	margin:0 0 0 0px;
-	padding:20px;
-	text-shadow:0 1px 0 #000000;
+	padding:10px;
+	text-shadow:0 0px 0 #000000;
 	white-space:pre-wrap;
-	width:740px;
+	width:930px;
 	word-wrap:break-word;
 }
 div.notice {
