@@ -394,11 +394,8 @@ span.balloon {
 }
 
 #logo {
-    margin: -65px 10px -30px -50px;
-    float: right;
-    background: url("/images/gems-15.png") repeat scroll 0% 0% transparent;
-    height: 213px;
-    width: 204px;
+	width:740px;
+	margin:20px auto;
 }
 
 #logo h1 a{
