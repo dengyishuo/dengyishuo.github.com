@@ -1,13 +1,11 @@
 ---
 author: admin
 comments: true
-date: 2010-05-05 13:01:30
 layout: post
 slug: support-vector-machine
 title: 关于支持向量机
-wordpress_id: 379
 categories:
-- R语言
+- R
 tags:
 - 机器学习
 - Support Vector Machine
