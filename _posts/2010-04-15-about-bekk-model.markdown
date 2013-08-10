@@ -7,7 +7,7 @@ slug: about-bekk-model
 title: 关于BEKK模型
 wordpress_id: 324
 categories:
-- R语言
+- R
 tags:
 - BEKK
 - mgarch
