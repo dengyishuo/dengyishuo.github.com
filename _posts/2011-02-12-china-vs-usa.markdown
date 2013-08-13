@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-02-12 14:35:50
 layout: post
-slug: china-vs-usa
 title: 2010年中国与美国之终极对比
-wordpress_id: 504
 categories:
 - life
 tags:

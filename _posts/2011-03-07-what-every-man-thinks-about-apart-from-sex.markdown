@@ -3,7 +3,6 @@ author: admin
 comments: true
 layout: post
 title: What Every Man Thinks About Apart From Sex
-wordpress_id: 557
 categories:
 - life
 tags:
