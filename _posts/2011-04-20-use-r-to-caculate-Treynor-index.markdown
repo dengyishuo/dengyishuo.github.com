@@ -3,7 +3,7 @@ layout: post
 title: 用R计算Treynor系数
 comments: true
 categories:
-- 金融投资分析(R)
+- FinancialAnalysis(R)
 tags:
 - Treynor指数
 - 基金

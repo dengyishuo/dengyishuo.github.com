@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: R与单位根检验
 categories:
-- 计量经济学(R)
+- econometrics(R)
 tags:
 - Augmented Dickey-Fuller test
 - unit root test

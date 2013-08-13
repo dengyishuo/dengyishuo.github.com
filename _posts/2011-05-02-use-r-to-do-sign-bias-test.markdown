@@ -3,7 +3,7 @@ layout: post
 title: 符号偏误检验（Sign Bias Test）
 comments: true
 categories:
-- 计量经济学(R)
+- econometrics(R)
 tags:
 - Joint Test
 - JT

@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 我们能带领统计学创造历史么？
 categories:
-- 生活
+- life
 tags:
 - COS
 - 历史

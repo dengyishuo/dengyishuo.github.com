@@ -3,7 +3,7 @@ layout: post
 title: 不放肝胆，如何成行？
 comments: true
 categories:
-- 生活
+- life
 tags:
 - R培训
 - 统计之都

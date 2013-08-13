@@ -3,7 +3,7 @@ layout: post
 title: 规则这件事情
 comments: true
 categories:
-- 生活
+- life
 tags：
 - 规则
 ---

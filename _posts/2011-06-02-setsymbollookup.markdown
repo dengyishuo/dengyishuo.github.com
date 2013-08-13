@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: setSymbolLookup
 categories:
-- 金融投资分析(R)
+- FinancialAnalysis(R)
 tags:
 - quantmod
 - 指定名称

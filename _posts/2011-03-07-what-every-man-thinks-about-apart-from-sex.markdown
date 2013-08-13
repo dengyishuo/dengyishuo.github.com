@@ -5,7 +5,7 @@ layout: post
 title: What Every Man Thinks About Apart From Sex
 wordpress_id: 557
 categories:
-- 生活
+- life
 tags:
 - 书
 - 商业思维

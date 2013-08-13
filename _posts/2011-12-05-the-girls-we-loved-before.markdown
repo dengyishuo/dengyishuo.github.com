@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 烟火众生
 categories:
-- 生活
+- life
 tags:
 - 九把刀，那些年，我们一起追的女孩，读书
 ---
