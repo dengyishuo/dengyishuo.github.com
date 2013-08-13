@@ -17,7 +17,6 @@
 		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		  })();
 		</script>
-		
 	</head>
 
 	<body>
@@ -27,27 +26,7 @@
 			<h1><a href="/">格物堂</a><font color="#FAFA96">R语言、量化投资及生活随笔</font></h1></div>
 		<div id="wrapper">
 			<div id="content">
-				<script type="text/javascript" charset="utf-8">
-(function(){
-  var _w = 72 , _h = 16;
-  var param = {
-    url:location.href,
-    type:'3',
-    count:'1', /**是否显示分享数，1显示(可选)*/
-    appkey:'', /**您申请的应用appkey,显示分享来源(可选)*/
-    title:'', /**分享的文字内容(可选，默认为所在页面的title)*/
-    pic:'', /**分享图片的路径(可选)*/
-    ralateUid:'', /**关联用户的UID，分享微博会@该用户(可选)*/
-    language:'zh_cn', /**设置语言，zh_cn|zh_tw(可选)*/
-    dpc:1
-  }
-  var temp = [];
-  for( var p in param ){
-    temp.push(p + '=' + encodeURIComponent( param[p] || '' ) )
-  }
-  document.write('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://service.weibo.com/staticjs/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
-})()
-</script>
+				<a target="_blank" style="float:right;margin-top:15px" href="http://service.weibo.com/share/share.php?url=http://yishuo.org{{ page.url }}&via=dengyishuo&text={{ page.title }}"><span class="balloon">retweet</span></a>
 				<h2>{{ page.title }}</h2>
 				<div class="cnt">
 					{{ content }}
