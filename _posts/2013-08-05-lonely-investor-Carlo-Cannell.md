@@ -3,7 +3,7 @@ layout: post
 title: 孤独的投资者卡洛·坎奈尔
 comments: true
 categories:
-- FinancialAnalysis(R)
+- investment(R)
 tags:
 - 卡洛·坎奈尔
 ---

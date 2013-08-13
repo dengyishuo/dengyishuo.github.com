@@ -7,7 +7,7 @@ slug: what-type-of-website-should-we-have
 title: 应该建立怎样的网站
 wordpress_id: 561
 categories:
-- 商业
+- business
 tags:
 - 建立
 - 民粹

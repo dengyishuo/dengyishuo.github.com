@@ -3,7 +3,7 @@ layout: post
 title: 黄仁宇《万历十五年》，可进藏书柜
 comments: true
 categories:
-- 文史哲
+- art
 tags:
 - 万历十五年
 - 藏书

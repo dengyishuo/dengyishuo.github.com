@@ -8,7 +8,7 @@ categories:
 - life
 tags:
 - 书
-- 商业思维
+- business思维
 - 男人
 ---
 

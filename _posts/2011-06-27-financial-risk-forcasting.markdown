@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 新书：Financial Risk Forecasting
 categories:
-- FinancialAnalysis(R)
+- investment(R)
 - life
 tags:
 - Financial Risk Forecasting

@@ -7,9 +7,9 @@ slug: all-about-economic
 title: 关于经济学
 wordpress_id: 454
 categories:
-- 经济学
+- economics
 tags:
-- 经济学
+- economics
 ---
 
 1.play solow

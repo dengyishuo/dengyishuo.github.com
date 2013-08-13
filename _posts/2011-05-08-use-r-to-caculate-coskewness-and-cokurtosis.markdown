@@ -3,7 +3,7 @@ layout: post
 title: 用R计算协偏度（coskewness）和协峰度（cokurtosis）
 comments: true
 categories:
-- FinancialAnalysis(R)
+- investment(R)
 tags:
 - cokurtosis
 - coskewness

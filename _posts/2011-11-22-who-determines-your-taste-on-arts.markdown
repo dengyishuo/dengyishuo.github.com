@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 什么培养了你的品味
 categories:
-- 文史哲
+- art
 tags:
 - 品位
 - 教育

@@ -7,7 +7,7 @@ slug: income-position
 title: 收入温度计：看看你的收入位置在哪里
 wordpress_id: 545
 categories:
-- 经济学
+- economics
 tags:
 - 收入
 - 温度计

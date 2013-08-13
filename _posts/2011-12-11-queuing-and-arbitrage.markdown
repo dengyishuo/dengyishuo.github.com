@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: 套利与排队
 categories:
-- 经济学
+- economics
 tags:
 - 排队
 - 套利

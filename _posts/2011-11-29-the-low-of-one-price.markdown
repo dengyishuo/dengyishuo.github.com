@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: 一价定律（The Low of One Price）
 categories:
-- 经济学
+- economics
 tags:
 - 一价定律
 - 弗里德曼

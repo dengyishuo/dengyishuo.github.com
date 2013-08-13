@@ -3,9 +3,9 @@ layout: post
 title: 科斯对现代经济学的批评
 comments: true
 categories:
-- 经济学
+- economics
 tags:
-- 经济学
+- economics
 - 科斯
 - 实体
 - 产业

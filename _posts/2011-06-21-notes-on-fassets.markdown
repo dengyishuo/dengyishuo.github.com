@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: fAssets包学习笔记
 categories:
-- FinancialAnalysis(R)
+- investment(R)
 tags:
 - fAssets
 - 包

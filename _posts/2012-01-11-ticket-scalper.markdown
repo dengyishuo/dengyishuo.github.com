@@ -5,11 +5,11 @@ slug: ticket-scalper
 title: 黄牛党：价格管制体制下的需求调节器
 wordpress_id: 1051
 categories:
-- 经济学
+- economics
 tags:
 - 供给
 - 经济发展
-- 经济学
+- economics
 - 车票
 - 需求
 - 黄牛党

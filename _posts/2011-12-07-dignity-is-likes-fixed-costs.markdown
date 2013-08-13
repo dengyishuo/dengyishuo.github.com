@@ -4,10 +4,10 @@ comments: true
 layout: post
 title: 尊严是人的固定成本（乞讨的经济学分析）
 categories:
-- 经济学
+- economics
 tags:
 - 尊严
-- 经济学
+- economics
 - 成本
 - 乞讨
 ---
