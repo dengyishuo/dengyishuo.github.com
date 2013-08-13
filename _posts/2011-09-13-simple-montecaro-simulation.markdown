@@ -4,7 +4,7 @@ layout: post
 title: 13.1 蒙特卡洛模拟
 wordpress_id: 846
 categories:
-- R语言
+- R
 tags:
 - r
 - 模拟

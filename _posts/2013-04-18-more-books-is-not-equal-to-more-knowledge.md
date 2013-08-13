@@ -3,7 +3,7 @@ layout: post
 title: 几本关于R的书籍
 comments: true
 categories:
-- R语言
+- R
 tags:
 - R
 - 书籍

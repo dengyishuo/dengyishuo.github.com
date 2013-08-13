@@ -7,7 +7,7 @@ slug: scatterplot3d-a-maverick-package
 title: scatterplot3d:一个特立独行的R包
 wordpress_id: 412
 categories:
-- R语言
+- R
 tags:
 - R
 - scatterplot3d

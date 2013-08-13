@@ -3,7 +3,7 @@ layout: post
 title: 时空数据可视化
 comments: true
 categories: 
-- R语言
+- R
 tags: 
 - quantmod
 - R

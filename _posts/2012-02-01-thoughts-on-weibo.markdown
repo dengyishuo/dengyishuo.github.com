@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: weibo数据开发思路
 categories:
-- R语言
+- R
 tags：
 - 微博
 ---

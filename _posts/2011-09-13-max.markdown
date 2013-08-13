@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 13.3 极大似然估计
 categories:
-- R语言
+- R
 tags:
 - r
 - 极大似然估计

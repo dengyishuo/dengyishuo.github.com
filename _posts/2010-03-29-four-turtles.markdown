@@ -3,7 +3,7 @@ layout: post
 title: 四龟行走或追逐问题
 comments: true
 categories:
-- R语言
+- R
 tags:
 - 四龟行走
 - 模拟

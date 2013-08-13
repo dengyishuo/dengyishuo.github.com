@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: R中的MINE方法
 categories:
-- R语言
+- R
 tags：
 - MINE方法
 ---

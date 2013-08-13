@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 13.2 Haar小波变换
 categories:
-- R语言
+- R
 tags:
 - Haar
 - r

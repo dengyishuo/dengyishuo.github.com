@@ -3,7 +3,7 @@ layout: post
 title: 从东方财富网获取股票开户数据
 comments: true
 categories:
-- R语言
+- R
 tags:
 - 抓取数据
 - 股票开户数据

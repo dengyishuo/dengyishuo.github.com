@@ -7,7 +7,7 @@ slug: web-resource-about-r
 title: R语言在线资源列表
 wordpress_id: 1131
 categories:
-- R语言
+- R
 tags:
 - r
 - 学习

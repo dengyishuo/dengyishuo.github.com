@@ -4,7 +4,7 @@ comments: TRUE
 layout: post
 title: R数据分析实例：稳健回归
 categories:
-- R语言
+- R
 tags:
 - 数据分析
 - 实例

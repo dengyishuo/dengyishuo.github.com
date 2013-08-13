@@ -3,7 +3,7 @@ layout: post
 title: 有用但不易被发现的R函数：file.choose
 comments: true
 categories:
-- R语言
+- R
 tags:
 - file.choose
 - R

@@ -4,7 +4,7 @@ layout: post
 title: R示例：LPPL
 wordpress_id: 836
 categories:
-- R语言
+- R
 tags:
 - LPPL
 - r

@@ -3,7 +3,7 @@ layout: post
 title: R中的量化投资包：quantstrat（1）
 comments: true
 categories:
-- R语言
+- R
 tags:
 - R
 - 量化投资

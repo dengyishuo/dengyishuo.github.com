@@ -5,7 +5,7 @@ layout: post
 slug: notes-on-quantmod-2
 title: quantmod:R中的金融分析包（学习笔记）
 categories:
-- R语言
+- R
 tags:
 - quantmod
 - 分析

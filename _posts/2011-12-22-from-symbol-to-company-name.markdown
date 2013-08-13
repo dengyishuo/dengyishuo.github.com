@@ -5,7 +5,7 @@ layout: post
 title: 从股票代码到公司名
 wordpress_id: 1020
 categories:
-- R语言
+- R
 tags:
 - quantmod
 - yahoo

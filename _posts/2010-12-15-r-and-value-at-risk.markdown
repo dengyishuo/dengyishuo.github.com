@@ -9,7 +9,7 @@ wordpress_id: 447
 categories:
 - 金融投资分析(R)
 tags:
-- R语言
+- R
 - Value at Risk
 - 风险
 - 风险度量

@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 用R检验股票的协整关系
 categories:
-- 计量经济学（R）
+- 计量经济学(R)
 tags:
 - 协整
 - 股票

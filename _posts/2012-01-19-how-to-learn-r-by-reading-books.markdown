@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: R语言书籍的学习路线图
 categories:
-- R语言
+- R
 tags:
 - ggobi
 - ggplot2

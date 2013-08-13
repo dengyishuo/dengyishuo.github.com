@@ -5,7 +5,7 @@ layout: post
 title: R是一种生活，统计是一种态度(讲稿)
 wordpress_id: 1109
 categories:
-- R语言
+- R
 tags:
 - 演讲稿
 ---

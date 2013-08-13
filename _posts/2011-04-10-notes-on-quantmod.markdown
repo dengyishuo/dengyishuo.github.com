@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: quantmod：R中的金融分析包
 categories:
-- R语言
+- R
 tags:
 - quantmod
 - 笔记

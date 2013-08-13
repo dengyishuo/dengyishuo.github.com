@@ -5,7 +5,7 @@ slug: magic
 title: R中的魔方矩阵
 wordpress_id: 830
 categories:
-- R语言
+- R
 tags:
 - 魔方矩阵
 ---

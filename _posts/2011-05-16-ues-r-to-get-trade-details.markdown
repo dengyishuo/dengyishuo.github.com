@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 获取交易明细数据
 categories:
-- R语言
+- R
 tags:
 - 交易明细数据
 ---

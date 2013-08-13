@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: Bagplot:趣味横生的野值点检验方法
 categories:
-- R语言
+- R
 tags:
 - bagplot
 - 可视化

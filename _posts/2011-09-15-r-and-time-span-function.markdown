@@ -7,7 +7,7 @@ slug: r-and-time-span-function
 title: R与月跨度函数，理论与应用的差距
 wordpress_id: 854
 categories:
-- R语言
+- R
 tags:
 - 差距
 - 应用

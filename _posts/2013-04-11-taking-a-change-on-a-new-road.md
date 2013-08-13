@@ -5,7 +5,7 @@ comments: true
 categories:
 - 生活
 tags:
-- R语言培训
+- R培训
 - 统计之都
 - 放肝胆
 ---

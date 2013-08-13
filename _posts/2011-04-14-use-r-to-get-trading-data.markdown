@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: R获取股票数据
 categories:
-- R语言
+- R
 tags:
 - quantmod
 - yahoo

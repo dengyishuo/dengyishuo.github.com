@@ -3,7 +3,7 @@ layout: post
 title: 乱码，又见乱码
 comments: true
 categories:
-- R语言
+- R
 tags:
 - R
 - 财务数据

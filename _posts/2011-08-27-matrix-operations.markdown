@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: R与矩阵运算总结
 categories:
-- R语言
+- R
 tags:
 - 总结
 - 矩阵运算

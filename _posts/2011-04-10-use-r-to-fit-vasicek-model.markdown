@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 用R拟合Vasicek模型
 categories:
-- R语言
+- R
 tags:
 - 利率模型
 - Vasicek

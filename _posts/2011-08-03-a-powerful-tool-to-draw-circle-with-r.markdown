@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: draw.circle，R中的绘圆利器
 categories:
-- R语言
+- R
 tags:
 - 圆
 - 绘图

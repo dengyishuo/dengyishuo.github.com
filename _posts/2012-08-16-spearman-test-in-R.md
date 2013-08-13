@@ -3,7 +3,7 @@ layout: post
 title: R中的斯皮尔曼等级相关检验与异方差
 comments: true
 categories:
-- R语言
+- R
 tags:
 - speraman
 - spearman test
