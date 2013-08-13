@@ -1,9 +1,7 @@
 ---
-author: admin
 comments: true
 layout: post
 title: R与金融时间序列分析常见问题集
-wordpress_id: 1095
 categories:
 - investment
 tags:
