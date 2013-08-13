@@ -3,7 +3,7 @@ layout: post
 title: 里昂证券最重要的图表：中国外储增长表
 comments: true
 categories:
-- investment(R)
+- investment
 tags:
 - 外汇储备
 - 证券

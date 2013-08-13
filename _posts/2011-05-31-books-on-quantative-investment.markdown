@@ -3,7 +3,7 @@ layout: post
 title: R与量化投资分析入门书单（更新....）
 comments: true
 categories:
-- investment(R)
+- investment
 tags:
 - r
 - 书单

@@ -5,7 +5,7 @@ layout: post
 title: R与金融时间序列分析常见问题集
 wordpress_id: 1095
 categories:
-- investment(R)
+- investment
 tags:
 - EVT
 - GARCH

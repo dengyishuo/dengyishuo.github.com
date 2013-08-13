@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: setSymbolLookup
 categories:
-- investment(R)
+- investment
 tags:
 - quantmod
 - 指定名称

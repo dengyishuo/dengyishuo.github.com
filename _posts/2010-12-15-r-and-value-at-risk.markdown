@@ -7,7 +7,7 @@ slug: r-and-value-at-risk
 title: R与VaR计算
 wordpress_id: 447
 categories:
-- investment(R)
+- investment
 tags:
 - R
 - Value at Risk

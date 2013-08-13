@@ -4,7 +4,7 @@ layout: post
 title: 用R进行Jarque Bera检验
 wordpress_id: 690
 categories:
-- econometrics(R)
+- econometrics
 tags:
 - jarque bera检验
 - jb检验

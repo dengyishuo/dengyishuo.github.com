@@ -3,7 +3,7 @@ layout: post
 title: 从历史数据看今日股市
 comments: true
 categories:
-- investment(R)
+- investment
 tags:
 - 潜在合理增长线
 - 投资

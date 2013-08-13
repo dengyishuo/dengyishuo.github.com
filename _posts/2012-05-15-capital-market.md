@@ -3,7 +3,7 @@ layout: post
 title: 资本市场的先知先觉
 comments: true
 categories:
-- investment(R)
+- investment
 tags:
 - 事件冲击
 - 资本市场

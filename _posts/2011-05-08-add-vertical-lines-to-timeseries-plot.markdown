@@ -4,7 +4,7 @@ comments: true
 layout: post
 title: 在时间序列的线图上添加垂线
 categories:
-- econometrics(R)
+- econometrics
 tags:
 - r
 - 垂线

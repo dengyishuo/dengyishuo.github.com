@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: R与时间序列的平稳性
 categories:
-- econometrics(R)
+- econometrics
 tags:
 - R
 - 平稳性

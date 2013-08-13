@@ -3,7 +3,7 @@ comments: true
 layout: post
 title: 用R检验股票的协整关系
 categories:
-- econometrics(R)
+- econometrics
 tags:
 - 协整
 - 股票
