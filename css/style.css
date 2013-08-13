@@ -256,11 +256,11 @@ pre {
 	-webkit-border-radius:5px;
 	border-radius:3px;
 	-moz-box-shadow:0 -1px 0 #FFFFF;
-	background-color:#C8C8C8;
+	background-color:#EBFF9B;
 	color:#000000;
 	font-size:13px;
-	margin:0 0 0 0px;
-	padding:10px;
+	margin:-13 0 0 0px;
+	padding:13px;
 	text-shadow:0 0px 0 #000000;
 	white-space:pre-wrap;
 	width:900px;
