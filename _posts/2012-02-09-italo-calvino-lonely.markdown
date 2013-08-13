@@ -1,9 +1,7 @@
 ---
-author: admin
 comments: true
 layout: post
 title: 伊塔洛·卡尔维诺《孤独》，荒诞的黑色幽默
-wordpress_id: 1116
 categories:
 - life
 tags:

@@ -1,5 +1,4 @@
 ---
-author: admin
 comments: true
 layout: post
 title: What Every Man Thinks About Apart From Sex

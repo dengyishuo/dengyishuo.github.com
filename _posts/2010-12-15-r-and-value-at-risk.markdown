@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2010-12-15 07:48:08
 layout: post
-slug: r-and-value-at-risk
 title: R与VaR计算
-wordpress_id: 447
 categories:
 - investment
 tags:

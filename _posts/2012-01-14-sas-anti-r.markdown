@@ -1,5 +1,4 @@
 ---
-author: admin
 comments: true
 layout: post
 title: 为对抗新兴软件R,SAS或对国内高校免费

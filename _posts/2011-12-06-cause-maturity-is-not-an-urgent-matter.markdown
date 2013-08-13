@@ -1,11 +1,7 @@
 ---
-author: admin
 comments: true
-date: 2011-12-06 23:07:47
 layout: post
-slug: cause-maturity-is-not-an-urgent-matter
 title: 伪情书：因为成熟不是一件急迫的事情
-wordpress_id: 914
 categories:
 - life
 tags:
