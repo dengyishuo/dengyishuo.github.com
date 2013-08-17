@@ -199,7 +199,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
+<img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" />
 
 Selection: 8
 
