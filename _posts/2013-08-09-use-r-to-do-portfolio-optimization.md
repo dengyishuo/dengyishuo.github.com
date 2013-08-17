@@ -201,6 +201,7 @@ Make a plot selection (or 0 to exit):
 
 ![pic7](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
+{% highlight r %}
 Selection: 8
 
 Make a plot selection (or 0 to exit): 
@@ -214,6 +215,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
+{% endhighlight %}
+
 ![pic8](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
-{% endhighlight %}
