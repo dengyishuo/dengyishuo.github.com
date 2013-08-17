@@ -99,6 +99,7 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
+
 {% endhighlight %}
 
 {% highlight r %}
