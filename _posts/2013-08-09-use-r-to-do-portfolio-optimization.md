@@ -83,10 +83,10 @@ Target Return and Risks:
 
 Description:
  Fri Aug 09 11:21:31 2013 by user: Owner 
+ 
 {% endhighlight %}
 
 {% highlight r %}
-
 plot(Frontier)
 
 Make a plot selection (or 0 to exit): 
@@ -99,11 +99,9 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
 {% endhighlight %}
 
 {% highlight r %}
-
 Selection: 1
 
 Make a plot selection (or 0 to exit): 
