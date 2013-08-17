@@ -86,7 +86,10 @@ Description:
  
 {% endhighlight %}
 
+
+
 {% highlight r %}
+
 plot(Frontier)
 
 Make a plot selection (or 0 to exit): 
@@ -100,6 +103,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 {% endhighlight %}
+
 
 {% highlight r %}
 Selection: 1
