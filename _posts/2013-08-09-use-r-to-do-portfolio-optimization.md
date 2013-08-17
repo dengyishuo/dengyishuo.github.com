@@ -83,5 +83,137 @@ Target Return and Risks:
 
 Description:
  Fri Aug 09 11:21:31 2013 by user: Owner 
+> plot(Frontier)
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+Selection: 1
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+
+Selection: 2
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+
+Selection: 3
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+
+Selection: 4
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+
+Selection: 5
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1751.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107839572.png" /></a>
+
+Selection: 6
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
+
+Selection: 7
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
+
+Selection: 8
+
+Make a plot selection (or 0 to exit): 
+
+1:   Plot Efficient Frontier
+2:   Add Minimum Risk Portfolio
+3:   Add Tangency Portfolio
+4:   Add Risk/Return of Single Assets
+5:   Add Equal Weights Portfolio
+6:   Add Two Asset Frontiers [LongOnly Only]
+7:   Add Monte Carlo Portfolios
+8:   Add Sharpe Ratio [Markowitz PF Only]
+
+<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
 
 {% endhighlight %}
