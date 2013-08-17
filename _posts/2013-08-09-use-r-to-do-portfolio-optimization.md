@@ -83,7 +83,11 @@ Target Return and Risks:
 
 Description:
  Fri Aug 09 11:21:31 2013 by user: Owner 
-> plot(Frontier)
+{% endhighlight %}
+
+{% highlight r %}
+
+plot(Frontier)
 
 Make a plot selection (or 0 to exit): 
 
@@ -95,6 +99,9 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
+{% endhighlight %}
+
+{% highlight r %}
 
 Selection: 1
 
@@ -108,8 +115,11 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
+{% endhighlight %}
 
 ![pic1](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
+
+{% highlight r %}
 
 Selection: 2
 
@@ -123,8 +133,10 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic2](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
+
+{% highlight r %}
 
 Selection: 3
 
@@ -138,8 +150,10 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic3](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
+
+{% highlight r %}
 
 Selection: 4
 
@@ -153,8 +167,10 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic4](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
+
+{% highlight r %}
 
 Selection: 5
 
@@ -168,8 +184,10 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic5](http://i1.tietuku.com/2013/0817/3/13767107839572.png)
+
+{% highlight r %}
 
 Selection: 6
 
@@ -183,9 +201,10 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic6](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
+{% highlight r %}
 Selection: 7
 
 Make a plot selection (or 0 to exit): 
@@ -198,10 +217,11 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
+{% endhighlight %}
 ![pic7](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
 {% highlight r %}
+
 Selection: 8
 
 Make a plot selection (or 0 to exit): 
@@ -214,7 +234,6 @@ Make a plot selection (or 0 to exit):
 6:   Add Two Asset Frontiers [LongOnly Only]
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
-
 {% endhighlight %}
 
 ![pic8](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
