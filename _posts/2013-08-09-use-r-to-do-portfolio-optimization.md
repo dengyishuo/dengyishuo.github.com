@@ -109,7 +109,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+![pic1](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
 
 Selection: 2
 
@@ -124,7 +124,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+![pic2](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
 
 Selection: 3
 
@@ -139,7 +139,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+![pic3](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
 
 Selection: 4
 
@@ -154,7 +154,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1747.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107819590.png" /></a>
+![pic4](http://i1.tietuku.com/2013/0817/3/13767107819590.png)
 
 Selection: 5
 
@@ -169,7 +169,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1751.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107839572.png" /></a>
+![pic5](http://i1.tietuku.com/2013/0817/3/13767107839572.png)
 
 Selection: 6
 
@@ -184,7 +184,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
+![pic6](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
 Selection: 7
 
@@ -199,7 +199,7 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" />
+![pic7](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
 Selection: 8
 
@@ -214,6 +214,6 @@ Make a plot selection (or 0 to exit):
 7:   Add Monte Carlo Portfolios
 8:   Add Sharpe Ratio [Markowitz PF Only]
 
-<a href="http://tietuku.com/pic/1752.html" target="_blank"><img src="http://i1.tietuku.com/2013/0817/3/13767107845933.png" /></a>
+![pic8](http://i1.tietuku.com/2013/0817/3/13767107845933.png)
 
 {% endhighlight %}
