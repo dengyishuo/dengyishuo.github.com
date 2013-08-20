@@ -4,7 +4,7 @@ title: 规则这件事情
 comments: true
 categories:
 - life
-tags：
+tags:
 - 规则
 ---
 

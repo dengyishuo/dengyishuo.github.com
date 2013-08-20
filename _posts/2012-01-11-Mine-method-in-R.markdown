@@ -5,7 +5,7 @@ layout: post
 title: R中的MINE方法
 categories:
 - R
-tags：
+tags:
 - MINE方法
 ---
 
