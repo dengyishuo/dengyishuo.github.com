@@ -445,3 +445,12 @@ div#disqus_thread li ul li {
 	list-style:none;
 }
 
+div#statement
+{
+    width: 998px;
+    margin: 0px auto;
+    text-align: left;
+    padding: 0 4px;
+    margin-bottom: 50px;
+    background-color: Blue;
+}
