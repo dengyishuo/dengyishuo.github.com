@@ -125,6 +125,15 @@ div#header li {
 	float:left;
 	margin:0 0 0 20px;
 }
+div#statement
+{
+    width: 998px;
+    margin: 0px auto;
+    text-align: left;
+    padding: 0 4px;
+    margin-bottom: 50px;
+    background-color: Blue;
+}
 div#footer {
 	margin:50px 0 0;
 }
