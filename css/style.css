@@ -454,3 +454,9 @@ div#disqus_thread li ul li {
 	list-style:none;
 }
 
+p.tip span {
+	font-weight:bold;
+	color:#ff9955;
+	}
+	
+	
