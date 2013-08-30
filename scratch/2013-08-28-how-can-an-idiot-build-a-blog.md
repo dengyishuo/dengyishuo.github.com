@@ -10,6 +10,7 @@ tags:
 - 博客
 ---
 
+<span>发布日期：2013-08-30 作者：邓一硕</span>
 1.下载并安装RailsInstaller
 2.输入用户名：比如，dengyishuo@163.com
 3.把生成的公钥(在 .ssh文件夹里，id_rsa.pub文件)导入到github的ssh
