@@ -457,8 +457,8 @@ div#disqus_thread li ul li {
 }
 
 pre.anounce {
-width: 900px;
-margin: 0px -5px 0px;
+width: 980px;
+margin: 5px 0px 0px;
 padding: 5px;
 border: 1px dotted rgb(119, 136, 85);
 background: none repeat scroll 0% 0% rgb(245, 245, 245);
