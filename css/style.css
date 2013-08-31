@@ -456,18 +456,11 @@ div#disqus_thread li ul li {
 	list-style:none;
 }
 
-span.anounce {
-	-moz-border-radius: 5px 5px 5px 5px;
-	-moz-webkit-radius: 5px 5px 5px 5px;
-	border-radius: 5px;
-	-moz-box-shadow:0 -1px 0 #444444;
-	background-color:#fafafa;
-	color:#000000;
-	display:inline-block;
-	font-size:13px;
-	font-weight:500;
-	line-height:16px;
-	margin:0 5px;
-	padding:2px 5px;
-}	
+pre.anounce {
+    width: 620px;
+    margin: 10px 0px 0px;
+    padding: 10px;
+    border: 1px dotted rgb(119, 136, 85);
+    background: none repeat scroll 0% 0% rgb(245, 245, 245);
+}
 	
