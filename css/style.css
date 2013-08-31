@@ -462,9 +462,9 @@ span.anounce {
 	border-radius: 5px;
 	-moz-box-shadow:0 -1px 0 #444444;
 	background-color:#fafafa;
-	color:#FFFFFF;
+	color:#000000;
 	display:inline-block;
-	font-size:10px;
+	font-size:13px;
 	font-weight:500;
 	line-height:16px;
 	margin:0 5px;
