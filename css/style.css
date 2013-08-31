@@ -461,7 +461,7 @@ span.anounce {
 	-moz-webkit-radius: 5px 5px 5px 5px;
 	border-radius: 5px;
 	-moz-box-shadow:0 -1px 0 #444444;
-	background-color:#222222;
+	background-color:#fafafa;
 	color:#FFFFFF;
 	display:inline-block;
 	font-size:10px;
@@ -469,6 +469,5 @@ span.anounce {
 	line-height:16px;
 	margin:0 5px;
 	padding:2px 5px;
-	text-shadow:0 1px 0 #000000;
 }	
 	
