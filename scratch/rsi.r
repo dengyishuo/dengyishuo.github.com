@@ -7,11 +7,13 @@ suppressWarnings(rm("order_book.RSI",pos=.strategy))
 suppressWarnings(rm("account.RSI","portfolio.RSI",pos=.blotter))
 suppressWarnings(rm("account.st","portfolio.st","stock.str","stratRSI","initDate","initEq",'start_t','end_t'))
 
+```
 # Initialize a strategy object
 # 初始化策略对象，命名为stratRSI
 stratRSI <- strategy("RSI")
 
 n=2
+```
 
 # Add an indicator
 # 添加指标
