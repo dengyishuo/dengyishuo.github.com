@@ -74,7 +74,7 @@
 * seriesLo(x):提取最低价
 
 ### 2.3 简单的计算函数
-#### 列操作函数
+#### Delt 函数
 
 计算变化率
 Delt(x1, x2 = NULL, k = 0, type = c("arithmetic", "log")) 
@@ -114,14 +114,22 @@ Delt(Stock.Open,Stock.Close,K=1)
 
 (Stock.Open[1:6]-Stock.Close[2:7])/Stock.Open[1:6]
 
+#### 其它列计算函数
 
 OpCl(x):等同于Delt(Op(x), Cl(x))
-ClCl(x):等同于Delt(Cl(x))
+
+ClCl(x):等同于Delt(Cl(x));等价于diff(Cl(x))/lag(Cl(x))
+
 HiCl(x):等同于Delt(Hi(x),Cl(x))
+
 LoCl(x):等同于Delt(Lo(x),Cl(x))
+
 LoHi(x):等同于Delt(Lo(x),Hi(x))
+
 OpHi(x):等同于Delt(Op(x),Hi(x))
+
 OpLo(x):等同于Delt(OP(x),Lo(x))
+
 OpOp(x):等同于Delt(Op(x))
 
 ### 2.4 计算收益率的函数
