@@ -333,7 +333,7 @@ span.balloon {
 	float:left;
 	margin-left:-50px;
 	text-transform:uppercase;
-	width:25%;
+	width:23%;
 }
 
 #sidebar ul {
@@ -377,7 +377,7 @@ span.balloon {
 
 #main {
 	float:right;
-	width:75%;
+	width:77%;
 }
 
 #main .posts {
