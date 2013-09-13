@@ -10,6 +10,8 @@ tags:
 - 世界发展指数
 ---
 
+<b>发布日期:2013-09-01 作者:邓一硕</b>
+
 在网络上闲逛时偶然发现了WDI包。
 
 搜索、提取及格式化世界银行（World Bank）公布的世界发展指标（World Development Indicators）数据。
