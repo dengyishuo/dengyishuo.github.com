@@ -8,7 +8,7 @@
 
 为什么要有逻辑判断类呢？因为`quantmod`包能处理的数据具有格式上的要求，即必须是 `OHLC` / `OHLCV` / `BBO` / `TBBO` / `HLC` / `quantmod` / `quantmodResults` 中的一种，否则的话，函数没法进行正确的计算。这就要求我们在进行其它操作之前，得先判断我们读进来的数据是否属于上述数据中的一种。逻辑判断类的函数就是干这个活计的。逻辑判断类的函数又能细分为两类，即`is.*`类和`has.*`类。
 
-#### is族函数
+#### 2.1.1 is族函数
 
 `is.*`类函数用来判断数据是否属于某个特定类型。
 
@@ -26,7 +26,7 @@
 
 * is.quantmodResults(x):  
 
-#### has族函数
+#### 2.1.2 has 族函数
 
 * has.OHLC(x, which = FALSE) 
 
@@ -49,7 +49,6 @@
 * has.Ask(x, which = FALSE)
 
 * has.Bid(x, which = FALSE)
-
 * has.Price(x, which = FALSE)
 
 * has.Qty(x, which = FALSE)
@@ -74,7 +73,7 @@
 * seriesLo(x):提取最低价
 
 ### 2.3 简单的计算函数
-#### Delt 函数
+#### 2.3.1 Delt 函数
 
 计算变化率
 Delt(x1, x2 = NULL, k = 0, type = c("arithmetic", "log")) 
@@ -114,7 +113,7 @@ Delt(Stock.Open,Stock.Close,K=1)
 
 (Stock.Open[1:6]-Stock.Close[2:7])/Stock.Open[1:6]
 
-#### 其它列计算函数
+#### 2.3.2 其它列计算函数
 
 OpCl(x):等同于Delt(Op(x), Cl(x))
 
