@@ -2,61 +2,83 @@
 
 任何数据分析过程都离不开数据操作，金融数据分析也不例外。这里就重点说一说`quantmod`包中与数据操作相关的一些函数及其用法。在谋划如何介绍这些包中的函数时，我很纠结，因为集中对函数进行学习很容易堕入函数和参数陷阱。会学习的十分难受。首先，按什么顺序来学习这些函数呢？按字母顺序来学习的话，显然是个颇为狗血的决定。因为字母顺序强硬地打破了各个函数之间承接关系。鉴于此，我决定将包中的函数按照用途进行分组。
 
-`quantmod`包中的函数大致可以归为这么几类：逻辑判断类、数据提取类、时期转换类、计算类、其它类。下面分类介绍一下这些函数，说明这些函数存在的原因以及具体用法。
+`quantmod` 包中的函数大致可以归为这么几类：逻辑判断类、数据提取类、时期转换类、计算类、其它类。下面分类介绍一下这些函数，说明这些函数存在的原因以及具体用法。
 
 ### 2.1 逻辑判断函数
 
-为什么要有逻辑判断类呢？因为`quantmod`包能处理的数据具有格式上的要求，即必须是 `OHLC` / `OHLCV` / `BBO` / `TBBO` / `HLC` / `quantmod` / `quantmodResults` 中的一种，否则的话，函数没法进行正确的计算。这就要求我们在进行其它操作之前，得先判断我们读进来的数据是否属于上述数据中的一种。逻辑判断类的函数就是干这个活计的。逻辑判断类的函数又能细分为两类，即`is.*`类和`has.*`类。
+为什么要有逻辑判断类呢？因为`quantmod`包能处理的数据具有格式上的要求，即必须是 `OHLC` / `OHLCV` / `BBO` / `TBBO` / `HLC` / `quantmod` / `quantmodResults` 中的一种，否则的话，函数没法进行正确的计算。这就要求我们在进行其它操作之前，得先判断我们读进来的数据是否属于上述数据中的一种。逻辑判断类的函数就是干这个活计的。逻辑判断类的函数又能细分为两类，即 `is.*` 类和 `has.*` 类。
 
-#### 2.1.1 is族函数
+#### 2.1.1 is 族函数
 
-`is.*`类函数用来判断数据是否属于某个特定类型。
+`is.*`类函数用来判断数据是否属于某个特定类型。具体用法如下：
 
 * is.OHLC(x):检查是否是OHLC类型数据
-
 * is.OHLCV(x)：检查是否是OHLCV类型数据
-
 * is.BBO(x)：检查是否是BBO类型数据
-
 * is.TBBO(x)：检查是否是TBBO类型数据
-
 * is.HLC(x):检查是否是HLC类型数据
-
 * is.quantmod(x):   
-
 * is.quantmodResults(x):  
+
+举个例子。我们从网上获取 yahoo 公司的股票数据：
+
+```{r}
+> getSymbols("YHOO")
+> YHOO["2013-10-01::"]
+           YHOO.Open YHOO.High YHOO.Low YHOO.Close YHOO.Volume YHOO.Adjusted
+2013-10-01     33.36     34.44    33.30      34.31    28153200         34.31
+2013-10-02     34.15     34.70    33.90      34.14    21609200         34.14
+2013-10-03     34.32     34.36    33.20      33.88    23252300         33.88
+2013-10-04     33.96     35.06    33.96      34.89    23937800         34.89
+2013-10-07     34.46     34.69    34.08      34.14    15432800         34.14
+2013-10-08     34.46     34.50    32.10      32.93    42872200         32.93
+2013-10-09     33.07     33.33    31.79      33.01    33491800         33.01
+2013-10-10     33.49     33.91    33.33      33.87    23417200         33.87
+2013-10-11     33.67     34.37    33.61      34.15    17006000         34.15
+2013-10-14     33.80     34.10    33.68      34.00    17594900         34.00
+2013-10-15     34.20     34.32    33.06      33.38    42360300         33.38
+> is.OHLC(YHOO)
+[1] TRUE
+> is.OHLCV(YHOO)
+[1] TRUE
+> is.HLC(YHOO)
+[1] TRUE
+> is.BBO(YHOO)
+[1] FALSE
+> is.quantmod(YHOO)
+[1] FALSE FALSE
+```
 
 #### 2.1.2 has 族函数
 
+has 族函数用来判断数据中是否包含某个维度。
+
 * has.OHLC(x, which = FALSE) 
-
 * has.HLC(x, which = FALSE)
-
 * has.OHLCV(x, which = FALSE)
-
 * has.Op(x, which = FALSE)
-
 * has.Hi(x, which = FALSE)
-
 * has.Lo(x, which = FALSE)
-
 * has.Cl(x, which = FALSE)
-
 * has.Vo(x, which = FALSE)
-
 * has.Ad(x, which = FALSE)
-
 * has.Ask(x, which = FALSE)
-
 * has.Bid(x, which = FALSE)
 * has.Price(x, which = FALSE)
-
 * has.Qty(x, which = FALSE)
-
 * has.Trade(x, which = FALSE)
 
+```{r}
+> has.OHLC(YHOO)
+[1] TRUE TRUE TRUE TRUE
+> has.HLC(YHOO)
+[1] TRUE TRUE TRUE
+> has.OHLCV(YHOO)
+[1] TRUE TRUE TRUE TRUE TRUE
+```
+
 ### 2.2 提取数据的函数
-#### 列名函数
+#### 2.2.1 列名函数
 * Op(x):提取开盘价
 * Hi(x):提取最高价
 * Lo(x):提取最低价
@@ -66,7 +88,7 @@
 * HLC(x):提取最高价、最低价和收盘价
 * OHLC(x):提取开盘价、最高价、最低价和收盘价
 
-#### series族函数
+#### 2.2.2 series族函数
 
 * seriesHi(x)：提取开盘价
 
@@ -144,21 +166,21 @@ OpOp(x):等同于Delt(Op(x))
 * yearlyReturn()
 * allReturns()
 
-```
+```{r}
 #求日收益率
 periodReturn(x,period='daily')
 #或者
 dailyReturn(x)
 ```
 
-~~~
+```{r}
 #求周收益率
 periodReturn(x,period='weekly')
 #或者
 weeklyReturn(x)
 ```
 
-```
+```{r}
 #求月收益率
 periodReturn(x,period='monthly')
 #或者
@@ -197,7 +219,7 @@ quarterlyReturn(x)
 * to.monthly():将PHLC数据转化为月数据
 * periodicity()：返回数据的日期范围
 
-```
+```{r}
 #例子
 Lag(Op(CHL))
 Lag(Op(CHL),c(1,3,5))

@@ -80,7 +80,7 @@ getSymbols("EDU")
 getSymbols("^SSEC")
 ```
 
-上面几个例子中，我们在获取股票日交易数据之前，得先知晓了上市公司股票或者指数的缩写码。如果不知道，怎么办？比如，我们想获取上证A股指数的日交易数据，或者，我们想要获取代码为`600635`的股票的日交易数据，怎么办？此时，我们可以令`getSymbols()`函数中的`symbol="600635.ss"`即可。
+上面几个例子中，我们在获取股票日交易数据之前，得先知道上市公司股票或者指数的缩写码。如果不知道，怎么办？比如，我们想获取上证 A 股指数的日交易数据，或者，我们想要获取代码为 `600635` 的股票的日交易数据，怎么办？此时，我们可以令 `getSymbols()` 函数中的 `symbol="600635.ss"` 即可。
 
 ```
 # 例子
@@ -95,23 +95,23 @@ getSymbols("600635.ss")
 getSymbols("000001.ss")
 ```
 
-同样的，我们可以获取上证A股指数（代码为000002.ss）、上证B股指数（代码为000003.ss）、上证综合指数（代码为000008.ss）、沪深300指数（代码为000300.ss）、深圳成指（代码为399001.sz）、三一重工（代码为600030.ss）等。
+同样，我们可以获取上证 A 股指数（代码为 000002.ss ）、上证B股指数（代码为 000003.ss ）、上证综合指数（代码为 000008.ss ）、沪深300指数（代码为 000300.ss ）、深圳成指（代码为 399001.sz ）、三一重工（代码为 600030.ss ）等。
 
 ```
 #例：获取上证A股指数
-#上证A股指数的代码为000002.ss
+#上证A股指数的代码为 000002.ss
 getSymbols("000002.ss")
 ```
 
 ```
 #例：获取上证B股指数
-#上证B股指数的代码为000003.ss
+#上证B股指数的代码为 000003.ss
 getSymbols("000003.ss")
 ```
 
 ```
 #例：获取上证综合指数
-#上证综合指数的代码为000008.ss。
+#上证综合指数的代码为 000008.ss
 getSymbols("000008.ss")
 ```
 
@@ -135,7 +135,7 @@ getSymbols("600030.ss")
 
 ### 1.1.2 日交易数据的重命名
 
-用前文说过的方法可以方便的获取各种指数和上市公司的日交易数据。然而，由于将`symbols`参数等于股票或者指数代码的时候，没有给数据命名。因此，对其引用时十分困难。为了使用数据的方便，我们可以借助`setSymbolLookup()`函数对数据进行重命名。
+用前文说过的方法可以方便地获取各种指数和上市公司的日交易数据。然而，由于将 `symbols` 参数等于股票或者指数代码的时候，没有给数据命名。因此，对其引用时十分困难。为了使用数据的方便，我们可以借助`setSymbolLookup()`函数对数据进行重命名。
 
 ```r
 #例子
@@ -176,19 +176,23 @@ getSymbols("SANY.HEAVY")
 
 
 ### 1.1.3 获取上市公司股息数据
-getDividends()函数可以获取上市公司的股息数据。
 
+`getDividends`函数可以获取上市公司的股息数据。
+
+```{r}
 getDividends("CHL")
+```
 
 根据股息调整股票价格
 
-adjustOHLC()函数可以对股票数据进行除息调整。
+`adjustOHLC`函数可以对股票数据进行除息调整。
 
+```{r}
 getSymbols("CHL", from="1990-01-01", src="yahoo")
 head(CHL)
 head(CHLL.a <- adjustOHLC(CHL))
 head(CHL.uA <- adjustOHLC(CHL, use.Adjusted=TRUE))
-
+```
 
 ### 1.1.4 获取上市公司的拆股数据
 
@@ -276,7 +280,7 @@ getSymbols('CPIAUCNS')
 ```
 ## 1.2 从数据库获取股票数据
 
-[quantmod](http://www.quantmod.com)除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括：
+[quantmod] (http://www.quantmod.com) 除了支持从网络数据库直接抓取数据外，当然也支持从本地数据库读入数据。目前，能支持的数据库类型包括：
 
 * MySQL
 * SQLite
@@ -285,10 +289,10 @@ getSymbols('CPIAUCNS')
 
 对应的函数有以下几个：
 
-* getSymbols.MySQL()：从MySQL数据库读取数据
-* getSymbols.SQLite()：从SQLite数据库读取数据
-* getSymbols.csv()：从csv文件读取OHLC数据
-* getSymbols.rda()：读取以.r格式存储的数据
+* getSymbols.MySQL()：从 MySQL 数据库读取数据
+* getSymbols.SQLite()：从 SQLite 数据库读取数据
+* getSymbols.csv()：从 csv 文件读取 OHLC 数据
+* getSymbols.rda()：读取以 .r 格式存储的数据
 
 
 ## 1.3 查看和移除股票数据
@@ -305,10 +309,13 @@ showSymbols(env=.GlobalEnv)
 RemoveSymbols("CHL")
 showSymbols(env=.GlobalEnv)
 ```
+
 ```
 getQuote("AAPL")
 getQuote("QQQQ;SPY;^VXN",what=yahooQF(c("Bid","Ask")))
 standardQuote()
 yahooQF()
 ```
+```
 attachSymbols()
+```
