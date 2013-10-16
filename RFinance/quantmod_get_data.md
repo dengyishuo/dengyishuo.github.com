@@ -13,7 +13,7 @@
 [quantmod](http://www.quantmod.com )包中的`getSymbols()`函数可以从网络上获取数据。我们用`args()`函数看一下它的基本用法。
 
 
-```{r}
+```r
 # 安装并载入quantmod包
 install.packages("quantmod")
 require(quantmod)
@@ -55,7 +55,7 @@ file.path|指定文件路径的字符串。
 
 基于`getSymbols()`函数从很容易从前文提到的几个数据库中获取上市公司股票的日交易数据。比如，我们想获取中国移动通讯公司的日交易数据，我们可以输入下面的代码：
 
-```
+``` r
 #例：获取中国移动公司数据
 getSymbols("CHL")
 ```
