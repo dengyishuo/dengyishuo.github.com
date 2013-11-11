@@ -13,7 +13,7 @@ tags:
 
 <b>发布日期:2013-09-28 作者:邓一硕</b>
 
-在 Windows 下面安装 RMySQL 就跟驯服一头猛兽差不多，有点费事儿，不过，搞定了也让令人兴奋。在驯兽之前要先把驯兽工具准备好。眼下需要的主要有这么个：
+在 Windows 下面安装 RMySQL 就跟驯服一头猛兽差不多，有点费事儿，不过，搞定了也让令人兴奋。
 
 1. 下载 R2.13.2: http://cran.stat.sfu.ca/index.html。
 2. 安装 RTools 214: http://cran.cict.fr 
