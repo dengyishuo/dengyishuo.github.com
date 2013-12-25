@@ -30,11 +30,11 @@ Be sure that the following paths are included in your Windows PATH variable: \Rt
 
 ### CREATE FOLDER AND COPY FILES
 
-* a. OPT: 在C:\Program Files\MySQL\MySQL Server 5.5\lib 下创建OPT文件夹，复制 MYSQLLIB.LIB 到该文件夹。复制libmysql.dll 到 \\R\R-2.14.0\bin\ (64 bit) 和 \\R\R-2.14.0\bin\i386\ (32 bit) 和 C:\Windows\System32。
+* a. OPT: 在C:\Program Files\MySQL\MySQL Server 5.5\lib 下创建OPT文件夹，复制 MYSQLLIB.LIB 到该文件夹。
 
 * b. Renviron.site: 打开\\R\R-2.14.0\etc\Renviron.site ，向文件添加一行: MYSQL_HOME =”C:/Program Files/MySQL/MySQL Server 5.5/” 
 
-* c. libMySQL.dll: 复制libMySQL.dll到 C:\Program Files\R\R-2.13.2\bin\i386 和 C:\Program Files\R\R-2.13.2\bin
+* c. 复制libmysql.dll 到 \\R\R-2.14.0\bin\ (64 bit) 和 \\R\R-2.14.0\bin\i386\ (32 bit) 和 C:\Windows\System32。
 
 ### RUN COMMANDS
 

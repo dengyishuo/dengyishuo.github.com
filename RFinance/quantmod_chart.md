@@ -212,8 +212,6 @@ addZLEMA()
 
 ### 3.5 图形缩放
 
-#### 图形缩放
-
 ```
 zooom(n=1, eps=2)
 zoomChart(subset, yrange=NULL)
