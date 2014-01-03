@@ -20,23 +20,23 @@ tags:
 
 下载并安装 [MySQL](http:http://dev.mysql.com/downloads/mysql/),这一点大多数人都知道如何操作，只提醒一点看清楚自己的电脑是 32 位还是 64位.
 
-### 第二弹,把 MySQL 添加到Path变量.
+#### 第二弹,把 MySQL 添加到Path变量.
 
-具体做法是找到我的电脑(指图标哦),右键,系统属性,打开"高级"选项卡,下面可以瞅见"环境变量",点进去,上面部分为"用户变量",下面部分是"系统变量",在变量列，找到一个叫 Path 的东西,选中,点编辑,把 MySQL 的安装路径复制进去即可;
+具体做法是找到我的电脑(指图标),右键,系统属性,打开"高级"选项卡,下面可以瞅见"环境变量",点进去,上面部分为"用户变量",下面部分是"系统变量",在变量列，找到一个叫 Path 的东西,选中,点编辑,把 MySQL 的安装路径复制进去即可;
 
-### 第三弹,关联 MySQL 和 R 软件
+#### 第三弹,关联 MySQL 和 R 软件
 
 具体是,打开 C:\Program Files\MySQL\MySQL Server 5.5\lib ,新建 OPT 文件夹, 并复制 MYSQLLIB.LIB 到该文件夹内.同时,复制 libmysql.dll 到到\\R\R-2.14.0\bin\ (64 bit) 或 \\R\R-2.14.0\bin\i386\ (32 bit) 和 C:\Windows\System32 中;接下来,找到 R\3.0.2\etc 文件夹，并新建 Renviron.site 文件,用记事本打开,向其中添加一行:MYSQL_HOME =”C:/Program Files/MySQL/MySQL Server 5.5/” .
 
-### 第四弹,下载并安装 [RTools](http://cran.r-project.org/bin/windows/Rtools/)
+#### 第四弹,下载并安装 [RTools](http://cran.r-project.org/bin/windows/Rtools/)
 
 安装过程很简单,略过.要提醒的是要把\Rtools\2.14\bin,\Rtools\3.0.x\MinGW\bin,\Rtools\3.0.x\MinGW64\bin 添加到 path 变量.
 
-### 第五弹,下载 [RMySQL](http://biostat.mc.vanderbilt.edu/wiki/main/RMySQL/RMySQL_0.8-0.tar.gz )源代码,
+#### 第五弹,下载 [RMySQL](http://biostat.mc.vanderbilt.edu/wiki/main/RMySQL/RMySQL_0.8-0.tar.gz )源代码,
 
 略过.
 
-### 第六弹,运行代码安装 RMySQL.
+#### 第六弹,运行代码安装 RMySQL.
 
 假设源码存放地址为 d://RMySQL_0.8-0.tar.gz ,运行如下命令:
 
@@ -53,9 +53,6 @@ con = dbConnect(drv,host="localhost",dbname="test",user="root",pass="root")
 album = dbGetQuery(con,statement="select * from t_master") 
 album
 {% endhighlight %}
-
-
-
 
 
 
