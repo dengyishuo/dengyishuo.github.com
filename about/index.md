@@ -1,0 +1,34 @@
+---
+title: About me
+layout: page
+comments: yes
+---
+
+<h1>个人简介</h1>
+<ul>
+<p>
+邓一硕，毕业于中央财经大学，现生活在帝都，效力于某国企计划财务部。感兴趣的方向是R语言在金融投资分析和计量经济学中的应用。
+</p>
+
+</ul>
+<h1>翻译作品</h1>
+<ul>
+<li>《R in a Nutshell》（已交稿）</li>
+<li>《R Graphics Cookbook》（已交稿）</li>
+<li>《Introductory Statistics with R》（校稿中）</li>
+<li>《Data Mining with Rattle and R》（翻译中）</li>
+</ul>
+
+<h1>在线作品</h1>
+<ul>
+<li>《金融时间序列分析常见问题集》</li>
+<li>《quantmod：R中的金融分析包》</li>
+<li>《GARCH族模型与R语言》</li>
+</ul>
+
+<h1>社会职务</h1>
+<ul>
+<li><a href="http://cos.name">统计之都</a>理事会前理事</li>
+<li>中国R语言会议理事会理事</li>
+<li>COS数据科学家沙龙联合发起人、理事会理事</li>
+</ul>

@@ -1,79 +1,46 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-	<head>
-		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-		<title>格物堂</title>
-		<link rel="stylesheet" type="text/css" href="/css/style.css" />
-		<link rel="stylesheet" type="text/css" href="/css/syntax.css" />
-		<link rel="alternate" type="application/rss+xml" title="RSS" href="http://feeds.feedburner.com/dengyishuo">
-		<script type="text/javascript">
-		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-1281124-20']);
-		  _gaq.push(['_trackPageview']);
-
-		  (function() {
-		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  })();
-		</script>
-	</head>
-
-	<body>
-	    
-    	<div id="logo">
-			<!--<span id="tags">专注于R语言在金融投资分析和计量经济学中的应用</span>-->
-			<!--<a href="http://yishuo.org/about.html" target="_blank"><span id="tags">如果对我有兴趣，点此查看关于我</span></a>-->
-			<h1><a href="/">格物堂</a><font color="#FAFA96">Statistics,Literature and Fantasy.</font></h1></div>
-		<div id="wrapper">
-			<div id="content" class="index">
-				<div id="sidebar">
-					<ul>
-						<li>
-							<a href="#">ARTICLES</a>
-							<ul>
-								{% for category in site.categories %}
-								<li><a href="/{{ category[0]  }}.html"> {{ category[0]  }}</a></li>
-								{% endfor %}
-							</ul>
-						</li>
-						<li><a href="/quotes.html">QUOTES</a></li>
-						<li><a href="/projects.html">PROJECTS</a></li>
-						<li><a href="/about.html">ABOUT</a></li>
-						<!--<li><a href="http://yishuo.org/about.html">RESUME</a></li>-->
-						<li><a href="/links.html">LINKS</a></li>
-						<li><a href="/contact.html">CONTACT</a></li>
-					</ul>
-				</div>
-				
-				<div id="main">
-				{{ content }}
-				</div>
-
-				<div id="footer">
-					<div id="feed">
-						<div class="badget" id="github">
-							<a href="http://github.com/dengyishuo">
-							<span class="service">github</span>
-							<span class="info">190+</span>
-							</a>
-						</div>
-						<div class="badget" id="weibo">
-							<a href="http://weibo.com/dengyishuo">
-							<span class="service">weibo</span>
-							<span class="info">1000+</span>
-							</a>
-						</div>
-						<div class="badget" id="feedburner">
-							<a href="http://feeds.feedburner.com/dengyishuo">
-							<span class="service">rss</span>
-							<span class="info">1000+</span>
-							</a>
-						</div>
-					</div>
-					<span style="color:#bbb;font-size:12px">专注于R语言在金融投资分析和计量经济学中的应用</span>
-					<p style="clear:both"></p>
-				</div>
-	</body>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="{{ site.author }}" />
+    <title>{{ page.title }} | {{ site.author }}</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="{{ site.url }}/feed/" rel="alternate" title="{{ site.author }}" type="application/atom+xml" />
+    <link rel="stylesheet" href="/media/css/style.css">
+    <link rel="stylesheet" href="/media/css/highlight.css">
+    <script type="text/javascript" src="/media/js/jquery-1.7.1.min.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="main" role="main">
+        <header>
+        <h1>{{ page.title }}</h1>
+        </header>
+        <nav>
+        <span><a title="home page" class="" href="{{ site.url }}/">home</a></span>
+        <span><a title="about" class="" href="{{ site.url }}/about/">about</a></span>
+        <span><a title="publication" class="" href="{{ site.url }}/publication/">publication</a></span>
+        <span><a title="guestbook" class="" href="{{ site.url }}/guestbook/">guestbook</a></span>
+        <span><a title="vitae" class="" href="{{ site.url }}/vitae/">vitae</a></span>
+        <span><a title="categories" class="" href="{{ site.url }}/categories/">categories</a></span>
+        <span><a title="tags" class="" href="{{ site.url }}/tags/">tags</a></span>
+        <span><a title="links" class="" href="{{ site.url }}/links/">links</a></span>
+        <span><a title="subscribe by RSS" class="" href="{{ site.url }}/feed/">subscribe</a></span>
+        </nav>
+        <article class="content">
+        {{ content }}
+        </article>
+      </div>
+    </div>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1988641-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
 </html>
-
