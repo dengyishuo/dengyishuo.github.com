@@ -1,6 +1,2 @@
 markdown: rdiscount
-permalink: /:year/:month/:title/
-url: http://yishuo.org/
-author: 邓一硕
 pygments: true
-

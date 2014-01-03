@@ -20,8 +20,7 @@
 	</head>
 
 	<body>
-	    
-    	<div id="logo">
+		<div id="logo">
 			<!--<span id="tags">专注于R语言在金融投资分析和计量经济学中的应用</span>-->
 			<!--<a href="http://yishuo.org/about.html" target="_blank"><span id="tags">如果对我有兴趣，点此查看关于我</span></a>-->
 			<h1><a href="/">格物堂</a><font color="#FAFA96">Statistics,Literature and Fantasy.</font></h1></div>
@@ -30,7 +29,7 @@
 				<div id="sidebar">
 					<ul>
 						<li>
-							<a href="#">ARTICLES</a>
+							<a href="/">ARTICLES</a>
 							<ul>
 								{% for category in site.categories %}
 								<li><a href="/{{ category[0]  }}.html"> {{ category[0]  }}</a></li>
@@ -41,39 +40,16 @@
 						<li><a href="/projects.html">PROJECTS</a></li>
 						<li><a href="/about.html">ABOUT</a></li>
 						<!--<li><a href="http://yishuo.org/about.html">RESUME</a></li>-->
-						<li><a href="/links.html">LINKS</a></li>
+						<!--<li><a href="/links.html">LINKS</a></li>-->
 						<li><a href="/contact.html">CONTACT</a></li>
 					</ul>
 				</div>
 				
 				<div id="main">
-				{{ content }}
+					{{ content }}
 				</div>
 
-				<div id="footer">
-					<div id="feed">
-						<div class="badget" id="github">
-							<a href="http://github.com/dengyishuo">
-							<span class="service">github</span>
-							<span class="info">190+</span>
-							</a>
-						</div>
-						<div class="badget" id="weibo">
-							<a href="http://weibo.com/dengyishuo">
-							<span class="service">weibo</span>
-							<span class="info">1000+</span>
-							</a>
-						</div>
-						<div class="badget" id="feedburner">
-							<a href="http://feeds.feedburner.com/dengyishuo">
-							<span class="service">rss</span>
-							<span class="info">1000+</span>
-							</a>
-						</div>
-					</div>
-					<span style="color:#bbb;font-size:12px">专注于R语言在金融投资分析和计量经济学中的应用</span>
-					<p style="clear:both"></p>
-				</div>
 	</body>
 </html>
+
 
