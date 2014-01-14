@@ -59,15 +59,16 @@ $$
 \begin{bmatrix}c_{11}&c_{12}&..&c_{1n}\\c_{21} &c_{22} &.. &c_{2n}\\..&..&..&..\\c_{n1} &c_{n2} &.. &c_{nn}\end{bmatrix}
 $$
 
+$$
 \begin{bmatrix}
 w_1\\ 
 w_2\\ 
 .. \\
 w_n\\ 
 \end{bmatrix}
-
 $$
 
+$$
 \sigma \_{p}=\begin{bmatrix}
 wc_{\cdot 1} & wc_{\cdot 2} &..  & wc_{\cdot j}
 \end{bmatrix}\begin{bmatrix}
