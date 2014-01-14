@@ -50,41 +50,18 @@ $$
 由前面的公式可知：
 
 $$
-\sigma \_{p}=\begin{matrix}
-w_1&w_2&..&w_n
-\end{matrix}
-\begin{array}
-c_{11}&c_{12}&..&c_{1n} \\
-c_{21} &c_{22} &.. &c_{2n}\\
-..&..&..&.. \\
-c_{n1} &c_{n2} &.. &c_{nn}
-\end{array}
+\begin{align*}
+  & \phi(x,y) = \phi \left(\sum_{i=1}^n x_ie_i, \sum_{j=1}^n y_je_j \right)
+  = \sum_{i=1}^n \sum_{j=1}^n x_i y_j \phi(e_i, e_j) = \\
+  & (x_1, \ldots, x_n) \left( \begin{array}{ccc}
+      \phi(e_1, e_1) & \cdots & \phi(e_1, e_n) \\
+      \vdots & \ddots & \vdots \\
+      \phi(e_n, e_1) & \cdots & \phi(e_n, e_n)
+    \end{array} \right)
+  \left( \begin{array}{c}
+      y_1 \\
+      \vdots \\
+      y_n
+    \end{array} \right)
+\end{align*}
 $$
-
-变形得到：
-
-$$
-\begin{bmatrix}
-w_1 \\\
-
-w_2 \\\
-  
-.. \\\
-
-w_n 
-\end{bmatrix}
-$$
-
-$$
-\sigma \_{p}=\begin{bmatrix}
-wc_{\cdot 1} & wc_{\cdot 2} &..  & wc_{\cdot j}
-\end{bmatrix}\begin{bmatrix}
-w_1\\ 
-w_2\\ 
-.\\
-w_n\\ 
-\end{bmatrix}
-
-$$
-
-
