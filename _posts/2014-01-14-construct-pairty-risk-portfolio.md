@@ -50,7 +50,14 @@ $$
 由前面的公式可知：
 
 $$
-\sigma \_{p}=\begin{bmatrix}
+\sigma \_{p}=
+$$
+
+变形得到：
+
+
+
+\begin{bmatrix}
 w_1&w_2&..&w_n
 \end{bmatrix}
 \begin{bmatrix}
@@ -65,9 +72,6 @@ w_2\\
 .. \\
 w_n\\ 
 \end{bmatrix}
-$$
-
-变形得到：
 
 $$
 
