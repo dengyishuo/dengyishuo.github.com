@@ -50,7 +50,7 @@ $$
 由前面的公式可知：
 
 $$
-\sigma \_p=\begin{bmatrix}
+\sigma \_{p}=\begin{bmatrix}
 w_1&w_2&..&w_n
 \end{bmatrix}\begin{bmatrix}
  c_{11} &c_{12} &.. &c_{1n} \\ 
@@ -70,7 +70,7 @@ $$
 
 $$
 
-\sigma \_p=\begin{bmatrix}
+\sigma \_{p}=\begin{bmatrix}
 wc_{\cdot 1} & wc_{\cdot 2} &..  & wc_{\cdot j}
 \end{bmatrix}\begin{bmatrix}
 w_1\\ 
