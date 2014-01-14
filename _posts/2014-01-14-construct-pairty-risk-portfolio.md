@@ -53,12 +53,12 @@ $$
 \sigma \_{p}=\begin{matrix}
 w_1&w_2&..&w_n
 \end{matrix}
-\begin{matrix}
+\begin{array}
 c_{11}&c_{12}&..&c_{1n} \\
 c_{21} &c_{22} &.. &c_{2n}\\
 ..&..&..&.. \\
 c_{n1} &c_{n2} &.. &c_{nn}
-\end{matrix}
+\end{array}
 $$
 
 变形得到：
