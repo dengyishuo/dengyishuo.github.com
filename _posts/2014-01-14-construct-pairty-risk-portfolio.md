@@ -50,14 +50,18 @@ $$
 由前面的公式可知：
 
 $$
-\sigma \_{p}=\begin{bmatrix}w_1&w_2&..&w_n\end{bmatrix}
+\sigma \_{p}=\begin{matrix}
+w_1&w_2&..&w_n
+\end{matrix}
+\begin{matrix}
+c_{11}&c_{12}&..&c_{1n} \\
+c_{21} &c_{22} &.. &c_{2n}\\
+..&..&..&.. \\
+c_{n1} &c_{n2} &.. &c_{nn}
+\end{matrix}
 $$
 
 变形得到：
-
-$$
-\begin{bmatrix}c_{11}&c_{12}&..&c_{1n}\\c_{21} &c_{22} &.. &c_{2n}\\..&..&..&..\\c_{n1} &c_{n2} &.. &c_{nn}\end{bmatrix}
-$$
 
 $$
 \begin{bmatrix}
