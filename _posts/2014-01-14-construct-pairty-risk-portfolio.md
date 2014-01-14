@@ -56,12 +56,7 @@ $$
 变形得到：
 
 $$
-\begin{bmatrix}
- c\_{11} &c_{12} &.. &c_{1n} \\ 
- c_{21} &c_{22} &.. &c_{2n} \\ 
- ..     &..     &.. &..     \\ 
- c_{n1} &c_{n2} &.. &c_{nn} 
-\end{bmatrix}
+\begin{bmatrix}c_{11}&c_{12}&..&c_{1n}\\c_{21} &c_{22} &.. &c_{2n}\\..&..&..&..\\c_{n1} &c_{n2} &.. &c_{nn}\end{bmatrix}
 $$
 
 \begin{bmatrix}
