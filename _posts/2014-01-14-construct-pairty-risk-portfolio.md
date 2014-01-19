@@ -36,10 +36,10 @@ $$
 $$ R_{p} = w'R $$
 
 $$
-\sigma \_p = w'Rw
+\sigma \_p = w'Cw
 $$
 
-其中，$ R=(R_1,R_2,...,R_n) $是组合中各证券的收益率。
+其中，$ R=(R_1,R_2,...,R_n) $是组合中各证券的收益率，C 是组合中各证券的收益率的协方差矩阵。
 
 把$ R_{p} $和$\sigma \_p $带入$U_p$，解出令$U_p$最小的$ w $即可。
 
@@ -50,10 +50,5 @@ $$
 由前面的公式可知：
 
 $$
-\begin{matrix}
-c_{11} &c_{12}  &\cdots & c_{1n} \\ 
-c_{21} &c_{22}  &\cdots & c_{2n} \\ 
-\vdots & \vdots &\vdots  &\vdots \\ 
-c_{n1} &c_{n2}  &\cdots  &c_{nn} \\ 
-\end{matrix}
+\sigma_p = w'Cw=w'c \time (w_1,w_2,...,w_n) 
 $$
