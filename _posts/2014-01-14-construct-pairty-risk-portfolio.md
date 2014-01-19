@@ -49,11 +49,11 @@ $$
 
 由前面的公式可知：
 
-\[
-  \begin{bmatrix}
+$$
+\begin{matrix}
 c_{11} &c_{12}  &\cdots & c_{1n} \\ 
 c_{21} &c_{22}  &\cdots & c_{2n} \\ 
 \vdots & \vdots &\vdots  &\vdots \\ 
 c_{n1} &c_{n2}  &\cdots  &c_{nn} \\ 
-\end{bmatrix}
-\]
+\end{matrix}
+$$
