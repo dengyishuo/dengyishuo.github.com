@@ -50,5 +50,7 @@ $$
 由前面的公式可知：
 
 $$
-\sigma_p = w'Cw=w'c \times (w_1,w_2,...,w_n)'
+\sigma_p = wCw=wc \times (w_1,w_2,...,w_n)'=\sum_{i=1}^n wc_{\dot i}w_i
 $$
+
+上面可以看到
