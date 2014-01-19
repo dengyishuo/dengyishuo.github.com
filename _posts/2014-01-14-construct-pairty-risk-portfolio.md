@@ -59,6 +59,46 @@ $$
 \sum\_{j=1}^n \sum\_{i=1}^n \left[ wC\_{\cdot i}w_i-wC\_{\cdot j}w_j \right]\^2
 $$
 
+这是一个很简单的优化问题，在 R 软件里面很容易得到结果。
 
+### 用 R 实现风险均摊优化器
+
+{% highlight r %}
+
+# 模拟获取数据
+require(quantmod);
+x=getSymbols("000635.sz",from="2013-01-01",auto.assign=FALSE)
+y=getSymbols("000547.sz",from="2013-01-01",auto.assign=FALSE)
+z=getSymbols("600241.ss",from="2013-01-01",auto.assign=FALSE)
+ret_mat <- cbind(dailyReturn(x),dailyReturn(y),dailyReturn(z))
+ret_mat <- na.omit(ret_mat)
+
+# 定义目标函数
+ff <- function(w,ret_mat){
+   cov_mat <- cov(ret_mat);
+   w=c(w,1-sum(w));
+   len <- length(w);
+   w_mat <- matrix(rep(w,time=len),nr=len,byrow=TRUE);
+   diag_mat <- diag(w);
+   res <- 2*len*as.vector(t(diag(w_mat%*%cov_mat%*%diag_mat))%*%diag(w_mat%*%cov_mat%*%diag_mat))-2*(sum  (diag(w_mat%*%cov_mat%*%diag_mat)))^2;
+   return(res);
+ } 
+ 
+# 优化目标函数
+w <- optim(c(0.3,0.3),ff,ret_mat=ret_mat)$par;
+
+# 查看权重
+w=c(w,1-sum(w));
+
+{% endhighlight %}
+
+
+
+ 
+ 
+ 
+w = c(w,1-w[1]-w[2])
+
+% endhighlight %
 
 
