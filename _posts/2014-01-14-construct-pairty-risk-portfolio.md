@@ -49,8 +49,11 @@ $$
 
 由前面的公式可知：
 
-\[\mathbf{V}_1 \times \mathbf{V}_2 =  \begin{vmatrix}
-\mathbf{i} &amp; \mathbf{j} &amp; \mathbf{k} \\
-\frac{\partial X}{\partial u} &amp;  \frac{\partial Y}{\partial u} &amp; 0 \\
-\frac{\partial X}{\partial v} &amp;  \frac{\partial Y}{\partial v} &amp; 0
-\end{vmatrix}  \]
+$$
+  \begin{bmatrix}
+c_{11} &c_{12}  &\cdots & c_{1n} \\ 
+c_{21} &c_{22}  &\cdots & c_{2n} \\ 
+\vdots & \vdots &\vdots  &\vdots \\ 
+c_{n1} &c_{n2}  &\cdots  &c_{nn} \\ 
+\end{bmatrix}
+$$
