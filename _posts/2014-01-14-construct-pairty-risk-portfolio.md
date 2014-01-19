@@ -56,7 +56,7 @@ $$
 上面可以看到证券组合的风险相当于是$ wC\_{\cdot i} $的加权组合，权重刚好是$ w=(w_1,w_2,...,w_n) $。所谓风险均摊，就是令$ wC\_{\cdot i}w_i=wC\_{\cdot j}w_j $。也即，确定一个权重w使得证券组合的风险均摊等同于找到一个权重 w 使得下式最小：
 
 $$
-\sum_{j=1}^n \sum_{i=1}^n \left[ wC\_{\cdot i}w_i-wC\_{\cdot j}w_j \right]\^2
+\sum\_{j=1}^n \sum\_{i=1}^n \left[ wC\_{\cdot i}w_i-wC\_{\cdot j}w_j \right]\^2
 $$
 
 
