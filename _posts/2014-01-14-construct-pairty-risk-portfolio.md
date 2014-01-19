@@ -89,16 +89,8 @@ w <- optim(c(0.3,0.3),ff,ret_mat=ret_mat)$par;
 
 # 查看权重
 w=c(w,1-sum(w));
-
-{% endhighlight %}
-
-
-
- 
- 
- 
 w = c(w,1-w[1]-w[2])
 
-% endhighlight %
+{% endhighlight %}
 
 
