@@ -18,11 +18,11 @@ tags:
 首先，计算偏度系数$ sk $ 和 峰度系数 $ k $：
 
 $$
-sk=\frac{(\frac{1}{n}\sum\_{i=1}^{n}(x\_{i}-\bar x))^{3}}{(\frac{1}{n}\sum\_{i=1}^{n}(x_{i}-\bar x)^{2})^{\frac{3}{2}} }
+sk=\frac{\frac{1}{n}\sum\_{i=1}^{n}(x\_{i}-\bar x)^{3}}{(\frac{1}{n}\sum\_{i=1}^{n}(x_{i}-\bar x)^{2})^{\frac{3}{2}} }
 $$
 
 $$
-k=\frac{\sum(x_t-\bar x)^4}{n\sigma\_{x}^4}
+k=\frac{\frac{1}{n}\sum\_{i=1}^{n}(x\_{i}-\bar x)^{4}}{(\frac{1}{n}\sum\_{i=1}^{n}(x_{i}-\bar x)^{2})^{2} }-3
 $$
 
 Jarqe 和 Bera 建立了如下检验统计量——JB统计量：
