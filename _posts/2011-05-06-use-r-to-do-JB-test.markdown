@@ -20,6 +20,10 @@ tags:
 $$
 sk=\frac{\sum(x_{t}-\bar x)^3}{n\sigma\_{x}^3}
 $$
+
+$$
+sk=\frac{a}{b}
+$$
 $$
 k=\frac{\sum(x_t-\bar x)^4}{n\sigma\_{x}^4}
 $$
