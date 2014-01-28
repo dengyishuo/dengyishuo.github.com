@@ -18,11 +18,7 @@ tags:
 首先，计算偏度系数$ sk $ 和 峰度系数 $ k $：
 
 $$
-sk=\frac{\sum(x_{t}-\bar x)^3}{n\sigma\_{x}^3}
-$$
-
-$$
-sk=\frac{a}{n\sigma}
+sk=\frac{a}{\frac{1}{n}\sum(x_{i}-\bar x)^2 }
 $$
 $$
 k=\frac{\sum(x_t-\bar x)^4}{n\sigma\_{x}^4}
