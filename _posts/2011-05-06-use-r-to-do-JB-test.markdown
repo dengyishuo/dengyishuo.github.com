@@ -19,7 +19,7 @@ tags:
 [latex]k=\frac{\sum(x_t-\bar x)^4}{n\sigma_{x}^4}[/latex]
 正态分布的偏度为0，峰度为3。
 Jarqe和Bera 建立了如下检验统计量——JB统计量：
-[latex]JB=\frac{n}{6}(sk^2+\frac{(k-3)^2}{4})[/latex]
+[latex]JB=\frac{n}{6}(sk^2+\frac{(k^2}{4})[/latex]
 他们证明了，在正态性假定下，JB统计量渐近地服从自由度为2的[latex]\chi ^2[/latex]分布。
 如果变量服从正态分布，则S为零，K为3，因而JB 统计量的值为零。但是如果变量不是正态变量，则JB 统计量将为一个逐渐增大值。而针对每一个JB统计量，我们可以轻易算出其对应的P值，根据P值和事先确定的置信水平便可以确定是否拒绝变量为正态分布的假设。
 在R软件中，Jarque-Bera检验可以用tseries包中的jarque.bera.test()来实现。
