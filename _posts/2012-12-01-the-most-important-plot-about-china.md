@@ -10,13 +10,10 @@ tags:
 - 图表
 ---
 
-
-
   
 几天前看到华尔街日报的一则报道，该报道采访了法国里昂证券的研究员Russel Napier。Russel Napier认为，全球经济已进入早期复苏阶段的希望可能过于乐观了。他说，中国外汇储备增长将出现令人担忧的停滞,而中国外汇储备增长一直是全球经济增长的动力。
 
 从下图可以看到，中国外汇储备增长率已经在过去五年里急剧下降，并且现在已经接近零增长。Napier说下面这张图表是“世界上最重要的图表”。他说：“在过去20年中，中国外储增长决定了金融市场所有的关键发展动向。印钱措施将美国国债收益率曲线人为压低。它是全球经济增长的基石，而现在这一切结束了。”
-
  
 
 与之相佐证的是eFinancial News的一则报道：
@@ -31,7 +28,7 @@ tags:
 
 获取数据和绘制图形的R代码如下：
 
-```
+{% highlight r %}
 library(XML)
 getFX=function(pg){
 url=paste("http://data.caixin.com/macro/macro_indicator_more.html?id=F0010&cpage=",pg,"&pageSize=30&url=macro_indicator_more.html#top",sep="");
@@ -47,11 +44,10 @@ write.csv(table,"FX.csv")
 FX=read.csv("FX.csv")[,4]
 growth=diff(rev(FX))/rev(FX)*100
 growth.ts=ts(growth,start=c(1995,5),frequency=12)
-png("fx.growth.png",bg="transparent")
 plot(growth.ts,type="h",col="yellow2")
 abline(h=0.5,col="red",lty=2)
 text(1998,1,"1998")
 text(2008,1,"2008")
 text(2012,1,"2012")
-dev.off()
-```
+
+{% endhighlight %}

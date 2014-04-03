@@ -49,4 +49,4 @@ h=fitted(l)-2*sd(residuals(l))
 lines((1:length(ssec))[ssec<=quantile(ssec,0.9)],h,col="green")
 dev.off()
 
-{% endhighlight r %}
+{% endhighlight %}
