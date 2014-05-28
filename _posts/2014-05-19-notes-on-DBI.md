@@ -11,15 +11,15 @@ tags:
 - 数据库
 ---
 
-### 1 简介
-
 DBI是DataBase Interface的简称，即数据库界面。这篇笔记的主要内容是讲一讲如何用R中的DBI包来与常见数据库进行交互。
 
-DBI定义了一个与任意RDBMS数据库进行通信的通用接口。对于任意一个RDBMS，会有一个兼容的数据库驱动来实现通用接口。目前可用的驱动包括Oracle，MySQL和SQLite。
+### 1 简介
 
-理论上说，DBI的通用接口允许用同样的代码来跟不同的RDBMS进行交互。但实际应用的时候，还取决于RDBMS与SQL标准的相似度以及数据库开发者是否在开发过程中避免了RDBMS特有的一些功能。
+DBI定义了一个与RDBMS类型数据库进行通信的泛型接口，对于任意一个RDBMS，DBI都会有一个兼容的数据库驱动来实现对接。目前，其可用的驱动包括Oracle、MySQL和SQLite等。
 
-下面以SQLite数据库为例，用的是Affymetrix hgu95av2的微阵列芯片数据。用之前先加载相关的包。
+理论上说，DBI的泛型接口允许我们同样的代码来跟不同的RDBMS进行通信。但实际应用的时候，还要看具体的RDBMS与SQL标准的是否完全相似，以及数据库开发者开发过程中是否避免使用RDBMS特有的一些功能。
+
+下面以SQLite数据库为例说明一下。例子中用的是Affymetrix hgu95av2的微阵列芯片数据，用之前先加载相关的包。
 
 <pre>
 > library(tools)
@@ -31,9 +31,7 @@ DBI定义了一个与任意RDBMS数据库进行通信的通用接口。对于任
 
 ### 2 DBI连接SQLite数据库
 
-DBI连接RDBMS需要两步。第一步，用dbDriver函数创建一个适合的数据库驱动；第二步，用dbConnect函数创建数据库连接。
-
-具体到SQLite，只需要指定包含数据库的文件夹路径即可。对于RDBMS的PC端或者服务器来，比如像MySQL或者Oracle，则需要指定主机地址、用户名和密码等信息。
+DBI连接RDBMS需要两步。第一步，用dbDriver函数创建一个适合的数据库驱动；第二步，用dbConnect函数创建数据库连接。具体到SQLite，只需要指定包含数据库的文件夹路径即可。而对于MySQL或者Oracle，则需要指定主机地址、用户名和密码等信息。
 
 <pre>
 > drv <- dbDriver("SQLite")
@@ -129,9 +127,7 @@ dbGetRowCount函数范围所有查询结果的行数。
 
 ### 6 ODBC
 
-RODBC包可以连接ODBC数据源，当然前提是安装相应的数据库驱动。R导入与导出中给出了一些使用RODBC的实例，可以供参考。
-
-用ODBC连接RDBMS时，需要指定一个ODBC数据服务，具体如何做要看所用的操作系统。总之，你需要一个与要连接的数据库相对应的ODBC驱动。
+RODBC包可以连接ODBC数据源，当然前提是安装相应的数据库驱动。R导入与导出中给出了一些使用RODBC的实例，可以供参考。用ODBC连接RDBMS时，需要指定一个ODBC数据服务，具体如何做要看所用的操作系统。
 
 RBioinf包中提供Gavin和Ho提供关于AP-MS蛋白质实验结果数据，分别给出了pcomplex.txt和pcomplex.xls两种格式，下面用它来演示下RODBC的用法。
 
