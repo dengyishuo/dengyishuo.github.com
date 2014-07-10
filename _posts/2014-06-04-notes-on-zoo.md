@@ -38,7 +38,6 @@ R软件是处理时间序列的利器。之所以这么说主要是基于两点�
 <tr>
 <td>各种</td><td>xts</td><td> </td><td>xts包</td>
 </tr>
-
 </table>
 
 第一个是stat包。RCore们在stat包中定义了R语言中最古典的时间序列对象类型，即ts类型。想必用R处理过时间序列的同学们都不陌生，这货的用法很简单，下面是从帮助文档中摘的例子：
@@ -65,20 +64,27 @@ zoo包出现在stat包、its包、tseries包和timeSeries包之后、在xts之�
 
 本篇笔记系统地说说zoo包的一些用法和特性。本文的结构如下：
 
-* zoo简介
-  * 创建zoo对象
-  * 画图
-  * 数据合并
-  * 基本运算
-  * 提取数据或索引
-  * 强制转换
-  * 缺失值处理
-* 总结
-* 资料推荐
+1. zoo简介
+   1.1 zoo对象简介及创建
+   1.2 创建zooreg对象
+   1.3 基本运算
+   1.4 滚动计算
+   1.5 数据及索引的提取和替换
+   1.6 汇总描述
+   1.7 数据合并
+   1.8 缺失值处理
+   1.9 类型转化
+   1.10 zoo对象的绘图
+2. 实际案例
+	2.1 协同tseries包处理金融数据
+	2.2 使用timeDate类索引
+	2.3 创建yearmon和yearqtr类型
+3. 总结
+4. 资料推荐
 
-### zoo简介
+### 1.zoo简介
 
-#### zoo对象及对象的创建
+#### 1.1 zoo对象简介及创建
 
 zoo包里面有两种基本的对象类型，一种是zoo，一种是zooreg。我们先创建一个zoo对象看看，创建zoo对象的基本命令是；
 
@@ -113,8 +119,6 @@ Z<-zoo(Z.data,Z.index);
 
 真正操作数据时，通常要处理的数据已经包含了索引，用不着单独创建。
 
-#### zoo对象的结构及显示方式
-
 R中的很多函数比如print，summary，str，head，tail以及[ 能够对zoo对象进行操作。
 
 要注意的是：向量型的zoo对象默认显示为行向量，而矩阵型的zoo对象默认为上下排列。
@@ -125,7 +129,7 @@ summary(z1)
 summary(Z)
 ```
 
-#### 创建zooreg对象
+#### 1.2 创建zooreg对象
 
 zoo对象本身就可以存储规则时间序列，而且stat包中本身也有存储规则时间序列的ts对象。为什么还要创建一个zooreg类型呢？有两个原因：一个是在将zoo对象转为ts对象时需要存储规则时间序列的频率，有了zooreg，可以在zoo对象和ts对象之间自由转换。再一个是因为对于ts对象，一旦出现缺失值，则其不再为规则时间序列，而zooreg可以存储有缺失值的规则时间序列。因此，我们可以把zooreg对象视为zoo的子对象，它继承了zoo对象的所有特性，并增加了frequency特性。
 
@@ -190,81 +194,7 @@ identical(zr2,as.zoo(as.ts(zr2)))
 
 因而，我们可以直接对zooreg对象使用acf，arima，stl等函数。
 
-#### zoo对象的绘图
-
-zoo对象的绘图要依赖于plot和lines函数。
-
-```{r}
-plot(Z)
-```
-
-图中，横轴是索引，纵轴是时间序列对应的取值。也可以将多条时间序列画到同一个面板上。
-
-```{r}
-plot(Z,plot.type="single",col=2:4)
-```
-
-我们可以指定col，pch等参数。这儿有一个不同之处，即zoo允许我们通过list指定这些参数，并且提供了自动补全功能。比如：
-
-```{r}
-plot(Z,type="b",lty=1:3,pch=list(Aa=1,Bb=2,Cc=4),col=list(Bb=2,4),plot.type="single")
-```
-
-#### 数据合并
-
-可用rbind函数来对zoo对象进行行合并，此时，合并前的对象必须有相同的列数，并且索引不能有重合。
-
-```
-rbind(z1[2:3],z1[5:10])  # 正常行合并
-
-rbind(z1[2:5],z1[5:10])  # 索引重合会报错
-```
-
-c函数跟rbind函数的作用相同。
-```
-c(z1[2:3],z1[5:10])
-```
-cbind函数可以对zoo对象进行列合并。
-```
-cbind(z1,z2)
-```
-这个函数实质上是以两个对象的索引的并集作为结果对象的索引，这样一来会出现缺失值，当然它们的位置会填充为NA。下面的命令与上面的命令结果相同；
-```
-merge(z1,z2,all=TRUE)
-```
-但merge可以提供更多的可用参数。比如，可以指定缺失值的填充方式，可以调整合并对象的列名，也可以指定返回结果的类型。
-
-如果merge的对象中有zooreg对象，则merge的结果将是zooreg对象。在这个过程中，merge会在幕后默默的判断时间序列的频率，并检查时间序列规则与否。如果merge的对象中有非zoo对象，那么，merge会毫不犹豫地把zoo对象的索引加到其它对象身上。
-
-如果merge的对象中，索引的类型不一样，R一般会给出警告，并尝试将索引强制转换为一致。我们不鼓励用merge合并索引类型不同的对象，否则，后果自负。
-
-#### 汇总描述
-
-aggregate可以对zoo对象进行汇总。说人话就是zoo会根据某一列的取值将zoo对象切割为几个独立的子集。再对每个子集执行指定的函数。
-
-对于Z来说，我们可以按月份对其其均值。这个过程需要两步，第一步是将Z的索引划分为月份，第二步是分组汇总。
-
-```
-firstofmonth <- function(x){as.Date(sub("..$","01",format(x)))} 
-index(Z)<-firstofmonth(index(Z))    # 将日期统一为当月首日日期
-aggregate(Z,index(Z),mean)
-
-aggregate(Z,firstofmonth,head,1)
-```
-
-与汇总相反的是数据还原，通常是借助插值来实现的。比如，Nile是ts类型的年度数据，我们可以将其转换为zoo类型的季度数据，并用na.approx，na.locf和na.spline来进行差值。
-
-```
-Nile.na<-merge(as.zoo(Nile),zoo(,seq(start(Nile)[1],end(Nile)[1],1/4)))
-head(as.zoo(Nile))
-
-head(na.approx(Nile.na))
-
-head(na.locf(Nile.na))
-
-head(na.spline(Nile.na))
-```
-#### 基本运算
+#### 1.3 基本运算
 
 对于维度一样的对象，直接计算即可。对于维度不一样的对象，会先计算对象索引的交集，在根据交集进行相关运算。
 ```
@@ -284,7 +214,39 @@ merge(z1,lag(z1,k=1))
 diff(z1)
 ```
 
-#### 数据及索引的提取和替换
+#### 1.4 滚动计算
+
+处理时间序列是经常用到滚动计算，比如，要滚动计算任意n天的均值、方差等等。zoo包里面提供了rollapply函数来完成这个操作。基本用法是；
+
+```
+rollapply(data, width, FUN)
+```
+
+这里的data是操作对象，width是滚动的窗口宽度，FUN是对每一个窗口的数据执行的具体函数。比如：
+
+```
+rollapply(Z,5,sd)
+```
+
+有些观测值被删除了，因为那些观测值没法占满窗口。我们可以通过设置na.pad=TRUE用NA来填充这些位置。
+
+```
+rollapply(Z,5,sd,na.pad=TRUE,align="left")
+```
+
+填补方式分为左填补、右填补和居中填补。
+
+```
+rollapply(Z,5,sd,na.pad=TRUe,align="TRUE")
+```
+
+对于一些常用的滚动计算，比如，rollapply(data,width,mean)，rollapply(data,width,max)等，zoo提供了rollmean(x,k)、rollmax(x,k)，rollmedian(x,k)等函数。
+
+```
+rollmean(z2,5,na.pad=TRUE)
+```
+
+#### 1.5 数据及索引的提取和替换
 
 coredata函数可以提取zoo对象的数据。类似于its包中的core函数及tseries包中的value函数。
 
@@ -345,16 +307,62 @@ window(Z,index=index(Z)[5:8],end=as.Date("2004-03-01"))  # 选出第5至第8个�
 ```
 window(z1,end=as.POSIXct("2004-02-01"))<-9:5
 ```
+#### 1.6 汇总描述
 
-#### 类型转化
+aggregate可以对zoo对象进行汇总。说人话就是zoo会根据某一列的取值将zoo对象切割为几个独立的子集。再对每个子集执行指定的函数。
 
-R中的很多对象都可以跟zoo进行自由转换。尤其是ts，irts，its等对象，很容易就可以转化为zoo对象。如果索引正确，还可以将zoo对象转化回去。zoo对象和zooreg对象之间的转化更方便，无非是增加或者删除frequency属性。除此之外，zoo对象还可以转化为向量、矩阵、列表和数据框，要注意的是转为数据框时索引属性会丢掉，但实质内容还是保留完整的。
+对于Z来说，我们可以按月份对其其均值。这个过程需要两步，第一步是将Z的索引划分为月份，第二步是分组汇总。
 
 ```
-as.data.frame(Z)
+firstofmonth <- function(x){as.Date(sub("..$","01",format(x)))} 
+index(Z)<-firstofmonth(index(Z))    # 将日期统一为当月首日日期
+aggregate(Z,index(Z),mean)
+
+aggregate(Z,firstofmonth,head,1)
 ```
 
-#### 缺失值处理
+与汇总相反的是数据还原，通常是借助插值来实现的。比如，Nile是ts类型的年度数据，我们可以将其转换为zoo类型的季度数据，并用na.approx，na.locf和na.spline来进行差值。
+
+```
+Nile.na<-merge(as.zoo(Nile),zoo(,seq(start(Nile)[1],end(Nile)[1],1/4)))
+head(as.zoo(Nile))
+
+head(na.approx(Nile.na))
+
+head(na.locf(Nile.na))
+
+head(na.spline(Nile.na))
+```
+
+#### 1.7 数据合并
+
+可用rbind函数来对zoo对象进行行合并，此时，合并前的对象必须有相同的列数，并且索引不能有重合。
+
+```
+rbind(z1[2:3],z1[5:10])  # 正常行合并
+
+rbind(z1[2:5],z1[5:10])  # 索引重合会报错
+```
+
+c函数跟rbind函数的作用相同。
+```
+c(z1[2:3],z1[5:10])
+```
+cbind函数可以对zoo对象进行列合并。
+```
+cbind(z1,z2)
+```
+这个函数实质上是以两个对象的索引的并集作为结果对象的索引，这样一来会出现缺失值，当然它们的位置会填充为NA。下面的命令与上面的命令结果相同；
+```
+merge(z1,z2,all=TRUE)
+```
+但merge可以提供更多的可用参数。比如，可以指定缺失值的填充方式，可以调整合并对象的列名，也可以指定返回结果的类型。
+
+如果merge的对象中有zooreg对象，则merge的结果将是zooreg对象。在这个过程中，merge会在幕后默默的判断时间序列的频率，并检查时间序列规则与否。如果merge的对象中有非zoo对象，那么，merge会毫不犹豫地把zoo对象的索引加到其它对象身上。
+
+如果merge的对象中，索引的类型不一样，R一般会给出警告，并尝试将索引强制转换为一致。我们不鼓励用merge合并索引类型不同的对象，否则，后果自负。
+
+#### 1.8 缺失值处理
 
 na.omit，na.contiguous，na.approx，na.locf，na.omit和na.spline都能来处理缺失值。na.omit的作用是剔除缺失值。
 
@@ -391,36 +399,32 @@ na.lcof是用前值替代法进行插值。
 na.locf(z1)
 ```
 
-#### 滚动计算
+#### 1.9 类型转化
 
-处理时间序列是经常用到滚动计算，比如，要滚动计算任意n天的均值、方差等等。zoo包里面提供了rollapply函数来完成这个操作。基本用法是；
-
-```
-rollapply(data, width, FUN)
-```
-
-这里的data是操作对象，width是滚动的窗口宽度，FUN是对每一个窗口的数据执行的具体函数。比如：
+R中的很多对象都可以跟zoo进行自由转换。尤其是ts，irts，its等对象，很容易就可以转化为zoo对象。如果索引正确，还可以将zoo对象转化回去。zoo对象和zooreg对象之间的转化更方便，无非是增加或者删除frequency属性。除此之外，zoo对象还可以转化为向量、矩阵、列表和数据框，要注意的是转为数据框时索引属性会丢掉，但实质内容还是保留完整的。
 
 ```
-rollapply(Z,5,sd)
+as.data.frame(Z)
 ```
 
-有些观测值被删除了，因为那些观测值没法占满窗口。我们可以通过设置na.pad=TRUE用NA来填充这些位置。
+#### 1.10 zoo对象的绘图
 
-```
-rollapply(Z,5,sd,na.pad=TRUE,align="left")
-```
+zoo对象的绘图要依赖于plot和lines函数。
 
-填补方式分为左填补、右填补和居中填补。
-
-```
-rollapply(Z,5,sd,na.pad=TRUe,align="TRUE")
+```{r}
+plot(Z)
 ```
 
-对于一些常用的滚动计算，比如，rollapply(data,width,mean)，rollapply(data,width,max)等，zoo提供了rollmean(x,k)、rollmax(x,k)，rollmedian(x,k)等函数。
+图中，横轴是索引，纵轴是时间序列对应的取值。也可以将多条时间序列画到同一个面板上。
 
+```{r}
+plot(Z,plot.type="single",col=2:4)
 ```
-rollmean(z2,5,na.pad=TRUE)
+
+我们可以指定col，pch等参数。这儿有一个不同之处，即zoo允许我们通过list指定这些参数，并且提供了自动补全功能。比如：
+
+```{r}
+plot(Z,type="b",lty=1:3,pch=list(Aa=1,Bb=2,Cc=4),col=list(Bb=2,4),plot.type="single")
 ```
 
 ### zoo与其它包的协同
@@ -446,7 +450,9 @@ ocus <- gefp(ohms ~ 1,order.by=~juice,data=fruitohms)
 
 上述代码中得到的ocus对象本身是基于zoo对象进行构建的，并且绘图过程实际上是调用了针对gefp对象的专属绘图方法。
 
-#### tseries包的协同
+### 2. 实际案例
+
+#### 2.1 协同tseries包处理金融数据
 
 tseries包中的get.hist.quote函数可以通过访问Yahoo!的在线金融数据库来获取路透社提供的金融数据。比如，用下面的代码可以获得微软公司在2011-01-01到2014-04-30日期间的日交易数据：
 
@@ -479,10 +485,9 @@ MSFT <- na.omit(MSFT)
 plot(diff(log(MSFT)))
 ```
 
-
 图4：微软公司集合收益率序列图
 
-#### 与timeDate包的协同
+#### 2.2 使用timeDate类索引
 
 zoo对象可以引用timeDate的日期对象作为索引。虽然zoo包的方法可以针对多种索引类型进行操作。但一些特殊的索引类型仍然有必要提供c()、length()、[、ORDER()和MATCH()等方法来确保zoo类方法的正常执行。像timeDate就是其中之一。事实上，timeDate对象天然支持c()、length()和[；而zoo则天然支持ORDER()和MATCH()。两者相加可谓珠联璧合。要说的是，ORDER()和MATCH()在执行过程中会现将对象强制转换为POSIXct，再调用相应的方法进行操作。
 
@@ -494,7 +499,7 @@ z2td <- zoo(coredata(z2),timeDate(index(z2),FinCenter = "GMT"))
 z2td
 ```
 
-#### yearmon和yearqtr类型
+#### 2.3 创建yearmon和yearqtr类型
 
 zoo包最强大的功能之一是能够对间序列对象的索引类型进行自定义。前面介绍了如何将一种已经存在的时间对象，比如，timeDate对象作为zoo对象的索引。下面介绍一下如何根据需要创建新的索引类型，比如可以创建yearmon和yearqtr等，很明显，这两个货分别针对月度和季度时间序列对象的专有索引。事实上，我们可以利用ts对象将月度时序数据的索引存储为数值型。但这么做的问题在于，该操作得到的结果并未包括时序数据本身为月度型数据的任何信息。而以yearmon类日期作为索引，由于yearmon类日期多了一个yearmon的属性，因而，可以明白的看出来这一点。创建yearmon对象的代码如下：
 
@@ -540,12 +545,12 @@ as.irts(zr3)
 
 可以看出，在zoo中对时序对象的索引尺度和类型进行转换方便至极。
 
-### 总结
+### 3. 总结
 
 zoo包是一个基于R中的S3类构建的一个R包，用来处理严格排序且带索引的时间序列，包括规则时间序列和不规则时间序列。zoo包的设计宗旨是构造一个独立于索引类型的时序对象，并比照古典的ts对象开发相应的泛型方法。
 
 上面的笔记我们简单的概括了zoo包的技术细节，并举例演示了zoo对象的绘图、合并、数学运算、数据提取、索引提取、缺失值处理等内容。事实上，我们可以简单地把zoo对象视为一个数据加索引的对象，其中，数据可以是向量或者矩阵，而索引则可以是任意类型的向量。对于特殊的zooreg对象，则还包括了frequency属性。zoo对象与其它时序对象比如ts、its、irts和timeSeries等可以自由转换，其填补了规则时间序列和不规则时间序列之间的隔膜。与经典的ts对象比较，可以更方便地处理缺失值。以上所说种种优点，使得我们可以进一步基于zoo对象构建新的时序类型或者应用。比如，quantmod中使用的xts类型就是基于zoo对象所构建的。但zoo包也有自身的缺点，即目前zoo对象的数据部分只能很好地支持数值型的向量或者矩阵，部分地支持带索引的因子型变量，对数据框、列表则支持的不够，但这些对象显然也能被索引化，这些应该是未来值得改进的地方。
 
-### 推荐文献
+### 4. 推荐文献
 
 zoo：An S3 Class and Methods for Indexed Totally Ordered Observations
