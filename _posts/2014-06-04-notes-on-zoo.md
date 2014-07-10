@@ -548,4 +548,4 @@ zoo包是一个基于R中的S3类构建的一个R包，用来处理严格排序�
 
 ### 推荐文献
 
-[1]:zoo：An S3 Class and Methods for Indexed Totally Ordered Observations
+zoo：An S3 Class and Methods for Indexed Totally Ordered Observations
