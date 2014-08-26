@@ -1,0 +1,27 @@
+\name{backtest.loadUniv}
+\alias{backtest.loadUniv}
+\title{load universe data}
+\usage{
+  backtest.loadUniv(startDate = NULL, endDate = NULL,
+    cfgLst)
+}
+\arguments{
+  \item{startDate}{startDate for backtesting}
+
+  \item{endDate}{endDate for backtesting}
+
+  \item{cfgLst}{configuration list for backtesting}
+}
+\value{
+  cfgLst
+}
+\description{
+  load universe data
+}
+\details{
+  load universe data
+}
+\author{
+  Weilin Lin
+}
+
