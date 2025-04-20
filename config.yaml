@@ -1,6 +1,6 @@
 baseurl: /
 languageCode: en-US
-title: A Hugo website
+title: MatrixSpk's website
 theme: hugo-lithium
 ignoreFiles:
   - \.Rmd$
@@ -15,11 +15,11 @@ menu:
     - name: GitHub
       url: https://gewutang.com
     - name: Twitter
-      url: https://twitter.com/gewutang
+      url: https://weibo.com/dengyishuo
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: A website built through Hugo and blogdown.
+  description: A website focus on Economics and Finance.
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
