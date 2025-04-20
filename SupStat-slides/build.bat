@@ -1,1 +1,0 @@
-pandoc -t beamer --template=supstat.beamer.tex --latex-engine=xelatex  -Vurl:1 -V theme:CambridgeUS -V colortheme:dolphin -V fontsize:10pt -V shorttitle:SupStat  Technical-Analysis-with-TTR.md  -o Technical-Analysis-with-TTR.pdf
