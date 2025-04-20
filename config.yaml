@@ -13,7 +13,7 @@ menu:
     - name: About
       url: /about/
     - name: GitHub
-      url: https://gewutang.com
+      url: http://gewutang.com
     - name: Twitter
       url: https://weibo.com/dengyishuo
 params:
