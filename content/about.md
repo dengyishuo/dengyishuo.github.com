@@ -1,6 +1,10 @@
 ---
 date: "2016-05-05T21:48:51-07:00"
-title: About
+title: 
 ---
 
-This is a "hello world" example website for the [**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium).
+- 2006年至2010年就读于中央财经大学。
+- 2010年-2017年，先后就职于首钢集团、Dawanjia Inc.等国企和互联网公司。
+- 2017年-2020年，先后就职于润安国际保险经纪及字节跳动。
+- 2019年-2021年，就读于北京大学光华管理学院。
+- 2021年至今，瞎折腾。
