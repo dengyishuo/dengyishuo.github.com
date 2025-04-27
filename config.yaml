@@ -1,6 +1,6 @@
-baseurl: /
+baseurl: http://gewutang.com
 languageCode: en-US
-title: A Hugo website
+title: 格物堂
 theme: hugo-lithium
 ignoreFiles:
   - \.Rmd$
