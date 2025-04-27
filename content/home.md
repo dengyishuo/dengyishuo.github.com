@@ -4,7 +4,7 @@ title:
 ---
 
 <div style="text-align: left;">
-![](images/logo.png)
+![images/logo.png](images/logo.png)
 </div>
 
 -----------------------------------------------------------------------------------------------------
