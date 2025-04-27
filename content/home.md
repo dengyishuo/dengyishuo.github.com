@@ -4,7 +4,7 @@ title:
 ---
 
 <div style="text-align: left;">
-![images/logo.png](images/logo.png)
+![themes/hugo-lithium/static/images/logo.png](themes/hugo-lithium/static/images/logo.png)
 </div>
 
 -----------------------------------------------------------------------------------------------------
