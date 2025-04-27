@@ -1,4 +1,4 @@
-baseurl: https://gewutang.com
+baseurl: http://gewutang.com
 languageCode: en-US
 title: 格物堂
 theme: hugo-lithium
@@ -20,7 +20,7 @@ menu:
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: A website built through Hugo and blogdown.
+  description: 专注于投资、读书和生活。
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
