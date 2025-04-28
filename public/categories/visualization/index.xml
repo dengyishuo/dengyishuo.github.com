@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Visualization on 格物堂</title>
+    <link>http://gewutang.com/categories/visualization/</link>
+    <description>Recent content in Visualization on 格物堂</description>
+    <generator>Hugo</generator>
+    <language>en-US</language>
+    <lastBuildDate>Sat, 20 Mar 2010 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://gewutang.com/categories/visualization/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>脸谱图</title>
+      <link>http://gewutang.com/2010/03/20/chernoff/</link>
+      <pubDate>Sat, 20 Mar 2010 00:00:00 +0000</pubDate>
+      <guid>http://gewutang.com/2010/03/20/chernoff/</guid>
+      <description>&lt;p&gt;出于一种特殊的审美原因，我一直都很欣赏Chernoff创造的脸谱图。它让我感觉到了统计学家的浪漫，让我摆脱了对统计学家严谨、保守的刻板印象。&lt;/p&gt;&#xA;&lt;p&gt;脸谱图工作原理极其简单，它用人类的脸部特征来刻画多维变量，与雷达图等在本质上并无太大不同。只不过，它带着人类的五官出现，是一种显得可爱又好玩的针对多元数据的可视化方法，可能十分适合用来激发人们对多元数据可视化的兴趣。&lt;/p&gt;&#xA;&lt;p&gt;一般的Chernoff脸谱图是这样的:&lt;/p&gt;&#xA;&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(aplpack)&#xA;faces(rnorm(5),face.type=0)&#xA;&lt;/code&gt;&lt;/pre&gt;&#xA;&lt;img src=&#34;http://gewutang.com/2010/03/20/chernoff/index_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&#xA;&lt;pre&gt;&lt;code&gt;## effect of variables:&#xA;##  modified item       Var   &#xA;##  &amp;quot;height of face   &amp;quot; &amp;quot;Var1&amp;quot;&#xA;##  &amp;quot;width of face    &amp;quot; &amp;quot;Var2&amp;quot;&#xA;##  &amp;quot;structure of face&amp;quot; &amp;quot;Var3&amp;quot;&#xA;##  &amp;quot;height of mouth  &amp;quot; &amp;quot;Var4&amp;quot;&#xA;##  &amp;quot;width of mouth   &amp;quot; &amp;quot;Var5&amp;quot;&#xA;##  &amp;quot;smiling          &amp;quot; &amp;quot;Var1&amp;quot;&#xA;##  &amp;quot;height of eyes   &amp;quot; &amp;quot;Var2&amp;quot;&#xA;##  &amp;quot;width of eyes    &amp;quot; &amp;quot;Var3&amp;quot;&#xA;##  &amp;quot;height of hair   &amp;quot; &amp;quot;Var4&amp;quot;&#xA;##  &amp;quot;width of hair   &amp;quot;  &amp;quot;Var5&amp;quot;&#xA;##  &amp;quot;style of hair   &amp;quot;  &amp;quot;Var1&amp;quot;&#xA;##  &amp;quot;height of nose  &amp;quot;  &amp;quot;Var2&amp;quot;&#xA;##  &amp;quot;width of nose   &amp;quot;  &amp;quot;Var3&amp;quot;&#xA;##  &amp;quot;width of ear    &amp;quot;  &amp;quot;Var4&amp;quot;&#xA;##  &amp;quot;height of ear   &amp;quot;  &amp;quot;Var5&amp;quot;&#xA;&lt;/code&gt;&lt;/pre&gt;&#xA;&lt;p&gt;上图使用的是随机数据，可能看起来比较呆板。我们当然可以画一个更好看的：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
