@@ -4,9 +4,8 @@ author: MatrixSpk
 date: '2010-03-20'
 slug: 'chernoff'
 categories:
-  - data-visualization
-tags: [data]
-      [visualization]
+  - datavisualization
+tags: [visualization]
 ---
 
 出于一种特殊的审美原因，我一直都很欣赏Chernoff创造的脸谱图。它让我感觉到了统计学家的浪漫，让我摆脱了对统计学家严谨、保守的刻板印象。

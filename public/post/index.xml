@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 格物堂</title>
+    <link>http://gewutang.com/post/</link>
+    <description>Recent content in Posts on 格物堂</description>
+    <generator>Hugo</generator>
+    <language>en-US</language>
+    <lastBuildDate>Mon, 28 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://gewutang.com/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>脸谱图</title>
+      <link>http://gewutang.com/2025/04/28/%E8%84%B8%E8%B0%B1%E5%9B%BE/</link>
+      <pubDate>Mon, 28 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://gewutang.com/2025/04/28/%E8%84%B8%E8%B0%B1%E5%9B%BE/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>A Plain Markdown Post</title>
+      <link>http://gewutang.com/2016/12/30/a-plain-markdown-post/</link>
+      <pubDate>Fri, 30 Dec 2016 21:49:57 -0700</pubDate>
+      <guid>http://gewutang.com/2016/12/30/a-plain-markdown-post/</guid>
+      <description>&lt;p&gt;This is a post written in plain Markdown (&lt;code&gt;*.md&lt;/code&gt;) instead of R Markdown (&lt;code&gt;*.Rmd&lt;/code&gt;). The major differences are:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;You cannot run any R code in a plain Markdown document, whereas in an R Markdown document, you can embed R code chunks (&lt;code&gt;```{r}&lt;/code&gt;);&lt;/li&gt;&#xA;&lt;li&gt;A plain Markdown post is rendered through &lt;a href=&#34;https://gohugo.io/overview/configuration/&#34;&gt;Blackfriday&lt;/a&gt;, and an R Markdown document is compiled by &lt;a href=&#34;http://rmarkdown.rstudio.com&#34;&gt;&lt;strong&gt;rmarkdown&lt;/strong&gt;&lt;/a&gt; and &lt;a href=&#34;http://pandoc.org&#34;&gt;Pandoc&lt;/a&gt;.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;There are many differences in syntax between Blackfriday&amp;rsquo;s Markdown and Pandoc&amp;rsquo;s Markdown. For example, you can write a task list with Blackfriday but not with Pandoc:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Lorem Ipsum</title>
+      <link>http://gewutang.com/2015/01/01/lorem-ipsum/</link>
+      <pubDate>Thu, 01 Jan 2015 13:09:13 -0600</pubDate>
+      <guid>http://gewutang.com/2015/01/01/lorem-ipsum/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;Lorem ipsum&lt;/strong&gt; dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore &lt;em&gt;magna aliqua&lt;/em&gt;. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://gewutang.com/1/01/01/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://gewutang.com/1/01/01/</guid>
+      <description>&lt;h2 id=&#34;tags-r-markdown-plot-regression&#34;&gt;y&amp;mdash;&#xA;title: &amp;ldquo;Hello R Markdown&amp;rdquo;&#xA;author: &amp;ldquo;Frida Gomam&amp;rdquo;&#xA;date: 2020-12-01T21:13:14-05:00&#xA;categories: [&amp;ldquo;R&amp;rdquo;]&#xA;tags: [&amp;ldquo;R Markdown&amp;rdquo;, &amp;ldquo;plot&amp;rdquo;, &amp;ldquo;regression&amp;rdquo;]&lt;/h2&gt;&#xA;&lt;h1 id=&#34;r-markdown&#34;&gt;R Markdown&lt;/h1&gt;&#xA;&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;You can embed an R code chunk like this:&lt;/p&gt;&#xA;&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;summary(cars)&#xA;##      speed           dist       &#xA;##  Min.   : 4.0   Min.   :  2.00  &#xA;##  1st Qu.:12.0   1st Qu.: 26.00  &#xA;##  Median :15.0   Median : 36.00  &#xA;##  Mean   :15.4   Mean   : 42.98  &#xA;##  3rd Qu.:19.0   3rd Qu.: 56.00  &#xA;##  Max.   :25.0   Max.   :120.00&#xA;fit &amp;lt;- lm(dist ~ speed, data = cars)&#xA;fit&#xA;## &#xA;## Call:&#xA;## lm(formula = dist ~ speed, data = cars)&#xA;## &#xA;## Coefficients:&#xA;## (Intercept)        speed  &#xA;##     -17.579        3.932&#xA;&lt;/code&gt;&lt;/pre&gt;&#xA;&lt;h1 id=&#34;including-plots&#34;&gt;Including Plots&lt;/h1&gt;&#xA;&lt;p&gt;You can also embed plots. See Figure &lt;a href=&#34;#fig:pie&#34;&gt;1&lt;/a&gt; for example:&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
