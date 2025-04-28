@@ -13,4 +13,8 @@ Encoding: UTF-8
 RnwWeave: knitr
 LaTeX: XeLaTeX
 
+LineEndingConversion: Native
+
 BuildType: Website
+
+UseNativePipeOperator: Yes
