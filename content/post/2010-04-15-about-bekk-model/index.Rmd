@@ -1,0 +1,92 @@
+---
+title: BEKK模型
+author: MatrixSpk
+date: '2010-04-15'
+slug: about-bekk-model
+categories:
+- R
+tags:
+- BEKK
+- mgarch
+- 多元garch模型
+---
+BEKK模型是目前比较流行的多变量波动性模型，可以看作GARCH模型在多维空间的实现。BEKK模型在应用过程中也有诸多缺点，其中最大的一个不足之处在于模型的待估计参数会随着模型维数的增加指数型增长。然而，这一点肯定会随着计算机的发展而被逐渐克服的。
+
+R软件中提供了mgarch和mgarchBEKK两个包来估计BEKK模型参数。
+
+## mgarch包及其示例
+
+```{R}
+# 安装包（如果未安装）
+# devtools::install_github("https://github.com/vst/mgarch")
+
+library(mgarch)
+```
+
+先看mgarch包，该包有三个主要函数：
+
+* mvBEKK.sim: 模拟一个MGARCH-BEKK过程
+* mvBEKK.est: 估计MGARCH-BEKK模型的参数
+* mvBEKK.diag:对拟合的MGARCH-BEKK模型进行诊断
+
+可以通过以下命令查询相关函数的用法：
+
+```{R eval=FALSE}
+?mvBEKK.sim
+?mvBEKK.est
+?mvBEKK.diag
+```
+
+运行以下命令可以模拟一个MGARCH-BEKK过程：
+
+```{r}
+set.seed(123)
+sim = mvBEKK.sim(series.count = 3, T = 1000)
+```
+
+合并模拟的时间序列：
+
+```{R}
+eps = data.frame(sim$eps[[1]], sim$eps[[2]], sim$eps[[3]]) 
+head(eps)
+tail(eps)
+```
+
+估计模型参数：
+
+```{R}
+est <- mvBEKK.est(eps)
+```
+
+查看估计结果包含哪些信息：
+
+```{R}
+names(est)
+```
+
+模型诊断：
+
+```{R}
+mvBEKK.diag(est)
+```
+
+## mgarchBEKK包及其示例
+
+```{r}
+# 安装包（如未安装）
+# devtools::install_github("https://github.com/vst/mgarchBEKK")
+```
+
+```{R}
+# 加载包
+library(mgarchBEKK)
+# 模拟mgarchBEKK过程
+simulated <- simulateBEKK(2, 1000, c(1,1))
+# 合并模拟数据
+simulated <- do.call(cbind, simulated$eps)
+# 估计模型
+estimated <- BEKK(simulated)
+# 模型诊断
+diagnoseBEKK(estimated)
+```
+

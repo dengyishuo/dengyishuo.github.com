@@ -1,0 +1,341 @@
+---
+title: VaR和方差协方差方法及R语言
+author: MatrixSpk
+date: 2010-12-17
+slug: VaR Caculation via Variance Covariance Method
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - 风险度量
+  - VaR
+  - r
+---
+# 方差-协方差法
+
+方差-协方差方法有不同的算法，下面分别进行简单的介绍。
+
+### 指数加权移动平均法
+
+#### 单资产情形
+
+##### 动态方差估计
+
+EWMA通过指数衰减因子$\lambda$赋予近期数据更高权重，捕捉波动率的时变特性：
+
+$$
+\sigma_t^2 = \lambda \sigma_{t-1}^2 + (1-\lambda) r_{t-1}^2
+$$
+其中：
+
+- `\(\lambda \in (0,1)\)`：衰减因子（典型值0.94）
+- `\(r_{t-1}\)`：前一日收益率
+- `\(\sigma_{t-1}^2\)`：前一日波动率
+
+##### VaR计算公式
+
+假设正态分布，置信水平$\alpha$对应的VaR：
+
+$$
+VaR_{\alpha} = P_0 \times \left( Z_{1-\alpha} \times \sigma_t^{\text{annual}} \right)
+$$
+
+其中：
+- `\(Z_{1-\alpha}\)`：标准正态分布分位数（95%置信水平对应1.645）
+- `\(\sigma_t^{\text{annual}} = \sigma_t \times \sqrt{252}\)`（年化波动率）
+
+##### 代码实现
+
+
+``` r
+# 加载必要包
+if (!require("quantmod")) install.packages("quantmod")  # 金融数据获取
+```
+
+```
+## 载入需要的程序包：quantmod
+```
+
+```
+## 载入需要的程序包：xts
+```
+
+```
+## 载入需要的程序包：zoo
+```
+
+```
+## 
+## 载入程序包：'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## 载入需要的程序包：TTR
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
+##   method            from
+##   as.zoo.data.frame zoo
+```
+
+``` r
+if (!require("ggplot2")) install.packages("ggplot2")    # 可视化
+```
+
+```
+## 载入需要的程序包：ggplot2
+```
+
+``` r
+library(quantmod)
+library(ggplot2)
+
+# 获取标普500指数数据（示例）
+getSymbols("^GSPC", src = "yahoo", from = "2020-01-01", to = Sys.Date())
+```
+
+```
+## [1] "GSPC"
+```
+
+``` r
+# 计算对数收益率
+returns <- na.omit(ROC(Cl(GSPC)))       # 使用收盘价计算
+colnames(returns) <- "Daily_Return"
+
+# 参数设置
+lambda <- 0.94                          # 衰减因子
+portfolio_value <- 1e6                  # 组合价值100万美元
+confidence_level <- 0.95                # 置信水平
+z_score <- qnorm(1 - confidence_level)  # 分位数（正态分布）
+
+# 初始化EWMA方差序列
+n <- length(returns)
+ewma_var <- numeric(n)
+ewma_var[1] <- var(returns)             # 初始化为样本方差
+
+# 递归计算EWMA方差
+for (i in 2:n) {
+  ewma_var[i] <- lambda * ewma_var[i-1] + (1 - lambda) * returns[i-1]^2
+}
+
+# 转换为年化波动率
+ewma_vol <- sqrt(ewma_var * 252)
+
+# 计算VaR序列
+VaR <- portfolio_value * z_score * ewma_vol
+
+# 获取最新VaR值
+latest_VaR <- tail(VaR, 1)
+cat("最新EWMA VaR（95%置信度）:", round(latest_VaR, 2), "美元\n")
+```
+
+```
+## 最新EWMA VaR（95%置信度）: -581585.7 美元
+```
+
+``` r
+# 可视化结果
+results <- data.frame(
+  Date = index(GSPC)[-1], 
+  Volatility = ewma_vol,
+  VaR = VaR
+)
+
+ggplot(results, aes(x = Date)) +
+  geom_line(aes(y = Volatility, color = "波动率")) +
+  geom_line(aes(y = VaR / 1e4, color = "VaR（万美元）")) +
+  scale_y_continuous(
+    name = "年化波动率",
+    sec.axis = sec_axis(~ . * 1e4, name = "VaR（美元）")
+  ) +
+  labs(title = "EWMA波动率与VaR动态变化",
+       color = "指标类型") +
+  theme_minimal()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+
+#### 多元资产组合EWMA-VaR建模原理与R实现
+
+##### 协方差矩阵动态更新
+
+多资产EWMA模型通过递归更新协方差矩阵捕捉资产间相关性的时变特征:
+
+$$
+\Sigma_t = \lambda \Sigma_{t-1} + (1-\lambda)\mathbf{r}_{t-1}\mathbf{r}_{t-1}^\top
+$$
+
+其中：
+
+- `\(\mathbf{r}_{t-1}\)`：前一期资产收益率向量（$n \times 1$）
+- `\(\Sigma_{t-1}\)`：前一期协方差矩阵（$n \times n$）
+- `\(\lambda\)`：衰减因子（建议值0.94）:ml-citation{ref="4,8" data="citationList"}
+
+##### 组合VaR计算流程
+
+| 步骤         | 计算公式                                                                        |
+|--------------|---------------------------------------------------------------------------------|
+| 组合方差     | `\(\sigma_p^2 = \mathbf{w}^\top \Sigma_t \mathbf{w}\)`                             |
+| 年化波动率   | `\(\sigma_p^{\text{annual}} = \sigma_p \sqrt{252}\)`                               |
+| VaR          | `\(VaR_{\alpha} = Z_{1-\alpha} \times P_0 \times \sigma_p^{\text{annual}}\)`       |
+
+- `\(\mathbf{w}\)`：资产权重向量（需满足$\sum w_i=1$）
+- `\(P_0\)`：组合总价值
+
+#### R语言完整实现（标普500、纳斯达克、道琼斯指数案例）
+
+
+``` r
+# 加载必要库
+library(quantmod)  # 多元金融数据获取
+library(ggplot2)   # 可视化
+library(reshape2)  # 数据重塑
+
+# 获取三大股指数据
+symbols <- c("^GSPC", "^IXIC", "^DJI")  # 标普500、纳斯达克、道琼斯
+getSymbols(symbols, from = "2020-01-01", to = Sys.Date())
+```
+
+```
+## [1] "GSPC" "IXIC" "DJI"
+```
+
+``` r
+# 合并收盘价并计算对数收益率
+prices <- na.omit(merge(Cl(GSPC), Cl(IXIC), Cl(DJI)))
+returns <- na.omit(ROC(prices))  
+colnames(returns) <- c("SP500", "NASDAQ", "DJI")
+
+# 参数设置
+lambda <- 0.94                     # 衰减因子
+weights <- c(0.5, 0.3, 0.2)        # 资产权重向量
+portfolio_value <- 1e7             # 组合价值（美元）
+conf_level <- 0.95                 # 置信水平
+
+# 初始化协方差矩阵
+n_assets <- ncol(returns)
+n_obs <- nrow(returns)
+covar <- array(dim = c(n_assets, n_assets, n_obs))
+covar[,,1] <- cov(returns)         # 初始协方差矩阵
+
+# 递归更新协方差矩阵
+for (i in 2:n_obs) {
+  r_prev <- as.numeric(returns[i-1, ])
+  covar[,,i] <- lambda * covar[,,i-1] + (1 - lambda) * outer(r_prev, r_prev)
+}
+
+# 计算组合波动率
+port_var <- sapply(1:n_obs, function(i) {
+  t(weights) %*% covar[,,i] %*% weights
+})
+annual_vol <- sqrt(port_var * 252)
+
+# 计算VaR序列
+z_score <- qnorm(conf_level)
+VaR_series <- -portfolio_value * z_score * annual_vol
+
+# 输出最新VaR
+cat("Latest Portfolio EWMA VaR (95%):", 
+    round(tail(VaR_series, 1), 2), "USD\n")
+```
+
+```
+## Latest Portfolio EWMA VaR (95%): -6013901 USD
+```
+
+``` r
+# 可视化协方差矩阵变化
+cov_df <- data.frame(
+  Date = index(returns),
+  SP500_NASDAQ = sapply(1:n_obs, function(i) covar[1,2,i]),
+  SP500_DJI = sapply(1:n_obs, function(i) covar[1,3,i]),
+  NASDAQ_DJI = sapply(1:n_obs, function(i) covar[2,3,i])
+)
+cov_long <- melt(cov_df, id.vars = "Date")
+
+ggplot(cov_long, aes(x = Date, y = value, color = variable)) +
+  geom_line(alpha = 0.7) +
+  labs(title = "协方差动态变化趋势", y = "协方差值") +
+  theme_minimal()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+
+
+#
+
+### 混合正态模型方法
+
+混合正态模型是为了解决金融时间序列的尖峰厚尾现象而提出来的。假设某个分布是两
+个正态分布混合而成，密度形式如下：
+其中， 为待估参数。 为两个不同正态分布的密度函数。混合
+正态分布的核心在于参数估计，一般用极大似然法来估计。
+基于混合正态模型构造的 VaR 如下：
+同理，
+
+### ARCH 类方法
+
+这是目前应用最广泛的方法。ARCH 模型的基本形式为：
+ARCH 模型的基本变种是 GARCH 模型。GARCH 模型的基本形式为：
+改变 GARCH 模型的分布假设可以得到 GARCH-t 模型、GARCH-GED 模型、GARCH-SGED
+ 
+
+5
+模型等；改变 GARCH 模型的主方程可以得到 EGARCH 模型、IGARCH 模型等。当然也可以
+衍生出 EGARCH-GED 等模型。
+library(rgarch)
+
+## 极值理论（Extrem Value Theory）方法
+
+虽然很多人把极值理论计算 VaR 标榜为新兴的方法。然而，这一种算法实际上也出现
+很久了。
+极值理论是上世纪 70 年代正式发展起来的一门理论，它针对极端事件建模。由于直方
+图中极端事件位于尾部，因此，有时候又説，极值理论主要是针对尾部建模。极值理论依托
+于两类重要的分布：极值分布和超限分布。
+
+### 广义极值分布：
+如果随机时间序列 独立同分布于分布函数 ，其均值为 ，方差为 ，无论样本数
+据的初始分布是什么样子，极值的渐进分布只有三种分布：Gumbel 分布、Frechet 分布、
+Weibull 分布，而他们又可以被统一为广义极值分布（Generalized Extrem Value Distribution）。
+其中 是形状参数， 为尾部指数。
+时， ； 时， ； 时，
+通过加入位置参数 和规模参数 可以得到完整的 GEV 分布，其密度函数如下：
+计算出分布的分位数公式，可进一步推出相应的 VaR 公式为：
+
+### 广义帕累托分布3：
+研究极值时还有另一种方法：首先选取一个足够大的门限值（阀值） ，然后，对 中
+所有超过 的值进行建模。这种方法称为 POT（Peaks Over Threshold）法。 中所有大于
+的样本 称为超限值。 称为超出量。根据条件概率，容易算出来超出量的分布 如
+下:
+ 
+
+等式两端对 求导得到超出量分布的密度函数：
+对于下面的分布：
+称 为超限分布。等式两端关于 求导得到超限分布的密度函数为：
+应用过程中一般用广义帕累托分布（GPD：Generized Paroto Distribution）来逼近超限
+分布，广义帕累托分布的密度函数如下：
+其中 为位置（location）参数， 为尺度（scale）参数， 为形状（shape）参数。在广
+义帕累托分布的假设下，VaR 的计算公式：
+其中 u 为阀值， 分别是 的估计值， 为总样本数目， 为超限值的数目。
+library(fExtremes)
+tailRisk()
+
+# VaR 的检验
+
+关于厚尾，本文引用 Ramazan Gancay 的定义，即：如果尾部密度函数是幂指数衰减的，
+就称为厚尾；如果尾部是指数衰减或有有限的终点的，称为细尾。
+
+# 与VaR计算相关的R包
+
+VaR 相关 R 包有 VaR 包、fExtremes 包、ghyp 包、PerformanceAnalytics 包、fAssets
+包、actuar 包；极值理论相关 R 包有 evir 包、evdbayes 包、evd 包、POT 包；GARCH 模
+型相关 R 包有 fGarch 包、goGarch 包、rgarch 包等。
