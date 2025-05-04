@@ -1,6 +1,8 @@
 ---
 title: R与时间序列的平稳性
 author: MatrixSpk
+date: '2011-01-09'
+slug: r-and-the-stationary-of-time-series
 categories:
 - econometrics
 tags:
@@ -40,7 +42,8 @@ tags:
 
 下面以R为例：
 
-```{r}
+
+``` r
 #生成两个时间序列：
 
 x=rnorm(500);  #没有单位根
@@ -50,29 +53,68 @@ y=cumsum(x);   #有单位根
 # 绘制时序图
 
 plot.ts(x);
+```
 
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+``` r
 plot.ts(y);
+```
 
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" />
+
+``` r
 # DF.test检验
 
 library(tseries) #载入tseries包
+```
 
+```
+## Registered S3 method overwritten by 'quantmod':
+##   method            from
+##   as.zoo.data.frame zoo
+```
+
+``` r
 adf.test(x)
+```
 
+```
+## Warning in adf.test(x): p-value smaller than printed p-value
+```
+
+```
+## 
+## 	Augmented Dickey-Fuller Test
+## 
+## data:  x
+## Dickey-Fuller = -7.863, Lag order = 7, p-value = 0.01
+## alternative hypothesis: stationary
 ```
 
 P值等于0.01，拒绝x是原假设（原假设为非平稳），即可以认为x是平稳的。
 
-```{r}
+
+``` r
 adf.test(y)
+```
+
+```
+## 
+## 	Augmented Dickey-Fuller Test
+## 
+## data:  y
+## Dickey-Fuller = -2.6979, Lag order = 7, p-value = 0.2829
+## alternative hypothesis: stationary
 ```
 
 P值等于0.303，因此y是非平稳的。
 
 还可以用urca包中的ur.df()函数来完成上述过程：
 
-```{R}
-install.packages('urca')#安装urca包
+
+``` r
+# install.packages('urca') #安装urca包
 
 library(urca)#载入urca包
 
@@ -80,30 +122,62 @@ library(urca)#载入urca包
 
 #用uroot包中的ADF.test()函数来完成上述过程
 
-install.packages('uroot')#  library(uroot) #载入uroot包，没有安装的话，需要install.packages(uroot)
+# install.packages('uroot')  #没有安装的话
 
+library(uroot)  #载入uroot包
 ?ADF.test#查看ADF.test()函数的帮助文档
+```
+
+```
+## 在指定的程序包和图书馆里没有与'ADF.test'有关的文档:
+## 你可以用用'??ADF.test'
 ```
 
 ## PP检验
 
-```{R}
+
+``` r
 library(tseries)
 
 pp.test(x)
+```
 
+```
+## Warning in pp.test(x): p-value smaller than printed p-value
+```
+
+```
+## 
+## 	Phillips-Perron Unit Root Test
+## 
+## data:  x
+## Dickey-Fuller Z(alpha) = -513.04, Truncation lag parameter = 5, p-value
+## = 0.01
+## alternative hypothesis: stationary
 ```
 
 P值等于0.01，拒绝x为非平稳序列的假设。
 
-```{R}
+
+``` r
 pp.test(y)
+```
+
+```
+## 
+## 	Phillips-Perron Unit Root Test
+## 
+## data:  y
+## Dickey-Fuller Z(alpha) = -15.795, Truncation lag parameter = 5, p-value
+## = 0.2286
+## alternative hypothesis: stationary
 ```
 
 P值等于0.2056，不能拒绝x是非平稳序列的假设，即x非平稳。
 
 也可以用stats包中的PP.test()函数来完成PP检验。
 
-```{R}
+
+``` r
 ?PP.test#查看PP.test()函数的帮助文档
 ```
