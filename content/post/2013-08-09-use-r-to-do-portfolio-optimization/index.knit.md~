@@ -1,0 +1,86 @@
+---
+title: 使用R语言构造投资组合的有效前沿
+author: MatrixSpk
+date: '2013-08-09'
+slug: use-r-to-do-portfolio-optimization
+categories:
+- 量化投资
+tags:
+- portfolio
+- frontier
+---
+构造投资组合是金融投资分析中历久弥新的问题。多年以来，学界、业界提出诸多对投资组合进行优化的方法。比如，最经典的基于收益率均值和收益率波动性进行组合优化，由于马克维滋提出用收益率方差表示收益率的波动性，所以，这种方法又称为的 M-V 方法，即 `Mean-Variance` 方法的缩写；后来，又衍生出基于夏普比率（`Sharp Ratio`）的投资组合优化方法；近年来，随着`VaR` (`Value at Risk`) 和 `CVaR` (`Conditional Vaule at Risk`) 概念的兴起，基于 `VaR` 和 `CVaR` 对投资组合进行优化的思路也开始勃兴；除此之外，对冲基金届还有一种非常有生命力的投资组合优化方法，即桥水公司（`Bridge-Water`）公司提出的风险均摊方法（ `Risk Pairy` ），这种方法的核心思路在于，估计组合中各个资产的风险度及其占组合风险的比率，然后，按照该比例对组合头寸进行分配。
+
+几种方法中，在学界和业界最收关注的还是 `M-V` 方法。而在 `M-V` 方法中最基本的一个知识点，就是构造投资组合的有效前沿。
+
+理论这里不再赘述，简单说一下其在 `R` 语言中的实现。构造有效前沿的步骤大致可按照获取数据、将数据加工处理为收益率矩阵、以收益率矩阵为输入计算得到有效前沿这三个步骤来完成。下面分布来说一说。
+
+第一步，获取数据。最简单的方法是使用 `quantmod` 中的 `getSymbols` 函数。因为要要做的事是构建资产组合，因此，得同时获取多只股票的交易数据，这里取 QQQ/SPY/YHOO 三只股票为例。需要运行的代码：
+
+
+``` r
+# 载入 quatnmod 包
+require(quantmod) 
+```
+
+```
+## 载入需要的程序包：quantmod
+```
+
+```
+## 载入需要的程序包：xts
+```
+
+```
+## 载入需要的程序包：zoo
+```
+
+```
+## 
+## 载入程序包：'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## 载入需要的程序包：TTR
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
+##   method            from
+##   as.zoo.data.frame zoo
+```
+
+``` r
+# 下载 QQQ/SPY/YHOO 交易数据
+getSymbols(c('QQQ','SPY','YHOO')) 
+```
+
+```
+## Warning: Failed to open
+## 'https://query2.finance.yahoo.com/v8/finance/chart/YHOO?period1=1167609600&period2=1746403200&interval=1d':
+## The requested URL returned error: 404
+```
+
+```
+## Warning: Unable to import "YHOO".
+## 无法打开链结
+```
+
+```
+## [1] "QQQ" "SPY"
+```
+
+第二步，将交易数据处理为收益率数据。这一步可以用 dailyReturn 函数来完成。
+
+
+
+
+
+
+

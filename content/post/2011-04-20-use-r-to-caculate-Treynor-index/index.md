@@ -1,0 +1,30 @@
+---
+title: 用R计算Treynor系数
+author: MatrixSpk
+date: '2011-04-20'
+slug: use-r-to-caculate-treynor-index
+categories:
+- 量化投资
+tags:
+- Treynor指数
+- 基金
+---
+Treynor指数是Treynor提出的用以衡量基金绩效的指数。Treynor认为优秀的基金管理者应能够通过投资组合消除所有的非系统性风险，因此，可以用单位系统性风险系数所获得的超额收益率来衡量投资基金的业绩。他采用基金收益率和无风险收益率的差来衡量基金的超额收益率。采用基金投资收益率的 `\(\beta\)` 系数作为衡量系统风险的指标。很显然，Treynor指数越大，表示单位系统风险系数对应的超额收益越大，也就代表基金的效益越好。在运作基金或者投资组合时这个指数十分有用。
+
+Treynor指数的计算公式如下:
+
+$$
+T=\frac{r_i-r_f}{\beta_i}
+$$
+其中：
+* `\(T\)` ：Treynor指数 
+* `\(r_f\)` ：无风险收益率
+* `\(r_i\)` ：基金的收益率 
+* `\(\beta_i\)` ：基金的 `\(\beta\)` 系数
+
+计算Treynor指数的R代码如下：
+
+```
+library(PerformanceAnalytics)
+TreynorRatio()
+```
