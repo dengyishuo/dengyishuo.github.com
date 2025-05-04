@@ -1,27 +1,41 @@
+---
+title: RSI指标可以作为量化投资的信号因子吗
+author: MatrixSpl
+date: '2025-05-04'
+slug: rsi
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - 技术指标
+  - r
+  - RSI
+---
 #############################################################################
 ### Test rsi in R
 #############################################################################
 
-```
+```{r}
 require(quantstrat)
 suppressWarnings(rm("order_book.RSI",pos=.strategy))
 suppressWarnings(rm("account.RSI","portfolio.RSI",pos=.blotter))
 suppressWarnings(rm("account.st","portfolio.st","stock.str","stratRSI","initDate","initEq",'start_t','end_t'))
-
 ```
+
+```{R}
 # Initialize a strategy object
 # 初始化策略对象，命名为stratRSI
 stratRSI <- strategy("RSI")
 n=2
 ```
 
-```
+```{r}
 # Add an indicator
 # 添加指标
 stratRSI <- add.indicator(strategy = stratRSI, name = "RSI", arguments = list(price = quote(getPrice(mktdata))), label="RSI")
 ```
 
-```
+```{r}
 # There are two signals:
 # 添加两个信号
 # The first is when RSI is greater than 70
@@ -32,7 +46,7 @@ stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list
 stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list(threshold=30, column="RSI",relationship="lt",cross=TRUE),label="RSI.lt.30")
 ```
 
-```
+```{r}
 # There are two rules:
 ## we use osMaxPos to put trade on in layers, or to a maximum position. 
 
@@ -52,6 +66,7 @@ stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(si
 
 # add trailing exit
 
+```{r}
 currency("USD")
 currency("EUR")
 symbols = c("XLF", "XLP", "XLE", "XLY", "XLV", "XLI", "XLB", "XLK", "XLU")
@@ -59,7 +74,7 @@ for(symbol in symbols){ # establish trade-able instruments
     stock(symbol, currency="USD",multiplier=1)
 	getSymbols(symbol)
 }
-
+```
 
 # you can test with something like this:
 # applySignals(strategy=stratRSI, mktdata=applyIndicators(strategy=stratRSI, mktdata=symbols[1]))
@@ -75,6 +90,7 @@ for(symbol in symbols){ # establish trade-able instruments
 #  {initDate="1999-12-31"
 #  endDate=Sys.Date()}
 
+```{r}
 initDate='1997-12-31'
 initEq=100000
 port.st<-'RSI' #use a string here for easier changing of parameters and re-trying
@@ -123,7 +139,8 @@ if("package:PerformanceAnalytics" %in% search() || require("PerformanceAnalytics
 
 
 ##### PLACE THIS BLOCK AT END OF DEMO SCRIPT ################### 
-# book  = getOrderBook(port)
-# stats = tradeStats(port)
-# rets  = PortfReturns(acct)
+book  = getOrderBook(port.st)
+stats = tradeStats(port.st)
+rets  = PortfReturns(port.st)
 ################################################################
+```
