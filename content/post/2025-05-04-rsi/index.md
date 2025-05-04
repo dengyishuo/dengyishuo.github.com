@@ -88,25 +88,16 @@ require(quantstrat)
 suppressWarnings(rm("order_book.RSI",pos=.strategy))
 suppressWarnings(rm("account.RSI","portfolio.RSI",pos=.blotter))
 suppressWarnings(rm("account.st","portfolio.st","stock.str","stratRSI","initDate","initEq",'start_t','end_t'))
-```
 
-
-``` r
 # Initialize a strategy object
 # 初始化策略对象，命名为stratRSI
 stratRSI <- strategy("RSI")
 n=2
-```
 
-
-``` r
 # Add an indicator
 # 添加指标
 stratRSI <- add.indicator(strategy = stratRSI, name = "RSI", arguments = list(price = quote(getPrice(mktdata))), label="RSI")
-```
 
-
-``` r
 # There are two signals:
 # 添加两个信号
 # The first is when RSI is greater than 70
@@ -115,10 +106,7 @@ stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list
 
 # The second is when RSI is less than 30
 stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list(threshold=30, column="RSI",relationship="lt",cross=TRUE),label="RSI.lt.30")
-```
 
-
-``` r
 # There are two rules:
 ## we use osMaxPos to put trade on in layers, or to a maximum position. 
 
@@ -129,7 +117,7 @@ stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(si
 # The second is to buy when the RSI crosses below the threshold
 stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.lt.30", sigval=TRUE, orderqty= 1000, ordertype='market', orderside='long', pricemethod='market', replace=FALSE, osFUN=osMaxPos), type='enter', path.dep=TRUE)
 stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.gt.70", sigval=TRUE, orderqty='all', ordertype='market', orderside='long', pricemethod='market', replace=FALSE), type='exit', path.dep=TRUE)
-```
+
 
 #add changeable parameters
 # add level in/out
@@ -139,7 +127,6 @@ stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(si
 # add trailing exit
 
 
-``` r
 currency("USD")
 ```
 
@@ -161,7 +148,7 @@ for(symbol in symbols){ # establish trade-able instruments
     stock(symbol, currency="USD",multiplier=1)
 	getSymbols(symbol)
 }
-```
+
 
 # you can test with something like this:
 # applySignals(strategy=stratRSI, mktdata=applyIndicators(strategy=stratRSI, mktdata=symbols[1]))
@@ -177,8 +164,6 @@ for(symbol in symbols){ # establish trade-able instruments
 #  {initDate="1999-12-31"
 #  endDate=Sys.Date()}
 
-
-``` r
 initDate='1997-12-31'
 initEq=100000
 port.st<-'RSI' #use a string here for easier changing of parameters and re-trying
@@ -19000,7 +18985,7 @@ print(end_t-start_t)
 ```
 
 ```
-## Time difference of 5.244886 mins
+## Time difference of 5.305772 mins
 ```
 
 ``` r
@@ -19068,7 +19053,7 @@ print(end_t-start_t)
 ```
 
 ```
-## Time difference of 0.4100499 secs
+## Time difference of 0.343982 secs
 ```
 
 ``` r
@@ -19076,15 +19061,20 @@ print(end_t-start_t)
 themelist<-chart_theme()
 themelist$col$up.col<-'lightgreen'
 themelist$col$dn.col<-'pink'
+
 for(symbol in symbols){
-    dev.new()
+    # dev.new()
     chart.Posn(Portfolio=port.st,Symbol=symbol,theme=themelist)
     plot(add_RSI(n=2))
 }
+```
 
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-4.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-6.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-7.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-8.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-9.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-10.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-11.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-12.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-13.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-14.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-15.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-16.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-17.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-18.png" width="672" />
+
+``` r
 ret1 <- PortfReturns(port.st)
 ret1$total <- rowSums(ret1)
-#ret1
+
 
 if("package:PerformanceAnalytics" %in% search() || require("PerformanceAnalytics",quietly=TRUE)) {
     dev.new()
