@@ -1,0 +1,50 @@
+---
+title: 2010年各地房价排行榜揭晓
+author: MatrixSpk
+date: '2011-02-10'
+slug: house-price
+categories:
+- 经济学
+tags:
+- 地图
+- 房价
+- 排行榜
+---
+今日看到一篇新闻，该新闻称《2010年中国城市房价排行榜》近日揭晓，杭州房价跃居榜首。该文列出了2010年7月中国城市房价排行榜数据如下：
+
+```{R}
+cities <- readRDS("cities.rds")
+print(cities)
+```
+
+用R将其可视化：
+
+```{r}
+# 安装包（如果未安装）
+# install.packages(c("ggplot2", "sf", "dplyr","ggrepel"))
+
+# 加载包
+library(ggplot2)
+library(sf)
+library(dplyr)
+library(ggrepel)
+library(showtext)
+
+
+# 下载中国地图数据（GADM级别0，全国）
+china_map <- st_read("https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_CHN_0.json")
+
+cities <- readRDS("cities.rds")
+
+ggplot() +
+  geom_sf(data = china_map, fill = "lightblue", color = "gray40") +  # 绘制地图边界
+  geom_point(data = cities[1:20,], aes(x = lat, y = lon), color = "red", size = 2) +  # 标记城市点
+  geom_text_repel(data = cities[1:20,], aes(x = lat, y = lon, label = city), 
+            hjust = -0.1, vjust = 0.5, color = "darkred", size = 3) +  # 添加城市标签
+  coord_sf(xlim = c(73, 135), ylim = c(18, 54)) +  # 设置地图范围（中国区域）
+  labs(title = "中国主要城市分布图", x = "经度", y = "纬度") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold",family="PingFang SC"))
+```
+
+果不其然，全都在沿海。
