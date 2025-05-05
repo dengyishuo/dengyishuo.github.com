@@ -1,0 +1,73 @@
+---
+title: VaR和方差协方差方法及R语言
+author: MatrixSpk
+date: '2010-12-17'
+slug: VaR-Caculation-via-Variance-Covariance-Method
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - 风险度量
+  - VaR
+  - r
+---
+## 方差-协方差法
+
+方差-协方差法是一种基于资产收益率正态性假设的VaR计算方法。其核心思想是通过历史数据估计资产收益率的均值、方差和协方差矩阵，构建投资组合收益率的概率分布，继而计算VaR值。
+
+具体流程可分为以下三步：
+
+首先，计算资产收益率的协方差矩阵以衡量风险关联；其次，根据投资组合权重计算组合收益率的期望值和标准差；最后，在给定置信水平下，利用正态分布分位数确定VaR值。例如，在95%置信水平下，单日VaR可表示为组合市值的绝对值乘以其标准差再乘1.645（对应正态分布左尾5%分位数）。该方法计算效率高，但对非线性风险和非正态分布敏感。多日VaR可通过时间平方根法则调整，即单日VaR乘 $\sqrt{T}$ 得到。
+
+## R代码实现
+
+```{R}
+# 加载必要包
+library(quantmod)
+library(PerformanceAnalytics)
+library(ggplot2)
+library(dplyr)
+
+# 1. 下载股票数据（示例使用苹果、微软、亚马逊）
+symbols <- c("AAPL", "MSFT", "AMZN")
+getSymbols(symbols, src = "yahoo", from = "2022-01-01", to = Sys.Date())
+
+# 2. 提取收盘价并合并
+prices <- merge(Cl(AAPL), Cl(MSFT), Cl(AMZN)) %>% na.omit()
+colnames(prices) <- symbols
+
+# 3. 计算对数收益率
+returns <- na.omit(Return.calculate(prices, method = "log"))
+
+# 4. 设定投资组合参数
+weights <- c(0.3, 0.4, 0.3)  # 组合权重
+conf_level <- 0.95            # 置信水平
+portfolio_value <- 1e6        # 组合价值（美元）
+
+# 5. 计算协方差矩阵与组合标准差
+cov_matrix <- cov(returns)
+port_sd <- sqrt(t(weights) %*% cov_matrix %*% weights)
+
+# 6. 计算单日VaR
+var_1d <- abs(portfolio_value * qnorm(1 - conf_level) * port_sd)
+
+# 7. 计算5日VaR（时间平方根法则）
+var_5d <- var_1d * sqrt(5)
+
+# 8. 可视化VaR分布
+ggplot(data = data.frame(Returns = as.numeric(returns %*% weights)), 
+       aes(x = Returns)) +
+  geom_histogram(aes(y = ..density..), bins = 50, fill = "steelblue", alpha = 0.7) +
+  geom_vline(xintercept = -var_1d/portfolio_value, color = "red", 
+             linetype = "dashed", size = 1) +
+  stat_function(fun = dnorm, args = list(mean = mean(returns %*% weights),
+               sd = sd(returns %*% weights)), color = "darkgreen") +
+  labs(title = "Portfolio Returns Distribution with VaR",
+       x = "Daily Returns", y = "Density") +
+  annotate("text", x = -var_1d/portfolio_value, y = 15, 
+           label = paste0("95% 1d VaR: $", round(var_1d)), color = "red")
+
+# 输出结果
+cat("单日VaR（95%置信度）:", round(var_1d), "美元\n")
+cat("5日VaR（95%置信度）:", round(var_5d), "美元")
+```

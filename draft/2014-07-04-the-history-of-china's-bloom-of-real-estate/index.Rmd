@@ -1,9 +1,10 @@
 ---
 title: 房价上涨的逻辑
 author: MatrixSpk
-slug: why house price so high
+date: '2014-07-04'
+slug: why-house-price-so-high
 categories:
-- R
+- 经济学
 tags:
 - 房价
 - 城镇化

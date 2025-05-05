@@ -1,8 +1,8 @@
 ---
 title: 从Tsay的书看R的未来
 author: MatrixSpk
-date: 2011-04-09 22:26:41
-slug: predict-rs-future-based-on-the-change-of-tsays-book
+date: '2011-04-09'
+slug: predict-r-based-on-the-change-of-tsays-book
 categories:
 - R
 tags:
@@ -10,7 +10,6 @@ tags:
 - 书籍
 - 金融时间序列分析
 ---
-
 [Tsay](http://faculty.chicagobooth.edu/ruey.tsay/)写的最著名的书叫[《Analysis of Financial Time Series》](http://faculty.chicagobooth.edu/ruey.tsay/teaching/)，这本书目前已经到了第三版。可能很少有人注意到，第三版跟第二版比在书籍介绍里有一个微妙的变化：
 
 第二版的部分[书籍介绍](http://faculty.chicagobooth.edu/ruey.tsay/teaching/fts2/)如下：
