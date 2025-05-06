@@ -1,0 +1,171 @@
+---
+title: R数据分析实例：稳健回归
+author: MatrixSpk
+date: '2011-12-09'
+slug: r-data-analysis-examples-robust-regression
+categories:
+- R
+tags:
+- 数据分析
+- 实例
+- 稳健回归
+- Robust Regression
+---
+**按语：**当数据含有离群点（Outliar）或者强影响点（influential observation）时，稳健回归（Robust Regression）会比普通最小二乘法(OLS)的表现要更优异。稳健回归也可以用来检测数据中的强影响点。
+
+**提示:** 本文旨在介绍与稳健回归相关的R命令，因此，并未全面覆盖稳健回归的相关知识，也不涉及数据清洗、数据检测、模型假设和模型诊断等内容。
+
+文档内容基于R 2.14.0，最后更新于2011年12月19日。
+
+#### 简介
+
+介绍几个线性回归（linear regression）中的术语：
+
+**残差（Residual）**:基于回归方程的预测值与观测值的差。
+
+**离群点（Outlier）**:线性回归（linear regression）中的离群点是指对应残差较大的观测值。也就是说，当某个观测值与基于回归方程的预测值相差较大时，该观测值即可视为离群点。 离群点的出现一般是因为样本自身较为特殊或者数据录入错误导致的，当然也可能是其他问题。
+
+**杠杆率（Leverage）**: 当某个观测值所对应的预测值为极端值时，该观测值称为高杠杆率点。杠杆率衡量的是独立变量对自身均值的偏异程度。高杠杆率的观测值对于回归方程的参数有重大影响。
+
+**影响力点：（Influence）**: 若某观测值的剔除与否，对回归方程的系数估计有显著相应，则该观测值是具有影响力的，称为影响力点。影响力是高杠杆率和离群情况引起的。
+
+**Cook距离（Cook's distance**）: 综合了杠杆率信息和残差信息的统计量。
+
+使用最小二乘回归时，有时候会遇到离群点和高杠杆率点。此时，若认定离群点或者高杠杆率点的出现并非因为数据录入错误或者该该观测值来自另外一个总体的话，使用最小二乘回归会变得很棘手，因为数据分析者因为没有充分的理由剔除离群点和高杠杆率。此时稳健回归是个极佳的替代方案。稳健回归在剔除离群点或者高杠杆率点和保留离群点或高杠杆率点并像最小二乘法那样平等使用各点之间找到了一个折中。其在估计回归参数时，根据观测值的稳健情况对观测值进行赋权。简而言之，稳健回归是加权最小二乘回归，或称文艺最小二乘回归。
+
+**MASS** 包中的 **rlm**命令提供了不同形式的稳健回归拟合方式。接下来，以基于Huber方法和bisquare方法下的M估计为例来进行演示。这是两种最为基本的M估计方法。在M估计中，要做的事情是在满足约束 $ \Sigma_{i=1}^{n}w_{i}(y_i-x_{i}^{'}b) x_{i}^{'} = 0 $时，求出使得 $\Sigma w_{i}^2e_i^2$ 最小的参数。
+
+由于权重的估计依赖于残差，而残差的估计又反过来依赖于权重，因此需用迭代重复加权最小二乘（ **I**teratively **R**eweighted **L**east **S**quares ，IRLS）来估计参数。
+
+举例，第j次迭代得到的系数矩阵为:$ B_j = \left[X^{'}W_{j-1}X-1X]-1X^{'}W_{j-1}Y\right]$  ，这里下脚标表示求解过程中的迭代次数，而不是通常的行标或者列标，持续这一过程，直到结果收敛为止。Huber方法下，残差较小的观测值被赋予的权重为1，残差较大的观测值的权重随着残差的增大而递减。而bisquare方法下，所有的非0残差所对应观测值的权重都是递减的。
+
+Huber权重函数通过阈值参数 $ k $ 控制对异常值的敏感度：
+
+$$
+w(e) = 
+\begin{cases} 
+1 & \text{若 } |e| \leq k \\
+\frac{k}{|e|} & \text{若 } |e| > k 
+\end{cases}
+$$
+
+* Huber方法特性
+- &zwnj;**梯度惩罚**&zwnj;：对 $|e| > k$ 的残差施加线性惩罚，平衡效率与鲁棒性
+- &zwnj;**连续性**&zwnj;：权重函数在 $ |e| = k $ 处连续但不可微分
+- &zwnj;**参数选择**&zwnj;：典型值 $ k = 1.345\sigma $，覆盖约95%的正态分布数据
+
+Bisquare权重函数采用平滑的二次递减形式：
+
+$$
+w(e) = 
+\begin{cases} 
+\left(1 - \left(\frac{e}{k}\right)^2\right)^2 & \text{若 } |e| \leq k \\
+0 & \text{若 } |e| > k 
+\end{cases}
+$$
+
+* Bisquare方法特性
+- &zwnj;**硬截断**&zwnj;：完全忽略 $|e| > k$ 的观测值
+- &zwnj;**平滑性**&zwnj;：权重曲线在 $ |e| = k $ 处连续且一阶可导
+- &zwnj;**参数选择**&zwnj;：典型值 $ k = 4.685\sigma $，保留约99%的正常数据
+
+#### 数据描述
+
+下面用到的数据是Alan Agresti和Barbara Finlay所著的《Statistical Methods for Social Sciences》中的crime数据集。
+
+该数据集的变量分别是：
+
+* 州代码(**sid**)
+* 州名 (**state**)
+* 每十万人暴力犯罪数(**crime**)
+* 每十万人谋杀犯罪数 (**murder**)
+* 城市圈人口占比 (**pctmetro**)
+* 白人占比(**pctwhite**)
+* 高中及以上教育占比 (**pcths**)
+* 贫困线以下人口占比 (**poverty**)
+* 单亲家庭人口占比 (**single**)
+```
+
+该数据集共有51个观测值。接下来用数据集中的**poverty** 和 **single** 变量来预测 **crime**.
+
+```{R eval=FALSE}
+library(foreign)
+
+cdata <- read.dta("http://www.ats.ucla.edu/stat/data/crime.dta")
+
+summary(cdata)
+```
+
+#### 稳健回归
+
+先对数据进行OLS回归，重点观察回归结果中的残差、拟合值、Cook距离和杠杆率。
+
+```{R eval=FALSE}
+ols <- lm(crime ~ poverty + single, data = cdata) summary(ols)
+```
+
+从图上看出，第 9, 第25和第5个观测值可能是离群点，看看这些观测值所属的是哪些州。
+
+```{R eval=FALSE}
+cdata[c(9, 25, 51), 1:2]
+```
+
+可以猜测，DC、Florida和Mississippi这三个地方所对应的观测值可能具有较大的残差或者杠杆率。
+
+下面观察一下Cook距离较大的观测值有哪些。在判断Cook距离大小的时候，通常采用过的经验分界点是Cook距离序列的4/n处，其中n是观测值的个数。
+
+```{R eval=FALSE}
+library(MASS) 
+d1 <- cooks.distance(ols) 
+r <- stdres(ols) 
+a <- cbind(cdata, d1, r) 
+a[d1 > 4/51, ]
+```
+
+本来应当先删除DC所对应的观测值，因为DC对应的并不是州。然而，由于DC所对应的Cook距离较大保留DC有助于我们进行观察。下面生成一个**absr1**变量，其对应的为残差序列的绝对值，取出残差绝对值较大的观测值：
+
+```{R eval=FALSE}
+rabs <- abs(r) a <- cbind(cdata, d1, r, rabs) asorted <- a[order(-rabs), ] asorted[1:10, ]
+```
+
+现在转向稳健回归。再提示一下，稳健回归是通过迭代重复加权最小二乘来完成的。其对应的R函数是**MASS**包中的**rlm**。IRLS对应的有多个权重函数（ weighting functions），首先演示一下Huber方法。
+
+演示过程中，重点关注IRLS过程得出的权重结果。
+
+```{R eval=FALSE}
+rr.huber <- rlm(crime ~ poverty + single, data = cdata) 
+summary(rr.huber)
+hweights <- data.frame(state = cdata$state, resid = rr.huber$resid, weight = rr.huber$w) 
+hweights2 <- hweights[order(rr.huber$w), ] hweights2[1:15, ]
+```
+
+容易看出来，观测值的残差绝对值越大，其被赋予的权重越小。结果表明Mississippi所对应的观测值被赋予的权重是最小的，其次是Florida所对应的观测值，而所有未被展示的观测值的权重皆为1。由于OLS回归中所有观测值的权重都为1，因此，稳健回归中权重为1的观测值越多，则稳健回归于OLS回归的分析结果越相近。
+
+接下来，用bisquare方法来进行稳健回归过程。
+
+```{R eval=FALSE}
+rr.bisquare <- rlm(crime ~ poverty + single, data=cdata, psi = psi.bisquare) summary(rr.bisquare)
+biweights <- data.frame(state = cdata$state, resid = rr.bisquare$resid, weight = rr.bisquare$w) 
+biweights2 <- biweights[order(rr.bisquare$w), ] 
+biweights2[1:15, ]
+```
+
+与Huber方法相比，bisquare方法下的 Mississippi观测值被赋予了极小的权重，并且两种方法估计出的回归参数也相差甚大。通常，当稳健回归跟OLS回归的分析结果相差较大时，数据分析者采用稳健回归较为明智。稳健回归和OLS回归的分析结果的较大差异通常暗示着离群点对模型参数产生了较大影响。所有的方法都有长处和软肋，稳健回归也不例外。稳健回归中，Huber方法的软肋在于无法很好的而处理极端离群点，而bisquare方法的软肋在于回归结果不易收敛，以至于经常有多个最优解。
+
+除此之外，两种方法得出的参数结果极为不同，尤其是**single**变量的系数和截距项(**intercept**)。不过，一般而言无需关注截距项，除非事先已经对预测变量进行了中心化，此时截距项才显的有些用处。再有， 变量** poverty** 的系数在两种方法下都不显著，而变量 **single**则刚好相反，都较为显著。
+
+#### 思考：
+	
+* 稳健回归没有解决OLS回归中的异方差问题，有关这一问题可以参见**sandwich**包中的 **lm**函数。
+
+* 这里展示的只是在**R**实现M估计的一种方法，读者尚可以在**rlm**中发现更多方法，比如MM等。此外，**robustbase**包中**ltsReg**可以用来实现最小截平方（ Least trimmed squares）。
+
+#### 参考资料：
+
+* Li, G. 1985. Robust regression. In Exploring Data Tables, Trends and Shapes, ed. D. C. Hoaglin, F. Mosteller, and J. W. Tukey, Wiley.
+
+* John Fox, Applied regression analysis,linear models and related models, Sage publications, Inc, 1997
+
+#### 更多内容：
+
+* [ R documentation for **rlm**](http://stat.ethz.ch/R-manual/R-patched/library/MASS/html/rlm.html)

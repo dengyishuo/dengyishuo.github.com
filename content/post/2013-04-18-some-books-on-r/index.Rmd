@@ -1,0 +1,20 @@
+---
+title: 几本关于R的书籍
+author: MatrixSpk
+date: '2013-04-18'
+slug: some-books-on-r
+categories:
+- R
+tags:
+- R
+- 书籍
+---
+最近，出版社的朋友推荐了四本在亚马逊上卖的火热的R书籍。大致看了下内容，都算是上乘之作。这里简单介绍一下：
+
+第一本叫《Introductory Time Series with R》。这是Springer出版社的UseR!系列作品，质量绝对是有保证的，内容集中于时间序列分析方面。作者是Paul S.P. Cowpertwait和Andrew V. Metcalfe 。
+
+第二本是《Time Series Analysis: With Applications in R》是Springer统计学系列的一本书，也是专注于时间序列分析，这本书的厚度是第一本书的两倍。
+
+第三本叫《Financial Risk Forecasting: The Theory and Practice of Forecasting Market Risk with Implementation in R and Matlab 》是Wiley出版社Finance Series系列的一本书，比较薄，内容主要集中在金融风险的预测上，更适合搞投资的人来阅读。
+
+第四本是《Software for Data Analysis: Programming with R》是 Springer旗下Statistics and Computing系列的一般书，作者是R领域的大牛人叫John Chambers，我想他的名字是如雷贯耳的，无需多言，只需膜拜。

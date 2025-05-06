@@ -1,0 +1,95 @@
+---
+title: 非线性模型极大似然估计方法
+author: MatrixSpk
+date: '2011-09-13'
+slug: max-likelyho
+categories:
+- R
+tags:
+- r
+- 极大似然估计
+- 计量经济学
+---
+## 一、模型设定与概率框架
+设非线性生产函数形式为：
+$$
+y_i = aL_i^bK_i^c + \epsilon_i \quad (i=1,...,n)
+$$
+其中误差项 `\(\epsilon_i \sim N(0,\sigma^2)\)`，则观测值 `\(y_i\)` 服从均值为 `\(aL_i^bK_i^c\)`、方差为 `\(\sigma^2\)` 的正态分布。
+
+## 二、似然函数构建
+### 1. 联合概率密度函数
+$$
+L(a,b,c,\sigma) = \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left[ -\frac{(y_i-aL_i^bK_i^c)^2}{2\sigma^2} \right]
+$$
+
+### 2. 负对数似然函数（目标函数）
+
+$$
+\ell(a,b,c,\sigma) = -\ln L = \frac{n}{2}\ln(2\pi) + n\ln\sigma + \frac{1}{2\sigma^2}\sum_{i=1}^n (y_i - aL_i^bK_i^c)^2
+$$
+
+## 三、参数估计流程
+### 1. 数据处理与准备
+
+
+``` r
+# 导入数据
+data <- data.frame(
+  y = c(76,47,97,107,123,139,159,152,191,201,207,200),
+  L = c(0.02,0.02,0.06,0.06,0.11,0.11,0.22,0.22,0.56,0.56,1.10,1.10),
+  K = c(1.1,0.9,2.3,2.1,3.4,3.6,4.5,4.3,5.8,6.0,7.2,7.0)
+)
+
+# 定义负对数似然函数
+mloglik <- function(theta) {
+  a <- theta[1]
+  b <- theta[2]
+  c <- theta[3]
+  sigma <- theta[4]
+  
+  y_pred <- a * data$L^b * data$K^c
+  residuals <- data$y - y_pred
+  n <- length(data$y)
+  
+  # 避免\sigma 趋近于零
+  if(sigma <= 0) return(1e10)
+  
+  (n/2)*log(2*pi) + n*log(sigma) + sum(residuals^2)/(2*sigma^2)
+}
+
+# 采用线性化方法获取初始值
+log_model <- lm(log(y) ~ log(L) + log(K), data = data)
+theta_init <- c(
+  exp(coef(log_model)[1]),
+  coef(log_model)[2],
+  coef(log_model)[3],
+  sd(resid(log_model))
+)
+
+# 优化求解
+fit <- nlm(mloglik, theta_init, hessian = TRUE)
+```
+
+```
+## Warning in nlm(mloglik, theta_init, hessian = TRUE): NA/NaN replaced by maximum
+## positive value
+```
+
+```
+## Warning in nlm(mloglik, theta_init, hessian = TRUE): Inf replaced by maximum
+## positive value
+```
+
+``` r
+# 提取估计结果
+params <- fit$estimate
+names(params) <- c("a", "b", "c", "sigma")
+params
+```
+
+```
+##           a           b           c       sigma 
+## 55.45620820 -0.02273718  0.67704166  7.67493891
+```
+
