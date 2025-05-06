@@ -34,4 +34,9 @@ cache WDIcache函数生成的数据列表。缺失的话，WDIsearch会在本地
 返回的是满足特定搜索条件的序列的代码、名字、数据源及序列描述。
 
 
+``` r
+WDIsearch(string='gdp', field='name', cache=NULL)
+WDIsearch(string='AG.AGR.TRAC.NO', field='indicator', cache=NULL)
+```
 
+使用世界银行的API获取需要的数据，解析生成的JSON文件并将结果整理为包含国家和年份信息的长格式数据。

@@ -32,7 +32,7 @@ cache WDIcache函数生成的数据列表。缺失的话，WDIsearch会在本地
 
 返回的是满足特定搜索条件的序列的代码、名字、数据源及序列描述。
 
-```{R eval=TRUE}
+```{R eval=FALSE}
 WDIsearch(string='gdp', field='name', cache=NULL)
 WDIsearch(string='AG.AGR.TRAC.NO', field='indicator', cache=NULL)
 ```
