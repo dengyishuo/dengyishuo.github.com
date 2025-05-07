@@ -16,11 +16,10 @@ menu:
       url: /about/
     - name: 主页
       url: /home/
- 
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
-  description: 专注于投资、读书和生活。
+  description: 让知识美好生活
   favicon: favicon.ico
   highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
   highlightjsLang:
@@ -31,7 +30,7 @@ params:
   logo:
     alt: Logo
     height: 50
-    url: logo.png
+    url: favicon.ico
     width: 50
 markup:
   defaultMarkdownHandler: goldmark
