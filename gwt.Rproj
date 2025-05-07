@@ -16,5 +16,6 @@ LaTeX: XeLaTeX
 LineEndingConversion: Native
 
 BuildType: Website
+WebsitePath: ~/GWT
 
 UseNativePipeOperator: Yes
