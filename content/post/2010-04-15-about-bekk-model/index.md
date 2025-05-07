@@ -140,8 +140,8 @@ mvBEKK.diag(est)
 ```
 ## 	Number of estimated series :  3 
 ## 	Length of estimated series :  1000 
-## 	Estimation Time            :  32.94379 
-## 	Total Time                 :  33.57183 
+## 	Estimation Time            :  32.41842 
+## 	Total Time                 :  32.98894 
 ## 	BEKK order                 :  1 1 
 ## 	Eigenvalues                :  0.8982855 0.5101535 0.4535976 0.3020472 0.2611067 0.2258987 0.1373383 0.05469751 0.05280793 
 ## 	aic                        :  4163.509 
@@ -348,8 +348,8 @@ diagnoseBEKK(estimated)
 ```
 ## 	Number of estimated series :  2000 
 ## 	Length of estimated series :  1000 
-## 	Estimation Time            :  3.092537 
-## 	Total Time                 :  3.226624 
+## 	Estimation Time            :  3.208226 
+## 	Total Time                 :  3.330154 
 ## 	BEKK order                 :  1 1 
 ## 	Eigenvalues                :  0.7940983 0.7122278 0.5839173 0.5353965 
 ## 	aic                        :  4614.775 
@@ -403,4 +403,3 @@ diagnoseBEKK(estimated)
 ## debug: browser()
 ## debug: dev.off()
 ```
-

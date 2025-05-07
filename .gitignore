@@ -2,3 +2,7 @@
 _drafts/
 _site/
 .Rproj.user
+Thumbs.db
+.hugo_build.lock
+/public/
+/resources/

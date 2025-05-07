@@ -2,9 +2,9 @@
 title: 布袋图与异常值检测
 author: MatrixSpk
 date: '2010-03-24'
-slug: bagplot and extreme value detection
+slug: bagplot-and-extreme-value-detection
 categories:
-  - data visualization
+  - 可视化
 tags:
   - data
   - vis
@@ -182,9 +182,9 @@ legend("topright", legend = c("Outlier", "Normal"),
 
 常用的统计分析方法主要包括$3\sigma$方法和四分位距。
 
-#### 3$\sigma$准则
+#### 3西格玛准则
 
-$3\sigma$准则的应用十分简明，即将超过均值三个标准差的数据全都视为异常值。下面看一个例子：
+$3\sigma$ 准则的应用十分简明，即将超过均值三个标准差的数据全都视为异常值。下面看一个例子：
 
 ```{R}
 # 生成示例数据
@@ -192,11 +192,11 @@ set.seed(123)
 data <- rnorm(100)
 data[20] <- 10  # 插入异常值
 
-# 3\sigma准则识别
+# 3西格玛准则识别
 mean_val <- mean(data)
 sd_val <- sd(data)
-outliers_3sigma <- data[abs(data - mean_val) > 3 * sd_val]
-cat("3\sigma准则识别的异常值：", outliers_3sigma, "\n")
+outliers_3sigma <- data[abs(data - mean_val) > 3*sd_val]
+cat("3西格玛准则识别的异常值：", outliers_3sigma, "\n")
 ```
 
 #### 四分位距
