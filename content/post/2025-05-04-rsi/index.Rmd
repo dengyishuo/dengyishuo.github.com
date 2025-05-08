@@ -250,7 +250,9 @@ for(symbol in symbols){
   } 
 
 print("初始化完成")
+```
 
+```{R include=FALSE}
 # ---------------------------
 # 5. 策略回测执行
 # ---------------------------
@@ -262,6 +264,8 @@ out<-try(
                 parameters=list(n=2) # 可传入策略参数
                 ) 
   )
+```
+```{R}
 end_t<-Sys.time()
 print(paste0("策略循环耗时:",end_t-start_t))
 
