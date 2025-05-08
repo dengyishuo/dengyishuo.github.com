@@ -1,6 +1,6 @@
 ---
 title: RSI指标可以作为量化投资的信号因子吗
-author: MatrixSpl
+author: MatrixSpk
 date: '2025-05-04'
 slug: rsi
 categories:
@@ -11,34 +11,57 @@ tags:
   - r
   - RSI
 ---
-#############################################################################
-### Test rsi in R
-#############################################################################
+## 引言
+
+技术指标是基于历史价格和成交量数据构建的分析工具，用于研判市场趋势及买卖时机。常见类型包括趋势指标（如移动平均线）、动量指标（如RSI）、波动率指标（布林带）和成交量指标（OBV）。其中，相对强弱指数（RSI）由韦尔斯·怀尔德于1978年提出，通过计算特定周期（通常14日）内平均涨幅与总波动的比值，衡量价格变化强度。其公式为：RSI = 100 - 100/(1 + 平均涨幅/平均跌幅)，数值在0-100间波动。应用时，70以上视为超买信号，提示潜在回调可能；30以下为超卖信号，暗示反弹机会。进阶用法包括：观察RSI与价格背离判断趋势反转；结合趋势线突破确认交易信号；在30-70区间内运用中位线（50）判断多空力道。
+
+需注意，在单边行情中RSI易出现钝化，应与趋势指标配合使用以提高准确性。该指标广泛应用于股票、外汇及加密货币市场的短线交易策略。
+
+## 策略实现
+
+下面我们用R实现一个基于RSI指标的量化交易策略，我们基于quantstrat包实现相关策略，完整代码及注释如下：
 
 
 ``` r
+# ======================================================
+# 量化交易策略框架搭建（基于quantstrat包）
+# 策略逻辑：基于RSI指标的双向交易系统
+# 核心流程：环境初始化 -> 策略定义 -> 数据准备 -> 回测执行
+# ======================================================
+
+# ---------------------------
+# 1. 包加载与环境清理
+# ---------------------------
+# 安装必要包（已注释，按需启用）
+# install.packages("devtools") 
+# install.packages("FinancialInstrument") 
+# install.packages("PerformanceAnalytics") 
+# devtools::install_github("braverock/blotter")
+# devtools::install_github("braverock/quantstrat")
+
+# 加载量化策略包
 require(quantstrat)
 ```
 
 ```
-## 载入需要的程序包：quantstrat
+## Loading required package: quantstrat
 ```
 
 ```
-## 载入需要的程序包：quantmod
+## Loading required package: quantmod
 ```
 
 ```
-## 载入需要的程序包：xts
+## Loading required package: xts
 ```
 
 ```
-## 载入需要的程序包：zoo
+## Loading required package: zoo
 ```
 
 ```
 ## 
-## 载入程序包：'zoo'
+## Attaching package: 'zoo'
 ```
 
 ```
@@ -48,7 +71,7 @@ require(quantstrat)
 ```
 
 ```
-## 载入需要的程序包：TTR
+## Loading required package: TTR
 ```
 
 ```
@@ -58,20 +81,20 @@ require(quantstrat)
 ```
 
 ```
-## 载入需要的程序包：blotter
+## Loading required package: blotter
 ```
 
 ```
-## 载入需要的程序包：FinancialInstrument
+## Loading required package: FinancialInstrument
 ```
 
 ```
-## 载入需要的程序包：PerformanceAnalytics
+## Loading required package: PerformanceAnalytics
 ```
 
 ```
 ## 
-## 载入程序包：'PerformanceAnalytics'
+## Attaching package: 'PerformanceAnalytics'
 ```
 
 ```
@@ -81,51 +104,145 @@ require(quantstrat)
 ```
 
 ```
-## 载入需要的程序包：foreach
+## Loading required package: foreach
 ```
 
 ``` r
+# 清理历史策略数据（避免残留数据干扰）
 suppressWarnings(rm("order_book.RSI",pos=.strategy))
 suppressWarnings(rm("account.RSI","portfolio.RSI",pos=.blotter))
-suppressWarnings(rm("account.st","portfolio.st","stock.str","stratRSI","initDate","initEq",'start_t','end_t'))
+suppressWarnings(rm("account.st",
+                    "portfolio.st",
+                    "stock.str",
+                    "stratRSI",
+                    "initDate",
+                    "initEq",
+                    'start_t',
+                    'end_t'
+                    )
+                 )
 
-# Initialize a strategy object
-# 初始化策略对象，命名为stratRSI
+# ---------------------------
+# 2. 策略主体构建
+# ---------------------------
+# 创建策略容器
 stratRSI <- strategy("RSI")
-n=2
+n=2  # 参数示例
 
-# Add an indicator
-# 添加指标
-stratRSI <- add.indicator(strategy = stratRSI, name = "RSI", arguments = list(price = quote(getPrice(mktdata))), label="RSI")
-
-# There are two signals:
-# 添加两个信号
-# The first is when RSI is greater than 70
-# 当RSI>90时返回第一个信号
-stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list(threshold=70, column="RSI",relationship="gt", cross=TRUE),label="RSI.gt.70")
-
-# The second is when RSI is less than 30
-stratRSI <- add.signal(strategy = stratRSI, name="sigThreshold",arguments = list(threshold=30, column="RSI",relationship="lt",cross=TRUE),label="RSI.lt.30")
-
-# There are two rules:
-## we use osMaxPos to put trade on in layers, or to a maximum position. 
-
-# The first is to sell when the RSI crosses above the threshold
-stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.gt.70", sigval=TRUE, orderqty=-1000, ordertype='market', orderside='short', pricemethod='market', replace=FALSE, osFUN=osMaxPos), type='enter', path.dep=TRUE)
-stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.lt.30", sigval=TRUE, orderqty='all', ordertype='market', orderside='short', pricemethod='market', replace=FALSE), type='exit', path.dep=TRUE)
-
-# The second is to buy when the RSI crosses below the threshold
-stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.lt.30", sigval=TRUE, orderqty= 1000, ordertype='market', orderside='long', pricemethod='market', replace=FALSE, osFUN=osMaxPos), type='enter', path.dep=TRUE)
-stratRSI <- add.rule(strategy = stratRSI, name='ruleSignal', arguments = list(sigcol="RSI.gt.70", sigval=TRUE, orderqty='all', ordertype='market', orderside='long', pricemethod='market', replace=FALSE), type='exit', path.dep=TRUE)
+# 2.1 添加技术指标
+# 使用经典RSI指标（默认周期14）
+stratRSI <- add.indicator(
+  strategy = stratRSI, 
+  name = "RSI",    # 内置RSI函数
+  arguments = list(price = quote(getPrice(mktdata))), # 获取价格数据
+  label = "RSI"
+)
 
 
-#add changeable parameters
-# add level in/out
+# 2.2 定义交易信号
+# 信号1：RSI上穿70（超买信号）
+stratRSI <- add.signal(
+  strategy = stratRSI, 
+  name = "sigThreshold",
+  arguments = list(
+    threshold = 70,
+    column = "RSI",
+    relationship = "gt",  # greater than
+    cross = TRUE          # 要求穿越阈值
+  ),
+  label = "RSI.gt.70"
+)
 
-# add trailing entry
+# 信号2：RSI下穿30（超卖信号）
+stratRSI <- add.signal(
+  strategy = stratRSI, 
+  name = "sigThreshold",
+  arguments = list(
+    threshold = 30,
+    column = "RSI",
+    relationship = "lt",  # less than
+    cross = TRUE
+  ),
+  label = "RSI.lt.30"
+)
 
-# add trailing exit
+# 2.3 设置交易规则
+# 规则组1：做空规则
+# 入场规则：RSI>70时建立空头仓位
+stratRSI <- add.rule(
+  strategy = stratRSI, 
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.gt.70",   # 触发信号列
+    sigval = TRUE,          # 信号有效值
+    orderqty = -1000,       # 卖出数量
+    ordertype = 'market',   # 市价单
+    orderside = 'short',    # 空头方向
+    pricemethod = 'market',
+    replace = FALSE,        # 不替换现有订单
+    osFUN = osMaxPos        # 使用最大仓位函数
+  ), 
+  type = 'enter',           # 入场规则
+  path.dep = TRUE           # 路径依赖
+)
 
+# 离场规则：RSI<30时平空仓
+stratRSI <- add.rule(
+  strategy = stratRSI,
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.lt.30",
+    sigval = TRUE,
+    orderqty = 'all',       # 平掉全部仓位
+    ordertype = 'market',
+    orderside = 'short',
+    pricemethod = 'market',
+    replace = FALSE
+  ),
+  type = 'exit',
+  path.dep = TRUE
+)
+
+# 规则组2：做多规则
+# 入场规则：RSI<30时建立多头仓位
+stratRSI <- add.rule(
+  strategy = stratRSI,
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.lt.30",
+    sigval = TRUE,
+    orderqty = 1000,        # 买入数量
+    ordertype = 'market',
+    orderside = 'long',     # 多头方向
+    pricemethod = 'market',
+    replace = FALSE,
+    osFUN = osMaxPos
+  ),
+  type = 'enter',
+  path.dep = TRUE
+)
+
+# 离场规则：RSI>70时平多仓
+stratRSI <- add.rule(
+  strategy = stratRSI,
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.gt.70",
+    sigval = TRUE,
+    orderqty = 'all',
+    ordertype = 'market',
+    orderside = 'long',
+    pricemethod = 'market',
+    replace = FALSE
+  ),
+  type = 'exit',
+  path.dep = TRUE
+)
+
+# ---------------------------
+# 3. 市场数据准备
+# ---------------------------
+# 设置基础货币
 
 currency("USD")
 ```
@@ -143,32 +260,58 @@ currency("EUR")
 ```
 
 ``` r
+# 定义交易标的（美国行业ETF）
 symbols = c("XLF", "XLP", "XLE", "XLY", "XLV", "XLI", "XLB", "XLK", "XLU")
-for(symbol in symbols){ # establish trade-able instruments
+# 初始化交易品种数据
+for(symbol in symbols){ 
+   # 注册金融工具
     stock(symbol, currency="USD",multiplier=1)
-	getSymbols(symbol)
+  # 下载历史数据（默认从Yahoo Finance）
+    getSymbols(symbol)
 }
 
+# 保存数据
+# 遍历所有符号
+# for (symbol in symbols) {
+#  # 检查对象是否存在
+#  if (exists(symbol)) {
+#    # 生成文件名
+#    file_name <- paste0(symbol, ".rds")
+#    # 保存为RDS文件
+#    saveRDS(get(symbol), file = file_name)
+#    # 打印保存信息
+#    message("已保存: ", symbol, " -> ", file_name)
+#  } else {
+#    warning("对象 ", symbol, " 不存在")
+#  }
+#}
 
-# you can test with something like this:
+# 可以用类似以下方式测试：
 # applySignals(strategy=stratRSI, mktdata=applyIndicators(strategy=stratRSI, mktdata=symbols[1]))
 
-##### PLACE DEMO AND TEST DATES HERE #################
+##### 在此放置演示和测试日期 #################
 #
 #if(isTRUE(options('in_test')$in_test))
-#  # use test dates
-#  {initDate="2011-01-01" 
-#  endDate="2012-12-31"   
+#  # 使用测试日期
+#  {initDate="2000-01-01" 
+#  endDate="2024-12-31"   
 #  } else
-#  # use demo defaults
-#  {initDate="1999-12-31"
+#  # 使用演示默认值
+#  {initDate="2000-01-01"
 #  endDate=Sys.Date()}
 
-initDate='1997-12-31'
-initEq=100000
-port.st<-'RSI' #use a string here for easier changing of parameters and re-trying
+# ---------------------------
+# 4. 回测系统初始化
+# ---------------------------
+# 设置回测参数
+initDate = '2000-01-01'  # 初始化日期
+initEq = 100000          # 初始资金（美元）
+port.st = 'RSI'          # 组合名称
 
-initPortf(port.st, symbols=symbols, initDate=initDate)
+# 初始化投资组合
+initPortf(port.st, 
+          symbols=symbols, 
+          initDate=initDate)
 ```
 
 ```
@@ -176,7 +319,11 @@ initPortf(port.st, symbols=symbols, initDate=initDate)
 ```
 
 ``` r
-initAcct(port.st, portfolios=port.st, initDate=initDate,initEq=initEq)
+# 初始化账户
+initAcct(port.st, 
+         portfolios=port.st, 
+         initDate=initDate,
+         initEq=initEq)
 ```
 
 ```
@@ -184,20 +331,38 @@ initAcct(port.st, portfolios=port.st, initDate=initDate,initEq=initEq)
 ```
 
 ``` r
-initOrders(portfolio=port.st, initDate=initDate)
-for(symbol in symbols){ addPosLimit(port.st, symbol, initDate, 300, 3 ) } #set max pos 
+# 初始化订单簿
+initOrders(portfolio=port.st, 
+           initDate=initDate)
 
-print("setup completed")
+# 设置仓位限制（每个品种最大300股，最多3个品种）
+for(symbol in symbols){ 
+  addPosLimit(port.st, 
+              symbol, 
+              initDate, 
+              300, 
+              3 ) 
+  } 
+
+print("初始化完成")
 ```
 
 ```
-## [1] "setup completed"
+## [1] "初始化完成"
 ```
 
 ``` r
-# Process the indicators and generate trades
+# ---------------------------
+# 5. 策略回测执行
+# ---------------------------
+# 执行策略应用
 start_t<-Sys.time()
-out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n=2) ) )
+out<-try(
+  applyStrategy(strategy=stratRSI , 
+                portfolios=port.st,
+                parameters=list(n=2) # 可传入策略参数
+                ) 
+  )
 ```
 
 ```
@@ -2309,6 +2474,9 @@ out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n
 ## [1] "2025-04-23 00:00:00 XLB -100 @ 81.4800033569336"
 ## [1] "2025-04-23 00:00:00 XLB -100 @ 81.4800033569336"
 ## [1] "2025-04-30 00:00:00 XLB -100 @ 83.8899993896484"
+## [1] "2025-05-05 00:00:00 XLB -100 @ 84.3000030517578"
+## [1] "2025-05-07 00:00:00 XLB 300 @ 83.2300033569336"
+## [1] "2025-05-07 00:00:00 XLB 100 @ 83.2300033569336"
 ## [1] "2007-01-16 00:00:00 XLE -100 @ 54.8699989318848"
 ## [1] "2007-01-22 00:00:00 XLE -100 @ 56.189998626709"
 ## [1] "2007-01-24 00:00:00 XLE -100 @ 57.9000015258789"
@@ -4397,6 +4565,10 @@ out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n
 ## [1] "2025-04-25 00:00:00 XLE -100 @ 82.3899993896484"
 ## [1] "2025-05-01 00:00:00 XLE 300 @ 80.8000030517578"
 ## [1] "2025-05-01 00:00:00 XLE 100 @ 80.8000030517578"
+## [1] "2025-05-05 00:00:00 XLE -100 @ 80.5"
+## [1] "2025-05-05 00:00:00 XLE -100 @ 80.5"
+## [1] "2025-05-06 00:00:00 XLE 100 @ 80.5199966430664"
+## [1] "2025-05-06 00:00:00 XLE 100 @ 80.5199966430664"
 ## [1] "2007-01-12 00:00:00 XLF -100 @ 30.05686378479"
 ## [1] "2007-01-19 00:00:00 XLF 100 @ 30.0243701934814"
 ## [1] "2007-01-19 00:00:00 XLF 100 @ 30.0243701934814"
@@ -14853,6 +15025,7 @@ out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n
 ## [1] "2025-04-24 00:00:00 XLU -100 @ 78.4499969482422"
 ## [1] "2025-04-24 00:00:00 XLU -100 @ 78.4499969482422"
 ## [1] "2025-04-29 00:00:00 XLU -100 @ 79.3000030517578"
+## [1] "2025-05-05 00:00:00 XLU -100 @ 79.5500030517578"
 ## [1] "2007-01-09 00:00:00 XLV -100 @ 33.689998626709"
 ## [1] "2007-01-11 00:00:00 XLV -100 @ 34.1199989318848"
 ## [1] "2007-01-23 00:00:00 XLV 200 @ 34.2799987792969"
@@ -16924,6 +17097,7 @@ out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n
 ## [1] "2025-04-25 00:00:00 XLV -100 @ 138.050003051758"
 ## [1] "2025-05-02 00:00:00 XLV 100 @ 138.529998779297"
 ## [1] "2025-05-02 00:00:00 XLV 100 @ 138.529998779297"
+## [1] "2025-05-07 00:00:00 XLV 100 @ 135.360000610352"
 ## [1] "2007-01-10 00:00:00 XLY -100 @ 38.7200012207031"
 ## [1] "2007-01-23 00:00:00 XLY 100 @ 39.5"
 ## [1] "2007-01-23 00:00:00 XLY 100 @ 39.5"
@@ -18969,69 +19143,65 @@ out<-try(applyStrategy(strategy=stratRSI , portfolios=port.st, parameters=list(n
 ## [1] "2025-04-22 00:00:00 XLY 100 @ 186.160003662109"
 ## [1] "2025-04-24 00:00:00 XLY -200 @ 194.110000610352"
 ## [1] "2025-04-24 00:00:00 XLY -100 @ 194.110000610352"
+## [1] "2025-05-05 00:00:00 XLY -100 @ 199.289993286133"
+## [1] "2025-05-07 00:00:00 XLY 200 @ 199.089996337891"
+## [1] "2025-05-07 00:00:00 XLY 100 @ 199.089996337891"
 ```
 
 ``` r
 end_t<-Sys.time()
-print("Strategy Loop:")
+print(paste0("策略循环耗时:",end_t-start_t))
 ```
 
 ```
-## [1] "Strategy Loop:"
-```
-
-``` r
-print(end_t-start_t)
-```
-
-```
-## Time difference of 5.305772 mins
+## [1] "策略循环耗时:4.176862068971"
 ```
 
 ``` r
-# look at the order book
+# 查看订单簿
 #print(getOrderBook(port.st))
 
 start_t<-Sys.time()
+# 更新组合净值
 updatePortf(Portfolio=port.st,Dates=paste('::',as.Date(Sys.time()),sep=''))
 ```
 
 ```
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-05-04 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 2007-01-03/2025-05-02. Using all data
+## Could not parse ::2025-05-08 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 2007-01-03/2025-05-07. Using all data
 ## instead.
 ```
 
@@ -19041,50 +19211,106 @@ updatePortf(Portfolio=port.st,Dates=paste('::',as.Date(Sys.time()),sep=''))
 
 ``` r
 end_t<-Sys.time()
-print("trade blotter portfolio update:")
+print(paste0("更新交易账簿耗时:",end_t-start_t))
 ```
 
 ```
-## [1] "trade blotter portfolio update:"
-```
-
-``` r
-print(end_t-start_t)
-```
-
-```
-## Time difference of 0.343982 secs
+## [1] "更新交易账簿耗时:0.297332048416138"
 ```
 
 ``` r
-# hack for new quantmod graphics, remove later
+# 临时修改quantmod图形参数
 themelist<-chart_theme()
 themelist$col$up.col<-'lightgreen'
 themelist$col$dn.col<-'pink'
 
 for(symbol in symbols){
     # dev.new()
-    chart.Posn(Portfolio=port.st,Symbol=symbol,theme=themelist)
+    chart.Posn(Portfolio=port.st,Symbol=symbol,theme=themelist)  # 绘制持仓图
     plot(add_RSI(n=2))
+    print(paste0(symbol,"仓位图"))
 }
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-4.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-6.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-7.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-8.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-9.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-10.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-11.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-12.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-13.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-14.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-15.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-16.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-17.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-18.png" width="672" />
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" />
+
+```
+## [1] "XLF仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-4.png" width="672" />
+
+```
+## [1] "XLP仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-6.png" width="672" />
+
+```
+## [1] "XLE仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-7.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-8.png" width="672" />
+
+```
+## [1] "XLY仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-9.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-10.png" width="672" />
+
+```
+## [1] "XLV仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-11.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-12.png" width="672" />
+
+```
+## [1] "XLI仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-13.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-14.png" width="672" />
+
+```
+## [1] "XLB仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-15.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-16.png" width="672" />
+
+```
+## [1] "XLK仓位图"
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-17.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-18.png" width="672" />
+
+```
+## [1] "XLU仓位图"
+```
 
 ``` r
+# 统计组合表现
 ret1 <- PortfReturns(port.st)
 ret1$total <- rowSums(ret1)
 
 
 if("package:PerformanceAnalytics" %in% search() || require("PerformanceAnalytics",quietly=TRUE)) {
     dev.new()
+    # 绘制收益率图
     charts.PerformanceSummary(ret1$total,geometric=FALSE,wealth.index=TRUE)
+    print("策略总体表现")
 }
+```
 
+```
+## [1] "策略总体表现"
+```
 
-##### PLACE THIS BLOCK AT END OF DEMO SCRIPT ################### 
+``` r
+##### 查看交易统计信息 #########################################
+# 查看交易单据
 book  = getOrderBook(port.st)
+# 查看交易统计
 stats = tradeStats(port.st)
+# 查看组合收益率
 rets  = PortfReturns(port.st)
 ################################################################
 ```

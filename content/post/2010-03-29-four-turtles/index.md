@@ -36,7 +36,7 @@ library(gganimate)
 # 模拟参数设置
 V <- 0.02       # 移动速度
 dt <- 0.01      # 时间步长
-total_time <- 5 # 总模拟时间
+total_time <- 500 # 总模拟时间
 threshold <- 0.01 # 停止阈值
 
 # 初始化四只乌龟的起始位置（正方形顶点）
