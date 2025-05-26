@@ -12,7 +12,7 @@ tags:
   - quantmod
 ---
 
-```{R setup, message=TRUE, warning=TRUE, include = FALSE }
+```{R setup, message=TRUE, warning=TRUE, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 # 加载软件包
 library(quantstrat)
@@ -23,69 +23,60 @@ library(showtext)
 library(PerformanceAnalytics)
 library(zoo)
 library(tidyverse)
+library(knitr)
+library(kableExtra)
 font_add("SimHei", regular = "SimHei.ttf")
 showtext_auto()
 ```
 
-常有人问我，能用几分钟时间上手写一段代码进行一个简易的量化投资策略的开发和回测吗？答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。
+常有人问我能用几分钟时间写一段代码进行一个简易的量化投资策略的开发和回测吗，答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。
  
 # 引言
 
 本文的代码基于[R](https://r-project.org)软件和 [Rstuido](https://posit.co)  软件运行，如果未安装上述软件，请自行安装。
 
+策略开发还需要基于以下 R 包来实现，可以运行如下代码安装并加载相关 R 包。
+
 ```{R pkg, eval = FALSE}
 # 安装依赖包，如果未安装
 install.packages(c("quantstrat", "Tushare", "xts", "dplyr", "showtext", "zoo","PerformanceAnalytics","tidyverse"))
 # 加载软件包
-library(quantstrat)
-library(Tushare)
-library(xts)
-library(dplyr)
-library(showtext)
-library(PerformanceAnalytics)
-library(zoo)
-library(tidyverse)
+suppressMessages({
+  library(quantmod)
+  library(quantstrat)
+  library(PerformanceAnalytics)
+  library(Tushare)
+  library(xts)
+  library(dplyr)
+  library(zoo)
+  library(tidyverse)
+})
 ```
 
 # 清理环境
 
+第一步，先清理历史环境，避免历史环境的干扰。
+
 ```{R rm}
-# 清理.strategy环境中的对象
-if (exists(".strategy", envir = globalenv())) {
-    strategy_env <- get(".strategy", envir = globalenv())
-    strategy_objects <- ls(strategy_env)
-    for (obj in strategy_objects) {
-        rm(list = obj, envir = strategy_env)
-    }
-}
-
-# 清理.blotter环境中的对象
-if (exists(".blotter", envir = globalenv())) {
-    blotter_env <- get(".blotter", envir = globalenv())
-    blotter_objects <- ls(blotter_env)
-    for (obj in blotter_objects) {
-        rm(list = obj, envir = blotter_env)
-    }
-}
-
-# 清理.account环境中的对象
-if (exists(".account", envir = globalenv())) {
-    account_env <- get(".account", envir = globalenv())
-    account_objects <- ls(account_env)
-    for (obj in account_objects) {
-        rm(list = obj, envir = account_env)
-    }
-}
+# 清理历史环境
+rm(list=ls(.blotter), envir=.blotter)
+rm(list=ls(.strategy), envir=.strategy)
 ```
 
 # 策略开发
 
+下面进入正式开发。
 
 ## 初始化设置
 
 ```{R init}
-currency("RMB")  # 设置货币为人民币
-stock("maotai", currency="RMB") # 设置贵州茅台股票代码
+# 参数设置
+initDate <- "2010-01-01"
+endDate <- "2025-05-26"
+symbol <- "600519.SS"
+initEq <- 100000
+fastMA <- 5
+slowMA <- 20
 ```
 
 ## 获取数据
@@ -93,26 +84,32 @@ stock("maotai", currency="RMB") # 设置贵州茅台股票代码
 使用quantmod获取贵州茅台数据
 
 ```{R dat}
-getSymbols("600519.SS", from="2010-01-01", to=Sys.Date())
-maotai <- `600519.SS` # 重命名对象
+# 获取数据
+getSymbols(symbol, from=initDate, to=endDate, src="yahoo")
+maotai <- `600519.SS`
 colnames(maotai) <- c("Open","High","Low","Close","Volume","Adjusted")
 ```
 
 ## 初始化策略
 
 ```{R creat_stra}
-strategy.name <- "SMA_Strategy"
-portfolio.name <- "maotai_portfolio"
-account.name <- "maotai_account"
+currency("RMB")
+stock(symbol, currency="RMB", multiplier=1)
+
+strategy.st <- "maotai_sma"
+portfolio.st <- "maotai_portfolio"
+account.st <- "maotai_account"
 
 # 清除旧策略(如果存在)
-rm.strat(strategy.name)
+if(exists("strategy.st", where=.strategy)) {
+  rm.strat(strategy.st)
+}
 
-# 初始化组合、账户和策略
-initPortf(portfolio.name, symbols="maotai", initDate="2009-12-31")
-initAcct(account.name, portfolios=portfolio.name, initDate="2009-12-31", initEq=100000)
-initOrders(portfolio.name, initDate="2009-12-31")
-strategy(strategy.name, store=TRUE)
+# 创建组合/账户/策略
+initPortf(portfolio.st, symbols=symbol, initDate=initDate)
+initAcct(account.st, portfolios=portfolio.st, initDate=initDate, initEq=initEq)
+initOrders(portfolio.st, initDate=initDate)
+strategy(strategy.st, store=TRUE)
 ```
 
 ## 添加指标
@@ -120,36 +117,38 @@ strategy(strategy.name, store=TRUE)
 这里添加的简单移动平均线(SMA)：
 
 ```{R add_indicator}
+# 添加指标
 add.indicator(
-  strategy = strategy.name,
-  name = "SMA",  # 使用SMA指标
-  arguments = list(x=quote(Cl(mktdata)), n=50), # 50日均线
-  label = "SMA50"
+  strategy.st,
+  name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=fastMA),
+  label="fastMA"
 )
 
 add.indicator(
-  strategy = strategy.name,
-  name = "SMA",
-  arguments = list(x=quote(Cl(mktdata)), n=200), # 200日均线
-  label = "SMA200"
+  strategy.st,
+  name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=slowMA),
+  label="slowMA"
 )
 ```
 
 ## 添加信号 - 金叉死叉
 
 ```{R add_signal}
+# 添加信号
 add.signal(
-  strategy.name,
-  name = "sigCrossover",
-  arguments = list(columns=c("SMA50","SMA200"), relationship="gt"), # 50日线上穿200日线
-  label = "golden.cross"
+  strategy.st,
+  name="sigCrossover",
+  arguments=list(columns=c("fastMA","slowMA"), relationship="gt"),
+  label="fast.gt.slow"
 )
 
 add.signal(
-  strategy.name,
-  name = "sigCrossover",
-  arguments = list(columns=c("SMA50","SMA200"), relationship="lt"), # 50日线下穿200日线
-  label = "death.cross"
+  strategy.st,
+  name="sigCrossover",
+  arguments=list(columns=c("fastMA","slowMA"), relationship="lt"),
+  label="fast.lt.slow"
 )
 ```
 
@@ -157,67 +156,100 @@ add.signal(
 ## 添加交易规则
 
 ```{R add_rule}
-# 金叉买入规则
 add.rule(
-  strategy.name,
-  name = "ruleSignal",
-  arguments = list(
-    sigcol = "golden.cross",
-    sigval = TRUE,
-    orderqty = 100,  # 买入100股
-    ordertype = "market",
-    orderside = "long",
-    replace = FALSE
+  strategy.st,
+  name="ruleSignal",
+  arguments=list(
+    sigcol="fast.gt.slow",
+    sigval=TRUE,
+    orderqty=100,
+    ordertype="market",
+    orderside="long",
+    replace=FALSE
   ),
-  type = "enter",
-  label = "EnterLong"
+  type="enter",
+  label="EnterLONG"
 )
 
-# 死叉卖出规则
 add.rule(
-  strategy.name,
-  name = "ruleSignal",
-  arguments = list(
-    sigcol = "death.cross",
-    sigval = TRUE,
-    orderqty = "all",  # 卖出全部持仓
-    ordertype = "market",
-    orderside = "long",
-    replace = FALSE
+  strategy.st,
+  name="ruleSignal",
+  arguments=list(
+    sigcol="fast.lt.slow",
+    sigval=TRUE,
+    orderqty="all",
+    ordertype="market",
+    orderside="long",
+    replace=FALSE
   ),
-  type = "exit",
-  label = "ExitLong"
+  type="exit",
+  label="ExitLONG"
 )
 ```
 
 # 策略回测
 
 ```{R apply}
-applyStrategy(
-  strategy = strategy.name,
-  portfolios = portfolio.name
-)
+applyStrategy(strategy.st, 
+              portfolios=portfolio.st)
 ```
 
 # 更新组合和账户
 
 ```{R update}
-updatePortf(portfolio.name)
-updateAcct(account.name)
-updateEndEq(account.name)
+updatePortf(portfolio.st)
+updateAcct(account.st)
+updateEndEq(account.st)
 ```
 
 # 分析结果
 
 ```{R ana}
+# 获取交易数据
+trades <- getTxns(Portfolio = portfolio.st, Symbol = symbol)
+print(trades)
+
 # 获取交易统计数据
-tstats <- tradeStats(portfolio.name)
+tstats <- tradeStats(portfolio.st)
 print(tstats)
 
+# 查看持仓情况
+positions <- getPos(Portfolio = portfolio.st, Symbol = symbol, Date = "2020-12-31")
+print(positions)
+
+# 获取投资组合的收益率
+returns <- PortfReturns(Account = account.st)
+
+# 计算夏普比率，假设无风险利率为0.02
+sharpe_ratio <- SharpeRatio(returns, Rf = 0.02)
+
+# 计算最大回撤
+max_drawdown <- maxDrawdown(returns)
+
+print(paste0("夏普比率: ", sharpe_ratio))
+print(paste0("最大回撤: ", max_drawdown))
+
+
+# 获取策略对象
+strategyObj <- getStrategy(strategy.st)
+
+str(strategyObj)
+# 查看指标数据
+indicator_data <- strategyObj$indicators
+print(indicator_data)
+
+# 查看信号数据
+signal_data <- strategyObj$signals
+print(signal_data)
+
 # 绘制权益曲线
-equity <- getAccount(account.name)$summary$End.Eq
+equity <- getAccount(account.st)$summary$End.Eq
 plot(equity, main="Strategy Equity Curve")
 
-# 绘制持仓和交易
-chart.Posn(portfolio.name, Symbol="maotai", TA="add_SMA(n=50,col='blue');add_SMA(n=200,col='red')")
+# 绘制持仓和交易图表
+chart.Posn(portfolio.st, Symbol=symbol, TA="add_SMA(n=fastMA,col='blue');add_SMA(n=slowMA,col='red')")
 ```
+
+# 结语
+
+基于 R 软件进行量化回测一件极度舒适的事情。但由于本文未对回测指标（即 SMA ）的参数做优化，因此，本文仅供技术探讨，不构成策略或投资建议。

@@ -14,217 +14,684 @@ tags:
 
 
 
-<p>常有人问我，能用几分钟时间上手写一段代码进行一个简易的量化投资策略的开发和回测吗？答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。</p>
+<p>常有人问我能用几分钟时间写一段代码进行一个简易的量化投资策略的开发和回测吗，答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。</p>
 <div id="引言" class="section level1">
 <h1>引言</h1>
 <p>本文的代码基于<a href="https://r-project.org">R</a>软件和 <a href="https://posit.co">Rstuido</a> 软件运行，如果未安装上述软件，请自行安装。</p>
+<p>策略开发还需要基于以下 R 包来实现，可以运行如下代码安装并加载相关 R 包。</p>
 <pre class="r"><code># 安装依赖包，如果未安装
 install.packages(c(&quot;quantstrat&quot;, &quot;Tushare&quot;, &quot;xts&quot;, &quot;dplyr&quot;, &quot;showtext&quot;, &quot;zoo&quot;,&quot;PerformanceAnalytics&quot;,&quot;tidyverse&quot;))
 # 加载软件包
-library(quantstrat)
-library(Tushare)
-library(xts)
-library(dplyr)
-library(showtext)
-library(PerformanceAnalytics)
-library(zoo)
-library(tidyverse)</code></pre>
+suppressMessages({
+  library(quantmod)
+  library(quantstrat)
+  library(PerformanceAnalytics)
+  library(Tushare)
+  library(xts)
+  library(dplyr)
+  library(zoo)
+  library(tidyverse)
+})</code></pre>
 </div>
 <div id="清理环境" class="section level1">
 <h1>清理环境</h1>
-<pre class="r"><code># 清理.strategy环境中的对象
-if (exists(&quot;.strategy&quot;, envir = globalenv())) {
-    strategy_env &lt;- get(&quot;.strategy&quot;, envir = globalenv())
-    strategy_objects &lt;- ls(strategy_env)
-    for (obj in strategy_objects) {
-        rm(list = obj, envir = strategy_env)
-    }
-}
-
-# 清理.blotter环境中的对象
-if (exists(&quot;.blotter&quot;, envir = globalenv())) {
-    blotter_env &lt;- get(&quot;.blotter&quot;, envir = globalenv())
-    blotter_objects &lt;- ls(blotter_env)
-    for (obj in blotter_objects) {
-        rm(list = obj, envir = blotter_env)
-    }
-}
-
-# 清理.account环境中的对象
-if (exists(&quot;.account&quot;, envir = globalenv())) {
-    account_env &lt;- get(&quot;.account&quot;, envir = globalenv())
-    account_objects &lt;- ls(account_env)
-    for (obj in account_objects) {
-        rm(list = obj, envir = account_env)
-    }
-}</code></pre>
+<p>第一步，先清理历史环境，避免历史环境的干扰。</p>
+<pre class="r"><code># 清理历史环境
+rm(list=ls(.blotter), envir=.blotter)
+rm(list=ls(.strategy), envir=.strategy)</code></pre>
 </div>
 <div id="策略开发" class="section level1">
 <h1>策略开发</h1>
+<p>下面进入正式开发。</p>
 <div id="初始化设置" class="section level2">
 <h2>初始化设置</h2>
-<pre class="r"><code>currency(&quot;RMB&quot;)  # 设置货币为人民币</code></pre>
-<pre><code>## [1] &quot;RMB&quot;</code></pre>
-<pre class="r"><code>stock(&quot;maotai&quot;, currency=&quot;RMB&quot;) # 设置贵州茅台股票代码</code></pre>
-<pre><code>## [1] &quot;maotai&quot;</code></pre>
+<pre class="r"><code># 参数设置
+initDate &lt;- &quot;2010-01-01&quot;
+endDate &lt;- &quot;2025-05-26&quot;
+symbol &lt;- &quot;600519.SS&quot;
+initEq &lt;- 100000
+fastMA &lt;- 5
+slowMA &lt;- 20</code></pre>
 </div>
 <div id="获取数据" class="section level2">
 <h2>获取数据</h2>
 <p>使用quantmod获取贵州茅台数据</p>
-<pre class="r"><code>getSymbols(&quot;600519.SS&quot;, from=&quot;2010-01-01&quot;, to=Sys.Date())</code></pre>
+<pre class="r"><code># 获取数据
+getSymbols(symbol, from=initDate, to=endDate, src=&quot;yahoo&quot;)</code></pre>
 <pre><code>## [1] &quot;600519.SS&quot;</code></pre>
-<pre class="r"><code>maotai &lt;- `600519.SS` # 重命名对象
+<pre class="r"><code>maotai &lt;- `600519.SS`
 colnames(maotai) &lt;- c(&quot;Open&quot;,&quot;High&quot;,&quot;Low&quot;,&quot;Close&quot;,&quot;Volume&quot;,&quot;Adjusted&quot;)</code></pre>
 </div>
 <div id="初始化策略" class="section level2">
 <h2>初始化策略</h2>
-<pre class="r"><code>strategy.name &lt;- &quot;SMA_Strategy&quot;
-portfolio.name &lt;- &quot;maotai_portfolio&quot;
-account.name &lt;- &quot;maotai_account&quot;
+<pre class="r"><code>currency(&quot;RMB&quot;)</code></pre>
+<pre><code>## [1] &quot;RMB&quot;</code></pre>
+<pre class="r"><code>stock(symbol, currency=&quot;RMB&quot;, multiplier=1)</code></pre>
+<pre><code>## [1] &quot;X600519.SS&quot;</code></pre>
+<pre class="r"><code>strategy.st &lt;- &quot;maotai_sma&quot;
+portfolio.st &lt;- &quot;maotai_portfolio&quot;
+account.st &lt;- &quot;maotai_account&quot;
 
 # 清除旧策略(如果存在)
-rm.strat(strategy.name)
+if(exists(&quot;strategy.st&quot;, where=.strategy)) {
+  rm.strat(strategy.st)
+}
 
-# 初始化组合、账户和策略
-initPortf(portfolio.name, symbols=&quot;maotai&quot;, initDate=&quot;2009-12-31&quot;)</code></pre>
+# 创建组合/账户/策略
+initPortf(portfolio.st, symbols=symbol, initDate=initDate)</code></pre>
 <pre><code>## [1] &quot;maotai_portfolio&quot;</code></pre>
-<pre class="r"><code>initAcct(account.name, portfolios=portfolio.name, initDate=&quot;2009-12-31&quot;, initEq=100000)</code></pre>
+<pre class="r"><code>initAcct(account.st, portfolios=portfolio.st, initDate=initDate, initEq=initEq)</code></pre>
 <pre><code>## [1] &quot;maotai_account&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio.name, initDate=&quot;2009-12-31&quot;)
-strategy(strategy.name, store=TRUE)</code></pre>
+<pre class="r"><code>initOrders(portfolio.st, initDate=initDate)
+strategy(strategy.st, store=TRUE)</code></pre>
 </div>
 <div id="添加指标" class="section level2">
 <h2>添加指标</h2>
 <p>这里添加的简单移动平均线(SMA)：</p>
-<pre class="r"><code>add.indicator(
-  strategy = strategy.name,
-  name = &quot;SMA&quot;,  # 使用SMA指标
-  arguments = list(x=quote(Cl(mktdata)), n=50), # 50日均线
-  label = &quot;SMA50&quot;
+<pre class="r"><code># 添加指标
+add.indicator(
+  strategy.st,
+  name=&quot;SMA&quot;,
+  arguments=list(x=quote(Cl(mktdata)), n=fastMA),
+  label=&quot;fastMA&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
 <pre class="r"><code>add.indicator(
-  strategy = strategy.name,
-  name = &quot;SMA&quot;,
-  arguments = list(x=quote(Cl(mktdata)), n=200), # 200日均线
-  label = &quot;SMA200&quot;
+  strategy.st,
+  name=&quot;SMA&quot;,
+  arguments=list(x=quote(Cl(mktdata)), n=slowMA),
+  label=&quot;slowMA&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
 </div>
 <div id="添加信号---金叉死叉" class="section level2">
 <h2>添加信号 - 金叉死叉</h2>
-<pre class="r"><code>add.signal(
-  strategy.name,
-  name = &quot;sigCrossover&quot;,
-  arguments = list(columns=c(&quot;SMA50&quot;,&quot;SMA200&quot;), relationship=&quot;gt&quot;), # 50日线上穿200日线
-  label = &quot;golden.cross&quot;
+<pre class="r"><code># 添加信号
+add.signal(
+  strategy.st,
+  name=&quot;sigCrossover&quot;,
+  arguments=list(columns=c(&quot;fastMA&quot;,&quot;slowMA&quot;), relationship=&quot;gt&quot;),
+  label=&quot;fast.gt.slow&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
 <pre class="r"><code>add.signal(
-  strategy.name,
-  name = &quot;sigCrossover&quot;,
-  arguments = list(columns=c(&quot;SMA50&quot;,&quot;SMA200&quot;), relationship=&quot;lt&quot;), # 50日线下穿200日线
-  label = &quot;death.cross&quot;
+  strategy.st,
+  name=&quot;sigCrossover&quot;,
+  arguments=list(columns=c(&quot;fastMA&quot;,&quot;slowMA&quot;), relationship=&quot;lt&quot;),
+  label=&quot;fast.lt.slow&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
 </div>
 <div id="添加交易规则" class="section level2">
 <h2>添加交易规则</h2>
-<pre class="r"><code># 金叉买入规则
-add.rule(
-  strategy.name,
-  name = &quot;ruleSignal&quot;,
-  arguments = list(
-    sigcol = &quot;golden.cross&quot;,
-    sigval = TRUE,
-    orderqty = 100,  # 买入100股
-    ordertype = &quot;market&quot;,
-    orderside = &quot;long&quot;,
-    replace = FALSE
+<pre class="r"><code>add.rule(
+  strategy.st,
+  name=&quot;ruleSignal&quot;,
+  arguments=list(
+    sigcol=&quot;fast.gt.slow&quot;,
+    sigval=TRUE,
+    orderqty=100,
+    ordertype=&quot;market&quot;,
+    orderside=&quot;long&quot;,
+    replace=FALSE
   ),
-  type = &quot;enter&quot;,
-  label = &quot;EnterLong&quot;
+  type=&quot;enter&quot;,
+  label=&quot;EnterLONG&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
-<pre class="r"><code># 死叉卖出规则
-add.rule(
-  strategy.name,
-  name = &quot;ruleSignal&quot;,
-  arguments = list(
-    sigcol = &quot;death.cross&quot;,
-    sigval = TRUE,
-    orderqty = &quot;all&quot;,  # 卖出全部持仓
-    ordertype = &quot;market&quot;,
-    orderside = &quot;long&quot;,
-    replace = FALSE
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
+<pre class="r"><code>add.rule(
+  strategy.st,
+  name=&quot;ruleSignal&quot;,
+  arguments=list(
+    sigcol=&quot;fast.lt.slow&quot;,
+    sigval=TRUE,
+    orderqty=&quot;all&quot;,
+    ordertype=&quot;market&quot;,
+    orderside=&quot;long&quot;,
+    replace=FALSE
   ),
-  type = &quot;exit&quot;,
-  label = &quot;ExitLong&quot;
+  type=&quot;exit&quot;,
+  label=&quot;ExitLONG&quot;
 )</code></pre>
-<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre><code>## [1] &quot;maotai_sma&quot;</code></pre>
 </div>
 </div>
 <div id="策略回测" class="section level1">
 <h1>策略回测</h1>
-<pre class="r"><code>applyStrategy(
-  strategy = strategy.name,
-  portfolios = portfolio.name
-)</code></pre>
-<pre><code>## [1] &quot;2012-04-17 00:00:00 maotai 100 @ 173.702484130859&quot;
-## [1] &quot;2012-12-17 00:00:00 maotai -100 @ 174.454544067383&quot;
-## [1] &quot;2014-04-11 00:00:00 maotai 100 @ 145.520660400391&quot;
-## [1] &quot;2015-10-14 00:00:00 maotai -100 @ 197.830001831055&quot;
-## [1] &quot;2015-11-24 00:00:00 maotai 100 @ 211.690002441406&quot;
-## [1] &quot;2016-01-20 00:00:00 maotai -100 @ 202.320007324219&quot;
-## [1] &quot;2016-03-25 00:00:00 maotai 100 @ 244.979995727539&quot;
-## [1] &quot;2018-08-29 00:00:00 maotai -100 @ 685.849975585938&quot;
-## [1] &quot;2019-03-11 00:00:00 maotai 100 @ 758.539978027344&quot;
-## [1] &quot;2020-03-30 00:00:00 maotai -100 @ 1072&quot;
-## [1] &quot;2020-04-17 00:00:00 maotai 100 @ 1226&quot;
-## [1] &quot;2021-08-13 00:00:00 maotai -100 @ 1700.0400390625&quot;
-## [1] &quot;2021-12-29 00:00:00 maotai 100 @ 2041&quot;
-## [1] &quot;2022-03-16 00:00:00 maotai -100 @ 1674.94995117188&quot;
-## [1] &quot;2022-07-07 00:00:00 maotai 100 @ 1990&quot;
-## [1] &quot;2022-10-14 00:00:00 maotai -100 @ 1737.60998535156&quot;
-## [1] &quot;2023-02-21 00:00:00 maotai 100 @ 1867&quot;
-## [1] &quot;2023-05-08 00:00:00 maotai -100 @ 1720.52001953125&quot;
-## [1] &quot;2023-08-01 00:00:00 maotai 100 @ 1889&quot;
-## [1] &quot;2023-11-22 00:00:00 maotai -100 @ 1781.51000976562&quot;
-## [1] &quot;2025-03-28 00:00:00 maotai 100 @ 1585.2099609375&quot;</code></pre>
+<pre class="r"><code>applyStrategy(strategy.st, 
+              portfolios=portfolio.st)</code></pre>
+<pre><code>## [1] &quot;2010-05-25 00:00:00 600519.SS 100 @ 98.6100692749023&quot;
+## [1] &quot;2010-06-01 00:00:00 600519.SS -100 @ 99.6468811035156&quot;
+## [1] &quot;2010-06-03 00:00:00 600519.SS 100 @ 101.450035095215&quot;
+## [1] &quot;2010-06-23 00:00:00 600519.SS -100 @ 98.9481582641602&quot;
+## [1] &quot;2010-07-15 00:00:00 600519.SS 100 @ 99.0458297729492&quot;
+## [1] &quot;2010-10-15 00:00:00 600519.SS -100 @ 120.195343017578&quot;
+## [1] &quot;2010-10-25 00:00:00 600519.SS 100 @ 129.977462768555&quot;
+## [1] &quot;2010-11-02 00:00:00 600519.SS -100 @ 122.216377258301&quot;
+## [1] &quot;2010-11-11 00:00:00 600519.SS 100 @ 132.171295166016&quot;
+## [1] &quot;2010-12-23 00:00:00 600519.SS -100 @ 143.283248901367&quot;
+## [1] &quot;2011-02-11 00:00:00 600519.SS 100 @ 138.940643310547&quot;
+## [1] &quot;2011-03-02 00:00:00 600519.SS -100 @ 133.140487670898&quot;
+## [1] &quot;2011-03-16 00:00:00 600519.SS 100 @ 136.619079589844&quot;
+## [1] &quot;2011-03-31 00:00:00 600519.SS -100 @ 135.123962402344&quot;
+## [1] &quot;2011-04-27 00:00:00 600519.SS 100 @ 136.100677490234&quot;
+## [1] &quot;2011-08-25 00:00:00 600519.SS -100 @ 171.421493530273&quot;
+## [1] &quot;2011-08-29 00:00:00 600519.SS 100 @ 177.909088134766&quot;
+## [1] &quot;2011-09-07 00:00:00 600519.SS -100 @ 171.561981201172&quot;
+## [1] &quot;2011-10-20 00:00:00 600519.SS 100 @ 157.933883666992&quot;
+## [1] &quot;2011-11-18 00:00:00 600519.SS -100 @ 165.760330200195&quot;
+## [1] &quot;2011-11-28 00:00:00 600519.SS 100 @ 176.752059936523&quot;
+## [1] &quot;2011-12-09 00:00:00 600519.SS -100 @ 165.140487670898&quot;
+## [1] &quot;2012-02-07 00:00:00 600519.SS 100 @ 153.603302001953&quot;
+## [1] &quot;2012-04-06 00:00:00 600519.SS -100 @ 171.876037597656&quot;
+## [1] &quot;2012-04-10 00:00:00 600519.SS 100 @ 171.991729736328&quot;
+## [1] &quot;2012-05-21 00:00:00 600519.SS -100 @ 184.454544067383&quot;
+## [1] &quot;2012-06-01 00:00:00 600519.SS 100 @ 198.652893066406&quot;
+## [1] &quot;2012-06-29 00:00:00 600519.SS -100 @ 197.644622802734&quot;
+## [1] &quot;2012-07-04 00:00:00 600519.SS 100 @ 213.768600463867&quot;
+## [1] &quot;2012-07-24 00:00:00 600519.SS -100 @ 206.099166870117&quot;
+## [1] &quot;2012-08-10 00:00:00 600519.SS 100 @ 205.132232666016&quot;
+## [1] &quot;2012-08-17 00:00:00 600519.SS -100 @ 189.768600463867&quot;
+## [1] &quot;2012-09-10 00:00:00 600519.SS 100 @ 199.735534667969&quot;
+## [1] &quot;2012-09-26 00:00:00 600519.SS -100 @ 194.933883666992&quot;
+## [1] &quot;2012-09-28 00:00:00 600519.SS 100 @ 203.140487670898&quot;
+## [1] &quot;2012-10-30 00:00:00 600519.SS -100 @ 202.132232666016&quot;
+## [1] &quot;2012-11-05 00:00:00 600519.SS 100 @ 200.760330200195&quot;
+## [1] &quot;2012-11-07 00:00:00 600519.SS -100 @ 196.256195068359&quot;
+## [1] &quot;2012-12-19 00:00:00 600519.SS 100 @ 181.363632202148&quot;
+## [1] &quot;2013-01-17 00:00:00 600519.SS -100 @ 169.528930664062&quot;
+## [1] &quot;2013-03-12 00:00:00 600519.SS 100 @ 150.561981201172&quot;
+## [1] &quot;2013-03-19 00:00:00 600519.SS -100 @ 136.512390136719&quot;
+## [1] &quot;2013-04-16 00:00:00 600519.SS 100 @ 143.107437133789&quot;
+## [1] &quot;2013-06-17 00:00:00 600519.SS -100 @ 156.59504699707&quot;
+## [1] &quot;2013-07-04 00:00:00 600519.SS 100 @ 162.495864868164&quot;
+## [1] &quot;2013-07-16 00:00:00 600519.SS -100 @ 157.809921264648&quot;
+## [1] &quot;2013-08-14 00:00:00 600519.SS 100 @ 147.677688598633&quot;
+## [1] &quot;2013-08-23 00:00:00 600519.SS -100 @ 142.966949462891&quot;
+## [1] &quot;2013-10-18 00:00:00 600519.SS 100 @ 118.16529083252&quot;
+## [1] &quot;2013-10-30 00:00:00 600519.SS -100 @ 109.578514099121&quot;
+## [1] &quot;2013-11-13 00:00:00 600519.SS 100 @ 119.603302001953&quot;
+## [1] &quot;2013-11-28 00:00:00 600519.SS -100 @ 117.214874267578&quot;
+## [1] &quot;2013-12-02 00:00:00 600519.SS 100 @ 113.041320800781&quot;
+## [1] &quot;2013-12-03 00:00:00 600519.SS -100 @ 113.702476501465&quot;
+## [1] &quot;2014-01-23 00:00:00 600519.SS 100 @ 110.818183898926&quot;
+## [1] &quot;2014-03-31 00:00:00 600519.SS -100 @ 127.85124206543&quot;
+## [1] &quot;2014-04-09 00:00:00 600519.SS 100 @ 135&quot;
+## [1] &quot;2014-04-30 00:00:00 600519.SS -100 @ 135.438018798828&quot;
+## [1] &quot;2014-06-11 00:00:00 600519.SS 100 @ 127.223136901855&quot;
+## [1] &quot;2014-08-14 00:00:00 600519.SS -100 @ 146.781814575195&quot;
+## [1] &quot;2014-09-05 00:00:00 600519.SS 100 @ 152.281814575195&quot;
+## [1] &quot;2014-09-18 00:00:00 600519.SS -100 @ 144.772720336914&quot;
+## [1] &quot;2014-10-08 00:00:00 600519.SS 100 @ 146.118179321289&quot;
+## [1] &quot;2014-10-13 00:00:00 600519.SS -100 @ 141.909088134766&quot;
+## [1] &quot;2014-11-18 00:00:00 600519.SS 100 @ 141.5&quot;
+## [1] &quot;2014-11-25 00:00:00 600519.SS -100 @ 140.581817626953&quot;
+## [1] &quot;2014-11-27 00:00:00 600519.SS 100 @ 142.43635559082&quot;
+## [1] &quot;2015-01-16 00:00:00 600519.SS -100 @ 169.190902709961&quot;
+## [1] &quot;2015-02-12 00:00:00 600519.SS 100 @ 166.881820678711&quot;
+## [1] &quot;2015-05-19 00:00:00 600519.SS -100 @ 227.309097290039&quot;
+## [1] &quot;2015-05-25 00:00:00 600519.SS 100 @ 260.754547119141&quot;
+## [1] &quot;2015-06-09 00:00:00 600519.SS -100 @ 235.481811523438&quot;
+## [1] &quot;2015-07-07 00:00:00 600519.SS 100 @ 221.981811523438&quot;
+## [1] &quot;2015-07-08 00:00:00 600519.SS -100 @ 215.327270507812&quot;
+## [1] &quot;2015-07-14 00:00:00 600519.SS 100 @ 226.409088134766&quot;
+## [1] &quot;2015-07-21 00:00:00 600519.SS -100 @ 221.660003662109&quot;
+## [1] &quot;2015-09-15 00:00:00 600519.SS 100 @ 202&quot;
+## [1] &quot;2015-09-29 00:00:00 600519.SS -100 @ 190.169998168945&quot;
+## [1] &quot;2015-10-15 00:00:00 600519.SS 100 @ 199.990005493164&quot;
+## [1] &quot;2015-11-20 00:00:00 600519.SS -100 @ 213.720001220703&quot;
+## [1] &quot;2015-12-07 00:00:00 600519.SS 100 @ 214.509994506836&quot;
+## [1] &quot;2015-12-11 00:00:00 600519.SS -100 @ 211.410003662109&quot;
+## [1] &quot;2015-12-21 00:00:00 600519.SS 100 @ 227.029998779297&quot;
+## [1] &quot;2016-01-05 00:00:00 600519.SS -100 @ 212.820007324219&quot;
+## [1] &quot;2016-02-05 00:00:00 600519.SS 100 @ 203.869995117188&quot;
+## [1] &quot;2016-04-18 00:00:00 600519.SS -100 @ 243.679992675781&quot;
+## [1] &quot;2016-05-03 00:00:00 600519.SS 100 @ 260&quot;
+## [1] &quot;2016-05-20 00:00:00 600519.SS -100 @ 251.259994506836&quot;
+## [1] &quot;2016-05-27 00:00:00 600519.SS 100 @ 252.440002441406&quot;
+## [1] &quot;2016-08-03 00:00:00 600519.SS -100 @ 306.820007324219&quot;
+## [1] &quot;2016-08-12 00:00:00 600519.SS 100 @ 316.970001220703&quot;
+## [1] &quot;2016-08-22 00:00:00 600519.SS -100 @ 307.320007324219&quot;
+## [1] &quot;2016-10-13 00:00:00 600519.SS 100 @ 303.890014648438&quot;
+## [1] &quot;2016-11-18 00:00:00 600519.SS -100 @ 310&quot;
+## [1] &quot;2016-11-29 00:00:00 600519.SS 100 @ 323.959991455078&quot;
+## [1] &quot;2016-12-26 00:00:00 600519.SS -100 @ 324.480010986328&quot;
+## [1] &quot;2017-01-04 00:00:00 600519.SS 100 @ 351.910003662109&quot;
+## [1] &quot;2017-02-07 00:00:00 600519.SS -100 @ 343.579986572266&quot;
+## [1] &quot;2017-02-16 00:00:00 600519.SS 100 @ 348.089996337891&quot;
+## [1] &quot;2017-07-05 00:00:00 600519.SS -100 @ 460.130004882812&quot;
+## [1] &quot;2017-07-25 00:00:00 600519.SS 100 @ 477.959991455078&quot;
+## [1] &quot;2017-09-07 00:00:00 600519.SS -100 @ 481.269989013672&quot;
+## [1] &quot;2017-09-19 00:00:00 600519.SS 100 @ 496.950012207031&quot;
+## [1] &quot;2017-11-27 00:00:00 600519.SS -100 @ 621.289978027344&quot;
+## [1] &quot;2017-12-15 00:00:00 600519.SS 100 @ 653.789978027344&quot;
+## [1] &quot;2018-01-31 00:00:00 600519.SS -100 @ 764.539978027344&quot;
+## [1] &quot;2018-02-28 00:00:00 600519.SS 100 @ 725.619995117188&quot;
+## [1] &quot;2018-03-14 00:00:00 600519.SS -100 @ 726.880004882812&quot;
+## [1] &quot;2018-03-15 00:00:00 600519.SS 100 @ 746.469970703125&quot;
+## [1] &quot;2018-03-27 00:00:00 600519.SS -100 @ 714.739990234375&quot;
+## [1] &quot;2018-05-10 00:00:00 600519.SS 100 @ 714.190002441406&quot;
+## [1] &quot;2018-06-25 00:00:00 600519.SS -100 @ 765.559997558594&quot;
+## [1] &quot;2018-07-17 00:00:00 600519.SS 100 @ 742.429992675781&quot;
+## [1] &quot;2018-08-02 00:00:00 600519.SS -100 @ 695.840026855469&quot;
+## [1] &quot;2018-08-30 00:00:00 600519.SS 100 @ 680.400024414062&quot;
+## [1] &quot;2018-09-06 00:00:00 600519.SS -100 @ 644&quot;
+## [1] &quot;2018-09-21 00:00:00 600519.SS 100 @ 700.010009765625&quot;
+## [1] &quot;2018-10-16 00:00:00 600519.SS -100 @ 667.140014648438&quot;
+## [1] &quot;2018-12-04 00:00:00 600519.SS 100 @ 602.22998046875&quot;
+## [1] &quot;2018-12-24 00:00:00 600519.SS -100 @ 568&quot;
+## [1] &quot;2019-01-07 00:00:00 600519.SS 100 @ 605.489990234375&quot;
+## [1] &quot;2019-05-09 00:00:00 600519.SS -100 @ 858.809997558594&quot;
+## [1] &quot;2019-06-03 00:00:00 600519.SS 100 @ 892&quot;
+## [1] &quot;2019-06-06 00:00:00 600519.SS -100 @ 862.130004882812&quot;
+## [1] &quot;2019-06-14 00:00:00 600519.SS 100 @ 913&quot;
+## [1] &quot;2019-07-16 00:00:00 600519.SS -100 @ 968&quot;
+## [1] &quot;2019-08-01 00:00:00 600519.SS 100 @ 959.299987792969&quot;
+## [1] &quot;2019-08-06 00:00:00 600519.SS -100 @ 946.299987792969&quot;
+## [1] &quot;2019-08-13 00:00:00 600519.SS 100 @ 1017.95001220703&quot;
+## [1] &quot;2019-09-17 00:00:00 600519.SS -100 @ 1094.01000976562&quot;
+## [1] &quot;2019-09-23 00:00:00 600519.SS 100 @ 1149&quot;
+## [1] &quot;2019-10-25 00:00:00 600519.SS -100 @ 1171.34997558594&quot;
+## [1] &quot;2019-10-31 00:00:00 600519.SS 100 @ 1180.01000976562&quot;
+## [1] &quot;2019-11-27 00:00:00 600519.SS -100 @ 1189.94995117188&quot;
+## [1] &quot;2019-12-20 00:00:00 600519.SS 100 @ 1146.30004882812&quot;
+## [1] &quot;2019-12-26 00:00:00 600519.SS -100 @ 1135.09997558594&quot;
+## [1] &quot;2019-12-31 00:00:00 600519.SS 100 @ 1183&quot;
+## [1] &quot;2020-01-06 00:00:00 600519.SS -100 @ 1077.98999023438&quot;
+## [1] &quot;2020-02-14 00:00:00 600519.SS 100 @ 1088&quot;
+## [1] &quot;2020-03-02 00:00:00 600519.SS -100 @ 1086.01000976562&quot;
+## [1] &quot;2020-03-05 00:00:00 600519.SS 100 @ 1171&quot;
+## [1] &quot;2020-03-18 00:00:00 600519.SS -100 @ 1007.98999023438&quot;
+## [1] &quot;2020-04-03 00:00:00 600519.SS 100 @ 1139.7900390625&quot;
+## [1] &quot;2020-07-29 00:00:00 600519.SS -100 @ 1672&quot;
+## [1] &quot;2020-08-19 00:00:00 600519.SS 100 @ 1687&quot;
+## [1] &quot;2020-09-11 00:00:00 600519.SS -100 @ 1733&quot;
+## [1] &quot;2020-09-17 00:00:00 600519.SS 100 @ 1670.52001953125&quot;
+## [1] &quot;2020-09-18 00:00:00 600519.SS -100 @ 1695&quot;
+## [1] &quot;2020-10-14 00:00:00 600519.SS 100 @ 1729&quot;
+## [1] &quot;2020-10-29 00:00:00 600519.SS -100 @ 1676&quot;
+## [1] &quot;2020-11-10 00:00:00 600519.SS 100 @ 1745&quot;
+## [1] &quot;2021-03-01 00:00:00 600519.SS -100 @ 2158&quot;
+## [1] &quot;2021-04-01 00:00:00 600519.SS 100 @ 2044.5&quot;
+## [1] &quot;2021-04-15 00:00:00 600519.SS -100 @ 2015.59997558594&quot;
+## [1] &quot;2021-04-20 00:00:00 600519.SS 100 @ 2094.80004882812&quot;
+## [1] &quot;2021-05-06 00:00:00 600519.SS -100 @ 1959&quot;
+## [1] &quot;2021-05-20 00:00:00 600519.SS 100 @ 2058.8798828125&quot;
+## [1] &quot;2021-06-18 00:00:00 600519.SS -100 @ 2090.93994140625&quot;
+## [1] &quot;2021-09-08 00:00:00 600519.SS 100 @ 1633.09997558594&quot;
+## [1] &quot;2021-11-01 00:00:00 600519.SS -100 @ 1803&quot;
+## [1] &quot;2021-11-23 00:00:00 600519.SS 100 @ 1896.43005371094&quot;
+## [1] &quot;2022-01-05 00:00:00 600519.SS -100 @ 2024&quot;
+## [1] &quot;2022-01-28 00:00:00 600519.SS 100 @ 1887&quot;
+## [1] &quot;2022-02-07 00:00:00 600519.SS -100 @ 1867.9599609375&quot;
+## [1] &quot;2022-04-07 00:00:00 600519.SS 100 @ 1765&quot;
+## [1] &quot;2022-04-28 00:00:00 600519.SS -100 @ 1835&quot;
+## [1] &quot;2022-05-05 00:00:00 600519.SS 100 @ 1837&quot;
+## [1] &quot;2022-05-13 00:00:00 600519.SS -100 @ 1778.23999023438&quot;
+## [1] &quot;2022-06-02 00:00:00 600519.SS 100 @ 1786&quot;
+## [1] &quot;2022-07-14 00:00:00 600519.SS -100 @ 1953&quot;
+## [1] &quot;2022-08-18 00:00:00 600519.SS 100 @ 1895.5&quot;
+## [1] &quot;2022-08-23 00:00:00 600519.SS -100 @ 1870.01000976562&quot;
+## [1] &quot;2022-09-20 00:00:00 600519.SS 100 @ 1878&quot;
+## [1] &quot;2022-09-23 00:00:00 600519.SS -100 @ 1834.43005371094&quot;
+## [1] &quot;2022-09-30 00:00:00 600519.SS 100 @ 1872.5&quot;
+## [1] &quot;2022-10-12 00:00:00 600519.SS -100 @ 1760&quot;
+## [1] &quot;2022-11-16 00:00:00 600519.SS 100 @ 1585.25&quot;
+## [1] &quot;2023-01-03 00:00:00 600519.SS -100 @ 1730.01000976562&quot;
+## [1] &quot;2023-01-09 00:00:00 600519.SS 100 @ 1841.19995117188&quot;
+## [1] &quot;2023-02-07 00:00:00 600519.SS -100 @ 1797&quot;
+## [1] &quot;2023-02-21 00:00:00 600519.SS 100 @ 1867&quot;
+## [1] &quot;2023-02-28 00:00:00 600519.SS -100 @ 1813.73999023438&quot;
+## [1] &quot;2023-03-30 00:00:00 600519.SS 100 @ 1800&quot;
+## [1] &quot;2023-04-13 00:00:00 600519.SS -100 @ 1723&quot;
+## [1] &quot;2023-05-08 00:00:00 600519.SS 100 @ 1720.52001953125&quot;
+## [1] &quot;2023-05-10 00:00:00 600519.SS -100 @ 1725&quot;
+## [1] &quot;2023-06-15 00:00:00 600519.SS 100 @ 1755&quot;
+## [1] &quot;2023-07-07 00:00:00 600519.SS -100 @ 1690.03002929688&quot;
+## [1] &quot;2023-07-18 00:00:00 600519.SS 100 @ 1722.80004882812&quot;
+## [1] &quot;2023-08-17 00:00:00 600519.SS -100 @ 1828.05004882812&quot;
+## [1] &quot;2023-09-01 00:00:00 600519.SS 100 @ 1851.05004882812&quot;
+## [1] &quot;2023-09-14 00:00:00 600519.SS -100 @ 1818.68994140625&quot;
+## [1] &quot;2023-11-03 00:00:00 600519.SS 100 @ 1811.23999023438&quot;
+## [1] &quot;2023-11-29 00:00:00 600519.SS -100 @ 1774.7099609375&quot;
+## [1] &quot;2024-01-02 00:00:00 600519.SS 100 @ 1685.01000976562&quot;
+## [1] &quot;2024-01-09 00:00:00 600519.SS -100 @ 1641&quot;
+## [1] &quot;2024-02-08 00:00:00 600519.SS 100 @ 1706&quot;
+## [1] &quot;2024-03-11 00:00:00 600519.SS -100 @ 1694.48999023438&quot;
+## [1] &quot;2024-03-14 00:00:00 600519.SS 100 @ 1716.63000488281&quot;
+## [1] &quot;2024-03-29 00:00:00 600519.SS -100 @ 1702.90002441406&quot;
+## [1] &quot;2024-04-02 00:00:00 600519.SS 100 @ 1713.98999023438&quot;
+## [1] &quot;2024-04-09 00:00:00 600519.SS -100 @ 1662.21997070312&quot;
+## [1] &quot;2024-04-26 00:00:00 600519.SS 100 @ 1709.43005371094&quot;
+## [1] &quot;2024-05-20 00:00:00 600519.SS -100 @ 1709&quot;
+## [1] &quot;2024-07-18 00:00:00 600519.SS 100 @ 1497.51000976562&quot;
+## [1] &quot;2024-07-26 00:00:00 600519.SS -100 @ 1422.18994140625&quot;
+## [1] &quot;2024-08-16 00:00:00 600519.SS 100 @ 1431.19995117188&quot;
+## [1] &quot;2024-08-28 00:00:00 600519.SS -100 @ 1389&quot;
+## [1] &quot;2024-09-30 00:00:00 600519.SS 100 @ 1748&quot;
+## [1] &quot;2024-10-29 00:00:00 600519.SS -100 @ 1531.61999511719&quot;
+## [1] &quot;2024-11-08 00:00:00 600519.SS 100 @ 1609.96997070312&quot;
+## [1] &quot;2024-11-20 00:00:00 600519.SS -100 @ 1544.81005859375&quot;
+## [1] &quot;2024-12-13 00:00:00 600519.SS 100 @ 1519&quot;
+## [1] &quot;2024-12-27 00:00:00 600519.SS -100 @ 1528.96997070312&quot;
+## [1] &quot;2025-02-17 00:00:00 600519.SS 100 @ 1471.61999511719&quot;
+## [1] &quot;2025-04-03 00:00:00 600519.SS -100 @ 1568.88000488281&quot;
+## [1] &quot;2025-04-22 00:00:00 600519.SS 100 @ 1548.80004882812&quot;
+## [1] &quot;2025-04-25 00:00:00 600519.SS -100 @ 1550&quot;
+## [1] &quot;2025-05-09 00:00:00 600519.SS 100 @ 1591.18005371094&quot;</code></pre>
 </div>
 <div id="更新组合和账户" class="section level1">
 <h1>更新组合和账户</h1>
-<pre class="r"><code>updatePortf(portfolio.name)</code></pre>
+<pre class="r"><code>updatePortf(portfolio.st)</code></pre>
 <pre><code>## [1] &quot;maotai_portfolio&quot;</code></pre>
-<pre class="r"><code>updateAcct(account.name)</code></pre>
+<pre class="r"><code>updateAcct(account.st)</code></pre>
 <pre><code>## [1] &quot;maotai_account&quot;</code></pre>
-<pre class="r"><code>updateEndEq(account.name)</code></pre>
+<pre class="r"><code>updateEndEq(account.st)</code></pre>
 <pre><code>## [1] &quot;maotai_account&quot;</code></pre>
 </div>
 <div id="分析结果" class="section level1">
 <h1>分析结果</h1>
+<pre class="r"><code># 获取交易数据
+trades &lt;- getTxns(Portfolio = portfolio.st, Symbol = symbol)
+print(trades)</code></pre>
+<pre><code>##            Txn.Qty  Txn.Price Txn.Fees   Txn.Value Txn.Avg.Cost
+## 2010-01-01       0    0.00000        0       0.000      0.00000
+## 2010-05-25     100   98.61007        0    9861.007     98.61007
+## 2010-06-01    -100   99.64688        0   -9964.688     99.64688
+## 2010-06-03     100  101.45004        0   10145.004    101.45004
+## 2010-06-23    -100   98.94816        0   -9894.816     98.94816
+## 2010-07-15     100   99.04583        0    9904.583     99.04583
+## 2010-10-15    -100  120.19534        0  -12019.534    120.19534
+## 2010-10-25     100  129.97746        0   12997.746    129.97746
+## 2010-11-02    -100  122.21638        0  -12221.638    122.21638
+## 2010-11-11     100  132.17130        0   13217.130    132.17130
+##        ...                                                     
+## 2024-10-29    -100 1531.62000        0 -153162.000   1531.62000
+## 2024-11-08     100 1609.96997        0  160996.997   1609.96997
+## 2024-11-20    -100 1544.81006        0 -154481.006   1544.81006
+## 2024-12-13     100 1519.00000        0  151900.000   1519.00000
+## 2024-12-27    -100 1528.96997        0 -152896.997   1528.96997
+## 2025-02-17     100 1471.62000        0  147162.000   1471.62000
+## 2025-04-03    -100 1568.88000        0 -156888.000   1568.88000
+## 2025-04-22     100 1548.80005        0  154880.005   1548.80005
+## 2025-04-25    -100 1550.00000        0 -155000.000   1550.00000
+## 2025-05-09     100 1591.18005        0  159118.005   1591.18005
+##            Net.Txn.Realized.PL
+## 2010-01-01              0.0000
+## 2010-05-25              0.0000
+## 2010-06-01            103.6812
+## 2010-06-03              0.0000
+## 2010-06-23           -250.1877
+## 2010-07-15              0.0000
+## 2010-10-15           2114.9513
+## 2010-10-25              0.0000
+## 2010-11-02           -776.1086
+## 2010-11-11              0.0000
+##        ...                    
+## 2024-10-29         -21638.0005
+## 2024-11-08              0.0000
+## 2024-11-20          -6515.9912
+## 2024-12-13              0.0000
+## 2024-12-27            996.9971
+## 2025-02-17              0.0000
+## 2025-04-03           9726.0010
+## 2025-04-22              0.0000
+## 2025-04-25            119.9951
+## 2025-05-09              0.0000</code></pre>
 <pre class="r"><code># 获取交易统计数据
-tstats &lt;- tradeStats(portfolio.name)
+tstats &lt;- tradeStats(portfolio.st)
 print(tstats)</code></pre>
-<pre><code>##               Portfolio Symbol Num.Txns Num.Trades Net.Trading.PL Avg.Trade.PL
-## maotai maotai_portfolio maotai       21         10       38704.14     3996.514
-##        Med.Trade.PL Largest.Winner Largest.Loser Gross.Profits Gross.Losses
-## maotai    -430.8968          47404        -36605      128143.1       -88178
-##        Std.Dev.Trade.PL Std.Err.Trade.PL Percent.Positive Percent.Negative
-## maotai         28575.32         9036.308               50               50
-##        Profit.Factor Avg.Win.Trade Med.Win.Trade Avg.Losing.Trade
-## maotai      1.453233      25628.63         31346         -17635.6
-##        Med.Losing.Trade Avg.Daily.PL Med.Daily.PL Std.Dev.Daily.PL
-## maotai           -14648     3996.514    -430.8968         28575.32
-##        Std.Err.Daily.PL Ann.Sharpe Max.Drawdown Profit.To.Max.Draw
-## maotai         9036.308   2.220192      -192488           0.201073
-##        Avg.WinLoss.Ratio Med.WinLoss.Ratio Max.Equity Min.Equity End.Equity
-## maotai          1.453233          2.139951   217302.1  -2495.042   38704.14</code></pre>
+<pre><code>##                  Portfolio    Symbol Num.Txns Num.Trades Net.Trading.PL
+## 600519.SS maotai_portfolio 600519.SS      219        109         107330
+##           Avg.Trade.PL Med.Trade.PL Largest.Winner Largest.Loser Gross.Profits
+## 600519.SS     1001.725    -420.9091          53221        -21638      312497.1
+##           Gross.Losses Std.Dev.Trade.PL Std.Err.Trade.PL Percent.Positive
+## 600519.SS    -203309.1         8949.005         857.1592          41.2844
+##           Percent.Negative Profit.Factor Avg.Win.Trade Med.Win.Trade
+## 600519.SS          58.7156      1.537054      6944.381      2675.455
+##           Avg.Losing.Trade Med.Losing.Trade Avg.Daily.PL Med.Daily.PL
+## 600519.SS        -3176.705        -1388.979     1001.725    -420.9091
+##           Std.Dev.Daily.PL Std.Err.Daily.PL Ann.Sharpe Max.Drawdown
+## 600519.SS         8949.005         857.1592   1.776945    -88252.01
+##           Profit.To.Max.Draw Avg.WinLoss.Ratio Med.WinLoss.Ratio Max.Equity
+## 600519.SS           1.216176          2.186032          1.926203     185832
+##           Min.Equity End.Equity
+## 600519.SS  -146.5065     107330</code></pre>
+<pre class="r"><code># 查看持仓情况
+positions &lt;- getPos(Portfolio = portfolio.st, Symbol = symbol, Date = &quot;2020-12-31&quot;)
+print(positions)</code></pre>
+<pre><code>##            Pos.Qty Pos.Avg.Cost
+## 2020-11-10     100         1745</code></pre>
+<pre class="r"><code># 获取投资组合的收益率
+returns &lt;- PortfReturns(Account = account.st)
+
+# 计算夏普比率，假设无风险利率为0.02
+sharpe_ratio &lt;- SharpeRatio(returns, Rf = 0.02)
+
+# 计算最大回撤
+max_drawdown &lt;- maxDrawdown(returns)
+
+print(paste0(&quot;夏普比率: &quot;, sharpe_ratio))</code></pre>
+<pre><code>## [1] &quot;夏普比率: -1.36579368456422&quot; &quot;夏普比率: -1.44224144013023&quot;
+## [3] &quot;夏普比率: -1.44224144013023&quot; &quot;夏普比率: -1.40746513390874&quot;</code></pre>
+<pre class="r"><code>print(paste0(&quot;最大回撤: &quot;, max_drawdown))</code></pre>
+<pre><code>## [1] &quot;最大回撤: 0.66676665654044&quot;</code></pre>
+<pre class="r"><code># 获取策略对象
+strategyObj &lt;- getStrategy(strategy.st)
+
+str(strategyObj)</code></pre>
+<pre><code>## List of 10
+##  $ name       : chr &quot;maotai_sma&quot;
+##  $ assets     : NULL
+##  $ indicators :List of 2
+##   ..$ fastMA:List of 5
+##   .. ..$ name     : chr &quot;SMA&quot;
+##   .. ..$ label    : chr &quot;fastMA&quot;
+##   .. ..$ enabled  : logi TRUE
+##   .. ..$ arguments:List of 2
+##   .. .. ..$ x: language Cl(mktdata)
+##   .. .. ..$ n: num 5
+##   .. ..$ call     : language add.indicator(strategy = strategy.st, name = &quot;SMA&quot;, arguments = list(x = quote(Cl(mktdata)),      n = fastMA), label = &quot;fastMA&quot;)
+##   .. ..- attr(*, &quot;class&quot;)= chr &quot;strat_indicator&quot;
+##   ..$ slowMA:List of 5
+##   .. ..$ name     : chr &quot;SMA&quot;
+##   .. ..$ label    : chr &quot;slowMA&quot;
+##   .. ..$ enabled  : logi TRUE
+##   .. ..$ arguments:List of 2
+##   .. .. ..$ x: language Cl(mktdata)
+##   .. .. ..$ n: num 20
+##   .. ..$ call     : language add.indicator(strategy = strategy.st, name = &quot;SMA&quot;, arguments = list(x = quote(Cl(mktdata)),      n = slowMA), label = &quot;slowMA&quot;)
+##   .. ..- attr(*, &quot;class&quot;)= chr &quot;strat_indicator&quot;
+##  $ signals    :List of 2
+##   ..$ :List of 5
+##   .. ..$ name     : chr &quot;sigCrossover&quot;
+##   .. ..$ label    : chr &quot;fast.gt.slow&quot;
+##   .. ..$ enabled  : logi TRUE
+##   .. ..$ arguments:List of 3
+##   .. .. ..$ columns     : chr [1:2] &quot;fastMA&quot; &quot;slowMA&quot;
+##   .. .. ..$ relationship: chr &quot;gt&quot;
+##   .. .. ..$ label       : chr &quot;fast.gt.slow&quot;
+##   .. ..$ call     : language add.signal(strategy = strategy.st, name = &quot;sigCrossover&quot;, arguments = list(columns = c(&quot;fastMA&quot;,      &quot;slowMA&quot;), | __truncated__
+##   .. ..- attr(*, &quot;class&quot;)= chr &quot;strat_signal&quot;
+##   ..$ :List of 5
+##   .. ..$ name     : chr &quot;sigCrossover&quot;
+##   .. ..$ label    : chr &quot;fast.lt.slow&quot;
+##   .. ..$ enabled  : logi TRUE
+##   .. ..$ arguments:List of 3
+##   .. .. ..$ columns     : chr [1:2] &quot;fastMA&quot; &quot;slowMA&quot;
+##   .. .. ..$ relationship: chr &quot;lt&quot;
+##   .. .. ..$ label       : chr &quot;fast.lt.slow&quot;
+##   .. ..$ call     : language add.signal(strategy = strategy.st, name = &quot;sigCrossover&quot;, arguments = list(columns = c(&quot;fastMA&quot;,      &quot;slowMA&quot;), | __truncated__
+##   .. ..- attr(*, &quot;class&quot;)= chr &quot;strat_signal&quot;
+##  $ rules      :List of 3
+##   ..$ order: list()
+##   ..$ enter:List of 1
+##   .. ..$ :List of 7
+##   .. .. ..$ name     :function (mktdata = mktdata, timestamp, sigcol, sigval, orderqty = 0, ordertype, 
+##     orderside = NULL, orderset = NULL, threshold = NULL, tmult = FALSE, 
+##     replace = TRUE, delay = 1e-04, osFUN = &quot;osNoOp&quot;, pricemethod = c(&quot;market&quot;, 
+##         &quot;opside&quot;, &quot;active&quot;), portfolio, symbol, ..., ruletype, TxnFees = 0, 
+##     prefer = NULL, sethold = FALSE, label = &quot;&quot;, order.price = NULL, chain.price = NULL, 
+##     time.in.force = &quot;&quot;)  
+##   .. .. ..$ type     : chr &quot;enter&quot;
+##   .. .. ..$ enabled  : logi TRUE
+##   .. .. ..$ label    : chr &quot;EnterLONG&quot;
+##   .. .. ..$ arguments:List of 6
+##   .. .. .. ..$ sigcol   : chr &quot;fast.gt.slow&quot;
+##   .. .. .. ..$ sigval   : logi TRUE
+##   .. .. .. ..$ orderqty : num 100
+##   .. .. .. ..$ ordertype: chr &quot;market&quot;
+##   .. .. .. ..$ orderside: chr &quot;long&quot;
+##   .. .. .. ..$ replace  : logi FALSE
+##   .. .. ..$ path.dep : logi TRUE
+##   .. .. ..$ call     : language add.rule(strategy = strategy.st, name = &quot;ruleSignal&quot;, arguments = list(sigcol = &quot;fast.gt.slow&quot;,      sigval = TRU| __truncated__ ...
+##   .. .. ..- attr(*, &quot;class&quot;)= chr &quot;trade_rule&quot;
+##   ..$ exit :List of 1
+##   .. ..$ :List of 7
+##   .. .. ..$ name     :function (mktdata = mktdata, timestamp, sigcol, sigval, orderqty = 0, ordertype, 
+##     orderside = NULL, orderset = NULL, threshold = NULL, tmult = FALSE, 
+##     replace = TRUE, delay = 1e-04, osFUN = &quot;osNoOp&quot;, pricemethod = c(&quot;market&quot;, 
+##         &quot;opside&quot;, &quot;active&quot;), portfolio, symbol, ..., ruletype, TxnFees = 0, 
+##     prefer = NULL, sethold = FALSE, label = &quot;&quot;, order.price = NULL, chain.price = NULL, 
+##     time.in.force = &quot;&quot;)  
+##   .. .. ..$ type     : chr &quot;exit&quot;
+##   .. .. ..$ enabled  : logi TRUE
+##   .. .. ..$ label    : chr &quot;ExitLONG&quot;
+##   .. .. ..$ arguments:List of 6
+##   .. .. .. ..$ sigcol   : chr &quot;fast.lt.slow&quot;
+##   .. .. .. ..$ sigval   : logi TRUE
+##   .. .. .. ..$ orderqty : chr &quot;all&quot;
+##   .. .. .. ..$ ordertype: chr &quot;market&quot;
+##   .. .. .. ..$ orderside: chr &quot;long&quot;
+##   .. .. .. ..$ replace  : logi FALSE
+##   .. .. ..$ path.dep : logi TRUE
+##   .. .. ..$ call     : language add.rule(strategy = strategy.st, name = &quot;ruleSignal&quot;, arguments = list(sigcol = &quot;fast.lt.slow&quot;,      sigval = TRU| __truncated__ ...
+##   .. .. ..- attr(*, &quot;class&quot;)= chr &quot;trade_rule&quot;
+##  $ constraints: NULL
+##  $ init       : list()
+##  $ wrapup     : list()
+##  $ trials     : num 6
+##  $ call       : language strategy(name = strategy.st, store = TRUE)
+##  - attr(*, &quot;class&quot;)= chr &quot;strategy&quot;</code></pre>
+<pre class="r"><code># 查看指标数据
+indicator_data &lt;- strategyObj$indicators
+print(indicator_data)</code></pre>
+<pre><code>## $fastMA
+## $name
+## [1] &quot;SMA&quot;
+## 
+## $label
+## [1] &quot;fastMA&quot;
+## 
+## $enabled
+## [1] TRUE
+## 
+## $arguments
+## $arguments$x
+## Cl(mktdata)
+## 
+## $arguments$n
+## [1] 5
+## 
+## 
+## $call
+## add.indicator(strategy = strategy.st, name = &quot;SMA&quot;, arguments = list(x = quote(Cl(mktdata)), 
+##     n = fastMA), label = &quot;fastMA&quot;)
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;strat_indicator&quot;
+## 
+## $slowMA
+## $name
+## [1] &quot;SMA&quot;
+## 
+## $label
+## [1] &quot;slowMA&quot;
+## 
+## $enabled
+## [1] TRUE
+## 
+## $arguments
+## $arguments$x
+## Cl(mktdata)
+## 
+## $arguments$n
+## [1] 20
+## 
+## 
+## $call
+## add.indicator(strategy = strategy.st, name = &quot;SMA&quot;, arguments = list(x = quote(Cl(mktdata)), 
+##     n = slowMA), label = &quot;slowMA&quot;)
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;strat_indicator&quot;</code></pre>
+<pre class="r"><code># 查看信号数据
+signal_data &lt;- strategyObj$signals
+print(signal_data)</code></pre>
+<pre><code>## [[1]]
+## $name
+## [1] &quot;sigCrossover&quot;
+## 
+## $label
+## [1] &quot;fast.gt.slow&quot;
+## 
+## $enabled
+## [1] TRUE
+## 
+## $arguments
+## $arguments$columns
+## [1] &quot;fastMA&quot; &quot;slowMA&quot;
+## 
+## $arguments$relationship
+## [1] &quot;gt&quot;
+## 
+## $arguments$label
+## [1] &quot;fast.gt.slow&quot;
+## 
+## 
+## $call
+## add.signal(strategy = strategy.st, name = &quot;sigCrossover&quot;, arguments = list(columns = c(&quot;fastMA&quot;, 
+##     &quot;slowMA&quot;), relationship = &quot;gt&quot;), label = &quot;fast.gt.slow&quot;)
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;strat_signal&quot;
+## 
+## [[2]]
+## $name
+## [1] &quot;sigCrossover&quot;
+## 
+## $label
+## [1] &quot;fast.lt.slow&quot;
+## 
+## $enabled
+## [1] TRUE
+## 
+## $arguments
+## $arguments$columns
+## [1] &quot;fastMA&quot; &quot;slowMA&quot;
+## 
+## $arguments$relationship
+## [1] &quot;lt&quot;
+## 
+## $arguments$label
+## [1] &quot;fast.lt.slow&quot;
+## 
+## 
+## $call
+## add.signal(strategy = strategy.st, name = &quot;sigCrossover&quot;, arguments = list(columns = c(&quot;fastMA&quot;, 
+##     &quot;slowMA&quot;), relationship = &quot;lt&quot;), label = &quot;fast.lt.slow&quot;)
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;strat_signal&quot;</code></pre>
 <pre class="r"><code># 绘制权益曲线
-equity &lt;- getAccount(account.name)$summary$End.Eq
+equity &lt;- getAccount(account.st)$summary$End.Eq
 plot(equity, main=&quot;Strategy Equity Curve&quot;)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/ana-1.png" width="672" /></p>
-<pre class="r"><code># 绘制持仓和交易
-chart.Posn(portfolio.name, Symbol=&quot;maotai&quot;, TA=&quot;add_SMA(n=50,col=&#39;blue&#39;);add_SMA(n=200,col=&#39;red&#39;)&quot;)</code></pre>
+<pre class="r"><code># 绘制持仓和交易图表
+chart.Posn(portfolio.st, Symbol=symbol, TA=&quot;add_SMA(n=fastMA,col=&#39;blue&#39;);add_SMA(n=slowMA,col=&#39;red&#39;)&quot;)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/ana-2.png" width="672" /></p>
+</div>
+<div id="结语" class="section level1">
+<h1>结语</h1>
+<p>基于 R 软件进行量化回测一件极度舒适的事情。但由于本文未对回测指标（即 SMA ）的参数做优化，因此，本文仅供技术探讨，不构成策略或投资建议。</p>
 </div>
