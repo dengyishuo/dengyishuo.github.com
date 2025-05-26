@@ -10,6 +10,7 @@ tags:
 - 平稳性
 - 计量经济学
 ---
+
 “协整”算是计量经济学里面的明星概念，不了解计量经济学的人很容易被它笼罩的计量经济学光环给吓到。但事实上，协整并不神秘，是平易近人。
 
 要了解“协整”，首先得提到一个名词——平稳。
@@ -78,14 +79,14 @@ P值等于0.303，因此y是非平稳的。
 
 library(urca)#载入urca包
 
-?ur.df#查看ur.df()函数的帮助文档
+# ?ur.df#查看ur.df()函数的帮助文档
 
 #用uroot包中的ADF.test()函数来完成上述过程
 
 # install.packages('uroot')  #没有安装的话
 
 library(uroot)  #载入uroot包
-?ADF.test#查看ADF.test()函数的帮助文档
+# ?ADF.test#查看ADF.test()函数的帮助文档
 ```
 
 ## PP检验

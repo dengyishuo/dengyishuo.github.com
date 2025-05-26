@@ -1,0 +1,39 @@
+---
+title: 用R计算协偏度和协峰度
+author: MatrixSpk
+date: '2011-05-08'
+slug: use-r-to-caculate-coskewness-and-cokurtosis
+categories:
+- investment
+tags:
+- cokurtosis
+- coskewness
+- 协偏度
+- 协峰度
+---
+
+
+
+<p>在传统的金融理论中，均值方差分析假设正态分布，但现实中的数据往往偏离这一假设。当资产收益率不服从正态分布时，仅用协方差不足以解释风险，这时候协高阶矩，比如协偏度和协峰度）就变得重要了。协偏度和协峰度是用于衡量资产收益率分布的高阶协动特性。</p>
+<p>协偏度衡量个股收益对市场极端波动的敏感度。低协偏度的股票可能有更高的预期回报，因为投资者偏好正偏而厌恶负偏，导致协偏度溢价效应。这有助于资产定价和组合优化。协峰度反映尾部风险和市场极端波动的协同性。正峰度表示更多极端值，可能意味着更大的市场风险。峰度还可以帮助评估异常值风险和集中度，这对金融风险预警很重要。</p>
+<p>在金融领域，协偏度和协峰度能更全面评估风险，尤其在市场波动剧烈时更是如此。</p>
+<p>PerformanceAnalytics包中提供了CoSkewness()和CoKurtosis()函数来计算两个资产间的协偏和协峰度。</p>
+<p>例如：</p>
+<pre class="r"><code>library(PerformanceAnalytics)  #载入包</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     legend</code></pre>
+<pre class="r"><code>data(managers)                 #加载managers数据集
+CoSkewness(managers[, &quot;HAM2&quot;, drop=FALSE], managers[, &quot;SP500 TR&quot;, drop=FALSE]) #计算协偏度</code></pre>
+<pre><code>## [1] -2.101289e-06</code></pre>
+<pre class="r"><code>CoKurtosis(managers[, &quot;HAM2&quot;, drop=FALSE], managers[, &quot;SP500 TR&quot;, drop=FALSE]) #计算协峰度</code></pre>
+<pre><code>## [1] 2.579066e-06</code></pre>

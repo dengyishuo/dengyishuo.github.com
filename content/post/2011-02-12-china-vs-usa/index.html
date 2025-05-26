@@ -1,0 +1,98 @@
+---
+title: 2010年中国与美国经济对比
+author: MatrixSpk
+date: '2011-02-12'
+slug: china-vs-usa
+categories:
+- 经济学
+tags:
+- 中国
+- 图形
+- 对比
+- 美国
+---
+
+
+
+<p>中国和美国现在的实力越来越接近，也许在未来会发生很多微妙的事情。对于这个实际而言，有两个实力接近的国家历来不是什么好事。</p>
+<pre class="r"><code>library(WDI)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.2     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.4     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;
+## 
+## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot
+## 
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter
+## 
+## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>library(dplyr)
+library(ggplot2)
+
+# 获取GDP数据（当前美元价）
+gdp_data &lt;- WDI(
+  country = c(&quot;CN&quot;, &quot;US&quot;),
+  indicator = c(&quot;NY.GDP.MKTP.CD&quot;, &quot;NY.GDP.PCAP.CD&quot;),  # GDP总量与人均GDP
+  start = 1978,
+  end = 2010
+) %&gt;%
+  rename(gdp = NY.GDP.MKTP.CD, gdp_per_cap = NY.GDP.PCAP.CD) %&gt;%
+  mutate(country = case_when(
+    iso2c == &quot;CN&quot; ~ &quot;中国&quot;,
+    iso2c == &quot;US&quot; ~ &quot;美国&quot;
+  ))
+  
+  
+  p1 &lt;- ggplot(gdp_data, aes(x=year, y=gdp/1e12, color=country)) +
+  geom_line(linewidth=1.2) +
+  scale_y_log10(
+    &quot;GDP（万亿美元）&quot;,
+    breaks = c(0.1, 1, 10),
+    labels = c(&quot;0.1&quot;, &quot;1&quot;, &quot;10&quot;)
+  ) +
+  scale_color_manual(values=c(&quot;#D62728&quot;, &quot;#2CA02C&quot;)) +
+  labs(title=&quot;1978-2010中美GDP增长轨迹对比&quot;,
+       subtitle=&quot;数据来源：世界银行WDI数据库（经对数转换处理）&quot;) +
+  theme_minimal(base_family=&quot;PingFang SC&quot;)
+  p1</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>  # 保存为pdf文件
+  # ggsave(&quot;Sino-US_gdp.pdf&quot;, device=cairo_pdf, width=14, height=9, dpi=300)
+  # 转化为交互图形
+  # ggplotly(p1)
+  
+  gdp_data &lt;- WDI(
+  country = c(&quot;CN&quot;, &quot;US&quot;),
+  indicator = c(&quot;NY.GDP.MKTP.CD&quot;, &quot;NY.GDP.PCAP.CD&quot;),  
+  start = 1978,
+  end = 2010
+) %&gt;%
+  rename(gdp = NY.GDP.MKTP.CD, gdp_per_cap = NY.GDP.PCAP.CD) %&gt;%
+  mutate(global_share = gdp / sum(gdp))  %&gt;%
+  group_by(year) 
+  p2 &lt;- ggplot(gdp_data, aes(x=year, y=global_share, fill=country)) +
+  geom_area(alpha=0.8) +
+  scale_y_continuous(labels=scales::percent) +
+  labs(y=&quot;占全球GDP比重&quot;, title=&quot;全球经济格局演变&quot;)
+  p2</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code>  # 保存为pdf文件
+  # ggsave(&quot;Sino-US_Comparison.pdf&quot;, device=cairo_pdf, width=14, height=9, dpi=300)
+  # 转化为交互图表
+  # ggplotly(p2)  </code></pre>

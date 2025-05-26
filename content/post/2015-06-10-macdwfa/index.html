@@ -1,0 +1,101 @@
+---
+title: macdWFA
+author: MatrixSpk
+date: '2015-06-10'
+slug: macdwfa
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+  - macd
+  - 技术指标
+---
+
+
+
+<div id="walk-forward-demo-for-macd" class="section level1">
+<h1>Walk Forward demo for MACD</h1>
+<div id="section" class="section level79">
+<p class="heading"></p>
+<p>require(foreach,quietly=TRUE)
+require(iterators)
+require(quantstrat)</p>
+</div>
+</div>
+<div id="run-the-macd-demo-in-this-session-to-set-things-up" class="section level1">
+<h1>run the macd demo in this session to set things up</h1>
+</div>
+<div id="use-source-rather-than-demo-so-that-everything-will-be-local-in-this-session" class="section level1">
+<h1>use source rather than demo so that everything will be local in this session</h1>
+<p>source(system.file(‘demo/macd.R’,package=‘quantstrat’),echo = TRUE)</p>
+</div>
+<div id="example-parallel-initialization-for-doparallel.-this-or-domc-or-doredis-are" class="section level1">
+<h1>example parallel initialization for doParallel. this or doMC, or doRedis are</h1>
+</div>
+<div id="most-probably-preferable-to-dosmp" class="section level1">
+<h1>most probably preferable to doSMP</h1>
+<p>#require(doParallel)
+#registerDoParallel() # by default number of physical cores -1</p>
+<p>#please run macd demo before all these…</p>
+<p>#retrieve the strategy from the environment, since the ‘macd’ strategy uses store=TRUE
+strategy.st &lt;- ‘macd’</p>
+<div id="set-up-parameter-values" class="section level3">
+<h3>Set up Parameter Values</h3>
+<p>.FastMA = (1:10)
+.SlowMA = (5:25)
+.nsamples = 15 #for random parameter sampling, less important if you’re using doParallel or doMC</p>
+</div>
+<div id="ma-paramset" class="section level3">
+<h3>MA paramset</h3>
+<p>add.distribution(strategy.st,
+paramset.label = ‘MA’,
+component.type = ‘indicator’,
+component.label = ’_‘, #this is the label given to the indicator in the strat
+variable = list(n = .FastMA),
+label = ’nFAST’
+)</p>
+<p>add.distribution(strategy.st,
+paramset.label = ‘MA’,
+component.type = ‘indicator’,
+component.label = ’_‘, #this is the label given to the indicator in the strat
+variable = list(n = .SlowMA),
+label = ’nSLOW’
+)</p>
+<p>add.distribution.constraint(strategy.st,
+paramset.label = ‘MA’,
+distribution.label.1 = ‘nFAST’,
+distribution.label.2 = ‘nSLOW’,
+operator = ‘&lt;’,
+label = ‘MA’
+)</p>
+</div>
+<div id="section-1" class="section level3">
+<h3></h3>
+<p>wfportfolio &lt;- “wf.macd”
+initPortf(wfportfolio,symbols=stock.str)
+initOrders(portfolio=wfportfolio)
+wf_start &lt;- Sys.time()
+wfresults &lt;- walk.forward(strategy.st,
+paramset.label = ‘MA’,
+portfolio.st = wfportfolio,
+account.st = account.st,
+nsamples = .nsamples,
+period = ‘months’,
+k.training = 36,
+k.testing = 12,
+verbose =TRUE,
+anchored = TRUE,
+include.insamples = TRUE,
+savewf = FALSE
+)
+wf_end &lt;-Sys.time()</p>
+<p>cat(“Running the walk forward search: ”)
+print(wf_end-wf_start)
+cat(” Total trials:“,.strategy<span class="math inline">\(macd\)</span>trials,”“)</p>
+<p>wfa.stats &lt;- wfresults$tradeStats</p>
+<p>print(wfa.stats)</p>
+<p>chart.forward(wfresults)</p>
+</div>
+</div>

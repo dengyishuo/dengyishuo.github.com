@@ -1,0 +1,34 @@
+---
+title: luxor sample MFE takeprofit
+author: MatrixSpk
+date: '2015-12-10'
+slug: luxor-sample-mfe-takeprofit
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+```{R}
+# Tested and found to work correctly using blotter r1457
+#
+# After Jaekle & Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
+#
+# Figure 3.16: MFE graph in percentage terms
+
+require('blotter')
+
+data('luxor-p066', package='quantstrat', envir=.blotter)
+
+currency(c('GBP', 'USD'))
+exchange_rate(c('GBPUSD'), tick_size=0.0001)
+
+chart.ME(
+	 Portfolio='luxor',
+	 Symbol='GBPUSD',
+	 type='MFE',
+	 scale='percent'
+)
+```

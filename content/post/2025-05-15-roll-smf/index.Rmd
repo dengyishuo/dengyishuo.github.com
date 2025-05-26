@@ -1,0 +1,134 @@
+---
+title: 用R实现滚动单因子模型
+author: MatrixSpk
+date: '2025-05-15'
+slug: roll-smf
+categories:
+  - quant
+tags:
+  - 单因子
+  - 投资
+  - r
+---
+
+
+```{r setup,include=FALSE}
+library(quantmod)
+library(PerformanceAnalytics)
+library(ggplot2)
+library(scales)
+```
+
+## 引言
+
+## 单因子模型
+
+## 滚动单因子模型的 R 代码
+
+ 
+```{r eval=FALSE}
+# 获取最新市场数据(2024-01-01至2025-05-15)
+getSymbols(c("TSLA", "^IXIC"), from="2024-01-01", src="yahoo")
+tsla_ret <- dailyReturn(Ad(TSLA))
+nasdaq_ret <- dailyReturn(Ad(IXIC))
+
+# 改进版滚动SFM函数
+# 高效版滚动SFM函数
+rollSFM <- function(Ra, Rb, window = 60) {
+  # 输入验证
+  n <- length(Ra)
+  if (n != length(Rb)) stop("Ra和Rb的长度必须相同")
+  if (n < window) stop("数据长度必须大于或等于窗口大小")
+  
+  # 预计算累积量用于快速计算
+  cum_sum_x <- cumsum(Rb)
+  cum_sum_y <- cumsum(Ra)
+  cum_sum_xy <- cumsum(Ra * Rb)
+  cum_sum_x2 <- cumsum(Rb^2)
+  
+  # 初始化结果向量
+  result_size <- n - window + 1
+  alpha <- numeric(result_size)
+  beta <- numeric(result_size)
+  r_squared <- numeric(result_size)
+  
+  # 计算每个窗口的统计量
+  for (i in 1:result_size) {
+    end_idx <- i + window - 1
+    start_idx <- end_idx - window + 1
+    
+    # 快速计算窗口内的统计量
+    sum_x <- cum_sum_x[end_idx] - if(start_idx > 1) cum_sum_x[start_idx - 1] else 0
+    sum_y <- cum_sum_y[end_idx] - if(start_idx > 1) cum_sum_y[start_idx - 1] else 0
+    sum_xy <- cum_sum_xy[end_idx] - if(start_idx > 1) cum_sum_xy[start_idx - 1] else 0
+    sum_x2 <- cum_sum_x2[end_idx] - if(start_idx > 1) cum_sum_x2[start_idx - 1] else 0
+    
+    # 计算均值
+    mean_x <- sum_x / window
+    mean_y <- sum_y / window
+    
+    # 计算回归系数
+    numerator <- sum_xy - sum_x * mean_y
+    denominator <- sum_x2 - sum_x * mean_x
+    
+    # 避免除以零
+    if (denominator == 0) {
+      beta[i] <- NA
+      alpha[i] <- NA
+      r_squared[i] <- NA
+    } else {
+      beta[i] <- numerator / denominator
+      alpha[i] <- mean_y - beta[i] * mean_x
+      
+      # 计算R²
+      pred_y <- alpha[i] + beta[i] * Rb[start_idx:end_idx]
+      ss_total <- sum((Ra[start_idx:end_idx] - mean_y)^2)
+      ss_residual <- sum((Ra[start_idx:end_idx] - pred_y)^2)
+      r_squared[i] <- 1 - (ss_residual / ss_total)
+    }
+  }
+  
+  # 返回结果数据框
+  data.frame(
+    Date = if(is.ts(Ra) || is.zoo(Ra)) index(Ra)[window:n] else window:n,
+    Alpha = alpha,
+    Beta = beta,
+    R_squared = r_squared
+  )
+}
+
+# 计算滚动参数
+results <- rollSFM(tsla_ret, nasdaq_ret)
+tail(results)  # 查看最近6个窗口结果
+
+
+
+# 创建绘图主题
+finance_theme <- theme_minimal() +
+  theme(
+    plot.title = element_text(size=14, face="bold"),
+    axis.title = element_text(size=12),
+    panel.grid.minor = element_blank(),
+    legend.position = "top"
+  )
+
+# Beta系数时序图
+ggplot(results, aes(x=Date, y=Beta)) +
+  geom_line(color="#2b8cbe", size=1) +
+  geom_hline(yintercept=1, linetype="dashed", color="#e34a33") +
+  labs(title="TSLA相对NASDAQ的60日滚动Beta系数",
+       x="日期", y="Beta系数") +
+  scale_x_date(labels=date_format("%Y-%m")) +
+  finance_theme
+
+# Alpha-Beta联合分布图
+ggplot(results, aes(x=Beta, y=Alpha)) +
+  geom_point(aes(color=R_squared), size=3) +
+  scale_color_gradient(low="#fee8c8", high="#e34a33", 
+                      name="R平方值") +
+  geom_vline(xintercept=1, linetype="dotted") +
+  geom_hline(yintercept=0, linetype="dotted") +
+  labs(title="TSLA Alpha-Beta分布（60日窗口）",
+       x="系统性风险(Beta)", y="超额收益(Alpha)") +
+  finance_theme
+```

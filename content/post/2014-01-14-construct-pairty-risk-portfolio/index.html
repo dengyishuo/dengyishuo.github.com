@@ -1,0 +1,85 @@
+---
+title: 说说风险均摊投资组合的构建方法
+author: MatrixSpk
+date: '2014-01-14'
+slug: construct-pairty-risk-portfolio
+categories:
+- 量化投资
+tags:
+- 风险均摊
+- 投资组合
+- R
+---
+
+
+
+<div id="引子" class="section level3">
+<h3>引子</h3>
+<p>构建股票投资组合时，在筛选出备选股票之后，要解决的另外一个问题是确定备选股票在投资组合中的权重。我们可以用一个向量来表示：</p>
+<p><span class="math display">\[
+w=\left(w_1,w_2,...,w_n \right)
+\]</span></p>
+<p>其中， <span class="math inline">\(\sum_{i=1}^nw_{i}=1,i=1,2,...,n\)</span> 。</p>
+<p>显然，权重的可选集是个无限集合。如果想选取其中一个作为最优权重，那得先确定一个判断最优与否的方法。耳熟能详的方法自然是收益-风险法，即如果一个权重能够使投资组合的收益最大、风险最小，那么，它就是好的。如果用标准差来刻画风险的话，就有下面的评价函数:</p>
+<p><span class="math display">\[
+U(R,\sigma)
+\]</span></p>
+<p>其中， <span class="math inline">\(\frac{\partial U\left(\cdot\right)}{\partial R}\gt 0\)</span> ， <span class="math inline">\(\frac{\partial U\left(\cdot\right)}{\partial\sigma}\lt 0\)</span>。</p>
+<p><span class="math inline">\(U\left(\cdot\right)\)</span> 最简单的形式如下：</p>
+<p><span class="math display">\[
+U_p = aR_{p} + b \sigma \_{p}
+\]</span></p>
+<p>其中， <span class="math inline">\(a\gt 0\)</span> ， <span class="math inline">\(b\le 0\)</span> ； <span class="math inline">\(R_{p}\)</span> 是组合的收益率， <span class="math inline">\(\sigma_{p}\)</span> 是组合的标准差。显然：</p>
+<p><span class="math display">\[
+R_{p} = w&#39;R
+\]</span></p>
+<p><span class="math display">\[
+\sigma_p = w&#39;Cw
+\]</span></p>
+<p>其中， <span class="math inline">\(R=(R_1,R_2,...,R_n)\)</span> 是组合中各证券的收益率， <span class="math inline">\(C\)</span> 是组合中各证券的收益率的协方差矩阵。</p>
+<p>把 <span class="math inline">\(R_{p}\)</span> 和 <span class="math inline">\(\sigma_p\)</span> 带入 <span class="math inline">\(U_p\)</span> ，解出令 <span class="math inline">\(U_p\)</span> 最小的 <span class="math inline">\(w\)</span> 即可。</p>
+<p>当然，也有其它理念。比如下面要说的风险均摊。风险均摊是指选出来这样一个权重，使得其确定的投资组合中各个证券的风险占证券投资总的风险的比例是相同的。有些拗口，直接看下面的公式。</p>
+</div>
+<div id="风险均摊的理论基础及公式" class="section level3">
+<h3>风险均摊的理论基础及公式</h3>
+<p>由前面的公式可知：</p>
+<p><span class="math display">\[
+\sigma_p = wCw’=wC \times (w_1,w_2,...,w_n)&#39;=\sum\_{i=1}^n wC\_{\cdot i}w_i
+\]</span></p>
+<p>上面可以看到证券组合的风险相当于是 <span class="math inline">\(wC_{\cdot i}\)</span> 的加权组合，权重是 <span class="math inline">\(w=(w_1,w_2,...,w_n)\)</span> 。所谓风险均摊，就是令 <span class="math inline">\(wC_{\cdot i}w_i=wC_{\cdot j}w_j\)</span> 。显然，确定一个权重 <span class="math inline">\(w\)</span> 使得证券组合的风险得以均摊等同于找到一个权重 <span class="math inline">\(w\)</span> 使得下式最小：</p>
+<p><span class="math display">\[
+\sum_{j=1}^n \sum_{i=1}^n \left[ wC_{\cdot i}w_i-wC_{\cdot j}w_j \right]^2
+\]</span></p>
+<p>这是一个比较简单的优化问题，在 R 软件里面很容易得到结果。</p>
+</div>
+<div id="用-r-实现风险均摊优化器" class="section level3">
+<h3>用 R 实现风险均摊优化器</h3>
+<pre class="r"><code># 模拟获取数据
+require(quantmod);
+x=getSymbols(&quot;000635.sz&quot;,from=&quot;2013-01-01&quot;,auto.assign=FALSE)
+y=getSymbols(&quot;000547.sz&quot;,from=&quot;2013-01-01&quot;,auto.assign=FALSE)
+z=getSymbols(&quot;600241.ss&quot;,from=&quot;2013-01-01&quot;,auto.assign=FALSE)
+ret_mat &lt;- cbind(dailyReturn(x),dailyReturn(y),dailyReturn(z))
+ret_mat &lt;- na.omit(ret_mat)
+
+# 定义目标函数
+
+ff &lt;- function(w,ret_mat){
+   cov_mat &lt;- cov(ret_mat);
+   w=c(w,1-sum(w));
+   len &lt;- length(w);
+   w_mat &lt;- matrix(rep(w,time=len),nr=len,byrow=TRUE);
+   diag_mat &lt;- diag(w);
+   res &lt;- 2*len*as.vector(t(diag(w_mat%*%cov_mat%*%diag_mat))%*%diag(w_mat%*%cov_mat%*%diag_mat))-2*(sum  (diag(w_mat%*%cov_mat%*%diag_mat)))^2;
+   return(res);
+ } 
+ 
+# 优化目标函数
+
+w &lt;- optim(c(0.3,0.3),ff,ret_mat=ret_mat)$par;
+
+# 查看权重
+
+w=c(w,1-sum(w));
+w = c(w,1-w[1]-w[2])</code></pre>
+</div>

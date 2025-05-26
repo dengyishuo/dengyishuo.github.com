@@ -1,0 +1,359 @@
+---
+title: pair trade
+author: MatrixSpk
+date: '2015-04-10'
+slug: pair-trade
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - 配对交易
+---
+
+
+
+<p>#Kindly contributed to quantstrat by Garrett See
+#code borrowed heavily from existing quantstrat demos</p>
+<div id="this-is-a-simple-pairs-trading-example-intended-to-illustrate-how-you-can" class="section level1">
+<h1>This is a simple pairs trading example intended to illustrate how you can</h1>
+</div>
+<div id="extend-existing-quantstrat-functionality.-it-uses-addposlimits-to-specify" class="section level1">
+<h1>extend existing quantstrat functionality. It uses addPosLimits to specify</h1>
+</div>
+<div id="levels-and-position-limits-and-shows-how-to-pass-a-custom-order-sizing" class="section level1">
+<h1>levels and position limits, and shows how to pass a custom order sizing</h1>
+</div>
+<div id="function-to-osfun" class="section level1">
+<h1>function to osFUN</h1>
+</div>
+<div id="note-that-it-would-be-easier-to-build-a-spread-first-and-treat-it-as-a-single" class="section level1">
+<h1>Note that it would be easier to build a spread first and treat it as a single</h1>
+</div>
+<div id="instrument-instead-of-dealing-with-a-portfolio-of-stocks." class="section level1">
+<h1>instrument instead of dealing with a portfolio of stocks.</h1>
+<div id="given-2-stocks-calculate-the-ratio-of-their-notional-values.-if-the-ratio" class="section level2">
+<h2>given 2 stocks, calculate the ratio of their notional values. If the ratio</h2>
+</div>
+</div>
+<div id="falls-below-its-2-stdev-band-then-when-it-crosses-back-above-it-buy-stock-1" class="section level1">
+<h1>falls below it’s 2 stdev band, then when it crosses back above it, buy stock 1</h1>
+</div>
+<div id="and-sell-stock-2.-if-the-ratio-rises-above-its-2-stdev-band-then-when-it" class="section level1">
+<h1>and sell stock 2. If the ratio rises above it’s 2 stdev band, then when it</h1>
+</div>
+<div id="crosses-back-below-it-sell-stock-1-and-buy-stock-2.-if-the-ratio-crosses" class="section level1">
+<h1>crosses back below it, sell stock 1 and buy stock 2. If the ratio crosses</h1>
+</div>
+<div id="its-moving-average-then-flatten-any-open-positions." class="section level1">
+<h1>its moving average, then flatten any open positions.</h1>
+</div>
+<div id="the-qty-of-stock-a-that-it-buys-sells-maxpos-lvls" class="section level1">
+<h1>The Qty of Stock A that it buys (sells) = MaxPos / lvls</h1>
+</div>
+<div id="the-qty-of-stock-b-that-is-sells-buys-maxpos-ratio-lvls" class="section level1">
+<h1>The Qty of Stock B that is sells (buys) = MaxPos * Ratio / lvls</h1>
+<p>require(quantstrat)</p>
+<p>suppressWarnings(rm(“order_book.pair1”,pos=.strategy))
+suppressWarnings(rm(“account.pairs”, “portfolio.pair1”, pos=.blotter))
+suppressWarnings(rm(“startDate”, “endDate”, “startDate”, “initEq”, “SD”, “N”,
+“symb1”, “symb2”, “portfolio1.st”, “account.st”,
+“pairStrat”, “out1”))</p>
+<p>startDate &lt;- ‘2009-01-01’<br />
+endDate &lt;- ‘2011-05-01’
+startDate &lt;- ‘2009-01-02’
+initEq &lt;- 100000
+SD &lt;- 2
+N &lt;- 20</p>
+<p>MaxPos &lt;- 1500 #max position in stockA;
+# max position in stock B will be max * ratio, i.e. no hard position limit in
+# Stock B
+lvls &lt;- 3 #how many times to fade; Each order’s qty will = MaxPos/lvls</p>
+<p>symb1 &lt;- ‘SPY’ #change these to try other pairs
+symb2 &lt;- ‘DIA’ #if you change them, make sure position limits still make sense</p>
+<p>portfolio1.st &lt;- ‘pair1’
+account.st &lt;- ‘pairs’</p>
+<p>getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE)</p>
+</div>
+<div id="the-following-function-is-used-to-make-sure-the-timestamps-of-all-symbols-are" class="section level1">
+<h1>The following function is used to make sure the timestamps of all symbols are</h1>
+</div>
+<div id="the-same-deletes-rows-where-one-of-the-stocks-is-missing-data" class="section level1">
+<h1>the same deletes rows where one of the stocks is missing data</h1>
+<p>alignSymbols &lt;- function(symbols, env=.GlobalEnv) {
+# This is a simplified version of qmao::alignSymbols()
+if (length(symbols) &lt; 2)
+stop(“Must provide at least 2 symbols”)
+if (any(!is.character(symbols)))
+stop(“Symbols must be vector of character strings.”)
+ff &lt;- get(symbols[1],env=env)
+for (sym in symbols[-1]) {
+tmp.sym &lt;- get(sym,env=env)
+ff &lt;- merge(ff, tmp.sym, all=FALSE)
+}
+for (sym in symbols) {
+assign(sym,ff[,grep(sym, colnames(ff))], env=env)
+}
+symbols
+}
+alignSymbols(c(symb1, symb2))</p>
+</div>
+<div id="define-instruments" class="section level1">
+<h1>Define Instruments</h1>
+<p>currency(“USD”)
+stock(symb1, currency=“USD”, multiplier=1)
+stock(symb2, currency=“USD”, multiplier=1)</p>
+</div>
+<div id="initialize-portfolio-account-and-orders" class="section level1">
+<h1>Initialize Portfolio, Account, and Orders</h1>
+<p>initPortf(name=portfolio1.st, c(symb1,symb2))
+initAcct(account.st, portfolios=portfolio1.st, initEq=initEq)
+initOrders(portfolio=portfolio1.st)</p>
+</div>
+<div id="osfun-will-need-to-know-which-symbol-is-leg-1-and-which-is-leg-2-as-well-as" class="section level1">
+<h1>osFUN will need to know which symbol is leg 1 and which is leg 2 as well as</h1>
+</div>
+<div id="what-the-values-are-for-maxpos-and-lvls.-so-create-a-slot-in-portfolio-to" class="section level1">
+<h1>what the values are for MaxPos and lvls. So, create a slot in portfolio to</h1>
+</div>
+<div id="hold-this-info." class="section level1">
+<h1>hold this info.</h1>
+<p>pair &lt;- c(1, 2, MaxPos, lvls)
+names(pair) &lt;- c(symb1, symb2, “MaxPos”, “lvls”)
+.blotter[[paste(‘portfolio’, portfolio1.st, sep=‘.’)]]$pair &lt;- pair</p>
+</div>
+<div id="create-initial-position-limits-and-levels-by-symbol" class="section level1">
+<h1>Create initial position limits and levels by symbol</h1>
+</div>
+<div id="allow-3-entries-for-long-and-short-if-lvls3." class="section level1">
+<h1>allow 3 entries for long and short if lvls=3.</h1>
+<p>addPosLimit(portfolio=portfolio1.st, timestamp=startDate, symbol=symb1,
+maxpos=MaxPos, longlevels=lvls, minpos=-MaxPos, shortlevels=lvls)
+addPosLimit(portfolio=portfolio1.st, timestamp=startDate, symbol=symb2,
+maxpos=MaxPos, longlevels=lvls, minpos=-MaxPos, shortlevels=lvls)</p>
+</div>
+<div id="create-a-strategy-object" class="section level1">
+<h1>Create a strategy object</h1>
+<p>pairStrat &lt;- strategy(‘pairStrat’)</p>
+</div>
+<div id="indicator-function" class="section level1">
+<h1>Indicator function</h1>
+<p>calcRatio &lt;- function(x) {
+#returns the ratio of notional close prices for 2 symbols
+x1 &lt;- get(x[1])
+x2 &lt;- get(x[2])
+mult1 &lt;- getInstrument(x[1])<span class="math inline">\(multiplier
+  mult2 &lt;- getInstrument(x[2])\)</span>multiplier
+rat &lt;- (mult1 * Cl(x1)) / (mult2 * Cl(x2))
+colnames(rat) &lt;- ‘Ratio’
+rat
+}
+# Indicator used for determining entry/exits
+Ratio &lt;- calcRatio(c(symb1[1], symb2[1]))</p>
+</div>
+<div id="store-hedge-ratio-in-portfolio-so-that-its-available-for-order-sizing" class="section level1">
+<h1>Store hedge ratio in portfolio so that it’s available for order sizing</h1>
+</div>
+<div id="function.-in-this-example-the-hedge-ratio-happens-to-be-the-same-as-the" class="section level1">
+<h1>function. In this example, the hedge ratio happens to be the same as the</h1>
+</div>
+<div id="ratio-indicator." class="section level1">
+<h1>Ratio indicator.</h1>
+<p>.blotter[[paste(‘portfolio’,portfolio1.st,sep=‘.’)]]<span class="math inline">\(HedgeRatio &lt;- Ratio
+#and make a function to get the most recent HedgeRatio
+getHedgeRatio &lt;- function(portfolio, timestamp) {
+  portf &lt;- getPortfolio(portfolio)
+  timestamp &lt;- format(timestamp,&quot;%Y-%m-%d %H:%M:%S&quot;)
+  # above line ensures you don&#39;t get last value of next day if using intraday
+  # data and timestamp=midnight
+  toDate &lt;- paste(&quot;::&quot;, timestamp, sep=&quot;&quot;)
+  Ratio &lt;- last(portf\)</span>HedgeRatio[toDate])
+as.numeric(Ratio)
+}</p>
+</div>
+<div id="create-an-indicator---bbands-on-the-ratio" class="section level1">
+<h1>Create an indicator - BBands on the Ratio</h1>
+<p>pairStrat &lt;- add.indicator(strategy=pairStrat, name = “calcRatio”,
+arguments=list(x=c(symb1,symb2)))
+pairStrat &lt;- add.indicator(strategy=pairStrat, name = “BBands”,
+arguments=list(HLC=quote(Ratio), sd=SD, n=N,
+maType=‘SMA’))</p>
+<p>#applyIndicators(strategy=pairStrat,mktdata=get(symb1[1])) #for debugging</p>
+</div>
+<div id="create-signals---buy-when-crossing-lower-band-from-below-sell-when-crossing" class="section level1">
+<h1>Create signals - buy when crossing lower band from below, sell when crossing</h1>
+</div>
+<div id="upper-band-from-above-flatten-when-crossing-mavg-from-above-or-from-below" class="section level1">
+<h1>upper band from above, flatten when crossing mavg from above or from below</h1>
+<p>pairStrat &lt;- add.signal(strategy=pairStrat, name=“sigCrossover”,
+arguments=list(columns=c(“Ratio”,“up”),
+relationship=“lt”),
+label=“cross.up”)
+pairStrat &lt;- add.signal(strategy=pairStrat, name=“sigCrossover”,
+arguments=list(columns=c(“Ratio”,“dn”),
+relationship=“gt”),
+label=“cross.dn”)
+pairStrat &lt;- add.signal(strategy=pairStrat, name=“sigCrossover”,
+arguments=list(columns=c(“Ratio”,“mavg”),
+relationship=“lt”),
+label=“cross.mid.fa”)
+pairStrat &lt;- add.signal(strategy=pairStrat, name=“sigCrossover”,
+arguments=list(columns=c(“Ratio”,“mavg”),
+relationship=“gt”),
+label=“cross.mid.fb”)</p>
+</div>
+<div id="make-an-order-sizing-function" class="section level1">
+<h1>make an order sizing function</h1>
+<p>#######################<em>ORDER SIZING FUNCTION</em>##################################
+# check to see which stock it is. If it’s the second stock, reverse orderqty and
+# orderside
+osSpreadMaxPos &lt;- function (data, timestamp, orderqty, ordertype, orderside,
+portfolio, symbol, ruletype, …, orderprice) {
+portf &lt;- getPortfolio(portfolio)
+#check to make sure pair slot has the things needed for this function
+if (!any(portf<span class="math inline">\(pair == 1) &amp;&amp; !(any(portf\)</span>pair == 2)))
+stop(‘pair must contain both values 1 and 2’)
+if (!any(names(portf<span class="math inline">\(pair) == &quot;MaxPos&quot;) || !any(names(portf\)</span>pair) == “lvls”))
+stop(‘pair must contain MaxPos and lvls’)</p>
+<p>if (portf<span class="math inline">\(pair[symbol] == 1) legside &lt;- &quot;long&quot;
+  if (portf\)</span>pair[symbol] == 2) legside &lt;- “short”<br />
+MaxPos &lt;- portf<span class="math inline">\(pair[&quot;MaxPos&quot;]
+  lvls &lt;- portf\)</span>pair[“lvls”]
+ratio &lt;- getHedgeRatio(portfolio, timestamp)
+pos &lt;- getPosQty(portfolio, symbol, timestamp)<br />
+PosLimit &lt;- getPosLimit(portfolio, symbol, timestamp)
+qty &lt;- orderqty
+if (legside == “short”) {#symbol is 2nd leg
+## Comment out next line to use equal ordersizes for each stock.
+addPosLimit(portfolio=portfolio, timestamp=timestamp, symbol=symbol,
+maxpos=round(MaxPos<em>ratio,0), longlevels=lvls,
+minpos=round(-MaxPos</em>ratio,0), shortlevels=lvls)
+##
+qty &lt;- -orderqty #switch orderqty for Stock B
+}</p>
+<p>if (qty &gt; 0) orderside = ‘long’
+if (qty &lt; 0) orderside = ‘short’</p>
+<p>orderqty &lt;- osMaxPos(data=data,timestamp=timestamp, orderqty=qty,
+ordertype=ordertype, orderside=orderside,
+portfolio=portfolio, symbol=symbol, ruletype=ruletype,
+…)</p>
+<p>#Add the order here instead of in the ruleSignal function
+if (!is.null(orderqty) &amp; !orderqty == 0 &amp; !is.null(orderprice)) {
+addOrder(portfolio=portfolio, symbol=symbol,
+timestamp=timestamp, qty=orderqty, price=as.numeric(orderprice),
+ordertype=ordertype, side=orderside, replace=FALSE,
+status=“open”, …=…)
+}
+return(0) #so that ruleSignal function doesn’t also try to place an order
+}
+################################################################################</p>
+</div>
+<div id="create-entry-and-exit-rules-for-longs-and-for-shorts.-both-symbols-will-get" class="section level1">
+<h1>Create entry and exit rules for longs and for shorts. Both symbols will get</h1>
+</div>
+<div id="the-same-buysell-signals-but-osmaxpos-will-reverse-those-for-the-second" class="section level1">
+<h1>the same buy/sell signals, but osMaxPos will reverse those for the second</h1>
+</div>
+<div id="symbol." class="section level1">
+<h1>symbol.</h1>
+</div>
+<div id="orderqtys-are-bigger-than-poslimits-allow.-osmaxpos-will-adjust-the-orderqty" class="section level1">
+<h1>orderqty’s are bigger than PosLimits allow. osMaxPos will adjust the orderqty</h1>
+</div>
+<div id="down-to-13-the-max-allowed.-13-is-because-we-are-using-3-levels-in" class="section level1">
+<h1>down to 1/3 the max allowed. (1/3 is because we are using 3 levels in</h1>
+</div>
+<div id="poslimit" class="section level1">
+<h1>PosLimit)</h1>
+<p>pairStrat &lt;- add.rule(strategy=pairStrat, name=‘ruleSignal’,
+arguments=list(sigcol=“cross.dn”, sigval=TRUE,
+orderqty=1e6, ordertype=‘market’,
+orderside=NULL, osFUN=‘osSpreadMaxPos’),
+type=‘enter’)
+pairStrat &lt;- add.rule(strategy=pairStrat, name=‘ruleSignal’,
+arguments=list(sigcol=“cross.up”, sigval=TRUE,
+orderqty=-1e6, ordertype=‘market’,
+orderside=NULL, osFUN=‘osSpreadMaxPos’),
+type=‘enter’)
+pairStrat &lt;- add.rule(strategy=pairStrat, name=‘ruleSignal’,
+arguments=list(sigcol=“cross.mid.fb”, sigval=TRUE,
+orderqty=‘all’, ordertype=‘market’,
+orderside=NULL),
+type=‘exit’)
+pairStrat &lt;- add.rule(strategy=pairStrat, name=‘ruleSignal’,
+arguments=list(sigcol=“cross.mid.fa”, sigval=TRUE,
+orderqty=‘all’, ordertype=‘market’,
+orderside=NULL),
+type=‘exit’)</p>
+<div id="for-debugging" class="section level2">
+<h2>for debugging</h2>
+</div>
+</div>
+<div id="applysignalsstrategypairstrat" class="section level1">
+<h1>applySignals(strategy=pairStrat,</h1>
+</div>
+<div id="mktdataapplyindicatorsstrategypairstrat-mktdatagetsymb1" class="section level1">
+<h1>mktdata=applyIndicators(strategy=pairStrat, mktdata=get(symb1)))</h1>
+<div id="section" class="section level2">
+<h2></h2>
+<p>out1&lt;-applyStrategy(strategy=pairStrat, portfolios=portfolio1.st)</p>
+<p>updatePortf(Portfolio=portfolio1.st,
+Dates=paste(“::”, as.Date(Sys.time()), sep=’’))
+updateAcct(account.st, Dates=paste(startDate, endDate, sep=“::”))
+updateEndEq(account.st, Dates=paste(startDate, endDate, sep=“::”))
+getEndEq(account.st, Sys.time())</p>
+<p>dev.new()
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb1)
+dev.new()
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb2)
+dev.new()
+chartSeries(Cl(get(symb1))/Cl(get(symb2)), TA=“addBBands(n=N,sd=SD)”)</p>
+<p>ret1 &lt;- PortfReturns(account.st)
+ret1$total &lt;- rowSums(ret1)
+#ret1</p>
+<p>if(“package:PerformanceAnalytics” %in% search() ||
+require(“PerformanceAnalytics”,quietly=TRUE)) {
+# getSymbols(“SPY”, from=‘1999-01-01’)
+# SPY.ret &lt;- Return.calculate(SPY<span class="math inline">\(SPY.Close)
+#  tmp &lt;- merge(SPY.ret,ret1\)</span>total,all=FALSE)
+dev.new()
+charts.PerformanceSummary(ret1$total, geometric=FALSE, wealth.index=TRUE)
+}</p>
+<div id="section-1" class="section level79">
+<p class="heading"></p>
+</div>
+</div>
+</div>
+<div id="r-httpr-project.org-quantitative-strategy-model-framework" class="section level1">
+<h1>R (<a href="http://r-project.org/" class="uri">http://r-project.org/</a>) Quantitative Strategy Model Framework</h1>
+</div>
+<div id="section-2" class="section level1">
+<h1></h1>
+</div>
+<div id="package-copyright-c-2009-2012" class="section level1">
+<h1>Package Copyright (c) 2009-2012</h1>
+</div>
+<div id="peter-carl-dirk-eddelbuettel-brian-g.-peterson-jeffrey-ryan-and-joshua-ulrich" class="section level1">
+<h1>Peter Carl, Dirk Eddelbuettel, Brian G. Peterson, Jeffrey Ryan, and Joshua Ulrich</h1>
+</div>
+<div id="section-3" class="section level1">
+<h1></h1>
+</div>
+<div id="this-library-is-distributed-under-the-terms-of-the-gnu-public-license-gpl" class="section level1">
+<h1>This library is distributed under the terms of the GNU Public License (GPL)</h1>
+</div>
+<div id="for-full-details-see-the-file-copying" class="section level1">
+<h1>for full details see the file COPYING</h1>
+</div>
+<div id="section-4" class="section level1">
+<h1></h1>
+</div>
+<div id="id" class="section level1">
+<h1><span class="math inline">\(Id\)</span></h1>
+</div>
+<div id="section-5" class="section level1">
+<h1></h1>
+<div id="section-6" class="section level79">
+<p class="heading"></p>
+</div>
+</div>

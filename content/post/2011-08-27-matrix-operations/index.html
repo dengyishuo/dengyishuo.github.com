@@ -1,0 +1,891 @@
+---
+title: R与矩阵运算总结
+author: MatrixSpk
+date: '2011-08-27'
+slug: matrix-operations
+categories:
+- R
+tags:
+- 总结
+- 矩阵运算
+---
+
+
+
+<div id="矩阵基本操作" class="section level1">
+<h1>1 矩阵基本操作</h1>
+<div id="创建向量" class="section level2">
+<h2>1.1创建向量</h2>
+<p>R里面有多种方法来创建向量（Vector），最简单的是用函数c()。例如：</p>
+<pre class="r"><code>X=c(1,2,3,4)
+
+X</code></pre>
+<pre><code>## [1] 1 2 3 4</code></pre>
+<p>当然，还有别的方法。例如：</p>
+<pre class="r"><code>X=1:4
+
+X</code></pre>
+<pre><code>## [1] 1 2 3 4</code></pre>
+<p>还有seq()函数。例如：</p>
+<pre class="r"><code>X=seq(1,4,length=4)
+
+X</code></pre>
+<pre><code>## [1] 1 2 3 4</code></pre>
+<p>注意一点，R中的向量默认为列向量，如果要得到行向量需要对其进行转置。</p>
+</div>
+<div id="创建矩阵" class="section level2">
+<h2>1.2创建矩阵</h2>
+<p>R中创建矩阵的方法也有很多。大致分为直接创建和由其它格式转换两种方法。</p>
+<div id="直接创建矩阵" class="section level3">
+<h3>1.2.1直接创建矩阵</h3>
+<p>最简单的直接创建矩阵的方法是用matrix()函数，matrix()函数的使用方法如下：</p>
+<pre class="r"><code>args(matrix)</code></pre>
+<pre><code>## function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL) 
+## NULL</code></pre>
+<p>其中，data参数输入的为矩阵的元素，不能为空；nrow参数输入的是矩阵的行数，默认为1；ncol参数输入的是矩阵的列数，默认为1；byrow参数控制矩阵元素的排列方式，TRUE表示按行排列，FALSE表示按列排列，默认为FALSE；dimnames参数输入矩阵的行名和列名，可以不输入，系统默认为NULL。例如：</p>
+<pre class="r"><code>matrix(1:6,nrow=2,ncol=3,byrow=FALSE)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6</code></pre>
+<p>改变矩阵的行数和列数：</p>
+<pre class="r"><code>matrix(1:6,nrow=3,ncol=2,byrow=FALSE)</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    4
+## [2,]    2    5
+## [3,]    3    6</code></pre>
+<p>改变byrow参数：</p>
+<pre class="r"><code>matrix(1:6,nrow=3,ncol=2,byrow=T)</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    2
+## [2,]    3    4
+## [3,]    5    6</code></pre>
+<p>设定矩阵的行名和列名：</p>
+<pre class="r"><code>matrix(1:6,nrow=3,ncol=2,byrow=T,dimnames=list(c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;),c(&quot;boy&quot;,&quot;girl&quot;)))</code></pre>
+<pre><code>##   boy girl
+## A   1    2
+## B   3    4
+## C   5    6</code></pre>
+</div>
+<div id="由其它格式转换" class="section level3">
+<h3>1.2.2 由其它格式转换</h3>
+<p>也可以由其它格式的数据转换为矩阵，此时需要用到函数as.matrix()。</p>
+</div>
+</div>
+<div id="查看和改变矩阵的维数" class="section level2">
+<h2>1.3 查看和改变矩阵的维数</h2>
+<p>矩阵有两个维数，即行维数和列维数。在R中查看矩阵的行维数和列维数可以用函数dim()。例如：</p>
+<pre class="r"><code> X=matrix(1:12,ncol=3,nrow=4)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<pre class="r"><code> dim(X)</code></pre>
+<pre><code>## [1] 4 3</code></pre>
+<p>只返回行维数：</p>
+<pre class="r"><code> dim(X)[1]</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>也可以用函数nrow()</p>
+<pre class="r"><code>nrow(X)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>只返回列维数：</p>
+<pre class="r"><code> dim(X)[2]</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>也可以用函数ncol():</p>
+<pre class="r"><code> ncol(X)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>同时，函数dim()也可以改变矩阵的维数。例如：</p>
+<pre class="r"><code>dim(X)=c(2,6)
+
+X</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6]
+## [1,]    1    3    5    7    9   11
+## [2,]    2    4    6    8   10   12</code></pre>
+</div>
+<div id="矩阵行列的名称" class="section level2">
+<h2>1.4矩阵行列的名称</h2>
+<p>查看矩阵的行名和列名分别用函数rownames()和函数colnames()。例如：</p>
+<pre class="r"><code>X=matrix(1:6,nrow=3,ncol=2,byrow=T,dimnames=list(c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;),c(&quot;boy&quot;,&quot;girl&quot;)))
+
+ X</code></pre>
+<pre><code>##   boy girl
+## A   1    2
+## B   3    4
+## C   5    6</code></pre>
+<p>查看矩阵的行名：</p>
+<pre class="r"><code> rownames(X)</code></pre>
+<pre><code>## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</code></pre>
+<p>查看矩阵的列名：</p>
+<pre class="r"><code> colnames(X)</code></pre>
+<pre><code>## [1] &quot;boy&quot;  &quot;girl&quot;</code></pre>
+<p>同时也可以改变矩阵的行名和列名，比如：</p>
+<pre class="r"><code>rownames(X)=c(&quot;E&quot;,&quot;F&quot;,&quot;G&quot;)
+
+ X</code></pre>
+<pre><code>##   boy girl
+## E   1    2
+## F   3    4
+## G   5    6</code></pre>
+<pre class="r"><code> colnames(X)=c(&quot;man&quot;,&quot;woman&quot;)
+
+ X</code></pre>
+<pre><code>##   man woman
+## E   1     2
+## F   3     4
+## G   5     6</code></pre>
+</div>
+<div id="矩阵元素的查看及其重新赋值" class="section level2">
+<h2>1.5 矩阵元素的查看及其重新赋值</h2>
+<p>查看矩阵的某个特定元素，只需要知道该元素的行坐标和列坐标即可，例如：</p>
+<pre class="r"><code> X=matrix(1:12,nrow=4,ncol=3)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<p>查看位于矩阵第二行、第三列的元素：</p>
+<pre class="r"><code> X[2,3]</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>也可以重新对矩阵的元素进行赋值，将矩阵第二行、第三列的元素替换为0：</p>
+<pre class="r"><code> X[2,3]=0
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6    0
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<p>R中有一个diag()函数可以返回矩阵的全部对角元素：</p>
+<pre class="r"><code> X=matrix(1:9,ncol=3,nrow=3)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<pre class="r"><code>diag(X)</code></pre>
+<pre><code>## [1] 1 5 9</code></pre>
+<p>当然也可以对对角元素进行重新赋值：</p>
+<pre class="r"><code> diag(X)=c(0,0,1)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    0    4    7
+## [2,]    2    0    8
+## [3,]    3    6    1</code></pre>
+<p>当操作对象不是对称矩阵时，diag()也可以进行操作。</p>
+<pre class="r"><code> X=matrix(1:12,nrow=4,ncol=3)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<pre class="r"><code> diag(X)</code></pre>
+<pre><code>## [1]  1  6 11</code></pre>
+<p>diag()函数还能用来生成对角矩阵：</p>
+<pre class="r"><code> diag(c(1,2,3))</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    0    0
+## [2,]    0    2    0
+## [3,]    0    0    3</code></pre>
+<p>也可以生成单位对角矩阵：</p>
+<pre class="r"><code> diag(3)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    0    0
+## [2,]    0    1    0
+## [3,]    0    0    1</code></pre>
+<pre class="r"><code> diag(4)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    0    0    0
+## [2,]    0    1    0    0
+## [3,]    0    0    1    0
+## [4,]    0    0    0    1</code></pre>
+<p>查看矩阵的上三角部分：在R中查看矩阵的上三角和下三角部分很简单。可以通过lower.tri()和upper.tir()来实现：</p>
+<pre class="r"><code> args(lower.tri)</code></pre>
+<pre><code>## function (x, diag = FALSE) 
+## NULL</code></pre>
+<pre class="r"><code> args(upper.tri)</code></pre>
+<pre><code>## function (x, diag = FALSE) 
+## NULL</code></pre>
+<p>查看上三角：</p>
+<pre class="r"><code> X=matrix(1:12,nrow=4,ncol=3)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<pre class="r"><code> X[lower.tri(X)]</code></pre>
+<pre><code>## [1]  2  3  4  7  8 12</code></pre>
+<p>改变赋值：</p>
+<pre class="r"><code> X[lower.tri(X)]=0
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    0    6   10
+## [3,]    0    0   11
+## [4,]    0    0    0</code></pre>
+</div>
+</div>
+<div id="矩阵计算" class="section level1">
+<h1>2 矩阵计算</h1>
+<div id="矩阵转置" class="section level2">
+<h2>2.1矩阵转置</h2>
+<p>R中矩阵的转置可以用t()函数完成，例如：</p>
+<pre class="r"><code> X=matrix(1:12,nrow=4,ncol=3)
+
+ X</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    5    9
+## [2,]    2    6   10
+## [3,]    3    7   11
+## [4,]    4    8   12</code></pre>
+<pre class="r"><code> t(X)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    2    3    4
+## [2,]    5    6    7    8
+## [3,]    9   10   11   12</code></pre>
+</div>
+<div id="矩阵的行和与列和及行平均值和列均值" class="section level2">
+<h2>2.2矩阵的行和与列和及行平均值和列均值</h2>
+<p>在R中很容易计算一个矩阵的各行和和各列和以及各行的平均值和各列的平均值。例如：</p>
+<pre class="r"><code> A=matrix(1:12,3,4)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<pre class="r"><code> rowSums(A)</code></pre>
+<pre><code>## [1] 22 26 30</code></pre>
+<pre class="r"><code> rowMeans(A)</code></pre>
+<pre><code>## [1] 5.5 6.5 7.5</code></pre>
+<pre class="r"><code> colSums(A)</code></pre>
+<pre><code>## [1]  6 15 24 33</code></pre>
+<pre class="r"><code> colMeans(A)</code></pre>
+<pre><code>## [1]  2  5  8 11</code></pre>
+</div>
+<div id="行列式的值" class="section level2">
+<h2>2.3行列式的值</h2>
+<p>R中的函数det()将计算方阵A的行列式。例如：</p>
+<pre class="r"><code> X=matrix(rnorm(9),nrow=3,ncol=3)
+
+ X</code></pre>
+<pre><code>##               [,1]       [,2]      [,3]
+## [1,] -0.6336214910 -0.6215124 0.4675878
+## [2,] -0.3530064340  0.6647819 0.9553801
+## [3,]  0.0007031574  0.5821593 0.5706415</code></pre>
+<pre class="r"><code> det(X)</code></pre>
+<pre><code>## [1] -0.1098816</code></pre>
+</div>
+<div id="矩阵相加减" class="section level2">
+<h2>2.4矩阵相加减</h2>
+<p>矩阵元素的相加减是指维数相同的矩阵，处于同行和同列的位置的元素进行加减。实现这个功能用“＋”，“－”即可。例如：</p>
+<pre class="r"><code> A=B=matrix(1:12,nrow=3,ncol=4)
+
+ A+B</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    2    8   14   20
+## [2,]    4   10   16   22
+## [3,]    6   12   18   24</code></pre>
+<pre class="r"><code> A-B</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    0    0    0    0
+## [2,]    0    0    0    0
+## [3,]    0    0    0    0</code></pre>
+</div>
+<div id="矩阵的数乘" class="section level2">
+<h2>2.5矩阵的数乘</h2>
+<p>矩阵的数乘是指一个常数与一个矩阵相乘。设A为 <span class="math inline">\(m\times n\)</span> 矩阵，当 <span class="math inline">\(c\ne0\)</span> 时，在R中求 <span class="math inline">\(c*A\)</span> 的值，可以用符号“*”。例如：</p>
+<pre class="r"><code> c=2
+
+ A=matrix(1:12,nrow=3,ncol=4)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<pre class="r"><code> c*A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    2    8   14   20
+## [2,]    4   10   16   22
+## [3,]    6   12   18   24</code></pre>
+<p>结果矩阵与原矩阵的所有相应元素都差一个常数c。</p>
+</div>
+<div id="矩阵相乘" class="section level2">
+<h2>2.6矩阵相乘</h2>
+<div id="矩阵的乘法" class="section level3">
+<h3>2.6.1矩阵的乘法</h3>
+<p>A为 <span class="math inline">\(m\times n\)</span> 矩阵，B为 <span class="math inline">\(n\times k\)</span> 矩阵，在R中求 <span class="math inline">\(A\times B\)</span> ，可以符号“%*%”。例如：</p>
+<pre class="r"><code> A=matrix(1:12,nrow=3,ncol=4)
+
+ B=matrix(1:12,nrow=4,ncol=3)
+
+ A%*%B</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]   70  158  246
+## [2,]   80  184  288
+## [3,]   90  210  330</code></pre>
+<p>注意: <span class="math inline">\(B\times A\)</span> 无意义，因其不符合矩阵的相乘规则。</p>
+<p>若A为 <span class="math inline">\(n\times m\)</span> 矩阵，B为 <span class="math inline">\(n\times k\)</span> 矩阵，在R中求 <span class="math inline">\(A^{&#39;}\times B\)</span> ：</p>
+<pre class="r"><code> A=matrix(1:12,nrow=4,ncol=3)
+
+ B=matrix(1:12,nrow=4,ncol=3)
+
+ t(A)%*%B</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]   30   70  110
+## [2,]   70  174  278
+## [3,]  110  278  446</code></pre>
+<p>也可以用函数crossprod()计算 <span class="math inline">\(A^{&#39;}\times B\)</span> ：</p>
+<pre class="r"><code>crossprod(A,B)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]   30   70  110
+## [2,]   70  174  278
+## [3,]  110  278  446</code></pre>
+</div>
+<div id="矩阵的kronecker积" class="section level3">
+<h3>2.6.2矩阵的Kronecker积</h3>
+<p><span class="math inline">\(n\times m\)</span> 的矩阵A和 <span class="math inline">\(h\times k\)</span> 的矩阵B的Kronecker积是一个 <span class="math inline">\(nh\times mk\)</span> 维矩阵，公式为：</p>
+<p><span class="math display">\[
+A \otimes B = \begin{bmatrix}
+a_{11}B &amp; a_{12}B &amp; \cdots &amp; a_{1m}B \\
+a_{21}B &amp; a_{22}B &amp; \cdots &amp; a_{2m}B \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{n1}B &amp; a_{n2}B &amp; \cdots &amp; a_{nm}B
+\end{bmatrix}
+\]</span></p>
+<p>其中：
+- <span class="math inline">\(a_{ij}\)</span> 表示矩阵A的第i行第j列元素
+- 每个分块 <span class="math inline">\(a_{ij}B\)</span> 是原矩阵B的所有元素按 <span class="math inline">\(a_{ij}\)</span> 比例缩放后的子矩阵
+- 最终结果矩阵的维度为 <span class="math inline">\((n \cdot h) \times (m \cdot k)\)</span>，即原矩阵行数乘积和新矩阵列数乘积</p>
+<p>在R中Kronecker积可以用函数kronecher()来计算。例如：</p>
+<pre class="r"><code> A=matrix(1:4,2,2)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    3
+## [2,]    2    4</code></pre>
+<pre class="r"><code> B=matrix(rep(1,4),2,2)
+
+ B</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]    1    1
+## [2,]    1    1</code></pre>
+<pre class="r"><code> kronecker(A,B)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    1    3    3
+## [2,]    1    1    3    3
+## [3,]    2    2    4    4
+## [4,]    2    2    4    4</code></pre>
+</div>
+</div>
+<div id="矩阵的伴随矩阵" class="section level2">
+<h2>2.7矩阵的伴随矩阵</h2>
+<p>求矩阵A的伴随矩阵可以用LoopAnalyst包中的函数make.adjoint()函数。例如：</p>
+<pre class="r"><code> A=matrix(1:12,nrow=3,ncol=4)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<pre class="r"><code> make.adjoint(A)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]   -3    6   -3
+## [2,]    6  -12    6
+## [3,]   -3    6   -3</code></pre>
+</div>
+<div id="矩阵的逆和广义逆" class="section level2">
+<h2>2.8矩阵的逆和广义逆</h2>
+<div id="矩阵的逆" class="section level3">
+<h3>2.8.1矩阵的逆</h3>
+<p>矩阵A的逆A-1可以用函数solve()，例如：</p>
+<pre class="r"><code> A=matrix(rnorm(9),nrow=3,ncol=3)
+
+ A</code></pre>
+<pre><code>##           [,1]        [,2]       [,3]
+## [1,] 0.1440307 -2.44840468  0.3255483
+## [2,] 0.9568455 -0.03856060  0.1743984
+## [3,] 0.7225901  0.05970506 -1.7698998</code></pre>
+<pre class="r"><code> solve(A)</code></pre>
+<pre><code>##             [,1]      [,2]        [,3]
+## [1,] -0.01308811 0.9762445  0.09378760
+## [2,] -0.41175649 0.1109213 -0.06480712
+## [3,] -0.01923345 0.4023093 -0.52889961</code></pre>
+<p>验证AA-1=1：</p>
+<pre class="r"><code> A%*%solve(A)</code></pre>
+<pre><code>##               [,1]          [,2]          [,3]
+## [1,]  1.000000e+00 -2.775558e-17 -2.775558e-17
+## [2,] -8.673617e-19  1.000000e+00  0.000000e+00
+## [3,]  0.000000e+00  1.110223e-16  1.000000e+00</code></pre>
+<p>用round函数可以更好的得到结果：</p>
+<pre class="r"><code> round(A%*%solve(A))</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    0    0
+## [2,]    0    1    0
+## [3,]    0    0    1</code></pre>
+<p>solve()函数也可以用来求解方程组ax=b。</p>
+</div>
+<div id="矩阵的广义逆moore-penrose" class="section level3">
+<h3>2.8.2矩阵的广义逆（Moore-Penrose）</h3>
+<p><span class="math inline">\(n \times m\)</span> 矩阵 <span class="math inline">\(A^+\)</span> 称为矩阵 <span class="math inline">\(A\)</span> 的 Moore-Penrose 广义逆，当且仅当它同时满足以下四个条件:</p>
+<p>1.<strong>相容性条件</strong>
+<span class="math display">\[ AA^+A = A \]</span><br />
+该条件保证了广义逆与原矩阵相乘后能保持原矩阵的核心结构不变。</p>
+<p>2.<strong>弱相容性条件</strong>
+<span class="math display">\[ A^+AA^+ = A^+ \]</span><br />
+表明广义逆的迭代运算具有稳定性；</p>
+<p>3.<strong>对称性条件</strong>
+<span class="math display">\[ (AA^+)^T = AA^+ \]</span><br />
+确保乘积矩阵 <span class="math inline">\(AA^+\)</span> 是正交投影算子；</p>
+<p>4.<strong>共轭对称性条件</strong>
+<span class="math display">\[ (A^+A)^T = A^+A \]</span><br />
+保证乘积矩阵 <span class="math inline">\(A^+A\)</span> 同样是正交投影算子。</p>
+<p>其核心特性包括：
+- 存在唯一性：任意矩阵都存在唯一的 Moore-Penrose 逆；
+- 退化特性：当 <span class="math inline">\(A\)</span> 可逆时，<span class="math inline">\(A^+ = A^{-1}\)</span>；
+- 计算方式：可通过奇异值分解实现 <span class="math display">\[ A^+ = V\Sigma^+U^T \]</span> 其中 <span class="math inline">\(\Sigma^+\)</span> 为奇异值矩阵的伪逆。</p>
+<p>R中MASS包中的ginv()函数可以计算矩阵的Moore-Penrose逆。例如：</p>
+<pre class="r"><code> library(MASS)
+
+ A=matrix(1:12,nrow=3,ncol=4)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<pre class="r"><code> # solve(A)  #出错
+
+ ginv(A)</code></pre>
+<pre><code>##              [,1]        [,2]        [,3]
+## [1,] -0.483333333 -0.03333333  0.41666667
+## [2,] -0.244444444 -0.01111111  0.22222222
+## [3,] -0.005555556  0.01111111  0.02777778
+## [4,]  0.233333333  0.03333333 -0.16666667</code></pre>
+<p>验证性质1：</p>
+<pre class="r"><code> A%*%ginv(A)%*%A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<pre class="r"><code> A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    4    7   10
+## [2,]    2    5    8   11
+## [3,]    3    6    9   12</code></pre>
+<p>验证性质2：</p>
+<pre class="r"><code> ginv(A)%*%A%*%ginv(A)</code></pre>
+<pre><code>##              [,1]        [,2]        [,3]
+## [1,] -0.483333333 -0.03333333  0.41666667
+## [2,] -0.244444444 -0.01111111  0.22222222
+## [3,] -0.005555556  0.01111111  0.02777778
+## [4,]  0.233333333  0.03333333 -0.16666667</code></pre>
+<pre class="r"><code> ginv(A)</code></pre>
+<pre><code>##              [,1]        [,2]        [,3]
+## [1,] -0.483333333 -0.03333333  0.41666667
+## [2,] -0.244444444 -0.01111111  0.22222222
+## [3,] -0.005555556  0.01111111  0.02777778
+## [4,]  0.233333333  0.03333333 -0.16666667</code></pre>
+<p>验证性质3：</p>
+<pre class="r"><code> A%*%ginv(A)</code></pre>
+<pre><code>##            [,1]      [,2]       [,3]
+## [1,]  0.8333333 0.3333333 -0.1666667
+## [2,]  0.3333333 0.3333333  0.3333333
+## [3,] -0.1666667 0.3333333  0.8333333</code></pre>
+<pre class="r"><code> t(A%*%ginv(A))</code></pre>
+<pre><code>##            [,1]      [,2]       [,3]
+## [1,]  0.8333333 0.3333333 -0.1666667
+## [2,]  0.3333333 0.3333333  0.3333333
+## [3,] -0.1666667 0.3333333  0.8333333</code></pre>
+<p>验证性质4：</p>
+<pre class="r"><code> ginv(A)%*%A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]  0.7  0.4  0.1 -0.2
+## [2,]  0.4  0.3  0.2  0.1
+## [3,]  0.1  0.2  0.3  0.4
+## [4,] -0.2  0.1  0.4  0.7</code></pre>
+<pre class="r"><code> t(ginv(A)%*%A)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]  0.7  0.4  0.1 -0.2
+## [2,]  0.4  0.3  0.2  0.1
+## [3,]  0.1  0.2  0.3  0.4
+## [4,] -0.2  0.1  0.4  0.7</code></pre>
+<p>也可以不必如此麻烦来验证性质3和4，因为3和4只是表明 <span class="math inline">\(AA^+\)</span> 和 <span class="math inline">\(A^+A\)</span> 是对称矩阵。</p>
+</div>
+<div id="xx-的逆" class="section level3">
+<h3>2.8.3 <span class="math display">\[X^&#39;X \]</span>的逆</h3>
+<p>很多时候，我们需要计算形如 <span class="math inline">\(X^{&#39;}X\)</span> 的逆。这很容易实现，例如：</p>
+<pre class="r"><code> x=matrix(rnorm(9),ncol=3,nrow=3)
+
+ x</code></pre>
+<pre><code>##            [,1]       [,2]      [,3]
+## [1,]  0.6071668 -2.8462564 -1.287536
+## [2,] -1.1709777  0.1040347 -1.014923
+## [3,]  0.8257318  0.7167508 -1.021941</code></pre>
+<pre class="r"><code> solve(crossprod(x))</code></pre>
+<pre><code>##            [,1]        [,2]        [,3]
+## [1,] 0.44683860  0.06387739  0.00395963
+## [2,] 0.06387739  0.16333374 -0.11622003
+## [3,] 0.00395963 -0.11622003  0.35642361</code></pre>
+<p>R中的strucchange包中的函数solveCrossprod()也可完成：</p>
+<pre class="r"><code> library(strucchange)</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: sandwich</code></pre>
+<pre class="r"><code> args(solveCrossprod)</code></pre>
+<pre><code>## function (X, method = c(&quot;qr&quot;, &quot;chol&quot;, &quot;solve&quot;)) 
+## NULL</code></pre>
+<pre class="r"><code> solveCrossprod(x,method=&quot;qr&quot;)</code></pre>
+<pre><code>##            [,1]        [,2]        [,3]
+## [1,] 0.44683860  0.06387739  0.00395963
+## [2,] 0.06387739  0.16333374 -0.11622003
+## [3,] 0.00395963 -0.11622003  0.35642361</code></pre>
+<pre class="r"><code> solveCrossprod(x,method=&quot;chol&quot;)</code></pre>
+<pre><code>##            [,1]        [,2]        [,3]
+## [1,] 0.44683860  0.06387739  0.00395963
+## [2,] 0.06387739  0.16333374 -0.11622003
+## [3,] 0.00395963 -0.11622003  0.35642361</code></pre>
+<pre class="r"><code> solveCrossprod(x,method=&quot;solve&quot;)</code></pre>
+<pre><code>##            [,1]        [,2]        [,3]
+## [1,] 0.44683860  0.06387739  0.00395963
+## [2,] 0.06387739  0.16333374 -0.11622003
+## [3,] 0.00395963 -0.11622003  0.35642361</code></pre>
+</div>
+</div>
+<div id="矩阵的特征值和特征向量" class="section level2">
+<h2>2.9矩阵的特征值和特征向量</h2>
+<p>矩阵的谱分解（或称特征分解）是将方阵分解为特征值和特征向量构成的正交投影矩阵的线性组合。设 <span class="math inline">\(A\)</span> 是 <span class="math inline">\(n \times n\)</span> 的<strong>正规矩阵</strong>（例如实对称矩阵、Hermitian矩阵或酉矩阵），其谱分解公式为：</p>
+<p><span class="math display">\[
+A=\sum_{i=1}^{k}\lambda_{i}E_{i}
+\]</span></p>
+<p>其中：
+- <span class="math inline">\(\lambda_i\)</span> 是 <span class="math inline">\(A\)</span> 的<strong>互异特征值</strong>（共 <span class="math inline">\(k\)</span> 个不同的特征值）；
+- <span class="math inline">\(E_i\)</span> 是到 <span class="math inline">\(\lambda_i\)</span> 对应特征空间的<strong>正交投影矩阵</strong>，满足：
+-<strong>正交性</strong>：<span class="math inline">\(E_i E_j = 0 \ (\forall i \neq j)\)</span>
+-<strong>幂等性</strong>：<span class="math inline">\(E_i^2 = E_i\)</span>
+-<strong>单位分解</strong>：<span class="math inline">\(\sum_{i=1}^k E_i = I_n\)</span></p>
+<div id="关键条件与性质" class="section level3">
+<h3>关键条件与性质：</h3>
+<p>1.<strong>可对角化性</strong>：谱分解要求矩阵 <span class="math inline">\(A\)</span> 可对角化，正规矩阵（如对称矩阵、Hermitian矩阵）一定满足此条件；
+2.<strong>唯一性</strong>：分解形式唯一，由特征值和对应的正交投影矩阵完全确定；
+3.<strong>几何意义</strong>：<span class="math inline">\(E_i\)</span> 将向量投影到 <span class="math inline">\(\lambda_i\)</span> 的特征空间，<span class="math inline">\(A\)</span> 的作用相当于在不同特征方向上按 <span class="math inline">\(\lambda_i\)</span> 缩放；
+4.<strong>特殊情形</strong>：若 <span class="math inline">\(A\)</span> 的特征值互异（无重复），则 <span class="math inline">\(E_i = v_i v_i^T / \|v_i\|^2\)</span>（<span class="math inline">\(v_i\)</span> 为标准正交特征向量）。</p>
+<p>比如：</p>
+<p>若 <span class="math inline">\(A = \begin{bmatrix} 2 &amp; 1 \\ 1 &amp; 2 \end{bmatrix}\)</span>，其特征值 <span class="math inline">\(\lambda_1=3\)</span>, <span class="math inline">\(\lambda_2=1\)</span>，对应投影矩阵：</p>
+<p><span class="math display">\[
+E_1 = \frac{1}{2}\begin{bmatrix} 1 &amp; 1 \\ 1 &amp; 1 \end{bmatrix}, \quad E_2 = \frac{1}{2}\begin{bmatrix} 1 &amp; -1 \\ -1 &amp; 1 \end{bmatrix}
+\]</span></p>
+<p>则谱分解为：</p>
+<p><span class="math display">\[
+A = 3E_1 + 1E_2
+\]</span></p>
+<pre class="r"><code> args(eigen)</code></pre>
+<pre><code>## function (x, symmetric, only.values = FALSE, EISPACK = FALSE) 
+## NULL</code></pre>
+<p>其中，x参数输入矩阵；symmetric参数判断矩阵是否为对称矩阵，如果参数为空，系统将自动检测矩阵的对称性。例如：</p>
+<pre class="r"><code> A=matrix(1:9,nrow=3,ncol=3)
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<pre class="r"><code> Aeigen=eigen(A)
+
+ Aeigen</code></pre>
+<pre><code>## eigen() decomposition
+## $values
+## [1]  1.611684e+01 -1.116844e+00 -5.700691e-16
+## 
+## $vectors
+##            [,1]       [,2]       [,3]
+## [1,] -0.4645473 -0.8829060  0.4082483
+## [2,] -0.5707955 -0.2395204 -0.8164966
+## [3,] -0.6770438  0.4038651  0.4082483</code></pre>
+<p>得到矩阵A的特征值：</p>
+<pre class="r"><code> Aeigen$values</code></pre>
+<pre><code>## [1]  1.611684e+01 -1.116844e+00 -5.700691e-16</code></pre>
+<p>得到矩阵A的特征向量：</p>
+<pre class="r"><code> Aeigen$vectors</code></pre>
+<pre><code>##            [,1]       [,2]       [,3]
+## [1,] -0.4645473 -0.8829060  0.4082483
+## [2,] -0.5707955 -0.2395204 -0.8164966
+## [3,] -0.6770438  0.4038651  0.4082483</code></pre>
+</div>
+</div>
+</div>
+<div id="矩阵高级操作" class="section level1">
+<h1>3 矩阵高级操作</h1>
+<div id="choleskey分解" class="section level2">
+<h2>3.1 Choleskey分解</h2>
+<p>对于正定矩阵A，可以对其进行Choleskey分解，<span class="math inline">\(A=P^{&#39;}P\)</span> ，其中P为上三角矩阵，在R中可以用函数chol()。例如：</p>
+<pre class="r"><code> A=diag(3)+1
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    2    1
+## [3,]    1    1    2</code></pre>
+<pre class="r"><code> chol(A)</code></pre>
+<pre><code>##          [,1]      [,2]      [,3]
+## [1,] 1.414214 0.7071068 0.7071068
+## [2,] 0.000000 1.2247449 0.4082483
+## [3,] 0.000000 0.0000000 1.1547005</code></pre>
+<p>验证<span class="math inline">\(A=P^{&#39;}P\)</span> ：</p>
+<pre class="r"><code> t(chol(A))%*%chol(A)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    2    1
+## [3,]    1    1    2</code></pre>
+<p>也可以用crossprod()函数：</p>
+<pre class="r"><code> crossprod(chol(A),chol(A))</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    2    1    1
+## [2,]    1    2    1
+## [3,]    1    1    2</code></pre>
+<p>可以用Choleskey分解来计算矩阵的行列式：</p>
+<pre class="r"><code> prod(diag(chol(A))^2)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<pre class="r"><code> det(A)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>也可以用Choleskey分解来计算矩阵的逆，这时候可以用到函数chol2inv():</p>
+<pre class="r"><code> chol2inv(chol(A))</code></pre>
+<pre><code>##       [,1]  [,2]  [,3]
+## [1,]  0.75 -0.25 -0.25
+## [2,] -0.25  0.75 -0.25
+## [3,] -0.25 -0.25  0.75</code></pre>
+<pre class="r"><code> solve(A)</code></pre>
+<pre><code>##       [,1]  [,2]  [,3]
+## [1,]  0.75 -0.25 -0.25
+## [2,] -0.25  0.75 -0.25
+## [3,] -0.25 -0.25  0.75</code></pre>
+</div>
+<div id="奇异值分解" class="section level2">
+<h2>3.2 奇异值分解</h2>
+<p>A为<span class="math inline">\(m\times n\)</span> 矩阵，矩阵的秩为r。A可以分解为<span class="math inline">\(A=UDV^{&#39;}\)</span> ，其中:<span class="math inline">\(U^{&#39;}U=V^{&#39;}V=I\)</span> 。在R中可以用函数svd()来完成奇异值分解。</p>
+<p>例如：</p>
+<pre class="r"><code> A=matrix(1:18,3,6)
+
+ A</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6]
+## [1,]    1    4    7   10   13   16
+## [2,]    2    5    8   11   14   17
+## [3,]    3    6    9   12   15   18</code></pre>
+<pre class="r"><code> svd(A)</code></pre>
+<pre><code>## $d
+## [1] 4.589453e+01 1.640705e+00 1.366522e-15
+## 
+## $u
+##            [,1]        [,2]       [,3]
+## [1,] -0.5290354  0.74394551  0.4082483
+## [2,] -0.5760715  0.03840487 -0.8164966
+## [3,] -0.6231077 -0.66713577  0.4082483
+## 
+## $v
+##             [,1]        [,2]       [,3]
+## [1,] -0.07736219 -0.71960032 -0.4076688
+## [2,] -0.19033085 -0.50893247  0.5745647
+## [3,] -0.30329950 -0.29826463 -0.0280114
+## [4,] -0.41626816 -0.08759679  0.2226621
+## [5,] -0.52923682  0.12307105 -0.6212052
+## [6,] -0.64220548  0.33373889  0.2596585</code></pre>
+<pre class="r"><code> svd(A)$u%*%diag(svd(A)$d)%*%t(svd(A)$v)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6]
+## [1,]    1    4    7   10   13   16
+## [2,]    2    5    8   11   14   17
+## [3,]    3    6    9   12   15   18</code></pre>
+</div>
+<div id="qr分解" class="section level2">
+<h2>3.3 QR分解</h2>
+<p>A为<span class="math inline">\(m\times n\)</span> 矩阵可以进行QR分解:<span class="math inline">\(A=QR\)</span> ，其中<span class="math inline">\(Q^{&#39;}Q=I\)</span> ，在R中可以用函数qr()来完成这个过程，例如：</p>
+<pre class="r"><code> A=matrix(1:12,4,3)
+
+ qr(A)</code></pre>
+<pre><code>## $qr
+##            [,1]        [,2]          [,3]
+## [1,] -5.4772256 -12.7801930 -2.008316e+01
+## [2,]  0.3651484  -3.2659863 -6.531973e+00
+## [3,]  0.5477226  -0.3781696  1.601186e-15
+## [4,]  0.7302967  -0.9124744 -5.547002e-01
+## 
+## $rank
+## [1] 2
+## 
+## $qraux
+## [1] 1.182574 1.156135 1.832050
+## 
+## $pivot
+## [1] 1 2 3
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;qr&quot;</code></pre>
+<p>Rank返回的是矩阵的秩。Qr项包含了Q矩阵和R矩阵的信息。要想得到Q矩阵和R矩阵，可以用qr.Q()函数和qr.R()函数：</p>
+<pre class="r"><code>qr.Q(qr(A))</code></pre>
+<pre><code>##            [,1]          [,2]       [,3]
+## [1,] -0.1825742 -8.164966e-01 -0.4000874
+## [2,] -0.3651484 -4.082483e-01  0.2546329
+## [3,] -0.5477226 -1.665335e-16  0.6909965
+## [4,] -0.7302967  4.082483e-01 -0.5455419</code></pre>
+<pre class="r"><code>qr.R(qr(A))</code></pre>
+<pre><code>##           [,1]       [,2]          [,3]
+## [1,] -5.477226 -12.780193 -2.008316e+01
+## [2,]  0.000000  -3.265986 -6.531973e+00
+## [3,]  0.000000   0.000000  1.601186e-15</code></pre>
+</div>
+</div>
+<div id="解方程组" class="section level1">
+<h1>4 解方程组</h1>
+<div id="普通方程组" class="section level2">
+<h2>4.1普通方程组</h2>
+<p>解普通方程组可以用函数solve()，solve()的基本用法是solve(A,b)，其中，A为方程组的系数矩阵，b为方程组的右端。例如：</p>
+<p>已知方程组：</p>
+<p><span class="math display">\[
+\begin{cases}
+2x_1+2x_3=1\\
+2x_1+x_2+2x_3=2\\
+2x_1+x_2=3
+\end{cases}
+\]</span></p>
+<p>解法如下：</p>
+<pre><code>A=matrix(
+c(2,0,2,
+  2,1,2,
+  2,1,0),
+  byrow=TRUE,nrow=3
+)
+
+b=1:3
+
+b
+
+solve(A,b)</code></pre>
+<p>即<span class="math inline">\(x_1=1\)</span> ，<span class="math inline">\(x_2=1\)</span> ，<span class="math inline">\(x_3=-0.5\)</span> 。</p>
+</div>
+<div id="特殊方程组" class="section level2">
+<h2>4.2 特殊方程组</h2>
+<p>对于系数矩阵是上三角矩阵和下三角矩阵的方程组。R中提供了backsolve()和fowardsolve()来解决这个问题。</p>
+<pre><code>backsolve(r, x, k=ncol(r), upper.tri=TRUE, transpose=FALSE)
+
+forwardsolve(l, x, k=ncol(l), upper.tri=FALSE, transpose=FALSE)</code></pre>
+<p>这两个函数都是符合操作的函数，大致可以分为三个步骤：</p>
+<ol style="list-style-type: decimal">
+<li><p>通过将系数矩阵的上三角或者下三角变为0的到新的系数矩阵,这通过upper.tri参数来实现，若upper.tri=TRUR，上三角不为0。</p></li>
+<li><p>通过将对步骤1中得到的新系数矩阵进行转置得到新的系数矩阵，这通过transpose参数实现，若transpose=FALSE，则步骤1中得到的系数矩阵将被转置。</p></li>
+<li><p>根据步骤2得到的系数矩阵来解方程组。</p></li>
+</ol>
+<p><span class="math display">\[
+\begin{cases}
+X_1+4X_2+7X_3=1\\
+2X_1+5X_2+8X_3=2\\
+3X_1+6X_2+9X_3=3
+\end{cases}
+\]</span></p>
+<p>方程组的系数矩阵为：</p>
+<pre class="r"><code>A &lt;- matrix(
+  c(1,4,7,
+    2,5,8,
+    3,6,9),
+  byrow=TRUE,
+  nrow = 3
+)
+
+b=1:3
+
+backsolve(A,b,upper.tri=T,transpose=F)</code></pre>
+<pre><code>## [1] -0.8000000 -0.1333333  0.3333333</code></pre>
+<p>过程分解：</p>
+<ul>
+<li>upper.tri=T，说明系数矩阵的上三角不为0。</li>
+</ul>
+<pre class="r"><code>B=A
+
+B[lower.tri(B)]=0
+
+B</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    0    5    8
+## [3,]    0    0    9</code></pre>
+<ul>
+<li><p>transpose=F说明系数矩阵未被转置。</p></li>
+<li><p>解方程：</p></li>
+</ul>
+<pre class="r"><code>solve(B,b)</code></pre>
+<pre><code>## [1] -0.8000000 -0.1333333  0.3333333</code></pre>
+</div>
+</div>
+<div id="其它" class="section level1">
+<h1>5 其它</h1>
+<div id="矩阵的向量化" class="section level2">
+<h2>5.1矩阵的向量化</h2>
+<p>将矩阵向量化有时候是必要的。矩阵的向量化可以通过as.vector()来实现：</p>
+<pre class="r"><code>A &lt;- matrix(1:9,nrow=3)
+
+A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<p>将矩阵元素向量化：</p>
+<pre class="r"><code>as.vector(A)</code></pre>
+<pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
+<pre class="r"><code>A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<p>将矩阵的方阵部分元素向量化：</p>
+<pre class="r"><code>as.vector(A[1:min(dim(A)),1:min(dim(A))])</code></pre>
+<pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
+</div>
+<div id="矩阵的合并" class="section level2">
+<h2>5.2矩阵的合并</h2>
+<div id="矩阵的列合并" class="section level3">
+<h3>5.2.1矩阵的列合并</h3>
+<p>矩阵的列合并可以通过cbind()来实现。</p>
+<pre class="r"><code>A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<pre class="r"><code>B=1:3
+
+cbind(A,B)</code></pre>
+<pre><code>##            B
+## [1,] 1 4 7 1
+## [2,] 2 5 8 2
+## [3,] 3 6 9 3</code></pre>
+</div>
+<div id="矩阵的行合并" class="section level3">
+<h3>5.2.2矩阵的行合并</h3>
+<p>矩阵的行合并可以通过rbind()来实现。</p>
+<pre class="r"><code>A</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    4    7
+## [2,]    2    5    8
+## [3,]    3    6    9</code></pre>
+<pre class="r"><code>B=1:3
+
+rbind(A,B)</code></pre>
+<pre><code>##   [,1] [,2] [,3]
+##      1    4    7
+##      2    5    8
+##      3    6    9
+## B    1    2    3</code></pre>
+</div>
+</div>
+</div>

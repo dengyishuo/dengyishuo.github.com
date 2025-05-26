@@ -1,0 +1,250 @@
+---
+title: 指数加权移动平均法计算VaR
+author: MatrixSpk
+date: '2010-12-18'
+slug: caculate-var-via-EWMA
+categories:
+  - 量化投资
+tags:
+  - VaR
+  - r
+  - 量化投资
+  - 方差
+  - 协方差
+---
+
+
+
+<div id="指数加权移动平均法" class="section level2">
+<h2>指数加权移动平均法</h2>
+<p>指数移动加权法是一种动态波动率建模方法，其核心思想是通过赋予历史收益率随时间衰减的权重，捕捉金融时间序列的波动率聚集特征。与传统等权重方法不同，EWMA通过引入衰减因子 <span class="math inline">\(\lambda\)</span>，其中: <span class="math inline">\(\left(0\le\lambda\le1\right)\)</span> ，使近期数据对波动率估计的影响呈指数级递增，而远期数据影响逐渐衰减（通常取 <span class="math inline">\(\lambda = 0.94\)</span> ，基于RiskMetrics建议）。这种机制使得模型能更快响应市场突变，尤其适用于高频风险监测。</p>
+<div id="单资产情形" class="section level3">
+<h3>单资产情形</h3>
+<div id="数据准备与收益率计算" class="section level4">
+<h4>1. 数据准备与收益率计算</h4>
+<ul>
+<li>获取资产历史收盘价序列<span class="math inline">\(\{P_t\}\)</span>，计算对数收益率：
+<span class="math display">\[
+r_t = \ln\left(\frac{P_t}{P_{t-1}}\right)
+\]</span></li>
+</ul>
+</div>
+<div id="动态方差估计" class="section level4">
+<h4>2. 动态方差估计</h4>
+<p>EWMA通过指数衰减因子 <span class="math inline">\(\lambda\)</span> 赋予近期数据更高权重，捕捉波动率的时变特性：</p>
+<p><span class="math display">\[
+\sigma_t^2 = \lambda \sigma_{t-1}^2 + (1-\lambda) r_{t-1}^2
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(\lambda \in (0,1)\)</span>：衰减因子（典型值0.94）</li>
+<li><span class="math inline">\(r_{t-1}\)</span>：前一日收益率</li>
+<li><span class="math inline">\(\sigma_{t-1}^2\)</span>：前一日波动率</li>
+</ul>
+</div>
+<div id="var计算正态假设" class="section level4">
+<h4>3. VaR计算（正态假设）</h4>
+<ul>
+<li>单日VaR公式：
+<span class="math display">\[
+\text{VaR}_{\alpha} = -\mu + \sigma_t \Phi^{-1}(1-\alpha)
+\]</span>
+其中<span class="math inline">\(\mu\)</span>为收益率均值（短期内可忽略），<span class="math inline">\(\Phi^{-1}\)</span>为标准正态分布分位数（如95%置信水平对应1.645）</li>
+</ul>
+</div>
+<div id="多期var调整" class="section level4">
+<h4>4. 多期VaR调整</h4>
+<ul>
+<li>持有期<span class="math inline">\(T\)</span>天的VaR扩展：
+<span class="math display">\[
+\text{VaR}_T = \text{VaR}_{1d} \times \sqrt{T}
+\]</span></li>
+</ul>
+<div id="代码实现" class="section level5">
+<h5>代码实现</h5>
+<pre class="r"><code># 加载必要包
+if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)  # 金融数据获取</code></pre>
+<pre><code>## Loading required package: quantmod</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>if (!require(&quot;ggplot2&quot;)) install.packages(&quot;ggplot2&quot;)    # 可视化</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>library(quantmod)
+library(ggplot2)
+
+# 获取标普500指数数据（示例）
+getSymbols(&quot;^GSPC&quot;, src = &quot;yahoo&quot;, from = &quot;2020-01-01&quot;, to = Sys.Date())</code></pre>
+<pre><code>## [1] &quot;GSPC&quot;</code></pre>
+<pre class="r"><code># 计算对数收益率
+returns &lt;- na.omit(ROC(Cl(GSPC)))       # 使用收盘价计算
+colnames(returns) &lt;- &quot;Daily_Return&quot;
+
+# 参数设置
+lambda &lt;- 0.94                          # 衰减因子
+portfolio_value &lt;- 1e6                  # 组合价值100万美元
+confidence_level &lt;- 0.95                # 置信水平
+z_score &lt;- qnorm(1 - confidence_level)  # 分位数（正态分布）
+
+# 初始化EWMA方差序列
+n &lt;- length(returns)
+ewma_var &lt;- numeric(n)
+ewma_var[1] &lt;- var(returns)             # 初始化为样本方差
+
+# 递归计算EWMA方差
+for (i in 2:n) {
+  ewma_var[i] &lt;- lambda * ewma_var[i-1] + (1 - lambda) * returns[i-1]^2
+}
+
+# 转换为年化波动率
+ewma_vol &lt;- sqrt(ewma_var * 252)
+
+# 计算VaR序列
+VaR &lt;- portfolio_value * z_score * ewma_vol
+
+# 获取最新VaR值
+latest_VaR &lt;- tail(VaR, 1)
+cat(&quot;最新EWMA VaR（95%置信度）:&quot;, round(latest_VaR, 2), &quot;美元\n&quot;)</code></pre>
+<pre><code>## 最新EWMA VaR（95%置信度）: -438733.4 美元</code></pre>
+<pre class="r"><code># 可视化结果
+results &lt;- data.frame(
+  Date = index(GSPC)[-1], 
+  Volatility = ewma_vol,
+  VaR = VaR
+)
+
+ggplot(results, aes(x = Date)) +
+  geom_line(aes(y = Volatility, color = &quot;波动率&quot;)) +
+  geom_line(aes(y = VaR / 1e4, color = &quot;VaR（万美元）&quot;)) +
+  scale_y_continuous(
+    name = &quot;年化波动率&quot;,
+    sec.axis = sec_axis(~ . * 1e4, name = &quot;VaR（美元）&quot;)
+  ) +
+  labs(title = &quot;EWMA波动率与VaR动态变化&quot;,
+       color = &quot;指标类型&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="多元资产组合ewma-var建模原理与r实现" class="section level3">
+<h3>多元资产组合EWMA-VaR建模原理与R实现</h3>
+<div id="协方差矩阵动态更新" class="section level4">
+<h4>协方差矩阵动态更新</h4>
+<p>多资产EWMA模型通过递归更新协方差矩阵捕捉资产间相关性的时变特征:</p>
+<p><span class="math display">\[
+\Sigma_t = \lambda \Sigma_{t-1} + (1-\lambda)\mathbf{r}_{t-1}\mathbf{r}_{t-1}^\top
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(\mathbf{r}_{t-1}\)</span>：前一期资产收益率向量（<span class="math inline">\(n \times 1\)</span>）</li>
+<li><span class="math inline">\(\Sigma_{t-1}\)</span>：前一期协方差矩阵（<span class="math inline">\(n \times n\)</span>）</li>
+<li><span class="math inline">\(\lambda\)</span>：衰减因子（建议值0.94）:ml-citation{ref=“4,8” data=“citationList”}</li>
+</ul>
+</div>
+<div id="组合var计算流程" class="section level4">
+<h4>组合VaR计算流程</h4>
+<table>
+<colgroup>
+<col width="14%" />
+<col width="85%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>步骤</th>
+<th>计算公式</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>组合方差</td>
+<td><span class="math inline">\(\sigma_p^2 = \mathbf{w}^\top \Sigma_t \mathbf{w}\)</span></td>
+</tr>
+<tr class="even">
+<td>年化波动率</td>
+<td><span class="math inline">\(\sigma_p^{\text{annual}} = \sigma_p \sqrt{252}\)</span></td>
+</tr>
+<tr class="odd">
+<td>VaR</td>
+<td><span class="math inline">\(VaR_{\alpha} = Z_{1-\alpha} \times P_0 \times \sigma_p^{\text{annual}}\)</span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><span class="math inline">\(\mathbf{w}\)</span>：资产权重向量（需满足<span class="math inline">\(\sum w_i=1\)</span>）</li>
+<li><span class="math inline">\(P_0\)</span>：组合总价值</li>
+</ul>
+</div>
+<div id="r语言完整实现" class="section level4">
+<h4>R语言完整实现</h4>
+<pre class="r"><code># 加载必要库
+library(quantmod)  # 多元金融数据获取
+library(ggplot2)   # 可视化
+library(reshape2)  # 数据重塑
+
+# 获取三大股指数据
+symbols &lt;- c(&quot;^GSPC&quot;, &quot;^IXIC&quot;, &quot;^DJI&quot;)  # 标普500、纳斯达克、道琼斯
+getSymbols(symbols, from = &quot;2020-01-01&quot;, to = Sys.Date())</code></pre>
+<pre><code>## [1] &quot;GSPC&quot; &quot;IXIC&quot; &quot;DJI&quot;</code></pre>
+<pre class="r"><code># 合并收盘价并计算对数收益率
+prices &lt;- na.omit(merge(Cl(GSPC), Cl(IXIC), Cl(DJI)))
+returns &lt;- na.omit(ROC(prices))  
+colnames(returns) &lt;- c(&quot;SP500&quot;, &quot;NASDAQ&quot;, &quot;DJI&quot;)
+
+# 参数设置
+lambda &lt;- 0.94                     # 衰减因子
+weights &lt;- c(0.5, 0.3, 0.2)        # 资产权重向量
+portfolio_value &lt;- 1e7             # 组合价值（美元）
+conf_level &lt;- 0.95                 # 置信水平
+
+# 初始化协方差矩阵
+n_assets &lt;- ncol(returns)
+n_obs &lt;- nrow(returns)
+covar &lt;- array(dim = c(n_assets, n_assets, n_obs))
+covar[,,1] &lt;- cov(returns)         # 初始协方差矩阵
+
+# 递归更新协方差矩阵
+for (i in 2:n_obs) {
+  r_prev &lt;- as.numeric(returns[i-1, ])
+  covar[,,i] &lt;- lambda * covar[,,i-1] + (1 - lambda) * outer(r_prev, r_prev)
+}
+
+# 计算组合波动率
+port_var &lt;- sapply(1:n_obs, function(i) {
+  t(weights) %*% covar[,,i] %*% weights
+})
+annual_vol &lt;- sqrt(port_var * 252)
+
+# 计算VaR序列
+z_score &lt;- qnorm(conf_level)
+VaR_series &lt;- -portfolio_value * z_score * annual_vol
+
+# 输出最新VaR
+cat(&quot;Latest Portfolio EWMA VaR (95%):&quot;, 
+    round(tail(VaR_series, 1), 2), &quot;USD\n&quot;)</code></pre>
+<pre><code>## Latest Portfolio EWMA VaR (95%): -4553984 USD</code></pre>
+<pre class="r"><code># 可视化协方差矩阵变化
+cov_df &lt;- data.frame(
+  Date = index(returns),
+  SP500_NASDAQ = sapply(1:n_obs, function(i) covar[1,2,i]),
+  SP500_DJI = sapply(1:n_obs, function(i) covar[1,3,i]),
+  NASDAQ_DJI = sapply(1:n_obs, function(i) covar[2,3,i])
+)
+cov_long &lt;- melt(cov_df, id.vars = &quot;Date&quot;)
+
+ggplot(cov_long, aes(x = Date, y = value, color = variable)) +
+  geom_line(alpha = 0.7) +
+  labs(title = &quot;协方差动态变化趋势&quot;, y = &quot;协方差值&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+</div>
+</div>

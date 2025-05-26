@@ -1,0 +1,35 @@
+---
+title: luxor sample mae stop trailing
+author: MatrixSpk
+date: '2016-01-12'
+slug: luxor-sample-mae-stop-trailing
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+
+
+<pre class="t"><code>#
+# Tested and found to work correctly using blotter r1457
+#
+# After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
+#
+# Figure 3.16: MFE graph in percentage terms
+
+require(&#39;blotter&#39;)
+
+data(&#39;luxor-p066&#39;, package=&#39;quantstrat&#39;, envir=.blotter)
+
+currency(c(&#39;GBP&#39;, &#39;USD&#39;))
+exchange_rate(c(&#39;GBPUSD&#39;), tick_size=0.0001)
+
+chart.ME(
+	 Portfolio=&#39;luxor&#39;,
+	 Symbol=&#39;GBPUSD&#39;,
+	 type=&#39;MFE&#39;,
+	 scale=&#39;percent&#39;
+)</code></pre>

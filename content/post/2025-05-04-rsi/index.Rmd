@@ -31,7 +31,7 @@ tags:
 # ---------------------------
 # 1. 包加载与环境清理
 # ---------------------------
-# 安装必要包（已注释，按需启用）
+# 安装必要包（按需启用）
 # install.packages("devtools") 
 # install.packages("FinancialInstrument") 
 # install.packages("PerformanceAnalytics") 

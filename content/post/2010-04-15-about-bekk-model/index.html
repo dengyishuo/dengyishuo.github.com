@@ -1,0 +1,301 @@
+---
+title: BEKK模型
+author: MatrixSpk
+date: '2010-04-15'
+slug: about-bekk-model
+categories:
+- R
+tags:
+- BEKK
+- mgarch
+- 多元garch模型
+---
+
+
+
+<p>BEKK模型是目前比较流行的多变量波动性模型，可以看作GARCH模型在多维空间的实现。BEKK模型在应用过程中也有诸多缺点，其中最大的一个不足之处在于模型的待估计参数会随着模型维数的增加指数型增长。然而，这一点肯定会随着计算机的发展而被逐渐克服的。</p>
+<p>R软件中提供了mgarch和mgarchBEKK两个包来估计BEKK模型参数。</p>
+<div id="mgarch包及其示例" class="section level2">
+<h2>mgarch包及其示例</h2>
+<pre class="r"><code># 安装包（如果未安装）
+# devtools::install_github(&quot;https://github.com/vst/mgarch&quot;)
+
+library(mgarch)</code></pre>
+<pre><code>## Loading required package: tseries</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## Loading required package: mvtnorm</code></pre>
+<p>先看mgarch包，该包有三个主要函数：</p>
+<ul>
+<li>mvBEKK.sim: 模拟一个MGARCH-BEKK过程</li>
+<li>mvBEKK.est: 估计MGARCH-BEKK模型的参数</li>
+<li>mvBEKK.diag:对拟合的MGARCH-BEKK模型进行诊断</li>
+</ul>
+<p>可以通过以下命令查询相关函数的用法：</p>
+<pre class="r"><code>?mvBEKK.sim
+?mvBEKK.est
+?mvBEKK.diag</code></pre>
+<p>运行以下命令可以模拟一个MGARCH-BEKK过程：</p>
+<pre class="r"><code>set.seed(123)
+sim = mvBEKK.sim(series.count = 3, T = 1000)</code></pre>
+<pre><code>## Class attributes are accessible through following names:
+## length series.count order params true.params eigenvalues uncond.cov.matrix white.noise eps cor sd</code></pre>
+<p>合并模拟的时间序列：</p>
+<pre class="r"><code>eps = data.frame(sim$eps[[1]], sim$eps[[2]], sim$eps[[3]]) 
+head(eps)</code></pre>
+<pre><code>##   sim.eps..1.. sim.eps..2.. sim.eps..3..
+## 1    0.9472441    1.2177306    0.5491724
+## 2   -1.1241768   -0.3366113   -0.6261458
+## 3    0.7179649   -0.3272567    1.6880032
+## 4   -0.4857962    1.2230006   -1.9563961
+## 5   -1.1301479    4.0603942   -1.3856283
+## 6    0.2057734    1.1435079   -0.6392246</code></pre>
+<pre class="r"><code>tail(eps)</code></pre>
+<pre><code>##      sim.eps..1.. sim.eps..2.. sim.eps..3..
+## 995   -1.43678861   -0.8651118  -1.55380698
+## 996   -1.10173653   -0.5863329  -1.14479754
+## 997   -1.06902893   -0.4398771  -3.08558958
+## 998   -0.11478218    0.7226409  -3.00375826
+## 999   -1.18562636    2.4487154  -0.04579639
+## 1000   0.05764529   -0.2241948   0.86390660</code></pre>
+<p>估计模型参数：</p>
+<pre class="r"><code>est &lt;- mvBEKK.est(eps)</code></pre>
+<pre><code>## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...</code></pre>
+<pre><code>## Warning in mvBEKK.est(eps): negative inverted hessian matrix element</code></pre>
+<p>查看估计结果包含哪些信息：</p>
+<pre class="r"><code>names(est)</code></pre>
+<pre><code>##  [1] &quot;eps&quot;               &quot;series.length&quot;     &quot;estimation.time&quot;  
+##  [4] &quot;total.time&quot;        &quot;order&quot;             &quot;estimation&quot;       
+##  [7] &quot;aic&quot;               &quot;asy.se.coef&quot;       &quot;est.params&quot;       
+## [10] &quot;cor&quot;               &quot;sd&quot;                &quot;H.estimated&quot;      
+## [13] &quot;eigenvalues&quot;       &quot;uncond.cov.matrix&quot; &quot;residuals&quot;</code></pre>
+<p>模型诊断：</p>
+<pre class="r"><code>mvBEKK.diag(est)</code></pre>
+<pre><code>## 	Number of estimated series :  3 
+## 	Length of estimated series :  1000 
+## 	Estimation Time            :  23.53347 
+## 	Total Time                 :  23.95345 
+## 	BEKK order                 :  1 1 
+## 	Eigenvalues                :  0.8982855 0.5101535 0.4535976 0.3020472 0.2611067 0.2258987 0.1373383 0.05469751 0.05280793 
+## 	aic                        :  4163.509 
+## 	unconditional cov. matrix  :  2.654942 -0.4582163 0.8566066 -0.4582163 2.38067 0.1093766 0.8566066 0.1093766 2.01 
+## 	var(resid 1 )                :  0.999399 
+## 	mean(resid 1 )               :  -0.03860414 
+## 	var(resid 2 )                :  0.9988757 
+## 	mean(resid 2 )               :  0.04335019 
+## 	var(resid 3 )                :  0.997348 
+## 	mean(resid 3 )               :  0.02152967 
+## 	Estimated parameters       :
+## 
+## 	C estimates:
+##           [,1]      [,2]       [,3]
+## [1,] 0.8909642 0.3328637 0.34152387
+## [2,] 0.0000000 0.9827892 0.05270326
+## [3,] 0.0000000 0.0000000 1.01236445
+## 
+## 	ARCH estimates:
+##              [,1]        [,2]       [,3]
+## [1,]  0.340809760  0.06992293 0.07918491
+## [2,] -0.064873614  0.36049917 0.35553210
+## [3,] -0.008381618 -0.06665216 0.50150310
+## 
+## 	GARCH estimates:
+##            [,1]       [,2]       [,3]
+## [1,] -0.3353086 0.37376137 -0.5032390
+## [2,]  0.2151724 0.03756262  0.4608374
+## [3,]  0.1756196 0.01577004 -0.4594647
+## 
+## 	asy.se.coef                : 
+## 
+## 	C estimates, standard errors:
+##            [,1]      [,2]      [,3]
+## [1,] 0.07738385 0.1351731 0.2359051
+## [2,] 0.00000000 0.1141723 0.2671477
+## [3,] 0.00000000 0.0000000 0.2311768
+## 
+## 	ARCH estimates, standard errors:
+##            [,1]       [,2]       [,3]
+## [1,] 0.05481912 0.05484527 0.07796872
+## [2,] 0.04677913 0.05338068 0.07267995
+## [3,] 0.02304154 0.02555282 0.04677987
+## 
+## 	GARCH estimates, standard errors:
+##            [,1]       [,2]       [,3]
+## [1,] 0.17105425 0.19123870 0.31018515
+## [2,] 0.17509179 0.26972309 0.33665408
+## [3,] 0.05380941 0.07028591 0.09210273
+## Called from: mvBEKK.diag(est)
+## debug: for (i in 1:length(estimation$eps)) {
+##     plot(estimation$residuals[[i]])
+##     browser()
+##     dev.off()
+## }
+## debug: plot(estimation$residuals[[i]])</code></pre>
+<pre><code>## debug: browser()
+## debug: dev.off()
+## debug: plot(estimation$residuals[[i]])</code></pre>
+<pre><code>## debug: browser()
+## debug: dev.off()
+## debug: plot(estimation$residuals[[i]])</code></pre>
+<pre><code>## debug: browser()
+## debug: dev.off()</code></pre>
+</div>
+<div id="mgarchbekk包及其示例" class="section level2">
+<h2>mgarchBEKK包及其示例</h2>
+<pre class="r"><code># 安装包（如未安装）
+# devtools::install_github(&quot;https://github.com/vst/mgarchBEKK&quot;)</code></pre>
+<pre class="r"><code># 加载包
+library(mgarchBEKK)
+# 模拟mgarchBEKK过程
+simulated &lt;- simulateBEKK(2, 1000, c(1,1))</code></pre>
+<pre><code>## Class attributes are accessible through following names:
+## length series.count order params true.params eigenvalues uncond.cov.matrix white.noise eps cor sd</code></pre>
+<pre class="r"><code># 合并模拟数据
+simulated &lt;- do.call(cbind, simulated$eps)
+# 估计模型
+estimated &lt;- BEKK(simulated)</code></pre>
+<pre><code>## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...
+## H IS SINGULAR!...</code></pre>
+<pre><code>## Warning in BEKK(simulated): negative inverted hessian matrix element</code></pre>
+<pre class="r"><code># 模型诊断
+diagnoseBEKK(estimated)</code></pre>
+<pre><code>## 	Number of estimated series :  2000 
+## 	Length of estimated series :  1000 
+## 	Estimation Time            :  2.130957 
+## 	Total Time                 :  2.22815 
+## 	BEKK order                 :  1 1 
+## 	Eigenvalues                :  0.7940983 0.7122278 0.5839173 0.5353965 
+## 	aic                        :  4614.775 
+## 	unconditional cov. matrix  :  6.481396 1.496551 1.496551 7.939293 
+## 	var(resid 1 )                :  1.000363 
+## 	mean(resid 1 )               :  -0.007109519 
+## 	var(resid 2 )                :  0.9958192 
+## 	mean(resid 2 )               :  -0.01444951 
+## 	Estimated parameters       :
+## 
+## 	C estimates:
+##           [,1]      [,2]
+## [1,] 0.9304752 0.4214324
+## [2,] 0.0000000 1.6921455
+## 
+## 	ARCH estimates:
+##            [,1]         [,2]
+## [1,] -0.5382996  0.003724502
+## [2,]  0.3896205 -0.351431137
+## 
+## 	GARCH estimates:
+##            [,1]      [,2]
+## [1,]  0.3804035 0.5270529
+## [2,] -0.2806881 0.6526116
+## 
+## 	asy.se.coef                : 
+## 
+## 	C estimates, standard errors:
+##           [,1]      [,2]
+## [1,] 0.2069876 0.5373757
+## [2,] 0.0000000 0.2889314
+## 
+## 	ARCH estimates, standard errors:
+##            [,1]       [,2]
+## [1,] 0.04044854 0.04641720
+## [2,] 0.02825686 0.04050683
+## 
+## 	GARCH estimates, standard errors:
+##            [,1]       [,2]
+## [1,] 0.05265359 0.05895967
+## [2,] 0.06856104 0.07941475</code></pre>
+<pre><code>## Called from: diagnoseBEKK(estimated)
+## debug: dev.off()
+## debug: plot(estimation$residuals[[i]])</code></pre>
+<pre><code>## debug: browser()
+## debug: dev.off()</code></pre>
+</div>

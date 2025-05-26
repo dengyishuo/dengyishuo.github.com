@@ -1,0 +1,42 @@
+---
+title: luxor sample trade graphs sma
+author: MatrixSpk
+date: '2015-01-10'
+slug: luxor-sample-trade-graphs-sma
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+
+
+<p>#!/usr/bin/Rscript –vanilla
+#
+# Jan Humme (<span class="citation">@opentrades</span>) - August 2012, revised April 2013
+#
+# Tested and found to work correctly using blotter r1457
+#
+# After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
+#
+# 3D SMA graph example</p>
+<p>require(quantstrat)
+require(rgl)</p>
+<div id="load-stats-back-into-.globalenv" class="section level3">
+<h3>load ‘stats’ back into .GlobalEnv</h3>
+<p>load(paste0(
+path.package(‘quantstrat’),
+‘/data/luxor.parameters.1-10.30-55.RData’)
+)</p>
+</div>
+<div id="show-trade-graphs-from-stats" class="section level3">
+<h3>show trade graphs from stats</h3>
+<p>tradeGraphs (
+stats = stats,
+free.params = c(“Param.indicator.1.nFast”, “Param.indicator.2.nSlow”),
+statistics = c(“Net.Trading.PL”, “maxDrawdown”, “Avg.Trade.PL”, “Num.Trades”, “Profit.Factor”),
+title = ‘Luxor SMA Parameter Scan’
+)</p>
+</div>

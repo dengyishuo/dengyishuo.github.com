@@ -1,0 +1,46 @@
+---
+title: luxor sample trade graphs timespan
+author: MatrixSpk
+date: '2015-10-10'
+slug: luxor-sample-trade-graphs-timespan
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - luxor
+---
+
+
+
+<p>#!/usr/bin/Rscript –vanilla
+#
+# Jan Humme (<span class="citation">@opentrades</span>) - August 2012, revised April 2013
+#
+# Tested and found to work correctly using blotter r1457
+#
+# After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
+#
+# 3D timespan graph example</p>
+<p>require(quantstrat)
+require(rgl)</p>
+<p>load(paste0(
+path.package(‘quantstrat’),
+‘/data/luxor.timespan.24x24.2002-2008.RData’)
+)</p>
+<p>names(stats)[names(stats)==‘testPackListPRL[[k]]$parameters’]&lt;-‘timespan’</p>
+<p>stats<span class="math inline">\(tmp = strsplit(as.character(stats\)</span>timespan),‘/’)</p>
+<p>stats<span class="math inline">\(from&lt;-sapply(stats\)</span>tmp,FUN=‘[’,1)
+stats<span class="math inline">\(to&lt;-sapply(stats\)</span>tmp,FUN=‘[’,2)</p>
+<p>stats<span class="math inline">\(start&lt;-as.numeric(gsub(&#39;T([0-9]+):[0-9]+&#39;,x=stats\)</span>from,‘\1’))
+stats<span class="math inline">\(stop&lt;-(as.numeric(gsub(&#39;T([0-9]+):[0-9]+&#39;,x=stats\)</span>to,‘\1’))+1)%%24</p>
+<div id="trading-data-is-in-est-gmt-4-move-4-hours-to-adjust-to-gmt" class="section level1">
+<h1>trading data is in EST (GMT-4): move 4 hours to adjust to GMT</h1>
+<p>#stats<span class="math inline">\(start&lt;-(stats\)</span>start+4)%%24
+#stats<span class="math inline">\(stop&lt;-(stats\)</span>stop+4)%%24</p>
+<p>tradeGraphs(
+stats,
+free.params=c(‘start’,‘stop’),
+statistics=c(‘Net.Trading.PL’,‘maxDrawdown’,“Avg.Trade.PL”,‘Num.Trades’,“Profit.Factor”),
+title = ‘Luxor Intraday TimeWindow Scan’
+)</p>
+</div>

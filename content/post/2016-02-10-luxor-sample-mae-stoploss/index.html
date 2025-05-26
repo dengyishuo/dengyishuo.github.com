@@ -1,0 +1,49 @@
+---
+title: luxor sample mae stoploss
+author: MatrixSpk
+date: '2016-02-10'
+slug: luxor-sample-mae-stoploss
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+
+
+<div id="section" class="section level1">
+<h1></h1>
+</div>
+<div id="jan-humme-opentrades---august-2012" class="section level1">
+<h1>Jan Humme (<span class="citation">@opentrades</span>) - August 2012</h1>
+</div>
+<div id="section-1" class="section level1">
+<h1></h1>
+</div>
+<div id="tested-and-found-to-work-correctly-using-blotter-r1457" class="section level1">
+<h1>Tested and found to work correctly using blotter r1457</h1>
+</div>
+<div id="section-2" class="section level1">
+<h1></h1>
+</div>
+<div id="after-jaekle-tamasini-a-new-approach-to-system-development-and-portfolio-optimisation-isbn-978-1-905641-79-6" class="section level1">
+<h1>After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)</h1>
+</div>
+<div id="section-3" class="section level1">
+<h1></h1>
+</div>
+<div id="figure-3.11-mae-graph-of-luxor-system" class="section level1">
+<h1>Figure 3.11: MAE graph of Luxor system</h1>
+<p>require(‘blotter’)</p>
+<p>data(‘luxor-p066’, package=‘quantstrat’, envir=.blotter)</p>
+<p>currency(c(‘GBP’, ‘USD’))
+exchange_rate(c(‘GBPUSD’), tick_size=0.0001)</p>
+<p>chart.ME(
+Portfolio=‘luxor’,
+Symbol=‘GBPUSD’,
+type=‘MAE’,
+scale=‘cash’
+)</p>
+</div>

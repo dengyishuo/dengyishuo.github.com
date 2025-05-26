@@ -1,0 +1,92 @@
+---
+title: 用R拟合Vasicek模型
+author: MatrixSpk
+date: '2011-04-10'
+slug: use-r-to-fit-vasicek-model
+categories:
+- R
+tags:
+- 利率模型
+- Vasicek
+---
+
+
+
+<p>Vasicek模型几乎可以说是最常见的利率模型。在金融领域有着很大的用处，可以用R来做Vasicek模型的人显然不够多。</p>
+<p>这里给出一个拟合Vasicek模型的代码：</p>
+<pre class="r"><code>#Vasicek negloglike函数:
+VASICEKnegloglike&lt;-function(param,data,times){ n.obs&lt;-length(data)
+  dum&lt;-sort.list(times)
+  data&lt;-data[dum]
+  times&lt;-times[dum]
+  delta&lt;-diff(times,1)
+  mv&lt;-data[1:(n.obs-1)]*exp(-param[2]*delta)+param[1]*(1-exp(-param[2]*delta))
+  variance&lt;-param[3]^2*(1-exp(-2*param[2]*delta))/(2*param[2])
+  VASICEKnegloglike&lt;--sum(log(dnorm(data[2:n.obs],mv,sqrt(variance))))/n.obs
+}
+
+# VASICEKyield函数
+VASICEKyield&lt;-function(r,tau,Pparam,riskpremium=0)
+{ b&lt;-Pparam[1]+riskpremium
+  a&lt;-Pparam[2]
+  sig&lt;-Pparam[3]
+  Btau&lt;-(1-exp(-a*tau))/a
+  Atau&lt;-((Btau-tau)*(a^2*b-0.5*sig^2)/a^2 - sig^2*Btau^2/(4*a))
+  VASICEKyield&lt;-r*Btau/tau-Atau/tau
+}
+
+# 数据实例
+maturities&lt;-c(0.25,0.5,1,2,5,10)
+spliceddata&lt;-matrix(scan(&quot;http://www.math.ku.dk/~rolf/teaching/mfe04/USrates.52to04.dat&quot;),byrow=T,ncol=7)
+obs&lt;-spliceddata[,2]
+N&lt;-length(obs)-1
+dt&lt;-1/12
+data&lt;-obs[2:(N+1)]
+lagdata&lt;-obs[1:N]
+dates&lt;-spliceddata[,1]
+
+#Closed form estimators
+bhat&lt;-(sum(data*lagdata) - sum(data)*sum(lagdata)/N)/(sum(lagdata*lagdata) - sum(lagdata)*sum(lagdata)/N)
+kappahat&lt;--log(bhat)/dt
+ahat&lt;-sum(data)/N-bhat*sum(lagdata)/N
+thetahat&lt;-ahat/(1-bhat)
+s2hat&lt;-sum((data-lagdata*bhat-ahat)^2)/N
+sigmahat&lt;-sqrt(2*kappahat*s2hat/(1-bhat^2))
+#plot the data (or more accurately, the short rate)
+plot(dates[2:(N+1)],data,type=&#39;l&#39;, xlab=&quot;date&quot;, ylab=&quot;US 3M rate&quot;, main=&quot;US short rate 1952-2004&quot;)
+abline(h=thetahat, lty=3)
+text(dates[10], thetahat, &quot;thetahat&quot;)
+
+tstVAS&lt;-optim(par=c(thetahat,kappahat,sigmahat),
+              fn=VASICEKnegloglike,method = &quot;BFGS&quot;, data=obs,times=dates)
+#analyze average yield curves
+meanyield&lt;-2:7
+for(i in 1:6) meanyield[i]&lt;-mean(spliceddata[,i+1])
+plot(maturities,meanyield,type=&#39;l&#39;,ylim=c(0.05,0.068),xlim=c(0,14),
+     ylab=&quot;mean/average/typical yield&quot;,
+	 main=&quot;Typical yield curves w/ US  1952-2004 data&quot;)
+text(maturities[6],meanyield[6], &quot;Average observed yield curve&quot;)
+points(maturities,VASICEKyield(meanyield[1],maturities,tstVAS$par,riskpremium=0),type=&#39;l&#39;,lty=2)
+text(maturities[6],VASICEKyield(meanyield[1],maturities[6],tstVAS$par,riskpremium=0)+0.001,
+                       &quot;Typical Vasicek model curve, I (r0 = avr. short rate, risk premium=0) &quot;)
+points(maturities,VASICEKyield(thetahat,maturities,tstVAS$par,riskpremium=0),type=&#39;l&#39;,lty=2)
+text(maturities[6],VASICEKyield(thetahat,maturities[6],tstVAS$par,riskpremium=0)-0.0005,&quot;Typical Vasicek model curve, II (r0 = thetahat, risk premium=0) &quot;)
+
+rpfit&lt;-function(rp){
+rpfit&lt;-sum(abs(meanyield-VASICEKyield(meanyield[1],maturities,tstVAS$par,riskpremium=rp)))
+}
+
+rp&lt;-optim(par=c(0),fn=rpfit,method = &quot;BFGS&quot;)$par
+
+theory&lt;-VASICEKyield(meanyield[1],maturities,tstVAS$par,riskpremium=rp)
+points(maturities,theory,type=&#39;l&#39;,lty=2)
+
+text(maturities[6],theory[6],&quot;Typical Vasicek model curve, III (r0=avr. short rate, risk premium=&#39;what fits best&#39;) &quot;)
+
+plot(maturities,spliceddata[(N+1),2:7],type=&#39;l&#39;,ylab=&quot;yield&quot;,ylim=c(0.01,0.06),xlim=c(0,13), main=&quot;On the last day in the sample&quot;)
+
+text(maturities[6],spliceddata[(N+1),7], &quot;Observed yield curve&quot;)
+
+points(maturities,VASICEKyield(spliceddata[(N+1),3],maturities,tstVAS$par,riskpremium=rp),type=&#39;l&#39;,lty=2)
+
+text(maturities[6],VASICEKyield(spliceddata[(N+1),3],maturities[6],tstVAS$par,riskpremium=rp),&quot;Vasicek model &#39;prediction&#39; (w/ all the estimates) &quot;)</code></pre>

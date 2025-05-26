@@ -1,0 +1,90 @@
+---
+title: R数据库交互系列笔记：DBI包
+author: MatrixSpk
+date: '2014-05-19'
+slug: notes-on-DBI
+categories:
+- R
+tags:
+- R
+- DBI
+- RODBC
+- 数据库
+---
+
+
+
+<p>DBI是DataBase Interface的简称，即数据库界面。这篇笔记的主要内容是讲一讲如何用R中的DBI包来与常见数据库进行交互。</p>
+<div id="简介" class="section level3">
+<h3>1 简介</h3>
+<p>DBI定义了一个与RDBMS类型数据库进行通信的泛型接口，对于任意一个RDBMS，DBI都会有一个兼容的数据库驱动来实现对接。目前，其可用的驱动包括Oracle、MySQL和SQLite等。</p>
+<p>理论上说，DBI的泛型接口允许我们同样的代码来跟不同的RDBMS进行通信。但实际应用的时候，还要看具体的RDBMS与SQL标准的是否完全相似，以及数据库开发者开发过程中是否避免使用RDBMS特有的一些功能。</p>
+<p>下面以SQLite数据库为例说明一下。例子中用的是Affymetrix hgu95av2的微阵列芯片数据，用之前先加载相关的包。</p>
+<pre class="r"><code>library(tools)
+library(&quot;RBioinf&quot;)
+library(&quot;DBI&quot;)
+library(&quot;RSQLite&quot;)
+dbPath &lt;- &quot;hgu95av2-sqlite.db&quot;</code></pre>
+</div>
+<div id="dbi连接sqlite数据库" class="section level3">
+<h3>2 DBI连接SQLite数据库</h3>
+<p>DBI连接RDBMS需要两步。第一步，用dbDriver函数创建一个适合的数据库驱动；第二步，用dbConnect函数创建数据库连接。具体到SQLite，只需要指定包含数据库的文件夹路径即可。而对于MySQL或者Oracle，则需要指定主机地址、用户名和密码等信息。</p>
+<pre class="r"><code>drv &lt;- dbDriver(&quot;SQLite&quot;)
+db &lt;- dbConnect(drv, dbPath)
+db</code></pre>
+<p>dbDisconnect函数可以断开连接。</p>
+<pre class="r"><code>dbDisconnect(db)</code></pre>
+</div>
+<div id="查询数据库结构" class="section level3">
+<h3>3 查询数据库结构</h3>
+<p>可以用dbListTables和dbListFields函数来列出数据库中的表名以及各表对应的字段（列名）。</p>
+<pre class="r"><code>db &lt;- dbConnect(drv, dbPath)
+dbListTables(db)
+dbListFields(db, &quot;go_probe&quot;)</code></pre>
+</div>
+<div id="查询语句" class="section level3">
+<h3>4 查询语句</h3>
+<p>dbSendQuery函数可以执行任意SQL语句。返回的结果是DBI结果的子类，这个子类的结果可以用fetch函数来查询。为了节约内存，用不到的数据库查询对象可以用dbClearResult函数进行清除。</p>
+<p>fetch函数可以将查询结果转为数据框。dbColumnInfo、dbGetRowsAffected和dbGetRowCount函数可以返回更多关于查询的信息。下面分别演示。</p>
+<pre class="r"><code>sql &lt;- &quot;select affy_id, evi from go_probe&quot;
+rs &lt;- dbSendQuery(db, sql)
+rs</code></pre>
+<p>DBIResult实例包含了查询的相关信息。</p>
+<pre class="r"><code>dbColumnInfo(rs)
+dbGetStatement(rs)
+dbGetRowsAffected(rs)</code></pre>
+<p>具体的结果可用fetch函数查看。</p>
+<pre class="r"><code>chunk &lt;- fetch(rs, n = 5)
+chunk</code></pre>
+<p>dbGetRowCount函数范围所有查询结果的行数。</p>
+<pre class="r"><code>dbGetRowCount(rs)</code></pre>
+<p>当不再用某个DBIResult实例时，记得清除。</p>
+<pre class="r"><code>dbClearResult(rs)
+rs</code></pre>
+</div>
+<div id="基于查询结果构建r中的数据对象" class="section level3">
+<h3>5 基于查询结果构建R中的数据对象</h3>
+<pre class="r"><code>sql &lt;- &quot;select * from go_probe&quot;
+rs &lt;- dbSendQuery(db, sql)
+dat &lt;- fetch(rs, n = 500)
+goList &lt;- split(dat$go_id, dat$affy_id)</code></pre>
+</div>
+<div id="odbc" class="section level3">
+<h3>6 ODBC</h3>
+<p>RODBC包可以连接ODBC数据源，当然前提是安装相应的数据库驱动。R导入与导出中给出了一些使用RODBC的实例，可以供参考。用ODBC连接RDBMS时，需要指定一个ODBC数据服务，具体如何做要看所用的操作系统。</p>
+<p>RBioinf包中提供Gavin和Ho提供关于AP-MS蛋白质实验结果数据，分别给出了pcomplex.txt和pcomplex.xls两种格式，下面用它来演示下RODBC的用法。</p>
+<p>数据包括三列：bait-protein，experiment和prey-protein。下面的结果仅在Windows系统下才能重现。</p>
+<pre class="r"><code>library(&quot;RODBC&quot;)
+if (.Platform$OS.type == &quot;Windows&quot;) {
+ pcomplexXls &lt;- system.file(&quot;extdata/pcomplex.xls&quot;, package = &quot;RBioinf&quot;)
+ db &lt;- odbcConnectExcel(pcomplexXls)
+ }
+if (!is.null(db)) {
+ sqlTables(db)
+ sqlQuery(db, &quot;select * from [Sheet1$] limit 5&quot;)
+ }</code></pre>
+</div>
+<div id="参考文献" class="section level3">
+<h3>7 参考文献</h3>
+<p>Seth Falcon，How to Use DBI: Connecting to Databases with R，January 17, 2006。</p>
+</div>

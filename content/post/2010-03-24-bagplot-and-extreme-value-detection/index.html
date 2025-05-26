@@ -1,0 +1,218 @@
+---
+title: 布袋图与异常值检测
+author: MatrixSpk
+date: '2010-03-24'
+slug: bagplot-and-extreme-value-detection
+categories:
+  - 可视化
+tags:
+  - data
+  - vis
+  - extreme value
+---
+
+
+
+<p>这两天在R软件中发现了一种趣味横生的检测异常值的可视化方法叫bagplot，我翻译为“布袋图”。它首先定义一个二维数据的中心,然后，将与中心较为疏离的点定义为野值。</p>
+<p>以经典的car数据为例演示下布袋图的用法：</p>
+<pre class="r"><code>library(aplpack);
+library(rpart);
+cardata&lt;-car.test.frame[,6:7];
+par(mfrow=c(1,1))
+bagplot(cardata,verbose=F,factor=3,show.baghull=T,
+    dkmethod=2,show.loophull=T,precision=1)
+title(&quot;car data Chambers/Hastie 1992&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>可以看到图形右上角有一些偏离中心较远的点被染成了血红色，那就是布袋图眼中的野值。</p>
+<p>如果随机生成一个正态数据，对应的布袋图会是什么样子？</p>
+<pre class="r"><code>seed=222;
+set.seed(seed);
+n=200;
+data=rnorm(n,mean=0);
+datan&lt;-cbind(data,c(rnorm(n-2,mean=20),10,30));
+datan[,2]&lt;-datan[,2]*300;
+bagplot(datan,factor=3,create.plot=T,approx.limit=300,
+    show.outlier=T,show.looppoints=T,
+    show.bagpoints=T,dkmethod=2,
+    show.whiskers=T,show.loophull=T,
+    show.baghull=T,verbose=F)
+title(paste(&quot;seed: &quot;,seed,&quot;/ n: &quot;,n));</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>我们增加数据规模看看会是什么效果。</p>
+<pre class="r"><code>seed &lt;- 194
+n &lt;- 3000
+set.seed(seed)
+data &lt;- rnorm(n)
+datan&lt;-cbind(data,c(rnorm(n-2,mean=76,sd=20),105,50));
+datan[,2]&lt;-datan[,2]*300
+bagplot(datan,factor=3,create.plot=T,approx.limit=300,
+    show.outlier=T,show.looppoints=T,
+    show.bagpoints=T,dkmethod=2,
+    show.whiskers=T,show.loophull=T,
+    show.baghull=T,verbose=F)
+title(paste(&quot;seed: &quot;,seed,&quot;/ n: &quot;,n))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>像一颗海胆。</p>
+<div id="其他异常值检测方法" class="section level1">
+<h1>其他异常值检测方法</h1>
+<p>除了布袋图之外，还有很多异常值的识别方法，这些方法大致可以分为可视化方法、模型方法和经验方法三类。</p>
+<div id="可视化方法" class="section level2">
+<h2>可视化方法</h2>
+<p>可视化方法识别异常值是最直观的一种方法了。常用的图形主要包括箱线图、QQ图、直方图、密度图、小提琴图、布袋图、散点图、热力图以及局部离群因子（LOF）得分图。</p>
+<div id="箱线图" class="section level3">
+<h3>箱线图</h3>
+<pre class="r"><code># 箱线图
+boxplot(data, main = &quot;Boxplot for Outlier Detection&quot;, col = &quot;lightblue&quot;)
+# 添加异常值标记
+outliers &lt;- boxplot.stats(data)$out
+points(rep(1, length(outliers)), outliers, col = &quot;red&quot;, pch = 19)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="qq图" class="section level3">
+<h3>QQ图</h3>
+<pre class="r"><code>qqnorm(data, main = &quot;Q-Q Plot for Normality Check&quot;)
+qqline(data, col = &quot;red&quot;)
+# 标出异常值
+qq_outliers &lt;- data[abs(scale(data)) &gt; 3]
+points(which(data %in% qq_outliers), qq_outliers, col = &quot;red&quot;, pch = 19)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="直方图" class="section level3">
+<h3>直方图</h3>
+<pre class="r"><code>hist(data, breaks = 30, col = &quot;skyblue&quot;, main = &quot;Histogram with Outliers&quot;)
+abline(v = outliers, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="密度图" class="section level3">
+<h3>密度图</h3>
+<pre class="r"><code># 密度图
+plot(density(data), main = &quot;Density Plot with Outliers&quot;)
+rug(data, col = &quot;blue&quot;)
+rug(outliers, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="小提琴图" class="section level3">
+<h3>小提琴图</h3>
+<pre class="r"><code># 使用ggplot2
+library(ggplot2)
+ggplot(data.frame(value = data), aes(x = &quot;&quot;, y = value)) +
+  geom_violin(fill = &quot;lightgreen&quot;) +
+  geom_boxplot(width = 0.1, fill = &quot;orange&quot;) +
+  ggtitle(&quot;Violin Plot with Boxplot&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="布袋图" class="section level3">
+<h3>布袋图</h3>
+<p>见本文开篇内容，不赘述。</p>
+</div>
+<div id="散点图分布图" class="section level3">
+<h3>散点图/分布图</h3>
+<pre class="r"><code># 生成含异常值的双变量数据
+set.seed(123)
+x &lt;- rnorm(100)
+y &lt;- x + rnorm(100, sd = 0.5)
+x[101:102] &lt;- c(4, -3)  # 插入异常值
+y[101:102] &lt;- c(5, -4)
+
+# 基础散点图
+plot(x, y, pch = 19, col = &quot;blue&quot;, main = &quot;Scatter Plot with Outliers&quot;)
+outliers &lt;- data.frame(x = x[101:102], y = y[101:102])
+points(outliers$x, outliers$y, col = &quot;red&quot;, pch = 19)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code># 使用ggplot2
+df &lt;- data.frame(x, y)
+ggplot(df, aes(x, y)) +
+  geom_point(color = ifelse(1:nrow(df) %in% 101:102, &quot;red&quot;, &quot;blue&quot;)) +
+  ggtitle(&quot;Outliers in Scatter Plot&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code># 使用GGally包
+library(GGally)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre class="r"><code>df &lt;- data.frame(x = rnorm(100), y = rnorm(100), z = rnorm(100))
+df[101:102, ] &lt;- c(5, 5, 5)  # 插入异常值
+ggpairs(df) + 
+theme_bw() +
+ggtitle(&quot;Matrix Scatter Plot for Multivariate Outliers&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-3.png" width="672" /></p>
+</div>
+<div id="热力图" class="section level3">
+<h3>热力图</h3>
+<pre class="r"><code># 生成含异常值的矩阵数据
+mat &lt;- matrix(rnorm(100), nrow = 10)
+mat[3, 5] &lt;- 10  # 插入异常值
+heatmap(mat, Colv = NA, Rowv = NA, col = heat.colors(256), 
+        main = &quot;Heatmap with Outlier (Bright Spot)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="局部离群因子lof得分图" class="section level3">
+<h3>局部离群因子（LOF）得分图</h3>
+<pre class="r"><code># 使用DMwR2包
+library(DMwR2)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>lof_scores &lt;- lofactor(data, k = 5)  # 计算LOF得分
+plot(data, col = ifelse(lof_scores &gt; 1.5, &quot;red&quot;, &quot;blue&quot;), 
+     pch = 19, main = &quot;LOF Outlier Scores&quot;)
+legend(&quot;topright&quot;, legend = c(&quot;Outlier&quot;, &quot;Normal&quot;), 
+       col = c(&quot;red&quot;, &quot;blue&quot;), pch = 19)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+</div>
+<div id="模型方法" class="section level2">
+<h2>模型方法</h2>
+<p>模型方法主要包括统计分析方法和机器学习方法。统计分析方法主要是利用一些常见的统计量作为指标来生成一些正常值的甄别标准，以此标准来甄别异常值。</p>
+<div id="统计分析法" class="section level3">
+<h3>统计分析法</h3>
+<p>常用的统计分析方法主要包括<span class="math inline">\(3\sigma\)</span>方法和四分位距。</p>
+<div id="西格玛准则" class="section level4">
+<h4>3西格玛准则</h4>
+<p><span class="math inline">\(3\sigma\)</span> 准则的应用十分简明，即将超过均值三个标准差的数据全都视为异常值。下面看一个例子：</p>
+<pre class="r"><code># 生成示例数据
+set.seed(123)
+data &lt;- rnorm(100)
+data[20] &lt;- 10  # 插入异常值
+
+# 3西格玛准则识别
+mean_val &lt;- mean(data)
+sd_val &lt;- sd(data)
+outliers_3sigma &lt;- data[abs(data - mean_val) &gt; 3*sd_val]
+cat(&quot;3西格玛准则识别的异常值：&quot;, outliers_3sigma, &quot;\n&quot;)</code></pre>
+<pre><code>## 3西格玛准则识别的异常值： 10</code></pre>
+</div>
+<div id="四分位距" class="section level4">
+<h4>四分位距</h4>
+<p>四分位距方法是根据上四分之一分位数和下四分之一分位数生成一个正常域，把超出正常域的数值视为异常值，具体算法见代码：</p>
+<pre class="r"><code># IQR法识别
+Q1 &lt;- quantile(data, 0.25)
+Q3 &lt;- quantile(data, 0.75)
+IQR_val &lt;- Q3 - Q1
+lower_bound &lt;- Q1 - 1.5 * IQR_val
+upper_bound &lt;- Q3 + 1.5 * IQR_val
+outliers_iqr &lt;- data[data &lt; lower_bound | data &gt; upper_bound]
+cat(&quot;IQR法识别的异常值：&quot;, outliers_iqr)</code></pre>
+<pre><code>## IQR法识别的异常值： 10</code></pre>
+</div>
+</div>
+<div id="机器学习方法" class="section level3">
+<h3>机器学习方法</h3>
+<p>最常用的甄别异常值的机器学习方法是聚类分析。</p>
+<div id="聚类分析" class="section level4">
+<h4>聚类分析</h4>
+<pre class="r"><code># K-means聚类识别异常值
+data(USArrests)
+data &lt;- USArrests
+kmeans_model &lt;- kmeans(data, centers = 2)
+cluster_centers &lt;- kmeans_model$centers
+distances &lt;- sqrt(rowSums((data - cluster_centers[kmeans_model$cluster])^2))
+outliers_cluster &lt;- data[distances &gt; quantile(distances, 0.95),]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="异常值的意义和处理" class="section level1">
+<h1>异常值的意义和处理</h1>
+<p>识别异常值只是万里长征第一步。更重要的是找到异常值出现的原因，到底是录入错误还是背后有深刻的原因。如果是录入错误可以重新补正或者干脆删除了之，当然也可以进行插值处理。值得注意的是背后有驱动原因的异常值。譬如，对于上市公司的股票价格而言，每一个异常的股票价格背后可能都对应了一个值得研究学习的事件，而类似的事件如果经常发生的话，就可以利用它构建一个事件驱动策略。</p>
+</div>

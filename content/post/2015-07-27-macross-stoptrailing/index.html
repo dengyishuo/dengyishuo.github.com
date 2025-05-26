@@ -1,0 +1,144 @@
+---
+title: maCross stoptrailing
+author: MatrixSpk
+date: '2015-07-27'
+slug: macross-stoptrailing
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - quantstrat
+  - r
+---
+
+
+
+<div id="section" class="section level79">
+<p class="heading"></p>
+</div>
+<div id="a-demo-script-using-a-simple-ma-cross-strategy-with-trailing-stops-to-be" class="section level1">
+<h1>A demo script using a simple MA cross strategy, with trailing stops to be</h1>
+</div>
+<div id="used-for-a-test.-thanks-to-kvekka-for-reporting-the-bug-in-116-and-for" class="section level1">
+<h1>used for a test. Thanks to <span class="citation">@kvekka</span> for reporting the bug in #116 and for</h1>
+</div>
+<div id="contributing-this-script.-see-httpsgithub.combraverockquantstratissues116" class="section level1">
+<h1>contributing this script. See <a href="https://github.com/braverock/quantstrat/issues/116" class="uri">https://github.com/braverock/quantstrat/issues/116</a></h1>
+<div id="section-1" class="section level79">
+<p class="heading"></p>
+<p>library(quantstrat)</p>
+<p>init_date &lt;- “2017-01-01”
+start_date &lt;- “2017-01-01”
+end_date &lt;- “2018-12-31”
+init_equity &lt;- 1e4 # $10,000
+.orderqty &lt;- 100
+Sys.setenv(TZ = “UTC”)
+fast &lt;- 5
+slow &lt;- 75
+symbols &lt;- symbol &lt;- “AAPL”
+tradesize = 1e4
+currency(‘USD’)
+# getSymbols.rda(“AAPL”, dir=“quantstrat/data/AAPL.rda”)
+data(AAPL)
+# getSymbols(symbol,from=start_date, to = end_date, auto.assign = T, index.class = “POSIXct”, src = ‘yahoo’)
+# for(i in symbols)
+# assign(i, adjustOHLC(get(i),use.Adjusted=TRUE))</p>
+<p>stock(symbols, currency = “USD”, multiplier = 1)</p>
+<p>portfolio.st &lt;- “Port.Luxor”
+account.st &lt;- “Acct.Luxor”
+strategy.st &lt;- “Strat.Luxor”</p>
+<p>rm.strat(strategy.st)
+rm.strat(portfolio.st)
+rm.strat(account.st)</p>
+<p>initPortf(name = portfolio.st,
+symbols = symbols,
+initDate = init_date)</p>
+<p>initAcct(name = account.st,
+portfolios = portfolio.st,
+initDate = init_date,
+initEq = init_equity)</p>
+<p>initOrders(portfolio = portfolio.st,
+symbols = symbols,
+initDate = init_date)</p>
+<p>strategy(strategy.st, store = TRUE)</p>
+<p>add.indicator(strategy = strategy.st,
+name = “SMA”,
+arguments = list(x = quote(Cl(mktdata)),
+n = fast),
+label = “nFast”)</p>
+<p>add.indicator(strategy = strategy.st,
+name = “SMA”,
+arguments = list(x = quote(Cl(mktdata)),
+n = slow),
+label = “nSlow”)</p>
+<p>add.signal(strategy.st,
+name = “sigCrossover”,
+arguments = list(column = c(“nFast”, “nSlow”),
+relationship = “gt”),
+label = “LONG”)</p>
+<p>add.signal(strategy.st,
+name = “sigCrossover”,
+arguments = list(column = c(“nFast”, “nSlow”),
+relationship = “lt”),
+label = “SHORT”)</p>
+<p>add.rule(strategy.st,
+name = “ruleSignal”,
+arguments = list(sigcol = “LONG”,
+sigval = TRUE,
+orderside = “long”,
+ordertype = “limit”, #market/ limit
+threshold = 1/100,
+# time.in.force= 24<em>60</em>60*2,
+tmult = T,
+orderqty = 1000,
+prefer = “Open”,
+TxnFees = -10,
+orderset = “ocolong”,
+replace = F),
+type = “enter”,
+enabled = T,
+label = “EnterLONG”)</p>
+<p>add.rule(strategy = strategy.st,
+name = “ruleSignal”,
+arguments = list(sigcol = “SHORT”,
+sigval = TRUE,
+orderqty = ‘all’,
+orderside = ‘long’,
+ordertype = “market”,
+prefer = “Open”,
+TxnFees = -10,
+orderset = “ocolong”,
+replace = F),
+type = “exit”,
+enabled = T,
+parent = “EnterLONG”,
+label = “Exit2SHORT”)</p>
+<p>add.rule(strategy.st,
+name = “ruleSignal”,
+arguments = list(sigcol = “LONG”,
+sigval = TRUE,
+orderside = “long”,
+ordertype = “stoptrailing”,
+orderqty = “all”,
+prefer = “Close”,
+threshold = 2/100,
+# time.in.force= 24<em>60</em>60*1,
+tmult = T,
+TxnFees = -10,
+orderset = “ocolong”,
+replace = F),
+type = “chain”,
+parent = “EnterLONG”,
+enabled = T,
+label = “StopTrailingLONG”)</p>
+<p>applyStrategy(strategy = strategy.st, portfolios = portfolio.st)
+updatePortf(portfolio.st)
+daterange &lt;- time(getPortfolio(portfolio.st)$summary)[-1]
+updateAcct(account.st, daterange)
+updateEndEq(account.st)
+tstats &lt;- t(tradeStats(Portfolios = portfolio.st))
+chart.Posn(Portfolio = portfolio.st, Symbol = “AAPL”, TA= c(“add_SMA(n=fast, col=‘blue’)”, “add_SMA(n=slow, col=‘red’)”))</p>
+<p>#look at the order book
+obook&lt;-getOrderBook(‘Port.Luxor’)</p>
+</div>
+</div>

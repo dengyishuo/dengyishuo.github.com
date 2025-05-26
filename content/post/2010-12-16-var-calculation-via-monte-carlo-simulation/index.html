@@ -1,0 +1,504 @@
+---
+title: VaR和蒙特卡洛模拟法
+author: MatrixSpk
+date: '2010-12-16'
+slug: VaR-Calculation-via-MonteCarlo-Simulation
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - 风险度量
+  - VaR
+  - r
+---
+
+
+
+<div id="蒙特卡洛模拟法" class="section level2">
+<h2>蒙特卡洛模拟法</h2>
+<p>蒙特卡洛模拟法是一种基于随机抽样和统计模拟的数值计算方法，其通过生成大量随机样本，利用概率统计理论估计复杂问题的近似解。该方法由数学家冯·诺伊曼和乌拉姆于20世纪40年代在核武器研制项目中首次提出。蒙特卡洛模拟法也可以用来计算投资组合的VaR。</p>
+<p>在应用蒙特卡洛模拟法计算VaR时，首先根据投资组合的历史特征，总结投资组合收益率对应的可能分布并提取该分布对应的核心参数；再以这些核心参数为基础，结合特定分布模拟出一系列符合要求的伪随机数作为假想的未来数据；最后，以这些“假想的未来数据”作为研究对象计算出VaR值。</p>
+</div>
+<div id="蒙特卡洛模拟法计算单资产var" class="section level2">
+<h2>蒙特卡洛模拟法计算单资产VaR</h2>
+<p>基于R语言应用蒙特卡洛模拟法计算VaR的代码如下:</p>
+<pre class="r"><code># 加载必要包
+if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)</code></pre>
+<pre><code>## Loading required package: quantmod</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>if (!require(&quot;MASS&quot;)) install.packages(&quot;MASS&quot;)</code></pre>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre class="r"><code>library(quantmod)
+library(MASS)
+library(dplyr)</code></pre>
+<pre><code>## 
+## ######################### Warning from &#39;xts&#39; package ##########################
+## #                                                                             #
+## # The dplyr lag() function breaks how base R&#39;s lag() function is supposed to  #
+## # work, which breaks lag(my_xts). Calls to lag(my_xts) that you type or       #
+## # source() into this session won&#39;t work correctly.                            #
+## #                                                                             #
+## # Use stats::lag() to make sure you&#39;re not using dplyr::lag(), or you can add #
+## # conflictRules(&#39;dplyr&#39;, exclude = &#39;lag&#39;) to your .Rprofile to stop           #
+## # dplyr from breaking base R&#39;s lag() function.                                #
+## #                                                                             #
+## # Code in packages is not affected. It&#39;s protected by R&#39;s namespace mechanism #
+## # Set `options(xts.warn_dplyr_breaks_lag = FALSE)` to suppress this warning.  #
+## #                                                                             #
+## ###############################################################################</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:MASS&#39;:
+## 
+##     select</code></pre>
+<pre><code>## The following objects are masked from &#39;package:xts&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code># 获取苹果公司股票数据（过去2年）
+getSymbols(&quot;AAPL&quot;, src = &quot;yahoo&quot;, from = as.Date(&quot;2023-05-01&quot;), to = as.Date(Sys.Date()))</code></pre>
+<pre><code>## [1] &quot;AAPL&quot;</code></pre>
+<pre class="r"><code># 计算对数收益率
+returns &lt;- na.omit(ROC(Cl(AAPL)))  
+colnames(returns) &lt;- &quot;AAPL_Return&quot;
+
+# 参数设置
+set.seed(123)
+n_sim &lt;- 10000  # 模拟次数
+confidence_level &lt;- 0.95
+portfolio_value &lt;- 1e6  # 组合价值100万美元
+
+# 估计收益率参数
+mu &lt;- mean(returns)
+sigma &lt;- sd(returns)
+
+# 蒙特卡洛模拟（正态分布）
+sim_normal &lt;- rnorm(n_sim, mean = mu, sd = sigma)
+portfolio_loss_normal &lt;- portfolio_value * (1 - exp(sim_normal))  # 对数收益转换为价格变动
+
+# 蒙特卡洛模拟（t分布）
+
+# 计算VaR
+var_normal &lt;- quantile(portfolio_loss_normal, probs = confidence_level)
+
+# 格式化输出
+cat(&quot;蒙特卡洛模拟VaR（正态分布假设）:&quot;, round(var_normal, 2), &quot;USD\n&quot;)</code></pre>
+<pre><code>## 蒙特卡洛模拟VaR（正态分布假设）: 27234.9 USD</code></pre>
+<pre class="r"><code># 可视化比较
+hist(portfolio_loss_normal, breaks = 50, main = &quot;正态分布模拟损失&quot;, 
+     xlab = &quot;损失金额(USD)&quot;, col = &quot;lightblue&quot;)
+abline(v = var_normal, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/single-1.png" width="672" /></p>
+<p>也可以将模拟的分布确定为以下分布：</p>
+<ul>
+<li>偏正态分布</li>
+<li>偏t分布</li>
+<li>广义误差分布</li>
+<li>偏广义误差分布</li>
+<li>混合正态分布</li>
+</ul>
+</div>
+<div id="蒙特卡洛模拟计算多资产投资组合var" class="section level2">
+<h2>蒙特卡洛模拟计算多资产投资组合VaR</h2>
+<p>蒙特卡洛模拟通过以下步骤实现多资产VaR计算:</p>
+<ul>
+<li>历史数据获取：通过quantmod获取真实资产价格数据</li>
+<li>参数估计：计算资产收益率的均值向量和协方差矩阵</li>
+<li>路径生成：生成服从多元正态分布的模拟收益率路径</li>
+<li>组合估值：根据权重计算组合价值变化</li>
+<li>损失分布：统计模拟损失的分位数得到VaR</li>
+</ul>
+<pre class="r"><code>## 环境配置与数据获取
+# ----------------------
+# 加载必要包
+# ----------------------
+library(ggplot2)
+# library(foreach)
+# library(doParallel)
+library(Matrix)
+library(matrixcalc)
+
+# ----------------------
+# 参数设置
+# ----------------------
+symbols &lt;- c(&quot;AAPL&quot;, &quot;GOOG&quot;, &quot;MSFT&quot;, &quot;AMZN&quot;)  # 资产列表
+weights &lt;- c(0.3, 0.3, 0.2, 0.2)              # 投资权重
+V0 &lt;- 1000000                                 # 初始组合价值（美元）
+n_sim &lt;- 100000                               # 模拟次数
+alpha &lt;- 0.99                                 # 置信水平
+T_days &lt;- 10                                  # 持有期（天）
+start_date &lt;- &quot;2020-01-01&quot;
+end_date &lt;- format(Sys.Date(), &quot;%Y-%m-%d&quot;)    # 动态获取最新数据
+
+# ----------------------
+# 获取真实历史数据
+# ----------------------
+getSymbols(symbols, src = &quot;yahoo&quot;, from = start_date, to = end_date)</code></pre>
+<pre><code>## [1] &quot;AAPL&quot; &quot;GOOG&quot; &quot;MSFT&quot; &quot;AMZN&quot;</code></pre>
+<pre class="r"><code># 提取调整后收盘价并计算日收益率
+prices &lt;- do.call(merge, lapply(symbols, function(x) Ad(get(x))))
+# 替换原returns计算代码
+returns &lt;- ROC(prices, type = &quot;discrete&quot;)
+
+# 添加数据清洗
+returns&lt;- apply(returns, 2, function(x) {
+  x[is.infinite(x)] &lt;- NA
+  na.omit(x)
+})
+
+# 验证数据完整性
+if (any(is.na(returns)) || any(is.infinite(returns))) {
+  stop(&quot;数据清洗失败，仍存在缺失值或无穷值&quot;)
+}
+
+  
+## 参数估计与路径生成（增强）
+
+# ----------------------
+# 计算统计参数（带时间调整）
+# ----------------------
+mu &lt;- colMeans(returns) * T_days              # 持有期收益率均值
+sigma &lt;- cov(returns) * T_days
+
+robust_sigma &lt;- function(sigma, eps=1e-8) {
+  eig &lt;- eigen(sigma)
+  ev &lt;- pmax(eig$values, eps)  # 特征值下限保护
+  sigma_robust &lt;- eig$vectors %*% diag(ev) %*% t(eig$vectors)
+  return(as.matrix(nearPD(sigma_robust, keepDiag=TRUE)$mat))
+}
+
+sigma &lt;- robust_sigma(sigma)
+
+# 协方差矩阵正定性修正
+# 矩阵条件数校验
+if (kappa(sigma) &gt; 1e6) warning(&quot;协方差矩阵条件数过高，建议降维处理&quot;)
+
+# 特征值范围验证
+eigen_values &lt;- eigen(sigma)$values
+if (min(eigen_values) &lt; 1e-6) stop(&quot;矩阵修正失败&quot;)
+
+# ----------------------
+# 蒙特卡洛模拟
+# ----------------------
+set.seed(123)
+
+sim_returns &lt;- MASS::mvrnorm(n_sim, mu, sigma)
+portfolio_returns &lt;- sim_returns %*% weights
+losses &lt;- -V0 * portfolio_returns
+
+# ----------------------
+# 三维可视化（带ES标注）
+# ----------------------
+### 风险指标计算与可视化（最终修正版）
+
+# ----------------------
+# 风险指标计算
+# ----------------------
+VaR &lt;- quantile(losses, probs=alpha,na.rm=TRUE)
+ES &lt;- mean(losses[losses &gt;= VaR])
+
+# ----------------------
+# 增强可视化
+# ----------------------
+
+# 生成精确breaks参数
+br &lt;- pretty(range(losses), n=100)
+if (length(br) &lt; 2) br &lt;- seq(min(losses), max(losses), length.out=100)
+
+loss_plot &lt;- ggplot(data.frame(Loss=losses), aes(x=Loss)) +
+  geom_histogram(aes(y=..density..), breaks=br, fill=&quot;#69b3a2&quot;, alpha=0.7) +
+  geom_vline(xintercept=VaR, color=&quot;red&quot;, linetype=&quot;dashed&quot;, size=1) +
+  geom_vline(xintercept=ES, color=&quot;blue&quot;, linetype=&quot;dotted&quot;, size=1) +
+  geom_density(color=&quot;darkblue&quot;, size=0.8, adjust=1.5) +  # 调整核密度估计带宽
+  labs(title=paste(&quot;多资产组合损失分布 (&quot;,T_days,&quot;天持有期)&quot;),
+       x=&quot;损失金额（美元）&quot;, y=&quot;密度&quot;) +
+  theme_minimal(base_size=12) +
+  theme(
+    plot.title=element_text(hjust=0.5, face=&quot;bold&quot;),
+    panel.grid.major=element_line(color=&quot;gray90&quot;),
+    panel.grid.minor=element_blank()
+  )</code></pre>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<pre class="r"><code># 动态计算标注位置
+plot_data &lt;- ggplot_build(loss_plot)</code></pre>
+<pre><code>## Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+## ℹ Please use `after_stat(density)` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<pre class="r"><code>max_density &lt;- max(plot_data$data[[1]]$density)
+
+loss_plot &lt;- loss_plot +
+  annotate(&quot;segment&quot;, 
+           x=VaR, xend=VaR, 
+           y=0, yend=0.65*max_density,
+           color=&quot;red&quot;, linetype=&quot;dashed&quot;) +
+  annotate(&quot;label&quot;, 
+           x=VaR, y=0.7*max_density,
+           label=paste0(alpha*100, &quot;% VaR\n$&quot;, format(round(VaR), big.mark=&quot;,&quot;)),
+           color=&quot;red&quot;, fill=&quot;white&quot;, size=4) +
+  annotate(&quot;segment&quot;,
+           x=ES, xend=ES,
+           y=0, yend=0.55*max_density,
+           color=&quot;blue&quot;, linetype=&quot;dotted&quot;) +
+  annotate(&quot;label&quot;,
+           x=ES, y=0.6*max_density,
+           label=paste0(&quot;Expected Shortfall\n$&quot;, format(round(ES), big.mark=&quot;,&quot;)),
+           color=&quot;blue&quot;, fill=&quot;white&quot;, size=4)
+
+print(loss_plot)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/trible-1.png" width="672" /></p>
+<pre class="r"><code># ----------------------
+# 结果输出
+# ----------------------
+cat(sprintf(&quot;\n【增强版蒙特卡洛模拟结果】(%d天持有期)\n&quot;, T_days))</code></pre>
+<pre><code>## 
+## 【增强版蒙特卡洛模拟结果】(10天持有期)</code></pre>
+<pre class="r"><code>cat(&quot;----------------------------------------\n&quot;)</code></pre>
+<pre><code>## ----------------------------------------</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;▪ 投资组合规模: $%s\n&quot;, format(V0, big.mark=&quot;,&quot;)))</code></pre>
+<pre><code>## ▪ 投资组合规模: $1e+06</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;▪ VaR(%d%%置信水平): $%s\n&quot;, alpha*100, format(round(VaR), big.mark=&quot;,&quot;)))</code></pre>
+<pre><code>## ▪ VaR(99%置信水平): $124,301</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;▪ 预期损失(ES): $%s\n&quot;, format(round(ES), big.mark=&quot;,&quot;)))</code></pre>
+<pre><code>## ▪ 预期损失(ES): $143,105</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;▪ 最大可能损失: $%s\n&quot;, format(round(max(losses)), big.mark=&quot;,&quot;)))</code></pre>
+<pre><code>## ▪ 最大可能损失: $237,342</code></pre>
+</div>
+<div id="基于混合多元正态分布优化蒙特卡洛模拟法" class="section level2">
+<h2>基于混合多元正态分布优化蒙特卡洛模拟法</h2>
+<p>混合多元正态分布可通过组合多个多元正态分布刻画不同市场状态下资产收益率的动态相关性和厚尾特征，适用于多资产组合的VaR计算。</p>
+<p>在置信水平 <span class="math inline">\(\alpha\)</span> 下，多元混合正态模型的分位数 <span class="math inline">\(Q_{\alpha}\)</span> 满足以下等式：</p>
+<p><span class="math display">\[
+\sum_{i=1}^k \pi_i \cdot \Phi\left(Q_\alpha \,;\, \mu_p^{(i)}, \sigma_p^{(i)}\right) = \alpha  
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\pi_i\)</span>: 第 <span class="math inline">\(i\)</span> 个混合成分的权重（<span class="math inline">\(\sum_{i=1}^k \pi_i = 1\)</span>）；<br />
+</li>
+<li><span class="math inline">\(\mu_p^{(i)} = \mathbf{w}^\top \boldsymbol{\mu}_i\)</span>: 第 <span class="math inline">\(i\)</span>个成分的线性组合均值（<span class="math inline">\(\mathbf{w}\)</span> 为资产权重向量，<span class="math inline">\(\boldsymbol{\mu}_i\)</span> 为成分均值向量）；<br />
+</li>
+<li><span class="math inline">\(\sigma_p^{(i)} = \sqrt{\mathbf{w}^\top \boldsymbol{\Sigma}_i \mathbf{w}}\)</span>: 第 <span class="math inline">\(i\)</span> 个成分的线性组合标准差（<span class="math inline">\(\boldsymbol{\Sigma}_i\)</span> 为成分协方差矩阵）；<br />
+</li>
+<li><span class="math inline">\(\Phi(\cdot)\)</span>: 标准单变量正态分布的累积分布函数（CDF）</li>
+</ul>
+<pre class="r"><code># 加载包
+library(quantmod)
+library(mclust)</code></pre>
+<pre><code>## Package &#39;mclust&#39; version 6.1.1
+## Type &#39;citation(&quot;mclust&quot;)&#39; for citing this R package in publications.</code></pre>
+<pre class="r"><code>library(MASS)
+library(Matrix)
+library(matrixcalc)
+library(dplyr)
+library(showtext)</code></pre>
+<pre><code>## Loading required package: sysfonts</code></pre>
+<pre><code>## Loading required package: showtextdb</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(DescTools)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;DescTools&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:mclust&#39;:
+## 
+##     BrierScore</code></pre>
+<pre class="r"><code># 参数设置
+symbols &lt;- c(&quot;AAPL&quot;, &quot;GOOG&quot;, &quot;MSFT&quot;)
+weights &lt;- c(0.4, 0.3, 0.3)
+portfolio_value &lt;- 1e6
+confidence_level &lt;- 0.95
+
+# 数据获取与处理
+getSymbols(symbols, from = &quot;2020-01-01&quot;, to = Sys.Date())</code></pre>
+<pre><code>## [1] &quot;AAPL&quot; &quot;GOOG&quot; &quot;MSFT&quot;</code></pre>
+<pre class="r"><code>prices &lt;- do.call(merge, lapply(symbols, function(x) Cl(get(x))))
+returns &lt;- ROC(prices,type = &quot;discrete&quot;) %&gt;% na.omit() %&gt;% as.matrix()
+
+# 混合模型拟合与修正
+set.seed(123)
+mix_model &lt;- Mclust(returns, G = 2)
+
+# 提取并修正模型参数
+weights_mix &lt;- mix_model$parameters$pro
+means_mix &lt;- mix_model$parameters$mean
+
+# 检查混合模型协方差参数维度
+sigma_dim &lt;- dim(mix_model$parameters$variance$sigma)
+cat(&quot;Sigma参数维度:&quot;, sigma_dim, &quot;\n&quot;)</code></pre>
+<pre><code>## Sigma参数维度: 3 3 2</code></pre>
+<pre class="r"><code># 确认模型类型是否兼容
+if (mix_model$modelName != &quot;VVV&quot;) {
+  warning(&quot;当前模型&quot;, mix_model$modelName, 
+          &quot;可能使用共享协方差矩阵结构，需调整修正逻辑&quot;)
+}
+
+
+
+covs_mix &lt;- lapply(1:mix_model$G, function(g) {
+  # 提取第g个成分的协方差矩阵
+  sigma &lt;- mix_model$parameters$variance$sigma[,,g]
+  
+  # 验证矩阵维度
+  if (!matrixcalc::is.square.matrix(sigma)) {
+    stop(paste(&quot;成分&quot;, g, &quot;协方差矩阵非正方形，维度:&quot;, 
+              paste(dim(sigma), collapse=&quot;x&quot;)))
+  }
+  
+  # 特征值修正
+  eig &lt;- eigen(sigma)
+  ev &lt;- pmax(eig$values, 1e-6)
+  sigma_corrected &lt;- eig$vectors %*% diag(ev) %*% t(eig$vectors)
+  as.matrix(nearPD(sigma_corrected)$mat)
+})
+
+# 增强型修正函数
+robust_cov_fix &lt;- function(sigma) {
+  if (!is.matrix(sigma) || nrow(sigma) != ncol(sigma)) {
+    sigma &lt;- matrix(sigma, nrow=sqrt(length(sigma)))  # 向量转矩阵
+  }
+  
+  # 添加对称性强制修正
+  sigma &lt;- 0.5 * (sigma + t(sigma))
+  
+  # 执行特征值修正
+  eig &lt;- eigen(sigma)
+  ev &lt;- pmax(eig$values, 1e-6)
+  eig$vectors %*% diag(ev) %*% t(eig$vectors)
+}
+
+# 应用修正函数
+covs_mix &lt;- lapply(1:mix_model$G, function(g) {
+  as.matrix(nearPD(
+    robust_cov_fix(mix_model$parameters$variance$sigma[,,g])
+  )$mat)
+})
+
+# 验证所有协方差矩阵性质
+sapply(covs_mix, function(x) {
+  c(dim=dim(x), isSquare=matrixcalc::is.square.matrix(x))
+})  # 维度应统一为NxN</code></pre>
+<pre><code>##          [,1] [,2]
+## dim1        3    3
+## dim2        3    3
+## isSquare    1    1</code></pre>
+<pre class="r"><code># 检查正定性
+sapply(covs_mix, matrixcalc::is.positive.definite)  # 应全为TRUE</code></pre>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<pre class="r"><code># 安全模拟函数
+safe_mvrnorm &lt;- function(n, mu, sigma) {
+  sigma_fixed &lt;- as.matrix(nearPD(sigma)$mat)
+  MASS::mvrnorm(n, mu, sigma_fixed)
+}
+
+# 蒙特卡洛模拟
+n_sim &lt;- 10000
+sim_returns &lt;- matrix(0, nrow = n_sim, ncol = 3)
+
+for (i in 1:n_sim) {
+  component &lt;- sample(1:length(weights_mix), 1, prob = weights_mix)
+  sim_returns[i, ] &lt;- safe_mvrnorm(1, 
+                                  means_mix[, component], 
+                                  covs_mix[[component]])
+}
+
+# 查看模拟结果摘要
+summary(sim_returns)  # 不应有NA或极端值</code></pre>
+<pre><code>##        V1                  V2                   V3            
+##  Min.   :-0.131830   Min.   :-0.1257738   Min.   :-0.1237321  
+##  1st Qu.:-0.010104   1st Qu.:-0.0103409   1st Qu.:-0.0097094  
+##  Median : 0.001295   Median : 0.0009476   Median : 0.0008647  
+##  Mean   : 0.001201   Mean   : 0.0009752   Mean   : 0.0009755  
+##  3rd Qu.: 0.012592   3rd Qu.: 0.0121794   3rd Qu.: 0.0114663  
+##  Max.   : 0.128666   Max.   : 0.1216745   Max.   : 0.1163181</code></pre>
+<pre class="r"><code># 计算VaR
+portfolio_returns &lt;- sim_returns %*% weights
+
+portfolio_returns &lt;- na.omit(portfolio_returns)  # 移除缺失值
+if (sd(portfolio_returns) &lt; 1e-6) stop(&quot;收益波动率过低，无法生成有效分布&quot;)
+
+# Winsorize处理极端值
+
+portfolio_returns &lt;- Winsorize(portfolio_returns)
+losses &lt;- -portfolio_value * portfolio_returns
+# 计算VaR和ES
+VaR &lt;- quantile(losses, 1 - confidence_level)
+ES &lt;- mean(losses[losses &lt;= VaR])
+
+# 生成自适应breaks
+br &lt;- pretty(range(portfolio_returns), n = 100)
+if (length(br) &lt; 10) br &lt;- seq(min(portfolio_returns), max(portfolio_returns), length.out=100)
+
+
+cat(&quot;95% VaR:&quot;, round(VaR, 2), &quot;元\n&quot;)</code></pre>
+<pre><code>## 95% VaR: -28414.95 元</code></pre>
+<pre class="r"><code>cat(&quot;95% ES:&quot;,round(ES, 2),&quot;元\n&quot;)</code></pre>
+<pre><code>## 95% ES: -28415.35 元</code></pre>
+<pre class="r"><code># 验证VaR计算合理性
+cat(&quot;VaR占组合比例:&quot;, round(VaR/portfolio_value*100, 2), &quot;%\n&quot;) </code></pre>
+<pre><code>## VaR占组合比例: -2.84 %</code></pre>
+<pre class="r"><code>cat(&quot;ES占组合比例:&quot;, round(ES/portfolio_value*100,2),&quot;%\n&quot;)</code></pre>
+<pre><code>## ES占组合比例: -2.84 %</code></pre>
+<pre class="r"><code># 正常范围通常在1%-10%之间
+
+showtext_auto()  # 启用中文字体支持
+
+# 计算VaR和ES的标签文本
+var_label &lt;- paste0(confidence_level*100, &quot;% VaR: ¥&quot;, format(round(VaR), big.mark = &quot;,&quot;))
+es_label &lt;- paste0(confidence_level*100, &quot;% ES: ¥&quot;, format(round(ES), big.mark = &quot;,&quot;))
+
+# 生成风险可视化图表
+loss_plot &lt;- ggplot(data.frame(losses), aes(x = losses)) +
+  geom_histogram(aes(y = after_stat(density)),  
+                 fill = &quot;#6baed6&quot;, alpha = 0.7, color = &quot;white&quot;) +  # 优化填充色并添加边框
+  geom_vline(aes(xintercept = VaR, color = &quot;VaR&quot;), 
+             linetype = &quot;dashed&quot;, linewidth = 1.2) +
+  geom_vline(aes(xintercept = ES, color = &quot;ES&quot;), 
+             linetype = &quot;dotdash&quot;, linewidth = 1.2) +  # 添加ES线
+  annotate(&quot;text&quot;, x = VaR, y = Inf, label = var_label,  # 使用annotate固定标签位置
+           color = &quot;#de2d26&quot;, vjust = 2.5, size = 5, family = &quot;sans&quot;) +
+  annotate(&quot;text&quot;, x = ES, y = Inf, label = es_label,
+           color = &quot;#3182bd&quot;, vjust = 4.5, size = 5, family = &quot;sans&quot;) +
+  scale_color_manual(name = &quot;风险指标&quot;,
+                     values = c(&quot;VaR&quot; = &quot;#de2d26&quot;, &quot;ES&quot; = &quot;#3182bd&quot;),
+                     guide = guide_legend(override.aes = list(
+                       linetype = c(&quot;dashed&quot;, &quot;dotdash&quot;)))) +
+  labs(title = &quot;投资组合风险价值分布可视化&quot;,
+       subtitle = paste(&quot;基于&quot;, length(symbols), &quot;资产混合正态模型蒙特卡洛模拟&quot;),
+       x = &quot;潜在损失金额 (元)&quot;, y = &quot;概率密度&quot;) +
+  theme_minimal(base_size = 14) +
+  theme(
+    text = element_text(family = &quot;sans&quot;),  # 确保中文字体显示
+    plot.title = element_text(hjust = 0.5, face = &quot;bold&quot;, size = 18),
+    plot.subtitle = element_text(hjust = 0.5, color = &quot;gray40&quot;, size = 12),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(color = &quot;gray30&quot;),
+    panel.grid.major = element_line(color = &quot;grey90&quot;, linewidth = 0.3),
+    panel.grid.minor = element_blank(),  # 移除次要网格线
+    legend.position = &quot;top&quot;,
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    plot.margin = margin(1, 1, 1, 1, &quot;cm&quot;)
+  ) +
+  coord_cartesian(clip = &quot;off&quot;)  # 允许标签超出绘图区域
+
+print(loss_plot)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mixed-1.png" width="672" /></p>
+</div>

@@ -1,0 +1,157 @@
+---
+title: 'macd '
+author: MatrixSpk
+date: '2015-08-10'
+slug: macd
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - macd
+---
+
+
+
+<div id="simple-macd-strategy" class="section level1">
+<h1>Simple MACD strategy</h1>
+</div>
+<div id="section" class="section level1">
+<h1></h1>
+</div>
+<div id="macd-may-be-used-in-many-ways-this-will-demonstrate-a-trend-indicator." class="section level1">
+<h1>MACD may be used in many ways, this will demonstrate a trend indicator.</h1>
+</div>
+<div id="section-1" class="section level1">
+<h1></h1>
+</div>
+<div id="traditionally-when-the-macd-signal-crosses-zero-this-indicated-a-establishment-of-a-positive-trend" class="section level1">
+<h1>traditionally, when the MACD signal crosses zero, this indicated a establishment of a positive trend</h1>
+</div>
+<div id="section-2" class="section level1">
+<h1></h1>
+</div>
+<div id="well-buy-on-positive-treshold-crossover-of-the-signal-column-and-sell-on-negative-threshold-crossover" class="section level1">
+<h1>we’ll buy on positive treshold crossover of the ‘signal’ column, and sell on negative threshold crossover</h1>
+</div>
+<div id="section-3" class="section level1">
+<h1></h1>
+</div>
+<div id="author-brian" class="section level1">
+<h1>Author: brian</h1>
+<div id="section-4" class="section level79">
+<p class="heading"></p>
+<p>require(quantstrat)
+suppressWarnings(rm(“order_book.macd”,pos=.strategy))
+suppressWarnings(rm(“account.macd”,“portfolio.macd”,pos=.blotter))
+suppressWarnings(rm(“account.st”,“portfolio.st”,“stock.str”,“stratMACD”,“startDate”,“initEq”,‘start_t’,‘end_t’))</p>
+<p>#correct for TZ issues if they crop up
+oldtz&lt;-Sys.getenv(‘TZ’)
+if(oldtz==’’) {
+Sys.setenv(TZ=“GMT”)
+}</p>
+<p>stock.str=‘AAPL’ # what are we trying it on</p>
+<p>#MA parameters for MACD
+fastMA = 12
+slowMA = 26
+signalMA = 9
+maType=“EMA”</p>
+<p>currency(‘USD’)
+stock(stock.str,currency=‘USD’,multiplier=1)</p>
+<p>#or use fake data
+#stock.str=‘sample_matrix’ # what are we trying it on
+#data(sample_matrix) # data included in package xts
+#sample_matrix&lt;-as.xts(sample_matrix)</p>
+<p>startDate=‘2006-12-31’
+initEq=1000000
+portfolio.st=‘macd’
+account.st=‘macd’</p>
+<p>initPortf(portfolio.st,symbols=stock.str)
+initAcct(account.st,portfolios=portfolio.st)
+initOrders(portfolio=portfolio.st)</p>
+<p>strat.st&lt;-portfolio.st
+# define the strategy
+strategy(strat.st, store=TRUE)</p>
+<p>#one indicator
+add.indicator(strat.st, name = “MACD”,
+arguments = list(x=quote(Cl(mktdata)),
+nFast=fastMA,
+nSlow=slowMA),
+label=’_’
+)</p>
+<p>#two signals
+add.signal(strat.st,name=“sigThreshold”,
+arguments = list(column=“signal._”,
+relationship=“gt”,
+threshold=0,
+cross=TRUE),
+label=“signal.gt.zero”
+)</p>
+<p>add.signal(strat.st,name=“sigThreshold”,
+arguments = list(column=“signal._”,
+relationship=“lt”,
+threshold=0,
+cross=TRUE),
+label=“signal.lt.zero”
+)</p>
+</div>
+<div id="section-5" class="section level4">
+<h4></h4>
+</div>
+</div>
+<div id="add-rules" class="section level1">
+<h1>add rules</h1>
+</div>
+<div id="entry" class="section level1">
+<h1>entry</h1>
+<p>add.rule(strat.st,name=‘ruleSignal’,
+arguments = list(sigcol=“signal.gt.zero”,
+sigval=TRUE,
+orderqty=100,
+ordertype=‘market’,
+orderside=‘long’,
+threshold=NULL),
+type=‘enter’,
+label=‘enter’,
+storefun=FALSE
+)</p>
+<p>#alternatives for risk stops:
+# simple stoplimit order, with threshold multiplier
+#add.rule(strat.st,name=‘ruleSignal’, arguments = list(sigcol=“signal.gt.zero”,sigval=TRUE, orderqty=‘all’, ordertype=‘stoplimit’, orderside=‘long’, threshold=-.05,tmult=TRUE, orderset=‘exit2’),type=‘chain’, parent=‘enter’, label=‘risk’,storefun=FALSE)
+# alternately, use a trailing order, also with a threshold multiplier
+#add.rule(strat.st,name=‘ruleSignal’, arguments = list(sigcol=“signal.gt.zero”,sigval=TRUE, orderqty=‘all’, ordertype=‘stoptrailing’, orderside=‘long’, threshold=-1,tmult=FALSE, orderset=‘exit2’), type=‘chain’, parent=‘enter’, label=‘trailingexit’)</p>
+</div>
+<div id="exit" class="section level1">
+<h1>exit</h1>
+<p>add.rule(strat.st,name=‘ruleSignal’,
+arguments = list(sigcol=“signal.lt.zero”,
+sigval=TRUE,
+orderqty=‘all’,
+ordertype=‘market’,
+orderside=‘long’,
+threshold=NULL,
+orderset=‘exit2’),
+type=‘exit’,
+label=‘exit’
+)</p>
+<p>#end rules
+####</p>
+<p>getSymbols(stock.str,from=startDate, to=‘2014-06-01’, src=‘yahoo’)
+start_t&lt;-Sys.time()
+out&lt;-applyStrategy(strat.st , portfolios=portfolio.st,parameters=list(nFast=fastMA, nSlow=slowMA, nSig=signalMA,maType=maType),verbose=TRUE)
+end_t&lt;-Sys.time()
+print(end_t-start_t)</p>
+<p>start_t&lt;-Sys.time()
+updatePortf(Portfolio=portfolio.st,Dates=paste(‘::’,as.Date(Sys.time()),sep=’’))
+end_t&lt;-Sys.time()
+print(“trade blotter portfolio update:”)
+print(end_t-start_t)</p>
+<p>chart.Posn(Portfolio=portfolio.st,Symbol=stock.str)
+plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA,maType=“EMA”))</p>
+<p>#look at the order book
+obook&lt;-getOrderBook(‘macd’)</p>
+</div>
+<div id="set-tz-as-it-was-before-the-demo" class="section level1">
+<h1>set tz as it was before the demo</h1>
+<p>Sys.setenv(TZ=oldtz)</p>
+</div>

@@ -1,0 +1,229 @@
+---
+title: R语言绘制维恩图
+author: MatrixSpk
+date: '2011-08-28'
+slug: venn
+categories:
+- R
+tags:
+- r
+- 韦恩图
+---
+
+
+
+<p>很久之前整理的关于R绘制维恩图的资料，虽然，用R绘制维恩图并不是很常见，还是记下一笔，以备需要者参考。</p>
+<pre class="r"><code># Gplots包
+library(gplots)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gplots&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     lowess</code></pre>
+<pre class="r"><code>A&lt;- 1:20
+B&lt;- 1:20
+C&lt;- 2:20
+D&lt;- 3:21
+
+input&lt;-list(A,B,C,D)
+input</code></pre>
+<pre><code>## [[1]]
+##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+## 
+## [[2]]
+##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+## 
+## [[3]]
+##  [1]  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+## 
+## [[4]]
+##  [1]  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21</code></pre>
+<pre class="r"><code>venn(input)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>A&lt;- as.logical(rbinom(100, 1, 0.2))
+B&lt;- as.logical(rbinom(100, 1, 0.7))
+C&lt;- as.logical(rbinom(100, 1, 0.2))
+D&lt;- as.logical(rbinom(100, 1, 0.1))
+
+input&lt;-data.frame(A,B,C,D)
+venn(input)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code>tmp &lt;- venn(input, simplify=TRUE)</code></pre>
+<pre><code>## Warning in drawVennDiagram(data = counts, small = small, showSetLogicLabel = showSetLogicLabel, : Not shown: 0101 contains 5</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<pre class="r"><code>tmp</code></pre>
+<pre><code>##      num A B C D
+## 0000   0 0 0 0 0
+## 0001   2 0 0 0 1
+## 0010   4 0 0 1 0
+## 0011   0 0 0 1 1
+## 0100  38 0 1 0 0
+## 0101   5 0 1 0 1
+## 0110  11 0 1 1 0
+## 0111   2 0 1 1 1
+## 1000   5 1 0 0 0
+## 1001   1 1 0 0 1
+## 1010   0 1 0 1 0
+## 1011   0 1 0 1 1
+## 1100   9 1 1 0 0
+## 1101   0 1 1 0 1
+## 1110   3 1 1 1 0
+## 1111   0 1 1 1 1
+## attr(,&quot;intersections&quot;)
+## attr(,&quot;intersections&quot;)$A
+## [1] &quot;20&quot; &quot;25&quot; &quot;31&quot; &quot;42&quot; &quot;55&quot;
+## 
+## attr(,&quot;intersections&quot;)$B
+##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;7&quot;  &quot;9&quot;  &quot;10&quot; &quot;21&quot; &quot;23&quot; &quot;27&quot; &quot;28&quot; &quot;29&quot; &quot;35&quot; &quot;39&quot;
+## [16] &quot;43&quot; &quot;44&quot; &quot;46&quot; &quot;47&quot; &quot;50&quot; &quot;51&quot; &quot;54&quot; &quot;57&quot; &quot;59&quot; &quot;63&quot; &quot;71&quot; &quot;72&quot; &quot;74&quot; &quot;75&quot; &quot;76&quot;
+## [31] &quot;78&quot; &quot;79&quot; &quot;86&quot; &quot;87&quot; &quot;88&quot; &quot;93&quot; &quot;96&quot; &quot;97&quot;
+## 
+## attr(,&quot;intersections&quot;)$C
+## [1] &quot;16&quot; &quot;49&quot; &quot;61&quot; &quot;66&quot;
+## 
+## attr(,&quot;intersections&quot;)$D
+## [1] &quot;30&quot; &quot;38&quot;
+## 
+## attr(,&quot;intersections&quot;)$`A:B`
+## [1] &quot;24&quot; &quot;33&quot; &quot;53&quot; &quot;58&quot; &quot;64&quot; &quot;69&quot; &quot;83&quot; &quot;91&quot; &quot;92&quot;
+## 
+## attr(,&quot;intersections&quot;)$`A:D`
+## [1] &quot;81&quot;
+## 
+## attr(,&quot;intersections&quot;)$`B:C`
+##  [1] &quot;14&quot; &quot;15&quot; &quot;17&quot; &quot;26&quot; &quot;41&quot; &quot;48&quot; &quot;70&quot; &quot;73&quot; &quot;77&quot; &quot;85&quot; &quot;90&quot;
+## 
+## attr(,&quot;intersections&quot;)$`B:D`
+## [1] &quot;12&quot; &quot;18&quot; &quot;52&quot; &quot;56&quot; &quot;84&quot;
+## 
+## attr(,&quot;intersections&quot;)$`A:B:C`
+## [1] &quot;22&quot; &quot;45&quot; &quot;62&quot;
+## 
+## attr(,&quot;intersections&quot;)$`B:C:D`
+## [1] &quot;60&quot; &quot;65&quot;
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;venn&quot;</code></pre>
+<pre class="r"><code>venn(input, showSetLogicLabel=TRUE)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-4.png" width="672" /></p>
+<pre class="r"><code># asbio包
+library(asbio)</code></pre>
+<pre><code>## Loading required package: tcltk</code></pre>
+<pre class="r"><code>Venn(A=.3,B=.2,AandB=.06)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>
+<pre class="r"><code># limma包
+# install.packages(&quot;BiocManager&quot;)
+# BiocManager::install(&quot;limma&quot;)
+library(limma)
+Y &lt;- matrix(rnorm(100*6),100,6)
+Y[1:10,3:4] &lt;- Y[1:10,3:4]+3
+Y[1:20,5:6] &lt;- Y[1:20,5:6]+3
+design &lt;- cbind(1,c(0,0,1,1,0,0),c(0,0,0,0,1,1))
+fit &lt;- eBayes(lmFit(Y,design))
+results &lt;- decideTests(fit)
+a &lt;- vennCounts(results)
+print(a)</code></pre>
+<pre><code>##   x1 x2 x3 Counts
+## 1  0  0  0     86
+## 2  0  0  1     12
+## 3  0  1  0      0
+## 4  0  1  1      2
+## 5  1  0  0      0
+## 6  1  0  1      0
+## 7  1  1  0      0
+## 8  1  1  1      0
+## attr(,&quot;class&quot;)
+## [1] &quot;VennCounts&quot;</code></pre>
+<pre class="r"><code>vennDiagram(a)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-6.png" width="672" /></p>
+<pre class="r"><code>vennDiagram(results,include=c(&quot;up&quot;,&quot;down&quot;),counts.col=c(&quot;red&quot;,&quot;green&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-7.png" width="672" /></p>
+<pre class="r"><code># venneuler包
+
+library(venneuler)</code></pre>
+<pre><code>## Loading required package: rJava</code></pre>
+<pre class="r"><code>vd &lt;- venneuler(c(A=0.3, B=0.3, C=1.1, &quot;A&amp;B&quot;=0.1, &quot;A&amp;C&quot;=0.2, &quot;B&amp;C&quot;=0.1 ,&quot;A&amp;B&amp;C&quot;=0.1))
+
+plot(vd)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-8.png" width="672" /></p>
+<pre class="r"><code>m &lt;- data.frame(elements=c(&quot;1&quot;,&quot;2&quot;,&quot;2&quot;,&quot;2&quot;,&quot;3&quot;),sets=c(&quot;A&quot;,&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;C&quot;))
+  
+v &lt;- venneuler(m)
+
+plot(v)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-9.png" width="672" /></p>
+<pre class="r"><code>m &lt;- as.matrix(data.frame(A=c(1.5, 0.2, 0.4, 0, 0),B=c(0, 0.2, 0, 1, 0), C=c(0, 0, 0.3, 0, 1)))
+
+v &lt;- venneuler(m &gt; 0)
+
+plot(v)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-10.png" width="672" /></p>
+<pre class="r"><code>v &lt;- venneuler(m)
+
+plot(v)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-11.png" width="672" /></p>
+<pre class="r"><code># Vennerable包
+
+# BiocManager::install(&quot;graph&quot;)
+# BiocManager::install(&quot;RBGL&quot;)
+# BiocManager::install(&quot;reshape&quot;)
+# install.packages(&quot;Vennerable&quot;, repos=&quot;http://R-Forge.R-project.org&quot;)
+
+library(Vennerable)</code></pre>
+<pre><code>## Loading required package: graph</code></pre>
+<pre><code>## Loading required package: BiocGenerics</code></pre>
+<pre><code>## Loading required package: generics</code></pre>
+<pre><code>## 
+## Attaching package: &#39;generics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+##     setequal, union</code></pre>
+<pre><code>## 
+## Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:rJava&#39;:
+## 
+##     anyDuplicated, duplicated, unique</code></pre>
+<pre><code>## The following object is masked from &#39;package:limma&#39;:
+## 
+##     plotMA</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+##     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+##     unsplit, which.max, which.min</code></pre>
+<pre><code>## Loading required package: RBGL</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: RColorBrewer</code></pre>
+<pre><code>## Loading required package: reshape</code></pre>
+<pre><code>## Loading required package: gtools</code></pre>
+<pre><code>## Loading required package: xtable</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Vennerable&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:asbio&#39;:
+## 
+##     Venn</code></pre>
+<pre class="r"><code>Venn(n=3)</code></pre>
+<pre><code>## A Venn object on 3 sets named
+## 1,2,3 
+## 000 100 010 110 001 101 011 111 
+##   1   1   1   1   1   1   1   1</code></pre>
+<pre class="r"><code>plot(Venn(n=3))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-12.png" width="672" /></p>
+<pre class="r"><code>data(StemCell)
+w &lt;- Venn(Sets=StemCell[1:2])
+Weights(w)</code></pre>
+<pre><code>##  00  10  01  11 
+##   0 219 875 404</code></pre>
+<pre class="r"><code>plot(w)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-13.png" width="672" /></p>
+<pre class="r"><code>Weights(w) &lt;- 1:4
+plot(w)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-14.png" width="672" /></p>

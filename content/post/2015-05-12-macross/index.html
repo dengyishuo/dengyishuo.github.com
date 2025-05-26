@@ -1,0 +1,81 @@
+---
+title: maCross
+author: MatrixSpk
+date: '2015-05-12'
+slug: macross
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+
+
+<div id="section" class="section level169">
+<p class="heading"></p>
+<p>#A simple moving average strategy to evaluate trade efficiency
+#checks on SMA of 50 days and SMA of 200 days
+#########################################################################################################################################################################</p>
+<p>require(quantstrat)</p>
+</div>
+<div id="section-1" class="section level15">
+<p class="heading"></p>
+</div>
+<div id="workaround-to-xts-date-handling-remove-later" class="section level1">
+<h1>workaround to xts Date handling, remove later</h1>
+<p>ttz&lt;-Sys.getenv(‘TZ’)
+Sys.setenv(TZ=‘UTC’)</p>
+<p>suppressWarnings(rm(“order_book.macross”,pos=.strategy))
+suppressWarnings(rm(“account.macross”,“portfolio.macross”,pos=.blotter))
+suppressWarnings(rm(“account.st”,“portfolio.st”,“stock.str”,“stratMACROSS”,‘start_t’,‘end_t’))</p>
+<p>stock.str=‘AAPL’ # what are we trying it on
+currency(‘USD’)
+stock(stock.str,currency=‘USD’,multiplier=1)</p>
+<p>startDate=“1999-12-31”
+initEq=1000000
+portfolio.st=‘macross’
+account.st=‘macross’
+initPortf(portfolio.st,symbols=stock.str)
+initAcct(account.st,portfolios=portfolio.st, initEq=initEq)
+initOrders(portfolio=portfolio.st)</p>
+<p>stratMACROSS&lt;- strategy(portfolio.st)</p>
+<p>stratMACROSS &lt;- add.indicator(strategy = stratMACROSS, name = “SMA”, arguments = list(x=quote(Cl(mktdata)), n=50),label= “ma50” )
+stratMACROSS &lt;- add.indicator(strategy = stratMACROSS, name = “SMA”, arguments = list(x=quote(Cl(mktdata)[,1]), n=200),label= “ma200”)</p>
+<p>stratMACROSS &lt;- add.signal(strategy = stratMACROSS,name=“sigCrossover”,arguments = list(columns=c(“ma50”,“ma200”), relationship=“gte”),label=“ma50.gt.ma200”)
+stratMACROSS &lt;- add.signal(strategy = stratMACROSS,name=“sigCrossover”,arguments = list(column=c(“ma50”,“ma200”),relationship=“lt”),label=“ma50.lt.ma200”)</p>
+<p>stratMACROSS &lt;- add.rule(strategy = stratMACROSS,name=‘ruleSignal’, arguments = list(sigcol=“ma50.gt.ma200”,sigval=TRUE, orderqty=100, ordertype=‘market’, orderside=‘long’),type=‘enter’)
+stratMACROSS &lt;- add.rule(strategy = stratMACROSS,name=‘ruleSignal’, arguments = list(sigcol=“ma50.lt.ma200”,sigval=TRUE, orderqty=‘all’, ordertype=‘market’, orderside=‘long’),type=‘exit’)</p>
+</div>
+<div id="if-you-want-a-longshort-stops-and-reverse-ma-cross-strategy-youd-add-two-more-rules-for-the-short-side" class="section level1">
+<h1>if you want a long/short Stops and Reverse MA cross strategy, you’d add two more rules for the short side:</h1>
+</div>
+<div id="stratmacross---add.rulestrategy-stratmacrossnamerulesignal-arguments-listsigcolma50.lt.ma200sigvaltrue-orderqty-100-ordertypemarket-ordersideshorttypeenter" class="section level1">
+<h1>stratMACROSS &lt;- add.rule(strategy = stratMACROSS,name=‘ruleSignal’, arguments = list(sigcol=“ma50.lt.ma200”,sigval=TRUE, orderqty=-100, ordertype=‘market’, orderside=‘short’),type=‘enter’)</h1>
+</div>
+<div id="stratmacross---add.rulestrategy-stratmacrossnamerulesignal-arguments-listsigcolma50.gt.ma200sigvaltrue-orderqty100-ordertypemarket-ordersideshorttypeexit" class="section level1">
+<h1>stratMACROSS &lt;- add.rule(strategy = stratMACROSS,name=‘ruleSignal’, arguments = list(sigcol=“ma50.gt.ma200”,sigval=TRUE, orderqty=100, ordertype=‘market’, orderside=‘short’),type=‘exit’)</h1>
+<p>getSymbols(stock.str,from=startDate,src=‘yahoo’)
+for(i in stock.str)
+assign(i, adjustOHLC(get(i),use.Adjusted=TRUE))</p>
+<p>start_t&lt;-Sys.time()
+out&lt;-applyStrategy(strategy=stratMACROSS , portfolios=portfolio.st)
+end_t&lt;-Sys.time()
+print(end_t-start_t)</p>
+<p>start_t&lt;-Sys.time()
+updatePortf(Portfolio=‘macross’,Dates=paste(‘::’,as.Date(Sys.time()),sep=’’))
+end_t&lt;-Sys.time()
+print(“trade blotter portfolio update:”)
+print(end_t-start_t)</p>
+<p>chart.Posn(Portfolio=‘macross’,Symbol=stock.str)
+add_SMA(n=50 , on=1,col=‘blue’)
+add_SMA(n=200, on=1)</p>
+<p>book = getOrderBook(‘macross’)
+stats = tradeStats(‘macross’)
+ptstats = perTradeStats(‘macross’)
+rets = PortfReturns(‘macross’)
+txns = getTxns(‘macross’, stock.str)</p>
+<p>#Date workaround, remove later
+Sys.setenv(TZ=ttz)</p>
+</div>

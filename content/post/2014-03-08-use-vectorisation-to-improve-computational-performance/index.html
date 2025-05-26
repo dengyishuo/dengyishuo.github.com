@@ -1,0 +1,124 @@
+---
+title: 善用向量化提升R语言的计算性能
+author: MatrixSpk
+date: '2014-03-08'
+slug: use-vectorisation-to-improve-computational-performance
+categories:
+- 量化投资
+tags:
+- 风险均摊
+- 投资组合
+- R
+---
+
+
+
+<p>用R 语言用的久了，渐渐发现 R 语言的世界里有很多黑魔法。其中一个黑魔法是向量化运算。向量化运算可以说是R语言区别于其它语言的特质之一，善用向量化运算不仅能有效降低代码的冗余度，还能显著提升代码的运算效率。遗憾的是，很多接触过其它编程语言的人未能掌握这一特性使得他们经常诟病R语言运算效率低下。这里给看官们举个例子来体会下。</p>
+<p>想必大家都遇到过替换向量元素的情况。比如，我们有下面这样一个数据框，维度是1200000×2：</p>
+<pre class="r"><code>n = 1200000
+df = data.frame(values = rnorm(n), 
+                ID = rep(LETTERS[1:3], each = n/3),
+                stringsAsFactors = FALSE)
+head(df)</code></pre>
+<pre><code>##       values ID
+## 1  0.8892629  A
+## 2 -1.0037582  A
+## 3 -2.0682706  A
+## 4  1.3484182  A
+## 5  0.5399216  A
+## 6  0.6779612  A</code></pre>
+<pre class="r"><code>tail(df)</code></pre>
+<pre><code>##             values ID
+## 1199995  1.0550619  C
+## 1199996  0.7427624  C
+## 1199997 -0.3992486  C
+## 1199998  0.2136206  C
+## 1199999  1.0295927  C
+## 1200000 -1.3815731  C</code></pre>
+<p>假设要把<em>df$ID</em>中的A替换为“A公司”，B和C类似。怎么做呢？一个常用的解决方案是利用if…for写循环。代码是这样的：</p>
+<pre class="r"><code>translator_if_for = function(input_vector) {
+     output_vector = input_vector
+     for(index in seq_along(input_vector)) {
+         if(input_vector[index] == &#39;A&#39;) {
+             output_vector[index] = &#39;A公司&#39;
+         } else if(input_vector[index] == &#39;B&#39;) {
+             output_vector[index] = &#39;B公司&#39;
+         } else if(input_vector[index] == &#39;C&#39;) {
+             output_vector[index] = &#39;C公司&#39;
+         }   
+     }   
+     return(output_vector)
+}</code></pre>
+<pre class="r"><code>dum_if_for = translator_if_for(df$ID)
+head(dum_if_for)
+tail(dum_if_for)</code></pre>
+<p>用<code>rbenchmark</code>包测试下上述操作需要的时间：</p>
+<pre class="r"><code>library(rbenchmark)
+res = benchmark(if_for_solution = translator_if_for(df$ID),
+                columns= c(&quot;test&quot;,&quot;replications&quot;,&quot;elapsed&quot;,&quot;relative&quot;,&quot;user.self&quot;,&quot;sys.self&quot;),
+ replications = 10)
+ res</code></pre>
+<pre><code>             test replications elapsed relative user.self sys.self
+1 if_for_solution           10   69.63        1     69.48        0</code></pre>
+<p>上面这段代码的缺点是时间久，而且看起来一点都不简洁。那么，是否有更好点的解决方案呢？Absolutely！而且不止一种。比较常用的替代方案是借助 <code>apply</code>族函数（<code>apply</code>族函数是R语言中避免编写显式循环的一个trick）。在用<code>apply</code>族函数之前，得先构造一个辅助函数。构造函数之前不妨先想想我们的操作逻辑，我们想做的事情是这样的，对于<code>df$ID</code>中的某个元素，如果元素是A其就变成A公司，B变成B公司，C变成C公司。这其实可以用<code>switch</code>来实现。对所有元素进行依次进行判断就可以了，针对所有元素进行判断这个过程可以交给<code>sapply</code>函数来完成，于是有下面的代码：</p>
+<pre class="r"><code> translator_function = function(element) {
+     switch(element,
+            A = &#39;A公司&#39;,
+            B = &#39;B公司&#39;,
+            C = &#39;C公司&#39;)
+ }
+ 
+ dum_switch_sapply = sapply(df$ID, translator_function)
+ head(dum_switch_sapply)
+ tail(dum_switch_sapply)</code></pre>
+<p>代码看起来更简洁，看看操作结果是否一致：</p>
+<pre class="r"><code>all.equal(dum_if_for, dum_switch_sapply, check.attributes = FALSE)</code></pre>
+<p>看看这段代码需要的时间：</p>
+<pre class="r"><code> res = benchmark(function_solution = sapply(df$ID, translator_function),
+ columns= c(&quot;test&quot;,&quot;replications&quot;,&quot;elapsed&quot;,&quot;relative&quot;,&quot;user.self&quot;,&quot;sys.self&quot;),
+                              replications = 10)
+ res</code></pre>
+<pre><code>               test replications elapsed relative user.self sys.self
+1 function_solution           10   64.58        1      64.1     0.24</code></pre>
+<p>可以看到时间也有所减少。But..这就是结束吗？操作效率是有提升，但提升的一点都不明显啊！？别急，我们还有杀手锏——向量化运算！先上代码，再慢慢解释逻辑。</p>
+<pre class="r"><code> translator_vector = c(A = &#39;A公司&#39;,
+                       B = &#39;B公司&#39;,
+                       C = &#39;C公司&#39;)
+ dum_vectorized = translator_vector[df$ID]
+ head(dum_vectorized)
+ tail(dum_vectorized)</code></pre>
+<p>看看结果是否一样：</p>
+<pre class="r"><code>all.equal(dum_vectorized, dum_switch_sapply, check.attributes = FALSE)</code></pre>
+<p>完全一样。但是看起来无疑简洁了很多。那么，从耗时角度讲呢？我们看一看：</p>
+<pre class="r"><code> res = benchmark(vector_solution   = translator_vector[df$ID],
+ columns= c(&quot;test&quot;,&quot;replications&quot;,&quot;elapsed&quot;,&quot;relative&quot;,&quot;user.self&quot;,&quot;sys.self&quot;),
+                 replications = 10)
+ res</code></pre>
+<pre><code>             test replications elapsed relative user.self sys.self
+1 vector_solution           10    1.13        1      1.06     0.03</code></pre>
+<p>时间大大减少了。把三种方案的耗时放到一起看一看：</p>
+<pre class="r"><code> res = benchmark(if_for_solution   = translator_if_for(df$ID),
+                 function_solution = sapply(df$ID, translator_function),
+                 vector_solution  = translator_vector[df$ID],
+ columns= c(&quot;test&quot;,&quot;replications&quot;,&quot;elapsed&quot;,&quot;relative&quot;,&quot;user.self&quot;,&quot;sys.self&quot;),
+                 replications = 10)
+ res</code></pre>
+<pre><code>               test replications elapsed relative user.self sys.self
+2 function_solution           10   71.51   87.207     70.95     0.42
+1   if_for_solution           10   69.89   85.232     69.34     0.25
+3   vector_solution           10    0.82    1.000      0.75     0.08</code></pre>
+<p>向量化运算无论在代码简洁度还是在效率上完爆前两种方案。缺点是操作逻辑十分巧妙，可能不是那么容易理解。这里简单解释一下：</p>
+<p>上面的<code>translator_vector</code>是个有名字的向量：</p>
+<pre class="r"><code> translator_vector = c(A = &#39;A公司&#39;,
+                        B = &#39;B公司&#39;,
+                        C = &#39;C公司&#39;)
+ translator_vector
+
+names(translator_vector)</code></pre>
+<p>因此，可以通过元素的名字对元素进行索引。例如：</p>
+<pre class="r"><code>translator_vector[&quot;A&quot;]
+translator_vector[&quot;B&quot;]
+translator_vector[c(&quot;A&quot;,&quot;B&quot;)]</code></pre>
+<p>而<code>df$ID</code>刚好是一个由<code>translator_vector</code>向量的元素名字组成的向量。因此,代码：</p>
+<pre class="r"><code>translator_vector[df$ID]</code></pre>
+<p>就相当于一个索引操作，其结果得到的恰好是<code>translator_vector</code>中对应的元素，这也就相当于对向量元素进行了替换。</p>

@@ -1,0 +1,327 @@
+---
+title: apply函数族入门
+author: MatrixSpk
+date: '2011-11-09'
+slug: apply-family
+categories:
+- R
+tags:
+- apply
+- r
+- 翻译
+---
+
+
+
+<p>在任何一个R语言问答网站或者论坛，你都能看见这样的问题：</p>
+<blockquote>
+<p>Q:如何用循环做【…各种奇怪的事情…】
+A:不用用循环哦，亲！apply函数可以解决这个问题哦，亲！</p>
+</blockquote>
+<p>上面答案中提到的这个神奇的apply函数到底是什么？下面通过一些简单的操作示范一下。</p>
+<p>打开R，敲入??apply函数，选定base包部分你会看到下面的东西：</p>
+<pre><code>base::apply Apply Functions Over Array Margins
+base::by Apply a Function to a Data Frame Split by Factors
+base::eapply Apply a Function Over Values in an Environment
+base::lapply Apply a Function over a List or Vector
+base::mapply Apply a Function to Multiple List or Vector Arguments
+base::rapply Recursively Apply a Function to a List
+base::tapply Apply a Function Over a Ragged Array</code></pre>
+<p>下面一一示范。</p>
+<ul>
+<li>apply</li>
+</ul>
+<p>先看看帮助文档中对其的描述：</p>
+<blockquote>
+<p>“Returns a vector or array or list of values obtained by applying a function to margins of an array or matrix. ”</p>
+</blockquote>
+<p>好吧，vector、array和function是神马我都明白，margins是什么？我来翻译一下吧，margins为1时是指行，margins为2时是指列，如果是c(1:2)，好吧，这个啰嗦的举动，指的是整个array或者matrix。</p>
+<p>例子如下:</p>
+<pre class="r"><code>#创建一个10行2列的矩阵
+m &lt;- matrix(c(1:10,11:20),nrow=10,ncol=2)
+
+#求m的每一行的均值
+apply(m,1,mean)</code></pre>
+<pre><code>##  [1]  6  7  8  9 10 11 12 13 14 15</code></pre>
+<pre class="r"><code>#求m的每一列的均值
+apply(m,2,mean)</code></pre>
+<pre><code>## [1]  5.5 15.5</code></pre>
+<pre class="r"><code>#将m的每个值除以2
+apply(m,1:2,function(x) x/2)</code></pre>
+<pre><code>##       [,1] [,2]
+##  [1,]  0.5  5.5
+##  [2,]  1.0  6.0
+##  [3,]  1.5  6.5
+##  [4,]  2.0  7.0
+##  [5,]  2.5  7.5
+##  [6,]  3.0  8.0
+##  [7,]  3.5  8.5
+##  [8,]  4.0  9.0
+##  [9,]  4.5  9.5
+## [10,]  5.0 10.0</code></pre>
+<p>最后一个例子仅仅是为了示范，我们有更简单的方法一秒钟实现。</p>
+<pre class="r"><code>m/2</code></pre>
+<pre><code>##       [,1] [,2]
+##  [1,]  0.5  5.5
+##  [2,]  1.0  6.0
+##  [3,]  1.5  6.5
+##  [4,]  2.0  7.0
+##  [5,]  2.5  7.5
+##  [6,]  3.0  8.0
+##  [7,]  3.5  8.5
+##  [8,]  4.0  9.0
+##  [9,]  4.5  9.5
+## [10,]  5.0 10.0</code></pre>
+<ul>
+<li>by</li>
+</ul>
+<p>帮助文档中的描述：</p>
+<blockquote>
+<p>“Function by is an object-oriented wrapper for tapply applied to data frames. ”</p>
+</blockquote>
+<p>事实上，by的功能绝不是这一句话所能描述的。接着读下去，你会看到</p>
+<blockquote>
+<p>“A data frame is split by row into data frames subsetted by the values of one or more factors, and function FUN is applied to each subset in turn. ”</p>
+</blockquote>
+<p>这里，我们用一个带有定性变量的数据进行示范。这个数据集就是著名的iris。</p>
+<pre class="r"><code>attach(iris)
+head(iris)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</code></pre>
+<pre class="r"><code>#根据Species分类，求前4个变量的均值
+by(iris[,1:4],Species,mean)</code></pre>
+<pre><code>## Warning in mean.default(data[x, , drop = FALSE], ...): argument is not numeric
+## or logical: returning NA
+## Warning in mean.default(data[x, , drop = FALSE], ...): argument is not numeric
+## or logical: returning NA
+## Warning in mean.default(data[x, , drop = FALSE], ...): argument is not numeric
+## or logical: returning NA</code></pre>
+<pre><code>## Species: setosa
+## [1] NA
+## ------------------------------------------------------------ 
+## Species: versicolor
+## [1] NA
+## ------------------------------------------------------------ 
+## Species: virginica
+## [1] NA</code></pre>
+<p>其实，就是根据一个定性变量将数据分为若干个子集，再对各子集进行apply操作。</p>
+<ul>
+<li>eapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“eapply applies FUN to the named values from an environment and returns the results as a list. The user can request that all named objects are used (normally names that begin with a dot are not). The output is not sorted and no enclosing environments are searched. ”</p>
+</blockquote>
+<p>有理解这句话，重点是理解environment这个东西。environment相当于是R里面的一个小系统，这个系统包含有自己的变量和函数等内容。</p>
+<p>用一个简单的例子来示范：</p>
+<pre class="r"><code>#创建一个新的environment
+e=new.env()
+#在e中创建两个变量
+e$a=1:10
+e$b=11:20
+#求e中变量的均值
+eapply(e,mean)</code></pre>
+<pre><code>## $a
+## [1] 5.5
+## 
+## $b
+## [1] 15.5</code></pre>
+<p>一般人儿可能不常用environment这个东西。不过，Bioconductor们是例外。</p>
+<ul>
+<li>lapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“lapply returns a list of the same length as X, each element of which is the result of applying FUN to the corresponding element of X. ”</p>
+</blockquote>
+<p>这是apply函数的帮助文档中最简明扼要的一个。直接给示范：</p>
+<pre class="r"><code>#创建一个list
+l=list(a=1:10,b=11:20)
+#计算list中每个元素的均值
+lapply(l,mean)</code></pre>
+<pre><code>## $a
+## [1] 5.5
+## 
+## $b
+## [1] 15.5</code></pre>
+<pre class="r"><code>#计算list中每个元素的和
+lapply(l,sum)</code></pre>
+<pre><code>## $a
+## [1] 55
+## 
+## $b
+## [1] 155</code></pre>
+<p>lapply的文档中让我们进一步参考sapply、vapply和replicate。那我们走去看看。</p>
+<ul>
+<li>sapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“sapply is a user-friendly version and wrapper of lapply by default returning a vector, matrix or, if simplify=“array”, an array if appropriate, by applying simplify2array(). sapply(x, f, simplify=FALSE, USE.NAMES=FALSE) is the same as lapply(x,f). ”</p>
+</blockquote>
+<p>上面一堆简单说就是，lapply返回的是一个含有两个元素<span class="math inline">\(a和\)</span>b的list，而sapply返回的是一个含有元素[[“a”]]和[[“b”]]的vector，或者列名为a和b的矩阵。</p>
+<p>示范如下：</p>
+<pre class="r"><code>#创建一个list
+l=list(a=1:10,b=11:20)
+#用sapply求均值
+l.mean=sapply(l,mean)
+#观察返回结果的类型
+class(l.mean)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>l.mean[[&#39;a&#39;]]</code></pre>
+<pre><code>## [1] 5.5</code></pre>
+<ul>
+<li>vapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“vapply is similar to sapply, but has a pre-specified type of return value, so it can be safer (and sometimes faster) to use.”</p>
+</blockquote>
+<p>直接示范：</p>
+<pre class="r"><code>l=list(a=1:10,b=11:20)
+#用vapply函数计算五分位数
+l.fivenum=vapply(l,fivenum,c(Min.=0,&quot;lst Qu.&quot;=0,Median=0,&quot;3rd Qu.&quot;=0,Max.=0))
+class(l.fivenum)</code></pre>
+<pre><code>## [1] &quot;matrix&quot; &quot;array&quot;</code></pre>
+<pre class="r"><code>#结果
+l.fivenum</code></pre>
+<pre><code>##            a    b
+## Min.     1.0 11.0
+## lst Qu.  3.0 13.0
+## Median   5.5 15.5
+## 3rd Qu.  8.0 18.0
+## Max.    10.0 20.0</code></pre>
+<p>从结果可以看到，vapply返回的是一个矩阵。矩阵的列名是list的元素，行名取决于函数的输出结果。</p>
+<ul>
+<li>replicate</li>
+</ul>
+<p>帮助文档的描述:</p>
+<blockquote>
+<p>“replicate is a wrapper for the common use of sapply for repeated evaluation of an expression (which will usually involve random number generation). ”</p>
+</blockquote>
+<p>replicate是一个非常强大的函数，它有两个强制参数：replications,即操作的重复次数；function，及要重复的操作。还有一个可选择参数：simplify=T，是否将操作结果转化为vector或者matrix。</p>
+<p>示范：</p>
+<pre class="r"><code>replicate(10,rnorm(10))</code></pre>
+<pre><code>##             [,1]        [,2]         [,3]        [,4]        [,5]       [,6]
+##  [1,]  0.1939633 -0.79479519  0.009000421 -0.52784825 -2.03533180  0.7923687
+##  [2,] -0.2118465 -0.82562896 -1.234895824 -0.20189869  2.12939439 -0.3269900
+##  [3,] -1.0611718 -0.58994966  1.488130725 -1.59689151 -0.51523104 -0.8327664
+##  [4,]  0.8062586 -0.49164827 -1.061103516 -0.81024471  0.14915765  0.8630892
+##  [5,]  0.8226618 -1.20793496  0.528062015  0.29912409  0.05810838 -1.5280022
+##  [6,]  1.0804965  0.69470117 -2.182922843 -1.12665436  0.41011923  1.3329488
+##  [7,]  1.2025404  0.62796107  1.113040851 -0.16329505 -0.31089909  0.8775663
+##  [8,] -0.2226050 -0.45691463 -0.330992346 -0.08447861 -0.14760911  0.2324062
+##  [9,]  0.9017412  0.05194845 -0.367642514  0.22304452 -0.92205030 -0.6131678
+## [10,]  0.6073767  0.14398326  0.503953202 -2.29520968  0.61197813 -0.5033133
+##             [,7]       [,8]        [,9]      [,10]
+##  [1,] -1.6576452  1.5035541 -0.03694026 -1.1841282
+##  [2,]  1.3047056 -0.6911962  0.54387377 -1.2437450
+##  [3,]  0.7795566  0.5608309 -0.47074065 -1.1950426
+##  [4,]  1.3902444 -1.3713926  0.13854796 -0.1047166
+##  [5,] -0.2461437  0.7482841  0.13997035  0.2604597
+##  [6,] -0.5707010  1.2083671 -1.08915604 -0.2904663
+##  [7,] -1.0467996 -0.6283753 -2.25062854 -1.0621732
+##  [8,] -0.3028418 -0.3597404 -0.19528082 -1.0428190
+##  [9,] -0.8539498  0.4368088  1.33492834 -0.2674640
+## [10,]  0.2421666 -0.5280379  0.17385488  0.6313563</code></pre>
+<ul>
+<li>mapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“mapply is a multivariate version of sapply. mapply applies FUN to the first elements of each … argument, the second elements, the third elements, and so on. Arguments are recycled if necessary. ”</p>
+</blockquote>
+<p>如果你认真看看mapply的帮助文档的话，我打赌你会看到头大。这里给看官两个简单的例子：</p>
+<pre class="r"><code>l1=list(a=1:10,b=11:20)
+l2=list(c=21:30,d=31:40)
+l1</code></pre>
+<pre><code>## $a
+##  [1]  1  2  3  4  5  6  7  8  9 10
+## 
+## $b
+##  [1] 11 12 13 14 15 16 17 18 19 20</code></pre>
+<pre class="r"><code>l2</code></pre>
+<pre><code>## $c
+##  [1] 21 22 23 24 25 26 27 28 29 30
+## 
+## $d
+##  [1] 31 32 33 34 35 36 37 38 39 40</code></pre>
+<pre class="r"><code>#计算l1,l2中各元素的和
+mapply(sum,l1$a,l1$b,l2$c,l2$d)</code></pre>
+<pre><code>##  [1]  64  68  72  76  80  84  88  92  96 100</code></pre>
+<p>竖直看下来，加总就得到了上面的结果。</p>
+<ul>
+<li>rapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“rapply is a recursive version of lapply. ”</p>
+</blockquote>
+<p>这个描述是史上最差描述之一。因为rapply跟recursive并没有太大关系。rapply的创造性在于提供了一个结果输出形式的参数。</p>
+<p>示范：</p>
+<pre class="r"><code>#创建list
+l=list(a=1:10,b=11:20)
+#计算l中元素的log2
+rapply(l,log2)</code></pre>
+<pre><code>##       a1       a2       a3       a4       a5       a6       a7       a8 
+## 0.000000 1.000000 1.584963 2.000000 2.321928 2.584963 2.807355 3.000000 
+##       a9      a10       b1       b2       b3       b4       b5       b6 
+## 3.169925 3.321928 3.459432 3.584963 3.700440 3.807355 3.906891 4.000000 
+##       b7       b8       b9      b10 
+## 4.087463 4.169925 4.247928 4.321928</code></pre>
+<pre class="r"><code>#将结果的输出形式设定为list
+
+rapply(l,log2,how=&quot;list&quot;)</code></pre>
+<pre><code>## $a
+##  [1] 0.000000 1.000000 1.584963 2.000000 2.321928 2.584963 2.807355 3.000000
+##  [9] 3.169925 3.321928
+## 
+## $b
+##  [1] 3.459432 3.584963 3.700440 3.807355 3.906891 4.000000 4.087463 4.169925
+##  [9] 4.247928 4.321928</code></pre>
+<pre class="r"><code>#计算均值
+rapply(l,mean)</code></pre>
+<pre><code>##    a    b 
+##  5.5 15.5</code></pre>
+<pre class="r"><code>rapply(l,mean,how=&quot;list&quot;)</code></pre>
+<pre><code>## $a
+## [1] 5.5
+## 
+## $b
+## [1] 15.5</code></pre>
+<p>综上，rapply函数的输出结果取决于函数和how参数。当how=“list”时，数据的原始结构被保留，否则，输出结果被转化为vector。</p>
+<p>当然，看官还可以将classes函数传递给rapply函数。例如在混合型list中，可以通过classes=numeric，是的函数子对数字型元素进行操作。</p>
+<ul>
+<li>tapply</li>
+</ul>
+<p>帮助文档的描述：</p>
+<blockquote>
+<p>“Apply a function to each cell of a ragged array, that is to each (non-empty) group of values given by a unique combination of the levels of certain factors.”</p>
+</blockquote>
+<p>语焉不详。翻译一下大概是：</p>
+<p>“tapply(X, INDEX, FUN = NULL, …, simplify = TRUE)”中的“X”是
+“an atomic object, typically a vector.”，而“INDEX”是“list of factors, each of same length as X. The elements are coerced to factors by as.factor.”</p>
+<p>依然以iris数据集为例示范一下：</p>
+<pre class="r"><code>attach(iris)</code></pre>
+<pre><code>## The following objects are masked from iris (pos = 3):
+## 
+##     Petal.Length, Petal.Width, Sepal.Length, Sepal.Width, Species</code></pre>
+<pre class="r"><code>#根据sprcies进行分类，计算petal的均值
+tapply(iris$Petal.Length,Species,mean)</code></pre>
+<pre><code>##     setosa versicolor  virginica 
+##      1.462      4.260      5.552</code></pre>
+<p>简短的总结：</p>
+<p>这里给出的都是极其简单的例子，基于最简单的数据，和最简单的函数。因为对于每一个操作而言，看官都可查看数据的操作前状态和操作后状态，这样便于看官知道，操作到底对数据干了什么事情。</p>
+<p>当然了，apply函数的功能不限于文中介绍的这些，进一步的功用期待看官自己去挖掘。</p>
+<p>给出几个使用apply函数的建议，在使用之前应当思考：</p>
+<ul>
+<li>原始数据是什么类型？vector?matrix?data frame?….</li>
+<li>想对原始数据的哪些子集进行操作？行?列？所有元素？….</li>
+<li>操作将返回什么结果？原始数据的结构是如何变化的？</li>
+</ul>
+<p>只是一个老生常谈的关于“输入——操作——输出”的故事：你有什么？你想要什么？两者之间需要什么？</p>

@@ -1,0 +1,291 @@
+---
+title: Relative Strength Index (RSI) strategy demonstrating long-only threshold actions
+author: MatrixSpk
+date: '2015-03-15'
+slug: relative-strength-index-rsi-strategy-demonstrating-long-only-threshold-actions
+categories:
+  - quant
+tags: 
+  - quant
+  - R
+  - quantstrat
+  - rsi
+  - long-only
+---
+## 代码思路图解
+
+graph TD
+    A[初始化环境] --> B[定义RSI策略]
+    B --> C[添加指标与信号]
+    C --> D[设置多空交易规则]
+    D --> E[加载历史数据]
+    E --> F[执行回测引擎]
+    F --> G[可视化分析结果]
+
+
+
+```{R setup}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = TRUE, root.dir = here::here())
+
+# 加载必要包
+library(quantstrat)
+##############################
+### 环境初始化部分
+##############################
+# 清理旧策略环境（防止残留数据干扰）
+suppressWarnings(rm("order_book.RSI", pos =.strategy))
+suppressWarnings(rm("account.RSI", "portfolio.RSI", pos =.blotter))
+suppressWarnings(rm("account.st", "portfolio.st", "stock.str", "stratRSI", "startDate", "initEq",'start_t', 'end_t'))
+
+
+##############################
+### 策略定义部分
+##############################
+# 创建策略对象
+stratRSI <- strategy("RSI")
+
+# 设置RSI参数
+n = 2  # RSI指标的周期参数（默认2日，通常建议14日）
+
+# 添加指标：计算RSI值
+stratRSI <- add.indicator(
+  strategy = stratRSI, 
+  name = "RSI",  # 使用TTR包的RSI函数
+  arguments = list(
+    price = quote(getPrice(mktdata)),  # 获取收盘价（Cl(mktdata)的简写）
+    n = n                               # RSI计算周期
+  ), 
+  label = "RSI"  # 指标列名
+)
+
+# 添加信号：RSI超买超卖信号
+# 信号1：RSI上穿70（超卖信号）
+stratRSI <- add.signal(
+  strategy = stratRSI, 
+  name = "sigThreshold",    # 阈值型信号函数
+  arguments = list(
+    threshold = 70,         # 阈值
+    column = "RSI",         # 作用在RSI指标列
+    relationship = "gt",    # 大于关系（greater than）
+    cross = TRUE            # 必须穿越阈值（防止持续触发）
+  ),
+  label = "RSI.gt.70"       # 信号列名
+)
+
+# 信号2：RSI下穿30（超买信号）
+stratRSI <- add.signal(
+  strategy = stratRSI, 
+  name = "sigThreshold",
+  arguments = list(
+    threshold = 30,         # 阈值
+    column = "RSI",
+    relationship = "lt",    # 小于关系（less than）
+    cross = TRUE
+  ),
+  label = "RSI.lt.30"       # 信号列名
+)
+
+##############################
+### 交易规则定义部分
+##############################
+# 规则1：做空规则（RSI超卖时进场）
+stratRSI <- add.rule(
+  strategy = stratRSI, 
+  name = 'ruleSignal',      # 基于信号的规则
+  arguments = list(
+    sigcol = "RSI.gt.70",   # 触发信号列
+    sigval = TRUE,          # 信号值为TRUE时触发
+    orderqty = -1000,       # 卖空1000股（固定手数）
+    ordertype ='market',   # 市价单
+    orderside ='short',    # 做空方向
+    pricemethod ='market', # 按市场价格成交
+    replace = FALSE,        # 不替换未成交订单
+    osFUN = osMaxPos        # 使用最大仓位限制函数
+  ), 
+  type = 'enter',           # 入场规则
+  path.dep = TRUE           # 路径依赖（考虑仓位变化）
+)
+
+# 规则2：平仓空头规则（RSI超买时平仓）
+stratRSI <- add.rule(
+  strategy = stratRSI,
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.lt.30", 
+    sigval = TRUE,
+    orderqty = 'all',       # 平掉全部仓位
+    ordertype ='market',
+    orderside ='short', 
+    pricemethod ='market',
+    replace = FALSE
+  ),
+  type = 'exit',            # 离场规则
+  path.dep = TRUE
+)
+
+# 规则3：做多规则（RSI超买时进场）
+stratRSI <- add.rule(
+  strategy = stratRSI, 
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.lt.30",
+    sigval = TRUE,
+    orderqty = 1000,        # 买入1000股
+    ordertype ='market',
+    orderside = 'long',     # 做多方向
+    pricemethod ='market',
+    replace = FALSE,
+    osFUN = osMaxPos
+  ), 
+  type = 'enter',
+  path.dep = TRUE
+)
+
+# 规则4：平仓多头规则（RSI超卖时平仓）
+stratRSI <- add.rule(
+  strategy = stratRSI,
+  name = 'ruleSignal',
+  arguments = list(
+    sigcol = "RSI.gt.70",
+    sigval = TRUE,
+    orderqty = 'all',       # 平掉全部仓位
+    ordertype ='market',
+    orderside = 'long',
+    pricemethod ='market',
+    replace = FALSE
+  ),
+  type = 'exit',
+  path.dep = TRUE
+)
+
+#add changeable parameters
+# add level in/out
+
+# add trailing entry
+
+# add trailing exit?
+
+##############################
+### 数据准备与回测初始化
+##############################
+# 设置货币和交易品种
+currency("USD")  # 基础货币
+currency("EUR")  # 其他货币（示例）
+symbols = c("XLF", "XLP", "XLE", "XLY", "XLV", "XLI", "XLB", "XLK", "XLU") # 9个SPDR行业ETF
+
+# 初始化金融工具
+for(symbol in symbols){
+  stock(symbol, currency = "USD", multiplier = 1)  # 定义合约属性
+}
+
+# 下载历史数据（雅虎财经源）
+getSymbols(
+  symbols, 
+  src = 'yahoo', 
+  index.class = c("POSIXt", "POSIXct"),  # 索引类型为时间戳
+  from = '1998-01-01'                    # 数据起始日期
+)
+
+
+# 获取下载的对应股票数据
+data_for_apply <- get(symbols[1])
+# 测试信号:
+applySignals(strategy = stratRSI,
+             mktdata = applyIndicators(strategy = stratRSI,
+                                       mktdata = data_for_apply
+                                       )
+             )
+
+##############################
+### 回测引擎配置
+##############################
+startDate = '1997-12-31'  # 回测开始日期
+initEq = 100000           # 初始资金10万美元
+port.st = 'RSI'           # 组合名称
+
+# 初始化投资组合
+initPortf(port.st, symbols = symbols)           # 创建组合对象
+initAcct(port.st, portfolios = port.st, initEq = initEq) # 创建账户
+initOrders(portfolio = port.st)                 # 初始化订单簿
+
+# 设置仓位限制（风控规则）
+for(symbol in symbols){
+  addPosLimit(
+    port.st, 
+    symbol, 
+    startDate, 
+    maxpos = 300,    # 单品种最大持仓量
+    minpos = -300    # 允许做空
+  )
+}
+
+print("setup completed")  # 完成初始化提示
+
+##############################
+### 执行策略回测
+##############################
+# 应用策略生成交易信号
+# 应用策略生成交易信号
+start_t <- Sys.time()
+out <- try(applyStrategy(
+  strategy = stratRSI,
+  portfolios = port.st,
+  parameters = list(n = 2)  # 传递参数（此处可优化为参数扫描）
+))
+end_t <- Sys.time()
+print("Strategy Loop:")
+print(end_t - start_t)  # 输出策略执行时间
+
+# 查看订单簿（调试用）
+# print(getOrderBook(port.st))
+
+# 更新组合数据
+start_t <- Sys.time()
+updatePortf(
+  Portfolio = port.st,
+  Dates = paste('::', as.Date(Sys.time()), sep = '')  # 更新至最新日期
+)
+end_t <- Sys.time()
+print("trade blotter portfolio update:")
+print(end_t - start_t)  # 输出更新时间
+
+##############################
+### 可视化与绩效分析
+##############################
+# 自定义图表主题
+themelist <- chart_theme()
+themelist$col$up.col <- 'lightgreen'  # 上涨颜色
+themelist$col$dn.col <- 'pink'        # 下跌颜色
+
+# 绘制各品种持仓图
+for(symbol in symbols){
+  dev.new()  # 新建图形窗口
+  chart.Posn(
+    Portfolio = port.st,
+    Symbol = symbol,
+    theme = themelist  # 应用自定义主题
+  )
+  plot(add_RSI(n = 2))  # 在图中叠加RSI指标
+}
+
+# 计算组合收益
+ret1 <- PortfReturns(port.st)       # 各品种收益
+ret1$total <- rowSums(ret1)         # 组合总收益
+#ret1
+
+# 可视化绩效摘要
+if("package:PerformanceAnalytics" %in% search() || 
+   require("PerformanceAnalytics", quietly = TRUE)) {
+  dev.new()
+  charts.PerformanceSummary(
+    ret1$total,
+    geometric = FALSE,   # 使用算术收益计算
+    wealth.index = TRUE  # 显示财富指数曲线
+  )
+}
+
+```
+
+## 结语
+
+该策略通过RSI指标的双向阈值触发多空交易，适合均值回归型市场，但在趋势行情中可能表现不佳，建议结合趋势过滤器改进。

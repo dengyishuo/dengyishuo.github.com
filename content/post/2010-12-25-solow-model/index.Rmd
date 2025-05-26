@@ -16,7 +16,7 @@ tags:
 
 基于R语言写一段模拟索罗模型的应用。
 
-```{r}
+```{r eval = FALSE}
 library(shiny)
 library(ggplot2)
 library(deSolve)

@@ -1,0 +1,126 @@
+---
+title: VaR和方差协方差方法及R语言
+author: MatrixSpk
+date: '2010-12-17'
+slug: VaR-Caculation-via-Variance-Covariance-Method
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - 风险度量
+  - VaR
+  - r
+---
+
+
+
+<div id="方差-协方差法" class="section level2">
+<h2>方差-协方差法</h2>
+<p>方差-协方差法是一种基于资产收益率正态性假设的VaR计算方法。其核心思想是通过历史数据估计资产收益率的均值、方差和协方差矩阵，构建投资组合收益率的概率分布，继而计算VaR值。</p>
+<p>具体流程可分为以下三步：</p>
+<p>首先，计算资产收益率的协方差矩阵以衡量风险关联；其次，根据投资组合权重计算组合收益率的期望值和标准差；最后，在给定置信水平下，利用正态分布分位数确定VaR值。例如，在95%置信水平下，单日VaR可表示为组合市值的绝对值乘以其标准差再乘1.645（对应正态分布左尾5%分位数）。该方法计算效率高，但对非线性风险和非正态分布敏感。多日VaR可通过时间平方根法则调整，即单日VaR乘 <span class="math inline">\(\sqrt{T}\)</span> 得到。</p>
+</div>
+<div id="r代码实现" class="section level2">
+<h2>R代码实现</h2>
+<pre class="r"><code># 加载必要包
+library(quantmod)</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>library(PerformanceAnalytics)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     legend</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)</code></pre>
+<pre><code>## 
+## ######################### Warning from &#39;xts&#39; package ##########################
+## #                                                                             #
+## # The dplyr lag() function breaks how base R&#39;s lag() function is supposed to  #
+## # work, which breaks lag(my_xts). Calls to lag(my_xts) that you type or       #
+## # source() into this session won&#39;t work correctly.                            #
+## #                                                                             #
+## # Use stats::lag() to make sure you&#39;re not using dplyr::lag(), or you can add #
+## # conflictRules(&#39;dplyr&#39;, exclude = &#39;lag&#39;) to your .Rprofile to stop           #
+## # dplyr from breaking base R&#39;s lag() function.                                #
+## #                                                                             #
+## # Code in packages is not affected. It&#39;s protected by R&#39;s namespace mechanism #
+## # Set `options(xts.warn_dplyr_breaks_lag = FALSE)` to suppress this warning.  #
+## #                                                                             #
+## ###############################################################################</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:xts&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code># 1. 下载股票数据（示例使用苹果、微软、亚马逊）
+symbols &lt;- c(&quot;AAPL&quot;, &quot;MSFT&quot;, &quot;AMZN&quot;)
+getSymbols(symbols, src = &quot;yahoo&quot;, from = &quot;2022-01-01&quot;, to = Sys.Date())</code></pre>
+<pre><code>## [1] &quot;AAPL&quot; &quot;MSFT&quot; &quot;AMZN&quot;</code></pre>
+<pre class="r"><code># 2. 提取收盘价并合并
+prices &lt;- merge(Cl(AAPL), Cl(MSFT), Cl(AMZN)) %&gt;% na.omit()
+colnames(prices) &lt;- symbols
+
+# 3. 计算对数收益率
+returns &lt;- na.omit(Return.calculate(prices, method = &quot;log&quot;))
+
+# 4. 设定投资组合参数
+weights &lt;- c(0.3, 0.4, 0.3)  # 组合权重
+conf_level &lt;- 0.95            # 置信水平
+portfolio_value &lt;- 1e6        # 组合价值（美元）
+
+# 5. 计算协方差矩阵与组合标准差
+cov_matrix &lt;- cov(returns)
+port_sd &lt;- sqrt(t(weights) %*% cov_matrix %*% weights)
+
+# 6. 计算单日VaR
+var_1d &lt;- abs(portfolio_value * qnorm(1 - conf_level) * port_sd)
+
+# 7. 计算5日VaR（时间平方根法则）
+var_5d &lt;- var_1d * sqrt(5)
+
+# 8. 可视化VaR分布
+ggplot(data = data.frame(Returns = as.numeric(returns %*% weights)), 
+       aes(x = Returns)) +
+  geom_histogram(aes(y = ..density..), bins = 50, fill = &quot;steelblue&quot;, alpha = 0.7) +
+  geom_vline(xintercept = -var_1d/portfolio_value, color = &quot;red&quot;, 
+             linetype = &quot;dashed&quot;, size = 1) +
+  stat_function(fun = dnorm, args = list(mean = mean(returns %*% weights),
+               sd = sd(returns %*% weights)), color = &quot;darkgreen&quot;) +
+  labs(title = &quot;Portfolio Returns Distribution with VaR&quot;,
+       x = &quot;Daily Returns&quot;, y = &quot;Density&quot;) +
+  annotate(&quot;text&quot;, x = -var_1d/portfolio_value, y = 15, 
+           label = paste0(&quot;95% 1d VaR: $&quot;, round(var_1d)), color = &quot;red&quot;)</code></pre>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<pre><code>## Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+## ℹ Please use `after_stat(density)` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code># 输出结果
+cat(&quot;单日VaR（95%置信度）:&quot;, round(var_1d), &quot;美元\n&quot;)</code></pre>
+<pre><code>## 单日VaR（95%置信度）: 28859 美元</code></pre>
+<pre class="r"><code>cat(&quot;5日VaR（95%置信度）:&quot;, round(var_5d), &quot;美元&quot;)</code></pre>
+<pre><code>## 5日VaR（95%置信度）: 64532 美元</code></pre>
+</div>

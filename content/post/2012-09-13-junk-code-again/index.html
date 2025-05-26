@@ -1,0 +1,35 @@
+---
+title: 乱码，又见乱码
+author: MatrixSpk
+date: '2012-09-13'
+slug: junk-code-again
+categories:
+- R
+tags:
+- R
+- 财务数据
+- 财新网
+- 宏观数据
+- htmlParse
+- readHTMLTable
+- utf-8
+- XML
+- 乱码
+- 抓数据 
+---
+
+
+
+<p>在Windows系统下，用readHTMLTable函数读取编码为unicod的网页时会出现乱码。这个时候的乱码是因为R是用本地码（通常是GBK）来解释了网页中的unicode，因此出现了符号不兼容。此时，只要用iconv(x,“utf-8”,“gbk”)就可以了。然而，有时候会出现另外一种情况：</p>
+<pre class="r"><code>library(XML);
+url=&quot;http://data.caixin.com/macro/macro_indicator_more.html?id=F0001&amp;cpage=2&amp;pageSize=30&amp;url=macro_indicator_more.html#top&quot;;
+tables=readHTMLTable(url)
+head(tables)</code></pre>
+<p>这种情况下icnov好像就无能为力了。不过，事情还是有解决方案的，在readHTMLTable之前加上一句代码就可以了。</p>
+<pre><code>url= htmlParse(url,encoding=&quot;UTF-8&quot;)</code></pre>
+<p>看看效果：</p>
+<pre class="r"><code>library(XML)
+url &lt;- &quot;http://data.caixin.com/macro/macro_indicator_more.html?id=F0001&amp;cpage=2&amp;pageSize=30&amp;url=macro_indicator_more.html#top&quot;
+url&lt;- htmlParse(url,encoding=&quot;UTF-8&quot;)
+tables &lt;- readHTMLTable(url)
+head(tables)</code></pre>

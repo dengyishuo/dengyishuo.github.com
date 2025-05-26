@@ -1,0 +1,114 @@
+---
+title: scatterplot3d:一个特立独行的R包
+author: MatrixSpk
+date: '2010-06-13'
+slug: scatterplot3d
+categories:
+- R
+tags:
+- R
+- scatterplot3d
+- 三维作图
+---
+
+
+
+<p>scatterplot3d是一个力图在3D空间展示多维数据的R包，在这个包里只含有一个函数scatterplot3d()，这一点上可谓是特立独行。scatterplot3d()的用法如下：</p>
+<pre class="r"><code>    scatterplot3d(x, y=NULL, z=NULL, color=par(&quot;col&quot;), pch=NULL,
+        main=NULL, sub=NULL, xlim=NULL, ylim=NULL, zlim=NULL,
+        xlab=NULL, ylab=NULL, zlab=NULL, scale.y=1, angle=40,
+        axis=TRUE, tick.marks=TRUE, label.tick.marks=TRUE,
+        x.ticklabs=NULL, y.ticklabs=NULL, z.ticklabs=NULL,
+        y.margin.add=0, grid=TRUE, box=TRUE, lab=par(&quot;lab&quot;),
+        lab.z=mean(lab[1:2]), type=&quot;p&quot;, highlight.3d=FALSE,
+        mar=c(5,3,4,3)+0.1, col.axis=par(&quot;col.axis&quot;),
+        col.grid=&quot;grey&quot;, col.lab=par(&quot;col.lab&quot;),
+        cex.symbols=par(&quot;cex&quot;), cex.axis=0.8 * par(&quot;cex.axis&quot;),
+        cex.lab=par(&quot;cex.lab&quot;), font.axis=par(&quot;font.axis&quot;),
+        font.lab=par(&quot;font.lab&quot;), lty.axis=par(&quot;lty&quot;),
+        lty.grid=par(&quot;lty&quot;), lty.hide=NULL, lty.hplot=par(&quot;lty&quot;),
+        log=&quot;&quot;, ...)</code></pre>
+<p>这个函数的参数多到让人眼花缭乱。下面是几个例子:</p>
+<p>先用scatterplot3d()画一个螺旋线：</p>
+<pre class="r"><code>library(scatterplot3d)
+z &lt;- seq(-10, 10, 0.01)
+x &lt;- cos(z)
+y &lt;- sin(z)
+scatterplot3d(x, y, z, highlight.3d=TRUE, col.axis=&quot;blue&quot;,col.grid=&quot;lightblue&quot;,main=&quot;scatterplot3d - 1&quot;, pch=20)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>再画半椭圆:</p>
+<pre class="r"><code>temp&lt;- seq(-pi, 0, length = 50)
+x &lt;- c(rep(1, 50) %*% t(cos(temp)))
+y &lt;- c(cos(temp) %*% t(sin(temp)))
+z &lt;- c(sin(temp) %*% t(sin(temp)))
+scatterplot3d(x, y, z, highlight.3d=TRUE,col.axis=&quot;blue&quot;, col.grid=&quot;lightblue&quot;,main=&quot;scatterplot3d - 2&quot;, pch=20)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>将两者结合，输出结果很像龙盘柱。有点酷！</p>
+<pre class="r"><code>    x &lt;- c(rep(1, 50) %*% t(cos(temp)))
+    y &lt;- c(cos(temp) %*% t(sin(temp)))
+    z &lt;- 10 * c(sin(temp) %*% t(sin(temp)))
+    color &lt;- rep(&quot;green&quot;, length(x))
+    temp &lt;- seq(-10, 10, 0.01)
+    x &lt;- c(x, cos(temp))
+    y &lt;- c(y, sin(temp))
+    z &lt;- c(z, temp)
+    color &lt;- c(color, rep(&quot;red&quot;, length(temp)))
+    scatterplot3d(x, y, z, color, pch=20, zlim=c(-2, 10),main=&quot;scatterplot3d - 3&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>来一个比较庸俗的，三维bar图：</p>
+<pre class="r"><code>my.mat &lt;- matrix(runif(25), nrow=5)
+dimnames(my.mat) &lt;- list(LETTERS[1:5], letters[11:15])
+s3d.dat &lt;- data.frame(cols=as.vector(col(my.mat)),rows=as.vector(row(my.mat)),value=as.vector(my.mat))
+scatterplot3d(s3d.dat, type=&quot;h&quot;, lwd=5, pch=&quot; &quot;,x.ticklabs=colnames(my.mat),y.ticklabs=rownames(my.mat))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>上面的可以说都不是很实用，下面看一下二维回归平面图：</p>
+<pre class="r"><code>data(trees)
+s3d &lt;- scatterplot3d(trees, type=&quot;h&quot;, highlight.3d=TRUE,angle=55, scale.y=0.7, pch=16, main=&quot;scatterplot3d - 5&quot;)
+s3d$points3d(seq(10,20,2), seq(85,60,-5), seq(60,10,-10),col=&quot;blue&quot;, type=&quot;h&quot;, pch=16)
+     # 画回归平面
+attach(trees)
+my.lm &lt;- lm(Volume ~ Girth + Height)
+s3d$plane3d(my.lm, lty.box = &quot;solid&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>我看见有很多帖子索要二维正态分布的示意图，这里画一个，</p>
+<pre class="r"><code>     library(mvtnorm)
+     x1 &lt;- seq(-10, 10, length = 51)
+     x2 &lt;- seq(-10, 10, length = 51)
+     dens &lt;- matrix(dmvnorm(expand.grid(x1,x2),sigma=rbind(c(3,2),c(2,3))),ncol=length(x1))
+     s3d&lt;-scatterplot3d(x1,x2,seq(min(dens),max(dens),length=length(x1)),
+     type=&quot;n&quot;,grid=FALSE,angle = 70,
+     zlab=expression(f(x[1],x[2])),
+     xlab=expression(x[1]),ylab=expression(x[2]),
+     main=&quot;Bivariate normal distribution&quot;)
+     text(s3d$xyz.convert(-1,10,0.07),
+    labels=expression(f(x)==frac(1,sqrt((2*pi)^n*phantom(&quot;.&quot;)*det(Sigma[X])))*phantom(&quot;.&quot;)*exp(bgroup(&quot;(&quot;,-scriptstyle(frac(1,2)*phantom(&quot;.&quot;))*(x-mu)^T*Sigma[X]^-1*(x-mu),&quot;)&quot;))))
+     for(i in length(x1):1)
+     s3d$points3d(rep(x1[i], length(x2)), x2, dens[i,], type = &quot;l&quot;)
+     for(i in length(x2):1)
+     s3d$points3d(x1, rep(x2[i], length(x1)), dens[,i], type = &quot;l&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>之所以画下面这个，完全是因为我贪图色彩：</p>
+<pre class="r"><code>     cubedraw &lt;- function(res3d, min = 0, max = 255, cex = 2, text. = FALSE)
+       {
+         cube01 &lt;- rbind(c(0,0,1), 0, c(1,0,0), c(1,1,0), 1, c(0,1,1), # &lt; 6 outer
+                         c(1,0,1), c(0,1,0)) 
+         cub &lt;- min + (max-min)* cube01
+         res3d$points3d(cub[c(1:6,1,7,3,7,5) ,], cex = cex, type = &#39;b&#39;, lty = 1)
+         res3d$points3d(cub[c(2,8,4,8,6),     ], cex = cex, type = &#39;b&#39;, lty = 3)
+         if(text.)
+             text(res3d$xyz.convert(cub), labels=1:nrow(cub), col=&#39;tomato&#39;, cex=2)
+       }
+       cc &lt;- colors()
+       crgb &lt;- t(col2rgb(cc))
+       par(xpd = TRUE)
+       rr &lt;- scatterplot3d(crgb, color = cc, box = FALSE, angle = 24,
+           xlim = c(-50, 300), ylim = c(-50, 300), zlim = c(-50, 300))
+       cubedraw(rr)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>       rbc &lt;- rainbow(201)
+       Rrb &lt;- t(col2rgb(rbc))
+       rR &lt;- scatterplot3d(Rrb, color = rbc, box = FALSE, angle = 24,
+           xlim = c(-50, 300), ylim = c(-50, 300), zlim = c(-50, 300))
+       cubedraw(rR)
+       rR$points3d(Rrb, col = rbc, pch = 16)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>

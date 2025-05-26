@@ -1,0 +1,55 @@
+---
+title: luxor sample MFE takeprofit
+author: MatrixSpk
+date: '2015-12-10'
+slug: luxor-sample-mfe-takeprofit
+categories:
+  - 量化投资
+tags:
+  - 量化投资
+  - r
+  - quantstrat
+---
+
+
+
+<pre class="r"><code># Tested and found to work correctly using blotter r1457
+#
+# After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
+#
+# Figure 3.16: MFE graph in percentage terms
+
+require(&#39;blotter&#39;)</code></pre>
+<pre><code>## Loading required package: blotter</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: FinancialInstrument</code></pre>
+<pre><code>## Loading required package: quantmod</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     legend</code></pre>
+<pre class="r"><code>data(&#39;luxor-p066&#39;, package=&#39;quantstrat&#39;, envir=.blotter)
+
+currency(c(&#39;GBP&#39;, &#39;USD&#39;))</code></pre>
+<pre><code>## [1] &quot;GBP&quot; &quot;USD&quot;</code></pre>
+<pre class="r"><code>exchange_rate(c(&#39;GBPUSD&#39;), tick_size=0.0001)</code></pre>
+<pre><code>## [1] &quot;GBPUSD&quot;</code></pre>
+<pre class="r"><code>chart.ME(
+	 Portfolio=&#39;luxor&#39;,
+	 Symbol=&#39;GBPUSD&#39;,
+	 type=&#39;MFE&#39;,
+	 scale=&#39;percent&#39;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>

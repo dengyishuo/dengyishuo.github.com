@@ -1,0 +1,94 @@
+---
+title: R与单位根检验
+author: MatrixSpk
+date: '2011-05-08'
+slug: use-r-to-do-unitroots-test
+categories:
+- 计量经济学
+tags:
+- Augmented Dickey-Fuller test
+- unit root test
+- 单位根检验
+---
+
+
+
+<p>R里面的fUnitRoots包可以轻松实现时间序列的单位根检验。两个主函数分别是adfTest和unitrootTest。对于以应用统计为主要目的的人而言，看懂单位根检验的结果可能比探讨单位根检验的原理更重要。</p>
+<p>为了清晰地表明有单位根的序列的检验结果和无单位根的序列的检验结果之间的差别，在这里生成两个可对比的单位根序列来举例：</p>
+<p>首先，载入fUnitRoots包：</p>
+<pre class="r"><code>library(fUnitRoots);
+
+# 生成没有单位根的序列x和由单位根的序列y
+
+x &lt;-  rnorm(1000) 
+y &lt;- cumsum(c(0, x)) </code></pre>
+<div id="对序列x进行adf检验" class="section level1">
+<h1>对序列x进行adf检验：</h1>
+<pre class="r"><code>adfTest(x)</code></pre>
+<pre><code>## Warning in adfTest(x): p-value smaller than printed p-value</code></pre>
+<pre><code>## 
+## Title:
+##  Augmented Dickey-Fuller Test
+## 
+## Test Results:
+##   PARAMETER:
+##     Lag Order: 1
+##   STATISTIC:
+##     Dickey-Fuller: -22.8387
+##   P VALUE:
+##     0.01 
+## 
+## Description:
+##  Thu May 22 12:40:47 2025 by user:</code></pre>
+<p>注意上述结果中的P值。</p>
+<p>对序列y进行adf检验：</p>
+<pre class="r"><code>adfTest(y) </code></pre>
+<pre><code>## 
+## Title:
+##  Augmented Dickey-Fuller Test
+## 
+## Test Results:
+##   PARAMETER:
+##     Lag Order: 1
+##   STATISTIC:
+##     Dickey-Fuller: 0.2124
+##   P VALUE:
+##     0.684 
+## 
+## Description:
+##  Thu May 22 12:40:47 2025 by user:</code></pre>
+<p>注意上述结果的p值，跟x序列的结果有什么区别？</p>
+<p>对序列x和序列y进行单位根检验，观察下两者的区别。</p>
+<pre class="r"><code>unitrootTest(x)</code></pre>
+<pre><code>## 
+## Title:
+##  Augmented Dickey-Fuller Test
+## 
+## Test Results:
+##   PARAMETER:
+##     Lag Order: 1
+##   STATISTIC:
+##     DF: -22.8387
+##   P VALUE:
+##     t: &lt; 2.2e-16 
+##     n: 0.0007873 
+## 
+## Description:
+##  Thu May 22 12:40:47 2025 by user:</code></pre>
+<pre class="r"><code>unitrootTest(y)</code></pre>
+<pre><code>## 
+## Title:
+##  Augmented Dickey-Fuller Test
+## 
+## Test Results:
+##   PARAMETER:
+##     Lag Order: 1
+##   STATISTIC:
+##     DF: 0.2124
+##   P VALUE:
+##     t: 0.7478 
+##     n: 0.7349 
+## 
+## Description:
+##  Thu May 22 12:40:47 2025 by user:</code></pre>
+</div>

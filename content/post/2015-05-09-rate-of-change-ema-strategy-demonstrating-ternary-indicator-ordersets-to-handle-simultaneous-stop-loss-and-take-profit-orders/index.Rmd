@@ -1,0 +1,177 @@
+---
+title: 三重动量趋势追踪策略及其 R 实现
+author: MatrixSpk
+date: '2015-05-09'
+slug: rate-of-change-ema-strategy-demonstrating-ternary-indicator-ordersets-to-handle-simultaneous-stop-loss-and-take-profit-orders
+categories:
+  - quant
+tags:
+  - quantstrat
+  - ema
+---
+
+```{R setup}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = here::here())
+```
+
+# 引言
+
+该回测系统采用三重技术指标组合策略，主要逻辑架构如下：
+
+## 核心策略逻辑
+
+* 趋势判断层：通过EMA(12)与EMA(26)双均线组合识别中期趋势方向，当快线上穿慢线时判定为上升趋势。
+
+* 动量验证层：计算快线EMA(12)的ROC(9)指标，确保价格变动具备持续动能。
+
+* 趋势过滤层：引入SMA(200)作为长期趋势基准，要求价格必须位于年线上方才允许做多。
+
+## 信号生成机制
+
+多头信号触发条件（同时满足）：
+
+* EMA(12) > EMA(26)（双均线金叉）
+* ROC(9) > 0（正向动量确认）
+* 收盘价 > SMA(200)（处于长期上升趋势）
+
+空头信号触发条件（同时满足）：
+
+* EMA(12) < EMA(26)（双均线死叉）
+* ROC(9) < 0（负向动量确认）
+* 收盘价 < SMA(200)（处于长期下降趋势）
+
+## 风险控制设计
+
+* 采用固定100股交易量简化头寸管理。
+* 通过quantstrat的ruleSignal机制实现市价单即时成交。
+* 绩效分析模块自动计算夏普比率、最大回撤等关键指标57
+
+该策略通过多指标协同验证，既保留EMA对趋势的敏感度，又利用SMA过滤假突破信号，同时ROC指标确保入场时点具备足够动能。回测框架严格遵循事件驱动原则，模拟真实交易中的订单撮合流程
+
+
+
+# R代码实现
+
+```{R}
+# 加载必要的包
+library(quantstrat)
+library(TTR)
+library(PerformanceAnalytics)
+library(xts)
+library(quantmod)
+# 设置环境选项
+options(width = 240)
+Sys.setenv(TZ = "GMT")
+
+# 清理旧的策略对象
+if (exists(".strategy", envir = globalenv())) {
+    strategy_env <- get(".strategy", envir = globalenv())
+    strategy_objects <- ls(strategy_env)
+    for (obj in strategy_objects) {
+        rm(list = obj, envir = strategy_env)
+    }
+}
+
+# 清理投资组合相关对象
+if (exists(".blotter", envir = globalenv())) {
+    blotter_env <- get(".blotter", envir = globalenv())
+    blotter_objects <- ls(blotter_env)
+    for (obj in blotter_objects) {
+        rm(list = obj, envir = blotter_env)
+    }
+}
+
+
+# 1. 初始化环境
+currency("USD")
+stock("AAPL", currency="USD", multiplier=1)
+initDate <- "2010-01-01"
+endDate <- "2025-05-25"
+initEq <- 100000
+
+# 2. 优化后的策略函数
+rocEmaStrategy <- function(priceData, 
+                          fastEMA = 12, 
+                          slowEMA = 26, 
+                          rocPeriod = 9,
+                          smaFilter = 200) {
+  # 计算三重技术指标
+  fastMA <- EMA(Cl(priceData), fastEMA)
+  slowMA <- EMA(Cl(priceData), slowEMA)
+  roc <- ROC(fastMA, rocPeriod)
+  trendFilter <- SMA(Cl(priceData), smaFilter)  # 新增SMA趋势过滤器
+  
+  # 生成交易信号
+  signal <- ifelse(
+    fastMA > slowMA & roc > 0 & Cl(priceData) > trendFilter, 1,
+    ifelse(
+      fastMA < slowMA & roc < 0 & Cl(priceData) < trendFilter, -1, 
+      0
+    )
+  )
+  xts(na.locf(signal), order.by=index(priceData))
+}
+
+# 3. 回测配置
+strategy.st <- "enhanced_roc_ema"
+portfolio.st <- "quant"
+account.st <- "quant"
+
+# 清除旧策略
+suppressWarnings(rm.strat(strategy.st))
+
+# 初始化组合
+initPortf(portfolio.st, "AAPL", initDate=initDate)
+initAcct(account.st, portfolios=portfolio.st, 
+        initDate=initDate, initEq=initEq)
+initOrders(portfolio.st, initDate=initDate)
+strategy(strategy.st, store=TRUE)
+
+# 4. 添加策略组件
+add.indicator(strategy.st, name="rocEmaStrategy",
+             arguments=list(priceData=quote(mktdata),
+                          fastEMA=12, slowEMA=26,
+                          rocPeriod=9, smaFilter=200),
+             label="signal")
+
+# 交易信号规则
+add.signal(strategy.st, name="sigThreshold",
+          arguments=list(column="signal",
+                        threshold=0.5, 
+                        relationship="gt"),
+          label="longEntry")
+
+add.signal(strategy.st, name="sigThreshold",
+          arguments=list(column="signal",
+                        threshold=-0.5,
+                        relationship="lt"),
+          label="shortEntry")
+
+# 交易执行规则
+add.rule(strategy.st, name="ruleSignal",
+        arguments=list(sigcol="longEntry", sigval=TRUE,
+                      orderqty=100, ordertype="market",
+                      orderside="long", replace=FALSE,
+                      prefer="Open"),
+        type="enter")
+
+add.rule(strategy.st, name="ruleSignal",
+        arguments=list(sigcol="shortEntry", sigval=TRUE,
+                      orderqty=-100, ordertype="market",
+                      orderside="short", replace=FALSE,
+                      prefer="Open"),
+        type="enter")
+
+# 5. 执行回测
+getSymbols("AAPL", from=initDate, to=endDate, adjust=TRUE)
+applyStrategy(strategy.st, portfolio.st)
+updatePortf(portfolio.st)
+updateAcct(account.st)
+updateEndEq(account.st)
+
+# 6. 绩效分析
+equity <- getAccount(account.st)$summary$End.Eq
+returns <- Return.calculate(equity)
+charts.PerformanceSummary(returns, main="策略资金曲线")
+tradeStats(portfolio.st, "AAPL")
+```

@@ -1,0 +1,181 @@
+---
+title: NASDAQ有泡沫吗
+author: MatrixSpk
+date: '2011-09-06'
+slug: demo-about-LPPL
+categories:
+- R
+tags:
+- LPPL
+- r
+- 示例
+- 股市拐点
+- 金融
+---
+
+
+
+<div id="lppl模型是什么" class="section level2">
+<h2>LPPL模型是什么</h2>
+<p>LPPL（对数周期性幂律）模型是由Didier Sornette等学者提出的金融市场泡沫检测模型，用于识别资产价格在崩盘前的非线性加速增长模式。该模型结合了幂律增长和对数周期性振荡，被广泛应用于金融泡沫预警和临界点预测。</p>
+<p>模型的核心是资产价格演化方程：</p>
+<p><span class="math display">\[
+\ln p(t) = A + B(t_c - t)^\beta \left[1 + C\cos\left(\omega \ln(t_c - t) + \phi\right)\right]
+\]</span>
+* <span class="math inline">\(t_c\)</span> 是临界时间（预测的崩盘时间）
+* <span class="math inline">\(\beta\)</span> 是幂律指数
+* <span class="math inline">\(\omega\)</span> 是振荡频率（典型值5-15）
+* <span class="math inline">\(C\)</span> 是振荡幅度
+* <span class="math inline">\(\phi\)</span> 是相位参数</p>
+<p>其中： <span class="math inline">\(0 \lt \beta \lt 1\)</span></p>
+<p>LPPL模型具有如下特征：</p>
+<ul>
+<li>价格加速增长
+<ul>
+<li>幂律项 <span class="math inline">\((t_c - t)^\beta\)</span> 描述价格超指数增长。</li>
+<li>典型泡沫阶段 <span class="math inline">\(\beta \in (0,1)\)</span>，反映增长速率随时间递增。</li>
+</ul></li>
+<li>对数周期振荡
+<ul>
+<li>其中 <span class="math inline">\(cos\left[\omega\ln\left(t_{c}-t\right)\right]\)</span> 反映投资者博弈产生的离散尺度不变性。</li>
+<li>震荡幅度随 <span class="math inline">\(t\to t_{c}\)</span> 增大，体现市场分歧加剧。</li>
+</ul></li>
+<li>临界时间特性
+<ul>
+<li>当 <span class="math inline">\(t\to t_{c}\)</span> 时模型预测系统失稳。</li>
+<li>实际崩盘可能发生在 <span class="math inline">\(t_{c}\)</span> 前6个月内。</li>
+</ul></li>
+</ul>
+</div>
+<div id="拟合模型" class="section level2">
+<h2>拟合模型</h2>
+<pre class="r"><code># 加载依赖包
+library(quantmod)</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>library(DEoptim)</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## 
+## DEoptim package
+## Differential Evolution algorithm in R
+## Authors: D. Ardia, K. Mullen, B. Peterson and J. Ulrich</code></pre>
+<pre class="r"><code>library(ggplot2)
+
+# 获取纳斯达克指数数据（2010-01-01至2011-08-30）
+getSymbols(&quot;^IXIC&quot;, src = &quot;yahoo&quot;, from = &quot;2010-01-01&quot;, to = &quot;2011-08-30&quot;)</code></pre>
+<pre><code>## [1] &quot;IXIC&quot;</code></pre>
+<pre class="r"><code>nasdaq &lt;- data.frame(
+  t = 1:nrow(IXIC), 
+  ln_p = log(Ad(IXIC))
+)
+
+colnames(nasdaq)=c(&quot;t&quot;,&quot;ln_p&quot;)
+# 数据降噪（7日移动平均）
+nasdaq$ln_p_smooth &lt;- stats::filter(nasdaq$ln_p, rep(1/7, 7), sides = 2)
+nasdaq &lt;- na.omit(nasdaq)  # 剔除NA值
+
+
+# 定义LPPL模型函数
+lppl_model &lt;- function(params, t) {
+  A &lt;- params[&quot;A&quot;]; B &lt;- params[&quot;B&quot;]; tc &lt;- params[&quot;tc&quot;]
+  beta &lt;- params[&quot;beta&quot;]; C &lt;- params[&quot;C&quot;]; omega &lt;- params[&quot;omega&quot;]; phi &lt;- params[&quot;phi&quot;]
+  term &lt;- pmax(tc - t, 1e-6)  # 防止出现负数
+  A + B * term^beta + C * term^beta * cos(omega * log(term) + phi)
+}
+
+# 定义损失函数（均方误差）
+loss &lt;- function(params) {
+  pred &lt;- lppl_model(params, nasdaq$t)
+  if (any(is.na(pred))) return(Inf)
+  mean((pred - nasdaq$ln_p_smooth)^2, na.rm = TRUE)
+}
+
+# 参数约束范围
+lower &lt;- c(
+  A = min(nasdaq$ln_p_smooth), 
+  B = -2, 
+  tc = max(nasdaq$t) + 1, 
+  beta = 0.01, 
+  C = 0, 
+  omega = 6, 
+  phi = 0
+)
+
+upper &lt;- c(
+  A = max(nasdaq$ln_p_smooth), 
+  B = 0, 
+  tc = max(nasdaq$t) * 1.2, 
+  beta = 0.99, 
+  C = 0.5, 
+  omega = 13, 
+  phi = 2 * pi
+)
+
+
+# 全局优化（差分进化算法）
+set.seed(123)
+de_result &lt;- DEoptim(
+  fn = loss, 
+  lower = lower, 
+  upper = upper, 
+  control = list(
+    itermax = 500, 
+    NP = 100, 
+    trace = FALSE
+  )
+)
+
+# 局部优化（L-BFGS-B）
+final_params &lt;- optim(
+  de_result$optim$bestmem, 
+  fn = loss, 
+  method = &quot;L-BFGS-B&quot;,
+  lower = lower, 
+  upper = upper
+)$par
+
+# 输出参数估计结果
+cat(&quot;LPPL模型参数估计结果：\n&quot;)</code></pre>
+<pre><code>## LPPL模型参数估计结果：</code></pre>
+<pre class="r"><code>print(round(final_params, 4))</code></pre>
+<pre><code>##        A        B       tc     beta        C    omega      phi 
+##   7.9574  -0.0009 459.8781   0.9167   0.0000   7.7609   5.3808</code></pre>
+</div>
+<div id="结果解读" class="section level2">
+<h2>结果解读</h2>
+<p>从模型结果可以看出：</p>
+<ul>
+<li>临界时间：<span class="math inline">\(t_c\)</span>若输出值为<code>round(final_params,4)$tc</code>，需结合市场背景评估泡沫风险；</li>
+<li>震荡频率：<span class="math inline">\(\omega\)</span>介于6-13区间符合典型泡沫特征；</li>
+<li>衰减指数: <span class="math inline">\(\beta\)</span> 接近<code>round(final_params,4)$beta</code>表明价格波动趋于临界点时分歧加大。</li>
+</ul>
+</div>
+<div id="模型结果可视化" class="section level2">
+<h2>模型结果可视化</h2>
+<pre class="r"><code># 生成预测值
+nasdaq$pred &lt;- lppl_model(final_params, nasdaq$t)
+
+# 绘制拟合曲线
+ggplot(nasdaq, aes(x = t)) +
+  geom_line(aes(y = ln_p, color = &quot;原始对数价格&quot;), alpha = 0.5) +
+  geom_line(aes(y = ln_p_smooth, color = &quot;平滑序列&quot;), linetype = &quot;dashed&quot;) +
+  geom_line(aes(y = pred, color = &quot;LPPL拟合&quot;), linewidth = 1) +
+  scale_color_manual(values = c(&quot;原始对数价格&quot; = &quot;grey&quot;, &quot;平滑序列&quot; = &quot;blue&quot;, &quot;LPPL拟合&quot; = &quot;red&quot;)) +
+  labs(
+    title = &quot;纳斯达克指数LPPL模型拟合效果（2020-2025）&quot;,
+    x = &quot;交易日序数&quot;, 
+    y = &quot;对数价格&quot;
+  ) +
+  theme_minimal() +
+  theme(legend.position = &quot;top&quot;, plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>

@@ -1,0 +1,43 @@
+---
+title: 自动下载财务套表
+author: MatriSpk
+date: '2013-05-27'
+slug: download-financial-sheets
+categories:
+- R
+tags:
+- 财务报表
+- R
+---
+
+
+
+<p>在国内获取上市公司的财务数据是一件叫人头疼的事儿。对于没有Wind终端的个人而言，只有一条路：那就是从网络上抓取。当然，这还是有前提的，那就是网上得有数据可抓。很长一段时间，我都受此困扰，跋山涉水之后，终于从sina财经找到了一个可以下载上市公司历年财务套表的接口，用R写一段自动下载的代码，就可以轻松获取上市公司财务数据了（耶！好开心，妈妈再也不用担心我的的数据来源了！）。</p>
+<p>代码真相在这里：</p>
+<pre class="r"><code># symbol：股票代码
+# type：报表类型。BS为资产负债表；PS为利润表；CF为现金流量表
+# file:存储下载文件的地址。比如，file=&quot;D://&quot;
+
+getsheets &lt;- function(symbol,type,file){
+    pre=&quot;http://money.finance.sina.com.cn/corp/go.php/vDOWN_&quot;;
+    mid=&quot;/displaytype/4/stockid/&quot;;
+    end=&quot;/ctrl/all.phtml&quot;;
+    
+    if(type==&quot;BS&quot;){
+        url=paste(pre,&quot;BalanceSheet&quot;,mid,symbol,end,sep=&quot;&quot;);
+        destfile=paste(file,&quot;BalanceSheet_&quot;,symbol,&quot;.xls&quot;,sep=&quot;&quot;);
+    }
+    else if(type==&quot;PS&quot;){
+          url=paste(pre,&quot;ProfitStatement&quot;,mid,symbol,end,sep=&quot;&quot;);
+          destfile=paste(file,&quot;ProfitStatement_&quot;,symbol,&quot;.xls&quot;,sep=&quot;&quot;);
+    }
+    else if(type==&quot;CF&quot;){
+          url=paste(pre,&quot;CashFlow&quot;,mid,symbol,end,sep=&quot;&quot;);
+          destfile=paste(file,&quot;CashFlow_&quot;,symbol,&quot;.xls&quot;,sep=&quot;&quot;);
+    }
+    download.file(url, destfile);
+}</code></pre>
+<p>运行时如下：</p>
+<pre class="r"><code># 下载000065的资产负债表，并存放在D盘
+getsheets(&quot;000065&quot;,&quot;BS&quot;,&quot;D://&quot;)</code></pre>
+<p>D盘里面有一个叫BalanceSheet_000065.xls的文件，打开就可以看到历年的资产负债表数据了。</p>

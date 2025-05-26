@@ -1,0 +1,114 @@
+---
+title: R中的魔方矩阵
+author: MatrixSpk
+date: '2011-08-29'
+slug: magic
+categories:
+- R
+tags:
+- 魔方矩阵
+---
+
+
+
+<p>某个朋友去证券公司笔试，题目中竟然有一道要求用C语言完成魔方矩阵的输出。如果之前没有做过相关练习，骤然间写出代码可是不容易的事情。</p>
+<p>今天下午查了一下R中的魔方矩阵，发现里面已经有一个magic包可以完成魔方矩阵的输出。R真有点无所不包的气势。</p>
+<div id="魔方矩阵原理应用与可视化实现" class="section level2">
+<h2>魔方矩阵：原理、应用与可视化实现</h2>
+<div id="一数学原理" class="section level3">
+<h3>一、数学原理</h3>
+<p>魔方矩阵（Magic Square）又称幻方，是<span class="math inline">\(n \times n\)</span>的方阵，满足以下特性：</p>
+<ol style="list-style-type: decimal">
+<li><strong>等和定律</strong>：每行、每列及两条主对角线的元素和相等，称为魔方常数<span class="math inline">\(M =\frac{n(n^2+1)}{2}\)</span>；</li>
+<li><strong>元素排列</strong>：包含<span class="math inline">\(1\)</span>到<span class="math inline">\(n^2\)</span>的连续自然数；</li>
+<li><strong>构造规律</strong>：奇数阶常用Siamese方法（楼梯法），偶数阶采用LUX或边界填充策略。</li>
+</ol>
+<p>以3阶魔方为例：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+8 &amp; 1 &amp; 6 \\
+3 &amp; 5 &amp; 7 \\
+4 &amp; 9 &amp; 2 \\
+\end{bmatrix}
+\]</span></p>
+<p>其行、列、对角线之和均为<span class="math inline">\(15\)</span>。</p>
+</div>
+<div id="二核心价值" class="section level3">
+<h3>二、核心价值</h3>
+<div id="科学研究维度" class="section level4">
+<h4>1. 科学研究维度</h4>
+<ul>
+<li><strong>数论验证</strong>：魔方常数与矩阵阶数的数学关系为代数理论提供验证案例</li>
+<li><strong>组合优化</strong>：启发旅行商问题(TSP)、排班系统等组合优化算法设计</li>
+</ul>
+</div>
+<div id="文化应用场景" class="section level4">
+<h4>2. 文化应用场景</h4>
+<ul>
+<li><strong>密码原型</strong>：古代战争曾用魔方矩阵加密军事情报</li>
+<li><strong>艺术设计</strong>：印度泰姬陵地砖、敦煌壁画均包含幻方图案</li>
+</ul>
+</div>
+</div>
+<div id="三r语言实现" class="section level3">
+<h3>三、R语言实现</h3>
+<div id="构造魔方矩阵" class="section level4">
+<h4>1. 构造魔方矩阵</h4>
+<pre class="r"><code># 安装必要包
+if (!require(&quot;magic&quot;)) install.packages(&quot;magic&quot;)</code></pre>
+<pre><code>## Loading required package: magic</code></pre>
+<pre><code>## Loading required package: abind</code></pre>
+<pre class="r"><code>library(magic)
+
+# 生成5阶魔方矩阵
+magic_matrix &lt;- magic(5)
+print(magic_matrix)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    9    2   25   18   11
+## [2,]    3   21   19   12   10
+## [3,]   22   20   13    6    4
+## [4,]   16   14    7    5   23
+## [5,]   15    8    1   24   17</code></pre>
+</div>
+<div id="可视化" class="section level4">
+<h4>2. 可视化</h4>
+<pre class="r"><code>library(ggplot2)
+library(reshape2)
+
+# 数据重塑
+melted_matrix &lt;- melt(magic_matrix)
+colnames(melted_matrix) &lt;- c(&quot;Row&quot;, &quot;Column&quot;, &quot;Value&quot;)
+
+# 绘制热力图
+ggplot(melted_matrix, aes(x = Column, y = Row, fill = Value)) +
+  geom_tile(color = &quot;white&quot;) +
+  scale_fill_gradient(low = &quot;#FFD700&quot;, high = &quot;#FF4500&quot;) +
+  geom_text(aes(label = Value), color = &quot;black&quot;, size = 4) +
+  theme_minimal(base_family=&quot;PingFang SC&quot;) +
+  labs(title = &quot;5阶魔方矩阵可视化&quot;,
+       subtitle = &quot;行、列、对角线之和均为65&quot;) +
+  coord_fixed()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>还可以写一段更简单的代码：</p>
+<pre class="r"><code># 安装包，如果为安装
+# install.packages(&quot;magic&quot;)
+library(magic)
+# 定义魔方矩阵函数magic.image()
+magic.image &lt;- function(n,...){
+    # 生成n阶魔方矩阵
+    m&lt;- magic(n)
+    # 生成魔方矩阵热图
+    image(m)
+    # 添加数字标签
+    for(j in 1:n){
+        for(i in 1:n){
+            text(1/(n-1)*i-1/(n-1),1+1/(n-1)-1/(n-1)*j,m[j,i])
+        }
+    }
+}
+# 使用函数
+magic.image(5)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+</div>
+</div>

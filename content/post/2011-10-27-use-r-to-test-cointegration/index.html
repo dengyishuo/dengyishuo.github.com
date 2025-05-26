@@ -1,0 +1,276 @@
+---
+title: 用R检验股票的协整关系
+author: MatrixSpk
+date: '2011-10-27'
+slug: use-r-to-test-cointegration
+categories:
+- 计量经济学
+tags:
+- 协整
+- 股票
+---
+
+
+
+<div id="需要用到的r包" class="section level2">
+<h2>需要用到的R包</h2>
+<p>xts和zoo是两个强大的处理时序对象的R包。xts包本身又相当于是一个加强版的zoo包。zoo包处理的对象是zoo，zoo对象与数据框（dataframe)类似，由行列构成。不同的是，zoo对象比数据框多了一个时间戳。</p>
+<p>假设我们有一个zoo对象t，index(t)返回时间戳，也就是一个表示日期的向量。start(t)和end（t）可以查看zoo对象的起始值和末端值。</p>
+</div>
+<div id="数据预处理" class="section level2">
+<h2>数据预处理</h2>
+<p>分四个步骤：</p>
+<ul>
+<li>读入数据（data frame格式）</li>
+<li>将日期转化为Date对象</li>
+<li>将data frame数据转换为zoo对象</li>
+<li>合并数据</li>
+</ul>
+</div>
+<div id="相应的r代码" class="section level2">
+<h2>相应的R代码：</h2>
+<pre class="r"><code>library(quantmod)   # 金融数据获取</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>library(urca)       # 协整检验
+library(ggplot2)    # 可视化
+
+# 获取2010-2011年股票数据
+getSymbols(c(&quot;AAPL&quot;,&quot;MSFT&quot;))</code></pre>
+<pre><code>## [1] &quot;AAPL&quot; &quot;MSFT&quot;</code></pre>
+<pre class="r"><code># 提取收盘价并转换为对数序列
+aapl &lt;- log(Ad(AAPL$AAPL.Adjusted))
+msft &lt;- log(Ad(MSFT$MSFT.Adjusted))
+
+# 创建合并数据集
+prices &lt;- merge(aapl, msft)
+colnames(prices) &lt;- c(&quot;log_AAPL&quot;, &quot;log_MSFT&quot;)
+
+# 绘制对数价格趋势
+ggplot(prices, aes(x=Index)) +
+  geom_line(aes(y=log_AAPL, color=&quot;苹果&quot;)) +
+  geom_line(aes(y=log_MSFT, color=&quot;微软&quot;)) +
+  labs(title=&quot;苹果与微软对数收盘价序列&quot;, y=&quot;log(Price)&quot;, x=&quot;日期&quot;) +
+  scale_color_manual(values=c(&quot;#FF6B6B&quot;, &quot;#4ECDC4&quot;)) +
+  theme_minimal(base_family = &quot;PingFang SC&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="平稳性检验" class="section level2">
+<h2>平稳性检验</h2>
+<pre class="r"><code># 原始序列检验
+# 苹果价格ADF检验
+summary(ur.df(prices$log_AAPL, type=&quot;drift&quot;, lags=5)) #P-value大于0.05则序列不平稳</code></pre>
+<pre><code>## 
+## ############################################### 
+## # Augmented Dickey-Fuller Test Unit Root Test # 
+## ############################################### 
+## 
+## Test regression drift 
+## 
+## 
+## Call:
+## lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.197472 -0.008979  0.000178  0.010309  0.141543 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.0016435  0.0008127   2.022   0.0432 *
+## z.lag.1     -0.0002110  0.0002251  -0.937   0.3488  
+## z.diff.lag1 -0.0305922  0.0147142  -2.079   0.0377 *
+## z.diff.lag2 -0.0150303  0.0146911  -1.023   0.3063  
+## z.diff.lag3 -0.0094694  0.0146928  -0.644   0.5193  
+## z.diff.lag4  0.0243825  0.0146916   1.660   0.0971 .
+## z.diff.lag5  0.0126530  0.0146884   0.861   0.3890  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.01993 on 4613 degrees of freedom
+## Multiple R-squared:  0.002168,	Adjusted R-squared:  0.0008705 
+## F-statistic: 1.671 on 6 and 4613 DF,  p-value: 0.1239
+## 
+## 
+## Value of test-statistic is: -0.9371 5.4518 
+## 
+## Critical values for test statistics: 
+##       1pct  5pct 10pct
+## tau2 -3.43 -2.86 -2.57
+## phi1  6.43  4.59  3.78</code></pre>
+<pre class="r"><code># 微软价格ADF检验
+summary(ur.df(prices$log_MSFT, type=&quot;drift&quot;, lags=5))  </code></pre>
+<pre><code>## 
+## ############################################### 
+## # Augmented Dickey-Fuller Test Unit Root Test # 
+## ############################################### 
+## 
+## Test regression drift 
+## 
+## 
+## Call:
+## lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.148286 -0.008040  0.000167  0.008823  0.160869 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  7.972e-05  1.002e-03   0.080  0.93662    
+## z.lag.1      1.734e-04  2.332e-04   0.744  0.45718    
+## z.diff.lag1 -1.087e-01  1.473e-02  -7.379 1.88e-13 ***
+## z.diff.lag2 -4.171e-02  1.480e-02  -2.819  0.00484 ** 
+## z.diff.lag3  5.266e-03  1.481e-02   0.356  0.72219    
+## z.diff.lag4 -4.285e-02  1.480e-02  -2.896  0.00380 ** 
+## z.diff.lag5 -1.780e-02  1.472e-02  -1.209  0.22684    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.01754 on 4613 degrees of freedom
+## Multiple R-squared:  0.0147,	Adjusted R-squared:  0.01342 
+## F-statistic: 11.47 on 6 and 4613 DF,  p-value: 8.848e-13
+## 
+## 
+## Value of test-statistic is: 0.7436 5.0339 
+## 
+## Critical values for test statistics: 
+##       1pct  5pct 10pct
+## tau2 -3.43 -2.86 -2.57
+## phi1  6.43  4.59  3.78</code></pre>
+<pre class="r"><code># 一阶差分平稳性验证
+# 差分处理
+diff_aapl &lt;- diff(prices$log_AAPL)[-1]
+diff_msft &lt;- diff(prices$log_MSFT)[-1]
+
+# 差分序列ADF检验
+summary(ur.df(diff_aapl, type=&quot;none&quot;))  </code></pre>
+<pre><code>## 
+## ############################################### 
+## # Augmented Dickey-Fuller Test Unit Root Test # 
+## ############################################### 
+## 
+## Test regression none 
+## 
+## 
+## Call:
+## lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.197881 -0.007933  0.001141  0.011329  0.140816 
+## 
+## Coefficients:
+##            Estimate Std. Error t value Pr(&gt;|t|)    
+## z.lag.1    -1.03871    0.02107 -49.300   &lt;2e-16 ***
+## z.diff.lag  0.01294    0.01471   0.879    0.379    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.01999 on 4621 degrees of freedom
+## Multiple R-squared:  0.5127,	Adjusted R-squared:  0.5125 
+## F-statistic:  2431 on 2 and 4621 DF,  p-value: &lt; 2.2e-16
+## 
+## 
+## Value of test-statistic is: -49.3002 
+## 
+## Critical values for test statistics: 
+##       1pct  5pct 10pct
+## tau1 -2.58 -1.95 -1.62</code></pre>
+<pre class="r"><code>summary(ur.df(diff_msft, type=&quot;none&quot;)) </code></pre>
+<pre><code>## 
+## ############################################### 
+## # Augmented Dickey-Fuller Test Unit Root Test # 
+## ############################################### 
+## 
+## Test regression none 
+## 
+## 
+## Call:
+## lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.149182 -0.007348  0.000788  0.009501  0.165492 
+## 
+## Coefficients:
+##            Estimate Std. Error t value Pr(&gt;|t|)    
+## z.lag.1    -1.14611    0.02183 -52.500  &lt; 2e-16 ***
+## z.diff.lag  0.03934    0.01470   2.676  0.00747 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.01757 on 4621 degrees of freedom
+## Multiple R-squared:  0.552,	Adjusted R-squared:  0.5518 
+## F-statistic:  2847 on 2 and 4621 DF,  p-value: &lt; 2.2e-16
+## 
+## 
+## Value of test-statistic is: -52.5003 
+## 
+## Critical values for test statistics: 
+##       1pct  5pct 10pct
+## tau1 -2.58 -1.95 -1.62</code></pre>
+</div>
+<div id="协整检验" class="section level2">
+<h2>协整检验</h2>
+<p>我们用Engle-Granger两步法进行协整检验。</p>
+<pre class="r"><code># 第一步：构建回归模型
+coint_model &lt;- lm(log_AAPL ~ log_MSFT, data=prices)
+summary(coint_model)  # 显示回归系数与R-squared</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log_AAPL ~ log_MSFT, data = prices)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.20571 -0.17989  0.03816  0.22289  0.77262 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -1.338879   0.020565   -65.1   &lt;2e-16 ***
+## log_MSFT     1.130783   0.004781   236.5   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3604 on 4624 degrees of freedom
+## Multiple R-squared:  0.9237,	Adjusted R-squared:  0.9236 
+## F-statistic: 5.595e+04 on 1 and 4624 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># 提取残差序列
+residuals &lt;- residuals(coint_model)
+
+# 第二步：残差平稳性检验
+adf_test &lt;- ur.df(residuals, type=&quot;none&quot;, lags=5)
+print(adf_test@teststat)    # ADF统计量</code></pre>
+<pre><code>##                tau1
+## statistic -2.863684</code></pre>
+<pre class="r"><code>print(adf_test@cval)        # 临界值</code></pre>
+<pre><code>##       1pct  5pct 10pct
+## tau1 -2.58 -1.95 -1.62</code></pre>
+<p>ADF统计量为-2.8636844,小于1%置信水平对应的临界值-2.58，故拒绝原假设，说明残差序列平稳，两股票存在协整关系。</p>
+</div>
+<div id="对协整关系进行可视化" class="section level2">
+<h2>对协整关系进行可视化</h2>
+<pre class="r"><code># 计算价差序列
+spread &lt;- prices$log_AAPL - coint_model$coefficients[2] * prices$log_MSFT
+
+# 绘制价差通道
+ggplot(spread, aes(x=Index)) +
+  geom_line(aes(y=spread), color=&quot;#2C3E50&quot;) +
+  geom_hline(yintercept=mean(spread), linetype=&quot;dashed&quot;, color=&quot;#E74C3C&quot;) +
+  geom_hline(yintercept=mean(spread)+2*sd(spread), color=&quot;#27AE60&quot;, alpha=0.5) +
+  geom_hline(yintercept=mean(spread)-2*sd(spread), color=&quot;#27AE60&quot;, alpha=0.5) +
+  labs(title=&quot;协整价差序列与2σ通道&quot;, y=&quot;标准化价差&quot;)+
+  theme_minimal(base_family = &quot;PingFang SC&quot;)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type &lt;xts/zoo&gt;.
+## Defaulting to continuous.</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>

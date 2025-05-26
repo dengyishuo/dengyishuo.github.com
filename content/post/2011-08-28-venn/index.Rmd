@@ -1,0 +1,100 @@
+---
+title: R语言绘制维恩图
+author: MatrixSpk
+date: '2011-08-28'
+slug: venn
+categories:
+- R
+tags:
+- r
+- 韦恩图
+---
+
+很久之前整理的关于R绘制维恩图的资料，虽然，用R绘制维恩图并不是很常见，还是记下一笔，以备需要者参考。
+
+```{r}
+# Gplots包
+library(gplots)
+A<- 1:20
+B<- 1:20
+C<- 2:20
+D<- 3:21
+
+input<-list(A,B,C,D)
+input
+
+venn(input)
+
+A<- as.logical(rbinom(100, 1, 0.2))
+B<- as.logical(rbinom(100, 1, 0.7))
+C<- as.logical(rbinom(100, 1, 0.2))
+D<- as.logical(rbinom(100, 1, 0.1))
+
+input<-data.frame(A,B,C,D)
+venn(input)
+tmp <- venn(input, simplify=TRUE)
+tmp
+
+venn(input, showSetLogicLabel=TRUE)
+
+# asbio包
+library(asbio)
+Venn(A=.3,B=.2,AandB=.06)
+
+# limma包
+# install.packages("BiocManager")
+# BiocManager::install("limma")
+library(limma)
+Y <- matrix(rnorm(100*6),100,6)
+Y[1:10,3:4] <- Y[1:10,3:4]+3
+Y[1:20,5:6] <- Y[1:20,5:6]+3
+design <- cbind(1,c(0,0,1,1,0,0),c(0,0,0,0,1,1))
+fit <- eBayes(lmFit(Y,design))
+results <- decideTests(fit)
+a <- vennCounts(results)
+print(a)
+
+vennDiagram(a)
+
+vennDiagram(results,include=c("up","down"),counts.col=c("red","green"))
+
+# venneuler包
+
+library(venneuler)
+vd <- venneuler(c(A=0.3, B=0.3, C=1.1, "A&B"=0.1, "A&C"=0.2, "B&C"=0.1 ,"A&B&C"=0.1))
+
+plot(vd)
+
+m <- data.frame(elements=c("1","2","2","2","3"),sets=c("A","A","B","C","C"))
+  
+v <- venneuler(m)
+
+plot(v)
+
+m <- as.matrix(data.frame(A=c(1.5, 0.2, 0.4, 0, 0),B=c(0, 0.2, 0, 1, 0), C=c(0, 0, 0.3, 0, 1)))
+
+v <- venneuler(m > 0)
+
+plot(v)
+
+v <- venneuler(m)
+
+plot(v)
+
+# Vennerable包
+
+# BiocManager::install("graph")
+# BiocManager::install("RBGL")
+# BiocManager::install("reshape")
+# install.packages("Vennerable", repos="http://R-Forge.R-project.org")
+
+library(Vennerable)
+Venn(n=3)
+plot(Venn(n=3))
+data(StemCell)
+w <- Venn(Sets=StemCell[1:2])
+Weights(w)
+plot(w)
+Weights(w) <- 1:4
+plot(w)
+```

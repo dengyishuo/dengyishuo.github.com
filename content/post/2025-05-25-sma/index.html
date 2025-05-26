@@ -1,0 +1,230 @@
+---
+title: 五分钟搞定 SMA 指标的量化策略开发和回测
+author: MatrixSpk
+date: '2025-05-25'
+slug: sma
+categories:
+  - quant
+tags:
+  - sma
+  - r
+  - quantstrat
+  - quantmod
+---
+
+
+
+<p>常有人问我，能用几分钟时间上手写一段代码进行一个简易的量化投资策略的开发和回测吗？答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。</p>
+<div id="引言" class="section level1">
+<h1>引言</h1>
+<p>本文的代码基于<a href="https://r-project.org">R</a>软件和 <a href="https://posit.co">Rstuido</a> 软件运行，如果未安装上述软件，请自行安装。</p>
+<pre class="r"><code># 安装依赖包，如果未安装
+install.packages(c(&quot;quantstrat&quot;, &quot;Tushare&quot;, &quot;xts&quot;, &quot;dplyr&quot;, &quot;showtext&quot;, &quot;zoo&quot;,&quot;PerformanceAnalytics&quot;,&quot;tidyverse&quot;))
+# 加载软件包
+library(quantstrat)
+library(Tushare)
+library(xts)
+library(dplyr)
+library(showtext)
+library(PerformanceAnalytics)
+library(zoo)
+library(tidyverse)</code></pre>
+</div>
+<div id="清理环境" class="section level1">
+<h1>清理环境</h1>
+<pre class="r"><code># 清理.strategy环境中的对象
+if (exists(&quot;.strategy&quot;, envir = globalenv())) {
+    strategy_env &lt;- get(&quot;.strategy&quot;, envir = globalenv())
+    strategy_objects &lt;- ls(strategy_env)
+    for (obj in strategy_objects) {
+        rm(list = obj, envir = strategy_env)
+    }
+}
+
+# 清理.blotter环境中的对象
+if (exists(&quot;.blotter&quot;, envir = globalenv())) {
+    blotter_env &lt;- get(&quot;.blotter&quot;, envir = globalenv())
+    blotter_objects &lt;- ls(blotter_env)
+    for (obj in blotter_objects) {
+        rm(list = obj, envir = blotter_env)
+    }
+}
+
+# 清理.account环境中的对象
+if (exists(&quot;.account&quot;, envir = globalenv())) {
+    account_env &lt;- get(&quot;.account&quot;, envir = globalenv())
+    account_objects &lt;- ls(account_env)
+    for (obj in account_objects) {
+        rm(list = obj, envir = account_env)
+    }
+}</code></pre>
+</div>
+<div id="策略开发" class="section level1">
+<h1>策略开发</h1>
+<div id="初始化设置" class="section level2">
+<h2>初始化设置</h2>
+<pre class="r"><code>currency(&quot;RMB&quot;)  # 设置货币为人民币</code></pre>
+<pre><code>## [1] &quot;RMB&quot;</code></pre>
+<pre class="r"><code>stock(&quot;maotai&quot;, currency=&quot;RMB&quot;) # 设置贵州茅台股票代码</code></pre>
+<pre><code>## [1] &quot;maotai&quot;</code></pre>
+</div>
+<div id="获取数据" class="section level2">
+<h2>获取数据</h2>
+<p>使用quantmod获取贵州茅台数据</p>
+<pre class="r"><code>getSymbols(&quot;600519.SS&quot;, from=&quot;2010-01-01&quot;, to=Sys.Date())</code></pre>
+<pre><code>## [1] &quot;600519.SS&quot;</code></pre>
+<pre class="r"><code>maotai &lt;- `600519.SS` # 重命名对象
+colnames(maotai) &lt;- c(&quot;Open&quot;,&quot;High&quot;,&quot;Low&quot;,&quot;Close&quot;,&quot;Volume&quot;,&quot;Adjusted&quot;)</code></pre>
+</div>
+<div id="初始化策略" class="section level2">
+<h2>初始化策略</h2>
+<pre class="r"><code>strategy.name &lt;- &quot;SMA_Strategy&quot;
+portfolio.name &lt;- &quot;maotai_portfolio&quot;
+account.name &lt;- &quot;maotai_account&quot;
+
+# 清除旧策略(如果存在)
+rm.strat(strategy.name)
+
+# 初始化组合、账户和策略
+initPortf(portfolio.name, symbols=&quot;maotai&quot;, initDate=&quot;2009-12-31&quot;)</code></pre>
+<pre><code>## [1] &quot;maotai_portfolio&quot;</code></pre>
+<pre class="r"><code>initAcct(account.name, portfolios=portfolio.name, initDate=&quot;2009-12-31&quot;, initEq=100000)</code></pre>
+<pre><code>## [1] &quot;maotai_account&quot;</code></pre>
+<pre class="r"><code>initOrders(portfolio.name, initDate=&quot;2009-12-31&quot;)
+strategy(strategy.name, store=TRUE)</code></pre>
+</div>
+<div id="添加指标" class="section level2">
+<h2>添加指标</h2>
+<p>这里添加的简单移动平均线(SMA)：</p>
+<pre class="r"><code>add.indicator(
+  strategy = strategy.name,
+  name = &quot;SMA&quot;,  # 使用SMA指标
+  arguments = list(x=quote(Cl(mktdata)), n=50), # 50日均线
+  label = &quot;SMA50&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre class="r"><code>add.indicator(
+  strategy = strategy.name,
+  name = &quot;SMA&quot;,
+  arguments = list(x=quote(Cl(mktdata)), n=200), # 200日均线
+  label = &quot;SMA200&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+</div>
+<div id="添加信号---金叉死叉" class="section level2">
+<h2>添加信号 - 金叉死叉</h2>
+<pre class="r"><code>add.signal(
+  strategy.name,
+  name = &quot;sigCrossover&quot;,
+  arguments = list(columns=c(&quot;SMA50&quot;,&quot;SMA200&quot;), relationship=&quot;gt&quot;), # 50日线上穿200日线
+  label = &quot;golden.cross&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre class="r"><code>add.signal(
+  strategy.name,
+  name = &quot;sigCrossover&quot;,
+  arguments = list(columns=c(&quot;SMA50&quot;,&quot;SMA200&quot;), relationship=&quot;lt&quot;), # 50日线下穿200日线
+  label = &quot;death.cross&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+</div>
+<div id="添加交易规则" class="section level2">
+<h2>添加交易规则</h2>
+<pre class="r"><code># 金叉买入规则
+add.rule(
+  strategy.name,
+  name = &quot;ruleSignal&quot;,
+  arguments = list(
+    sigcol = &quot;golden.cross&quot;,
+    sigval = TRUE,
+    orderqty = 100,  # 买入100股
+    ordertype = &quot;market&quot;,
+    orderside = &quot;long&quot;,
+    replace = FALSE
+  ),
+  type = &quot;enter&quot;,
+  label = &quot;EnterLong&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+<pre class="r"><code># 死叉卖出规则
+add.rule(
+  strategy.name,
+  name = &quot;ruleSignal&quot;,
+  arguments = list(
+    sigcol = &quot;death.cross&quot;,
+    sigval = TRUE,
+    orderqty = &quot;all&quot;,  # 卖出全部持仓
+    ordertype = &quot;market&quot;,
+    orderside = &quot;long&quot;,
+    replace = FALSE
+  ),
+  type = &quot;exit&quot;,
+  label = &quot;ExitLong&quot;
+)</code></pre>
+<pre><code>## [1] &quot;SMA_Strategy&quot;</code></pre>
+</div>
+</div>
+<div id="策略回测" class="section level1">
+<h1>策略回测</h1>
+<pre class="r"><code>applyStrategy(
+  strategy = strategy.name,
+  portfolios = portfolio.name
+)</code></pre>
+<pre><code>## [1] &quot;2012-04-17 00:00:00 maotai 100 @ 173.702484130859&quot;
+## [1] &quot;2012-12-17 00:00:00 maotai -100 @ 174.454544067383&quot;
+## [1] &quot;2014-04-11 00:00:00 maotai 100 @ 145.520660400391&quot;
+## [1] &quot;2015-10-14 00:00:00 maotai -100 @ 197.830001831055&quot;
+## [1] &quot;2015-11-24 00:00:00 maotai 100 @ 211.690002441406&quot;
+## [1] &quot;2016-01-20 00:00:00 maotai -100 @ 202.320007324219&quot;
+## [1] &quot;2016-03-25 00:00:00 maotai 100 @ 244.979995727539&quot;
+## [1] &quot;2018-08-29 00:00:00 maotai -100 @ 685.849975585938&quot;
+## [1] &quot;2019-03-11 00:00:00 maotai 100 @ 758.539978027344&quot;
+## [1] &quot;2020-03-30 00:00:00 maotai -100 @ 1072&quot;
+## [1] &quot;2020-04-17 00:00:00 maotai 100 @ 1226&quot;
+## [1] &quot;2021-08-13 00:00:00 maotai -100 @ 1700.0400390625&quot;
+## [1] &quot;2021-12-29 00:00:00 maotai 100 @ 2041&quot;
+## [1] &quot;2022-03-16 00:00:00 maotai -100 @ 1674.94995117188&quot;
+## [1] &quot;2022-07-07 00:00:00 maotai 100 @ 1990&quot;
+## [1] &quot;2022-10-14 00:00:00 maotai -100 @ 1737.60998535156&quot;
+## [1] &quot;2023-02-21 00:00:00 maotai 100 @ 1867&quot;
+## [1] &quot;2023-05-08 00:00:00 maotai -100 @ 1720.52001953125&quot;
+## [1] &quot;2023-08-01 00:00:00 maotai 100 @ 1889&quot;
+## [1] &quot;2023-11-22 00:00:00 maotai -100 @ 1781.51000976562&quot;
+## [1] &quot;2025-03-28 00:00:00 maotai 100 @ 1585.2099609375&quot;</code></pre>
+</div>
+<div id="更新组合和账户" class="section level1">
+<h1>更新组合和账户</h1>
+<pre class="r"><code>updatePortf(portfolio.name)</code></pre>
+<pre><code>## [1] &quot;maotai_portfolio&quot;</code></pre>
+<pre class="r"><code>updateAcct(account.name)</code></pre>
+<pre><code>## [1] &quot;maotai_account&quot;</code></pre>
+<pre class="r"><code>updateEndEq(account.name)</code></pre>
+<pre><code>## [1] &quot;maotai_account&quot;</code></pre>
+</div>
+<div id="分析结果" class="section level1">
+<h1>分析结果</h1>
+<pre class="r"><code># 获取交易统计数据
+tstats &lt;- tradeStats(portfolio.name)
+print(tstats)</code></pre>
+<pre><code>##               Portfolio Symbol Num.Txns Num.Trades Net.Trading.PL Avg.Trade.PL
+## maotai maotai_portfolio maotai       21         10       38704.14     3996.514
+##        Med.Trade.PL Largest.Winner Largest.Loser Gross.Profits Gross.Losses
+## maotai    -430.8968          47404        -36605      128143.1       -88178
+##        Std.Dev.Trade.PL Std.Err.Trade.PL Percent.Positive Percent.Negative
+## maotai         28575.32         9036.308               50               50
+##        Profit.Factor Avg.Win.Trade Med.Win.Trade Avg.Losing.Trade
+## maotai      1.453233      25628.63         31346         -17635.6
+##        Med.Losing.Trade Avg.Daily.PL Med.Daily.PL Std.Dev.Daily.PL
+## maotai           -14648     3996.514    -430.8968         28575.32
+##        Std.Err.Daily.PL Ann.Sharpe Max.Drawdown Profit.To.Max.Draw
+## maotai         9036.308   2.220192      -192488           0.201073
+##        Avg.WinLoss.Ratio Med.WinLoss.Ratio Max.Equity Min.Equity End.Equity
+## maotai          1.453233          2.139951   217302.1  -2495.042   38704.14</code></pre>
+<pre class="r"><code># 绘制权益曲线
+equity &lt;- getAccount(account.name)$summary$End.Eq
+plot(equity, main=&quot;Strategy Equity Curve&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/ana-1.png" width="672" /></p>
+<pre class="r"><code># 绘制持仓和交易
+chart.Posn(portfolio.name, Symbol=&quot;maotai&quot;, TA=&quot;add_SMA(n=50,col=&#39;blue&#39;);add_SMA(n=200,col=&#39;red&#39;)&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/ana-2.png" width="672" /></p>
+</div>

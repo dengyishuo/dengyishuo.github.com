@@ -1,0 +1,70 @@
+---
+title: R软件中的集合计算操作
+author: MatrixSpk
+date: '2013-09-27'
+slug: notes-on-sets-caculations-in-r
+categories:
+- R
+tags:
+- 集合运算
+- R语言
+- R软件
+---
+
+
+
+<p>在处理数据尤其是在编写函数或编译R包的时候会涉及到集合的运算操作。比如，判断某个元素是否属于某个集合，并用这个判断结果作为 if 结构中的条件语句。</p>
+<p>在量化投资的编程中更是经常用到集合的运算操作。比如，判断某支股票是否在今日的投资组合里，又或者在已有当前投资组合的情况下如何生成交易单以得到理想投资组合的股票代码，这涉及到差集操作。因此，了解一下R中的集合计算操作是很有必要的。</p>
+<p>根据小学时候的知识，我们知道集合计算无非包括这么几类：</p>
+<ul>
+<li>两个集合的交集，即两个集合中共有的那些元素</li>
+<li>两个集合的并集，即两个集合粗暴合并，并剔除重复值后剩余的那些元素</li>
+<li>两个集合的差集，集合1减去集合1跟集合2的交集，即得到集合1、集合2的差集，换句话说，集合1中包含而集合2未包含的那些元素</li>
+<li>元素判断，即开篇说的那个问题，某个元素是否属于某个集合</li>
+<li>集合等价判断，即两个集合是否是同一个集合</li>
+</ul>
+<p>它们对应的R函数就是下面这些：</p>
+<ul>
+<li>union(x, y)</li>
+<li>intersect(x, y)</li>
+<li>setdiff(x, y)</li>
+<li>is.element(el, set)</li>
+<li>setequal(x, y)</li>
+</ul>
+<p>本着解释知识不举例子就是耍流氓的精神，我们看看下面的例子:</p>
+<pre class="r"><code># 随意生成两个向量x和y
+x &lt;- c(sort(sample(1:20, 9)), NA)
+y &lt;- c(sort(sample(3:23, 7)), NA)
+# 查看 x，y 都长什么样子
+x</code></pre>
+<pre><code>##  [1]  2  3  6 13 14 15 16 17 20 NA</code></pre>
+<pre class="r"><code>y</code></pre>
+<pre><code>## [1]  7 10 13 14 15 18 21 NA</code></pre>
+<pre class="r"><code># 计算并集
+union(x, y)</code></pre>
+<pre><code>##  [1]  2  3  6 13 14 15 16 17 20 NA  7 10 18 21</code></pre>
+<pre class="r"><code># 计算交集
+intersect(x, y)</code></pre>
+<pre><code>## [1] 13 14 15 NA</code></pre>
+<pre class="r"><code># 计算差集，注意：计算差集时，集合的先后顺序是影响结果滴！
+setdiff(x, y)</code></pre>
+<pre><code>## [1]  2  3  6 16 17 20</code></pre>
+<pre class="r"><code>setdiff(y, x)</code></pre>
+<pre><code>## [1]  7 10 18 21</code></pre>
+<pre class="r"><code># x，y是否相等，当然不相等啦....
+setequal(x, y)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code># 看看并集、交集、差集的关系
+## True for all possible x &amp; y :
+setequal( union(x, y),
+          c(setdiff(x, y), intersect(x, y), setdiff(y, x)))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># 元素判断
+is.element(5, x)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.element(100, x)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.element(x, y) # length 10</code></pre>
+<pre><code>##  [1] FALSE FALSE FALSE  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE</code></pre>
+<pre class="r"><code>is.element(y, x) # length  8</code></pre>
+<pre><code>## [1] FALSE FALSE  TRUE  TRUE  TRUE FALSE FALSE  TRUE</code></pre>
