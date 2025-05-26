@@ -65,14 +65,15 @@ rm(list=ls(.strategy), envir=.strategy)
 
 # 策略开发
 
-下面进入正式开发。
+下面进入正式开发流程。
 
 ## 初始化设置
 
 ```{R init}
 # 参数设置
-initDate <- "2010-01-01"
-endDate <- "2025-05-26"
+initDate <- "2009-12-31"
+fromDate <- "2010-01-01"
+endDate <- Sys.Date()
 symbol <- "600519.SS"
 initEq <- 100000
 fastMA <- 5
@@ -85,7 +86,7 @@ slowMA <- 20
 
 ```{R dat}
 # 获取数据
-getSymbols(symbol, from=initDate, to=endDate, src="yahoo")
+getSymbols(symbol, from=fromDate, to=endDate, src="yahoo")
 maotai <- `600519.SS`
 colnames(maotai) <- c("Open","High","Low","Close","Volume","Adjusted")
 ```

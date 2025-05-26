@@ -42,12 +42,13 @@ rm(list=ls(.strategy), envir=.strategy)</code></pre>
 </div>
 <div id="策略开发" class="section level1">
 <h1>策略开发</h1>
-<p>下面进入正式开发。</p>
+<p>下面进入正式开发流程。</p>
 <div id="初始化设置" class="section level2">
 <h2>初始化设置</h2>
 <pre class="r"><code># 参数设置
-initDate &lt;- &quot;2010-01-01&quot;
-endDate &lt;- &quot;2025-05-26&quot;
+initDate &lt;- &quot;2009-12-31&quot;
+fromDate &lt;- &quot;2010-01-01&quot;
+endDate &lt;- Sys.Date()
 symbol &lt;- &quot;600519.SS&quot;
 initEq &lt;- 100000
 fastMA &lt;- 5
@@ -57,7 +58,7 @@ slowMA &lt;- 20</code></pre>
 <h2>获取数据</h2>
 <p>使用quantmod获取贵州茅台数据</p>
 <pre class="r"><code># 获取数据
-getSymbols(symbol, from=initDate, to=endDate, src=&quot;yahoo&quot;)</code></pre>
+getSymbols(symbol, from=fromDate, to=endDate, src=&quot;yahoo&quot;)</code></pre>
 <pre><code>## [1] &quot;600519.SS&quot;</code></pre>
 <pre class="r"><code>maotai &lt;- `600519.SS`
 colnames(maotai) &lt;- c(&quot;Open&quot;,&quot;High&quot;,&quot;Low&quot;,&quot;Close&quot;,&quot;Volume&quot;,&quot;Adjusted&quot;)</code></pre>
@@ -395,7 +396,7 @@ add.signal(
 trades &lt;- getTxns(Portfolio = portfolio.st, Symbol = symbol)
 print(trades)</code></pre>
 <pre><code>##            Txn.Qty  Txn.Price Txn.Fees   Txn.Value Txn.Avg.Cost
-## 2010-01-01       0    0.00000        0       0.000      0.00000
+## 2009-12-31       0    0.00000        0       0.000      0.00000
 ## 2010-05-25     100   98.61007        0    9861.007     98.61007
 ## 2010-06-01    -100   99.64688        0   -9964.688     99.64688
 ## 2010-06-03     100  101.45004        0   10145.004    101.45004
@@ -417,7 +418,7 @@ print(trades)</code></pre>
 ## 2025-04-25    -100 1550.00000        0 -155000.000   1550.00000
 ## 2025-05-09     100 1591.18005        0  159118.005   1591.18005
 ##            Net.Txn.Realized.PL
-## 2010-01-01              0.0000
+## 2009-12-31              0.0000
 ## 2010-05-25              0.0000
 ## 2010-06-01            103.6812
 ## 2010-06-03              0.0000
