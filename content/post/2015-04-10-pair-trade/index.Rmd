@@ -1,6 +1,6 @@
 ---
-title: pair trade
-author: MatrixSpk
+title: "基于 quantstrat 的配对交易策略实现与解析"
+author: "MatrixSpk"
 date: '2015-04-10'
 slug: pair-trade
 categories:
@@ -11,25 +11,31 @@ tags:
   - 配对交易
 ---
 
-#Kindly contributed to quantstrat by Garrett See
-#code borrowed heavily from existing quantstrat demos
+配对交易是一种基于统计套利的量化策略，其核心逻辑是通过识别价格走势高度相关的两只股票，当它们的价格偏离历史正常关系时建立对冲头寸，等待关系回归时获利。
 
-# This is a simple pairs trading example intended to illustrate how you can 
-# extend existing quantstrat functionality.  It uses addPosLimits to specify 
-# levels and position limits, and shows how to pass a custom order sizing 
-# function to osFUN 
+本文将解析一段基于 R 语言 quantstrat 包的配对交易策略代码，展示其实现思路与核心意义。
 
-# Note that it would be easier to build a spread first and treat it as a single 
-# instrument instead of dealing with a portfolio of stocks.
+# 策略核心逻辑与代码框架
 
-## given 2 stocks, calculate the ratio of their notional values.  If the ratio 
-# falls below it's 2 stdev band, then when it crosses back above it, buy stock 1 
-# and sell stock 2.  If the ratio rises above it's 2 stdev band, then when it 
-# crosses back below it, sell stock 1 and buy stock 2.  If the ratio crosses 
-# its moving average, then flatten any open positions.
+这段代码以 SPY 和 DIA 两只 ETF 为交易标的，通过构建价格比率的均值回归模型实现配对交易。策略的核心步骤包括：数据同步与准备、策略环境初始化、指标与信号构建、自定义订单规模控制、交易规则设置，以及回测与绩效分析。
 
-# The Qty of Stock A that it buys (sells) = MaxPos / lvls
-# The Qty of Stock B that is sells (buys) = MaxPos * Ratio / lvls  
+以下是完整代码实现：
+
+```{R pairTrade}
+# Kindly contributed to quantstrat by Garrett See
+# code borrowed heavily from existing quantstrat demos
+
+# 这是一个简单的配对交易示例，旨在展示如何扩展现有 quantstrat 功能。
+# 它使用 addPosLimits 指定头寸水平和限制，并演示如何将自定义订单规模函数传递给 osFUN
+
+# 注意：先构建价差并将其视为单一工具，比处理股票组合更简单
+
+## 给定两只股票，计算其名义价值比率。如果比率低于 2 标准差区间，
+# 当它回升穿过区间时，买入股票 1 并卖出股票 2。如果比率高于 2 标准差区间，
+# 当它回落穿过区间时，卖出股票 1 并买入股票 2。如果比率穿过其移动平均线，则平仓所有头寸。
+
+# 股票 A 的买入（卖出）数量 = MaxPos / lvls
+# 股票 B 的卖出（买入）数量 = MaxPos * 比率 / lvls  
 
 require(quantstrat)
 
@@ -39,250 +45,240 @@ suppressWarnings(rm("startDate", "endDate", "startDate", "initEq", "SD", "N",
                     "symb1", "symb2", "portfolio1.st", "account.st", 
                     "pairStrat", "out1"))
 
-startDate <- '2009-01-01'    
-endDate <- '2011-05-01'
-startDate <- '2009-01-02'
+initDate <- '2013-12-31'    
+startDate <- '2014-01-01'
+endDate <- '2015-05-01'
 initEq <- 100000
-SD <- 2
-N <- 20
+SD <- 2  # 标准差倍数
+N <- 20  # 移动平均线周期
 
-MaxPos <- 1500  #max position in stockA; 
-# max position in stock B will be max * ratio, i.e. no hard position limit in 
-# Stock B
-lvls <- 3  #how many times to fade; Each order's qty will = MaxPos/lvls
+MaxPos <- 1500  # 股票 A 的最大头寸；
+# 股票 B 的最大头寸将是 max * 比率，即对股票 B 没有硬性头寸限制
+lvls <- 3  # 分几步建仓；每笔订单数量 = MaxPos/lvls
 
-symb1 <- 'SPY' #change these to try other pairs
-symb2 <- 'DIA' #if you change them, make sure position limits still make sense
+symb1 <- 'SPY'  # 可更改这些标的以尝试其他配对
+symb2 <- 'DIA'  # 如果更改，需确保头寸限制仍然合理
 
 portfolio1.st <- 'pair1'
 account.st <- 'pairs'
 
+# 获取历史数据
 getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE) 
 
-# The following function is used to make sure the timestamps of all symbols are 
-# the same deletes rows where one of the stocks is missing data
+# 以下函数用于确保所有标的的时间戳相同，删除其中一只股票数据缺失的行
 alignSymbols <- function(symbols, env=.GlobalEnv) {
-  # This is a simplified version of qmao::alignSymbols()
+  # 这是 qmao::alignSymbols() 的简化版本
   if (length(symbols) < 2) 
-    stop("Must provide at least 2 symbols")
+    stop("必须提供至少 2 个标的")
   if (any(!is.character(symbols))) 
-    stop("Symbols must be vector of character strings.")
+    stop("标的必须是字符向量。")
   ff <- get(symbols[1],env=env)
   for (sym in symbols[-1]) {
     tmp.sym <- get(sym,env=env)
-    ff <- merge(ff, tmp.sym, all=FALSE)
+    ff <- merge(ff, tmp.sym, all=FALSE)  # 只保留双方都有数据的行
   }
   for (sym in symbols) {
-    assign(sym,ff[,grep(sym, colnames(ff))], env=env)
+    assign(sym,ff[,grep(sym, colnames(ff))], env=env)  # 更新标的数据
   }
   symbols
 }
-alignSymbols(c(symb1, symb2))
+alignSymbols(c(symb1, symb2))  # 对齐两只股票的时间戳
 
-# Define Instruments
-currency("USD")
-stock(symb1, currency="USD", multiplier=1)
-stock(symb2, currency="USD", multiplier=1)
+# 定义金融工具
+currency("USD")  # 基础货币为美元
+stock(symb1, currency="USD", multiplier=1)  # 定义股票 1 的属性
+stock(symb2, currency="USD", multiplier=1)  # 定义股票 2 的属性
 
-# Initialize Portfolio, Account, and Orders
-initPortf(name=portfolio1.st, c(symb1,symb2))
-initAcct(account.st, portfolios=portfolio1.st, initEq=initEq)
-initOrders(portfolio=portfolio1.st)
+# 初始化投资组合、账户和订单
+initPortf(name=portfolio1.st, c(symb1,symb2))  # 创建包含两只股票的组合
+initAcct(account.st, portfolios=portfolio1.st, initEq=initEq)  # 初始化账户，初始资金 10 万美元
+initOrders(portfolio=portfolio1.st)  # 初始化订单簿
 
-# osFUN will need to know which symbol is leg 1 and which is leg 2 as well as 
-# what the values are for MaxPos and lvls.  So, create a slot in portfolio to 
-# hold this info.
+# osFUN 需要知道哪个标的是第一腿、哪个是第二腿，以及 MaxPos 和 lvls 的值。
+# 因此，在投资组合中创建一个插槽来存储这些信息。
 pair <- c(1, 2, MaxPos, lvls)
 names(pair) <- c(symb1, symb2, "MaxPos", "lvls")
-.blotter[[paste('portfolio', portfolio1.st, sep='.')]]$pair <- pair
+.blotter[[paste('portfolio', portfolio1.st, sep='.')]]$pair <- pair  # 存储到组合属性中
 
-# Create initial position limits and levels by symbol
-# allow 3 entries for long and short if lvls=3.
+# 按标的创建初始头寸限制和水平
+# 如果 lvls=3，则允许多空各 3 次建仓。
 addPosLimit(portfolio=portfolio1.st, timestamp=startDate, symbol=symb1, 
             maxpos=MaxPos, longlevels=lvls, minpos=-MaxPos, shortlevels=lvls)
 addPosLimit(portfolio=portfolio1.st, timestamp=startDate, symbol=symb2, 
             maxpos=MaxPos, longlevels=lvls, minpos=-MaxPos, shortlevels=lvls)
 
-# Create a strategy object 
+# 创建策略对象
 pairStrat <- strategy('pairStrat')
 
-# Indicator function
+# 指标函数：计算两只股票的价格比率
 calcRatio <- function(x) { 
-  #returns the ratio of notional close prices for 2 symbols
+  # 返回两只股票的名义收盘价比率
   x1 <- get(x[1])
   x2 <- get(x[2])
-  mult1 <- getInstrument(x[1])$multiplier
+  mult1 <- getInstrument(x[1])$multiplier  # 合约乘数
   mult2 <- getInstrument(x[2])$multiplier
-  rat <- (mult1 * Cl(x1)) / (mult2 * Cl(x2))
+  rat <- (mult1 * Cl(x1)) / (mult2 * Cl(x2))  # 收盘价比率
   colnames(rat) <- 'Ratio'
   rat
 }
-# Indicator used for determining entry/exits
+# 用于确定入场/出场的指标：比率及其布林带
 Ratio <- calcRatio(c(symb1[1], symb2[1]))  
 
-# Store hedge ratio in portfolio so that it's available for order sizing 
-# function. In this example, the hedge ratio happens to be the same as the 
-# Ratio indicator.
+# 将对冲比率存储在投资组合中，以便订单规模函数使用。
+# 在本示例中，对冲比率与 Ratio 指标相同。
 .blotter[[paste('portfolio',portfolio1.st,sep='.')]]$HedgeRatio <- Ratio
-#and make a function to get the most recent HedgeRatio
+# 创建获取最新对冲比率的函数
 getHedgeRatio <- function(portfolio, timestamp) {
   portf <- getPortfolio(portfolio)
-  timestamp <- format(timestamp,"%Y-%m-%d %H:%M:%S")
-  # above line ensures you don't get last value of next day if using intraday 
-  # data and timestamp=midnight
+  timestamp <- format(timestamp,"%Y-%m-%d %H:%M:%S")  # 格式化时间戳
+  # 上述行确保在使用日内数据且时间戳为午夜时，不会获取次日的最后一个值
   toDate <- paste("::", timestamp, sep="")
-  Ratio <- last(portf$HedgeRatio[toDate])
+  Ratio <- last(portf$HedgeRatio[toDate])  # 获取该时间点的最新比率
   as.numeric(Ratio)
 }
 
-# Create an indicator - BBands on the Ratio
+# 添加指标：比率的布林带
 pairStrat <- add.indicator(strategy=pairStrat, name = "calcRatio", 
                            arguments=list(x=c(symb1,symb2)))
 pairStrat <- add.indicator(strategy=pairStrat, name = "BBands", 
                            arguments=list(HLC=quote(Ratio), sd=SD, n=N, 
-                                          maType='SMA'))
+                                          maType='SMA'))  # 基于 20 日 SMA 计算布林带
 
-#applyIndicators(strategy=pairStrat,mktdata=get(symb1[1])) #for debugging
-
-# Create signals - buy when crossing lower band from below, sell when crossing 
-# upper band from above, flatten when crossing mavg from above or from below
+# 生成信号：当比率从下方穿过下轨时买入，从上方穿过上轨时卖出，穿过中轨时平仓
 pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
                         arguments=list(columns=c("Ratio","up"), 
-                                        relationship="lt"),
+                                        relationship="lt"),  # 比率 < 上轨（从上方穿过）
                         label="cross.up")
 pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
                         arguments=list(columns=c("Ratio","dn"), 
-                                        relationship="gt"), 
+                                        relationship="gt"),  # 比率 > 下轨（从下方穿过）
                         label="cross.dn")
 pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
                         arguments=list(columns=c("Ratio","mavg"), 
-                                  relationship="lt"), 
+                                  relationship="lt"),  # 比率 < 中轨（从上方穿过）
                         label="cross.mid.fa")
 pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
                         arguments=list(columns=c("Ratio","mavg"), 
-                                       relationship="gt"), 
+                                       relationship="gt"),  # 比率 > 中轨（从下方穿过）
                         label="cross.mid.fb")
 
-# make an order sizing function
+# 自定义订单规模函数
 #######################_ORDER SIZING FUNCTION_##################################
-# check to see which stock it is. If it's the second stock, reverse orderqty and 
-# orderside
 osSpreadMaxPos <- function (data, timestamp, orderqty, ordertype, orderside, 
                             portfolio, symbol, ruletype, ..., orderprice) {
   portf <- getPortfolio(portfolio)
-  #check to make sure pair slot has the things needed for this function
+  # 检查 pair 插槽是否包含该函数所需的内容
   if (!any(portf$pair == 1) && !(any(portf$pair == 2))) 
-    stop('pair must contain both values 1 and 2')
+    stop('pair 必须包含值 1 和 2')
   if (!any(names(portf$pair) == "MaxPos") || !any(names(portf$pair) == "lvls")) 
-    stop('pair must contain MaxPos and lvls')  
-    
-  if (portf$pair[symbol] == 1) legside <- "long"
-  if (portf$pair[symbol] == 2) legside <- "short"  
+    stop('pair 必须包含 MaxPos 和 lvls')  
+  
+  if (portf$pair[symbol] == 1) legside <- "long"  # 第一腿
+  if (portf$pair[symbol] == 2) legside <- "short"  # 第二腿（与第一腿方向相反）
   MaxPos <- portf$pair["MaxPos"]
   lvls <- portf$pair["lvls"]
-  ratio <- getHedgeRatio(portfolio, timestamp)
-  pos <- getPosQty(portfolio, symbol, timestamp)       
-  PosLimit <- getPosLimit(portfolio, symbol, timestamp) 
+  ratio <- getHedgeRatio(portfolio, timestamp)  # 获取当前对冲比率
+  pos <- getPosQty(portfolio, symbol, timestamp)  # 当前头寸
+  PosLimit <- getPosLimit(portfolio, symbol, timestamp)  # 头寸限制
   qty <- orderqty
-  if (legside == "short") {#symbol is 2nd leg
-    ## Comment out next line to use equal ordersizes for each stock. 
+  if (legside == "short") {# 标的是第二腿
+    ## 注释掉下一行可使每只股票的订单规模相等。
     addPosLimit(portfolio=portfolio, timestamp=timestamp, symbol=symbol, 
                 maxpos=round(MaxPos*ratio,0), longlevels=lvls, 
-                minpos=round(-MaxPos*ratio,0), shortlevels=lvls)
+                minpos=round(-MaxPos*ratio,0), shortlevels=lvls)  # 调整第二腿的头寸限制
     ## 
-    qty <- -orderqty #switch orderqty for Stock B
+    qty <- -orderqty  # 反转股票 B 的订单数量（多空相反）
   }
   
-  if (qty > 0) orderside = 'long'
+  if (qty > 0) orderside = 'long'  # 确定订单方向
   if (qty < 0) orderside = 'short'
  
+  # 调用 osMaxPos 计算符合头寸限制的订单数量
   orderqty <- osMaxPos(data=data,timestamp=timestamp, orderqty=qty,
                        ordertype=ordertype, orderside=orderside,
                        portfolio=portfolio, symbol=symbol, ruletype=ruletype, 
                        ...)
           
-  #Add the order here instead of in the ruleSignal function
+  # 在规则信号函数中添加订单
   if (!is.null(orderqty) & !orderqty == 0 & !is.null(orderprice)) {
     addOrder(portfolio=portfolio, symbol=symbol, 
              timestamp=timestamp, qty=orderqty, price=as.numeric(orderprice), 
              ordertype=ordertype, side=orderside, replace=FALSE,
              status="open", ...=...)
   }
-  return(0) #so that ruleSignal function doesn't also try to place an order
+  return(0)  # 使 ruleSignal 函数不会尝试下单
 }
 ################################################################################
 
-# Create entry and exit rules for longs  and for shorts. Both symbols will get 
-# the same buy/sell signals, but osMaxPos will reverse those for the second 
-# symbol.
-# orderqty's are bigger than PosLimits allow. osMaxPos will adjust the orderqty 
-# down to 1/3 the max allowed. (1/3 is because we are using 3 levels in 
-# PosLimit)
+# 为多空方向创建入场和出场规则。两个标的将获得相同的买卖信号，
+# 但 osMaxPos 会为第二个标的反转这些信号。
+# orderqty 大于头寸限制允许的值。osMaxPos 会将订单数量调整为最大允许值的 1/3。
+# （1/3 是因为我们在 PosLimit 中使用了 3 个水平）
 pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
                       arguments=list(sigcol="cross.dn", sigval=TRUE, 
                                      orderqty=1e6, ordertype='market', 
                                      orderside=NULL, osFUN='osSpreadMaxPos'), 
-                      type='enter')
+                      type='enter')  # cross.dn 信号触发入场
 pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
                       arguments=list(sigcol="cross.up", sigval=TRUE, 
                                      orderqty=-1e6, ordertype='market', 
                                      orderside=NULL, osFUN='osSpreadMaxPos'), 
-                      type='enter')
+                      type='enter')  # cross.up 信号触发入场
 pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
                       arguments=list(sigcol="cross.mid.fb", sigval=TRUE, 
                                      orderqty='all', ordertype='market', 
                                      orderside=NULL), 
-                      type='exit')
+                      type='exit')  # cross.mid.fb 信号触发出场
 pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
                       arguments=list(sigcol="cross.mid.fa", sigval=TRUE, 
                                      orderqty='all', ordertype='market', 
                                      orderside=NULL), 
-                      type='exit')
+                      type='exit')  # cross.mid.fa 信号触发出场
 
 
-## for debugging
-# applySignals(strategy=pairStrat, 
-#              mktdata=applyIndicators(strategy=pairStrat, mktdata=get(symb1)))
-##
-
+# 执行策略回测
 out1<-applyStrategy(strategy=pairStrat, portfolios=portfolio1.st)
 
+# 更新组合和账户数据
 updatePortf(Portfolio=portfolio1.st,
             Dates=paste("::", as.Date(Sys.time()), sep=''))
 updateAcct(account.st, Dates=paste(startDate, endDate, sep="::")) 
 updateEndEq(account.st, Dates=paste(startDate, endDate, sep="::"))
-getEndEq(account.st, Sys.time())
+getEndEq(account.st, Sys.time())  # 查看最终权益
 
-dev.new()
-chart.Posn(Portfolio=portfolio1.st, Symbol=symb1)
-dev.new()
-chart.Posn(Portfolio=portfolio1.st, Symbol=symb2)
-dev.new()
-chartSeries(Cl(get(symb1))/Cl(get(symb2)), TA="addBBands(n=N,sd=SD)")
+# 绘制持仓图表
+# dev.new()
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb1)  # 股票 1 的持仓图
+# dev.new()
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb2)  # 股票 2 的持仓图
+# dev.new()
+chartSeries(Cl(get(symb1))/Cl(get(symb2)), TA="addBBands(n=N,sd=SD)")  # 比率与布林带图
 
-ret1 <- PortfReturns(account.st)
-ret1$total <- rowSums(ret1)
-#ret1
+# 绩效分析
+ret1 <- PortfReturns(account.st)  # 组合收益
+ret1$total <- rowSums(ret1)  # 总收益
 
+# 绘制绩效摘要
 if("package:PerformanceAnalytics" %in% search() || 
    require("PerformanceAnalytics",quietly=TRUE)) {
-#  getSymbols("SPY", from='1999-01-01')
-#  SPY.ret <- Return.calculate(SPY$SPY.Close)
-#  tmp <- merge(SPY.ret,ret1$total,all=FALSE)
-  dev.new()
-  charts.PerformanceSummary(ret1$total, geometric=FALSE, wealth.index=TRUE)
+  # dev.new()
+  charts.PerformanceSummary(ret1$total, geometric=FALSE, wealth.index=TRUE)  # 收益摘要图
 }
+```
 
+# 策略实现的核心思路
 
-###############################################################################
-# R (http://r-project.org/) Quantitative Strategy Model Framework
-#
-# Package Copyright (c) 2009-2012
-# Peter Carl, Dirk Eddelbuettel, Brian G. Peterson, Jeffrey Ryan, and Joshua Ulrich 
-#
-# This library is distributed under the terms of the GNU Public License (GPL)
-# for full details see the file COPYING
-#
-# $Id$
-#
-###############################################################################
+这段代码的核心是通过量化手段实现配对交易的均值回归逻辑，具体可分为以下几个关键环节：
+
+首先是数据预处理。配对交易对数据同步性要求极高，因此代码通过alignSymbols函数对齐两只股票的时间戳，删除存在数据缺失的时间点，确保价格比率的计算基于完整的共同数据。这种预处理是后续指标准确性的基础，避免因数据不同步导致的错误信号。
+
+其次是指标与信号体系。策略的核心指标是两只股票的价格比率（由calcRatio函数计算），并通过布林带（BBands）分析该比率的波动特征。布林带由中轨（20 日移动平均线）和上下轨（中轨 ±2 倍标准差）构成，反映比率的正常波动区间。当比率从下方突破下轨（cross.dn信号）时，认为两只股票的价格偏离过大且即将回归，此时买入第一只股票、卖出第二只；当比率从上方向下突破上轨（cross.up信号）时，则反向操作；当比率回归至中轨时（cross.mid信号），平仓获利。这种基于统计偏离的信号逻辑，是均值回归策略的典型应用。
+
+再者是头寸管理与订单规模控制。代码通过addPosLimits设置了最大头寸（MaxPos）和建仓层级（lvls），允许分 3 步建仓，避免单次入场风险过高。更关键的是自定义的osSpreadMaxPos函数，它根据两只股票的对冲比率动态调整订单数量，确保多空头寸的风险对冲平衡 —— 第一只股票的头寸为MaxPos/lvls，第二只则为其相反数乘以价格比率，使整体组合对市场系统性风险的暴露最小化。这种精细化的头寸控制，是配对交易实现风险对冲的核心。
+
+最后是回测与绩效评估。代码通过applyStrategy执行回测，更新组合和账户数据后，利用chart.Posn展示两只股票的持仓变化，通过charts.PerformanceSummary分析策略的收益曲线、最大回撤等关键指标，全面评估策略效果。
+策略的意义与价值
+
+这段代码的意义不仅在于实现了一个可运行的配对交易策略，更展示了如何在 quantstrat 框架下扩展自定义功能：通过addPosLimits灵活设置头寸规则，借助osFUN传递自定义订单规模函数，为复杂策略的实现提供了范例。对于量化研究者而言，它演示了均值回归思想在配对交易中的具体应用 —— 通过价格比率的统计特征捕捉套利机会，同时通过多空对冲控制风险。
+
+此外，代码也为策略优化提供了方向：例如调整布林带的周期（N）和标准差倍数（SD）以适应不同市场环境，或修改osSpreadMaxPos函数优化头寸调整逻辑。这种模块化的实现方式，使得策略易于维护和扩展，为量化交易的实践提供了有价值的参考。

@@ -1,5 +1,5 @@
 ---
-title: 三重动量趋势追踪策略及其 R 实现
+title: "三重动量趋势追踪策略及其 R 实现"
 author: MatrixSpk
 date: '2015-05-09'
 slug: rate-of-change-ema-strategy-demonstrating-ternary-indicator-ordersets-to-handle-simultaneous-stop-loss-and-take-profit-orders
@@ -47,7 +47,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = he
 * 绩效分析模块自动计算夏普比率、最大回撤等关键指标57
 
 该策略通过多指标协同验证，既保留EMA对趋势的敏感度，又利用SMA过滤假突破信号，同时ROC指标确保入场时点具备足够动能。回测框架严格遵循事件驱动原则，模拟真实交易中的订单撮合流程
-
 
 
 # R代码实现
