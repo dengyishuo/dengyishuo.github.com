@@ -1,5 +1,5 @@
 ---
-title: macd Parameters
+title: "MACD 策略的参数优化与有效性验证：基于 quantstrat 的实现"
 author: MatrixSpk
 date: '2015-07-10'
 slug: macd-parameters
@@ -14,74 +14,1501 @@ tags:
 
 
 
-<div id="parameter-demo-for-macd" class="section level1">
-<h1>Parameter demo for MACD</h1>
-<div id="section" class="section level79">
-<p class="heading"></p>
-<p>require(foreach,quietly=TRUE)
+<p>在量化交易中，策略参数的选择直接影响其表现 —— 同一策略在不同参数下可能呈现截然不同的收益特征。然而，盲目测试参数组合不仅效率低下，还可能因 “过度拟合” 导致策略在实盘失效。本文将解析一段基于 R 语言quantstrat包的 MACD 策略参数优化代码，展示如何系统地测试参数范围、施加合理约束，并通过统计指标验证参数有效性，为策略稳健性提供科学依据。</p>
+<div id="代码实现与核心注释" class="section level1">
+<h1>代码实现与核心注释</h1>
+<p>以下是完整的 MACD 参数优化代码，包含详细注释以说明各环节的功能与逻辑：</p>
+<pre class="r"><code># Parameter demo for MACD
+###############################################################################
+
+# 加载必要的包：foreach支持并行迭代，iterators用于迭代控制，quantstrat用于量化策略开发
+require(foreach, quietly=TRUE)
 require(iterators)
-require(quantstrat)</p>
-<p>demo(‘macd’,ask=FALSE)</p>
+require(quantstrat)
+
+# 运行内置的MACD策略演示，初始化策略环境（包含策略定义、交易标的、账户等基础设置）
+demo(&#39;macd&#39;, ask=FALSE)</code></pre>
+<pre><code>## 
+## 
+## 	demo(macd)
+## 	---- ~~~~
+## 
+## &gt; # Simple MACD strategy
+## &gt; #
+## &gt; # MACD may be used in many ways, this will demonstrate a trend indicator.
+## &gt; # 
+## &gt; # traditionally, when the MACD signal crosses zero, this indicated a establishment of a positive trend
+## &gt; #
+## &gt; # we&#39;ll buy on positive treshold crossover of the &#39;signal&#39; column, and sell on negative threshold crossover
+## &gt; # 
+## &gt; # Author: brian
+## &gt; ###############################################################################
+## &gt; 
+## &gt; 
+## &gt; require(quantstrat)
+## 
+## &gt; suppressWarnings(rm(&quot;order_book.macd&quot;,pos=.strategy))
+## 
+## &gt; suppressWarnings(rm(&quot;account.macd&quot;,&quot;portfolio.macd&quot;,pos=.blotter))
+## 
+## &gt; suppressWarnings(rm(&quot;account.st&quot;,&quot;portfolio.st&quot;,&quot;stock.str&quot;,&quot;stratMACD&quot;,&quot;startDate&quot;,&quot;initEq&quot;,&#39;start_t&#39;,&#39;end_t&#39;))
+## 
+## &gt; #correct for TZ issues if they crop up
+## &gt; oldtz&lt;-Sys.getenv(&#39;TZ&#39;)
+## 
+## &gt; if(oldtz==&#39;&#39;) {
+## +         Sys.setenv(TZ=&quot;GMT&quot;)
+## + }
+## 
+## &gt; stock.str=&#39;AAPL&#39; # what are we trying it on
+## 
+## &gt; #MA parameters for MACD
+## &gt; fastMA = 12 
+## 
+## &gt; slowMA = 26 
+## 
+## &gt; signalMA = 9
+## 
+## &gt; maType=&quot;EMA&quot;
+## 
+## &gt; currency(&#39;USD&#39;)
+## [1] &quot;USD&quot;
+## 
+## &gt; stock(stock.str,currency=&#39;USD&#39;,multiplier=1)
+## [1] &quot;AAPL&quot;
+## 
+## &gt; #or use fake data
+## &gt; #stock.str=&#39;sample_matrix&#39; # what are we trying it on
+## &gt; #data(sample_matrix)                 # data included in package xts
+## &gt; #sample_matrix&lt;-as.xts(sample_matrix)
+## &gt; 
+## &gt; startDate=&#39;2006-12-31&#39;
+## 
+## &gt; initEq=1000000
+## 
+## &gt; portfolio.st=&#39;macd&#39;
+## 
+## &gt; account.st=&#39;macd&#39;
+## 
+## &gt; initPortf(portfolio.st,symbols=stock.str)
+## [1] &quot;macd&quot;
+## 
+## &gt; initAcct(account.st,portfolios=portfolio.st)
+## [1] &quot;macd&quot;
+## 
+## &gt; initOrders(portfolio=portfolio.st)
+## 
+## &gt; strat.st&lt;-portfolio.st
+## 
+## &gt; # define the strategy
+## &gt; strategy(strat.st, store=TRUE)
+## 
+## &gt; #one indicator
+## &gt; add.indicator(strat.st, name = &quot;MACD&quot;, 
+## +       			  arguments = list(x=quote(Cl(mktdata)),
+## +       			                   nFast=fastMA, 
+## +       			                   nSlow=slowMA),
+## +       			  label=&#39;_&#39; 
+## + )
+## [1] &quot;macd&quot;
+## 
+## &gt; #two signals
+## &gt; add.signal(strat.st,name=&quot;sigThreshold&quot;,
+## +     		   arguments = list(column=&quot;signal._&quot;,
+## +     				   			        relationship=&quot;gt&quot;,
+## +     							          threshold=0,
+## +     							          cross=TRUE),
+## +     		   label=&quot;signal.gt.zero&quot;
+## + )
+## [1] &quot;macd&quot;
+## 
+## &gt; add.signal(strat.st,name=&quot;sigThreshold&quot;,
+## +     		   arguments = list(column=&quot;signal._&quot;,
+## +     				                relationship=&quot;lt&quot;,
+## +     							          threshold=0,
+## +     							          cross=TRUE),
+## +     	     label=&quot;signal.lt.zero&quot;
+## + )
+## [1] &quot;macd&quot;
+## 
+## &gt; ####
+## &gt; # add rules
+## &gt; 
+## &gt; # entry
+## &gt; add.rule(strat.st,name=&#39;ruleSignal&#39;, 
+## +     		 arguments = list(sigcol=&quot;signal.gt.zero&quot;,
+## +     				              sigval=TRUE, 
+## +     						          orderqty=100, 
+## +     						          ordertype=&#39;market&#39;, 
+## +     						          orderside=&#39;long&#39;, 
+## +     						          threshold=NULL),
+## +     	               type=&#39;enter&#39;,
+## +     		             label=&#39;enter&#39;,
+## +     		             storefun=FALSE
+## + )
+## [1] &quot;macd&quot;
+## 
+## &gt; #alternatives for risk stops:
+## &gt; # simple stoplimit order, with threshold multiplier
+## &gt; #add.rule(strat.st,name=&#39;ruleSignal&#39;, arguments = list(sigcol=&quot;signal.gt.zero&quot;,sigval=TRUE, orderqty=&#39;all&#39;, ordertype=&#39;stoplimit&#39;, orderside=&#39;long&#39;, threshold=-.05,tmult=TRUE, orderset=&#39;exit2&#39;),type=&#39;chain&#39;, parent=&#39;enter&#39;, label=&#39;risk&#39;,storefun=FALSE)
+## &gt; # alternately, use a trailing order, also with a threshold multiplier
+## &gt; #add.rule(strat.st,name=&#39;ruleSignal&#39;, arguments = list(sigcol=&quot;signal.gt.zero&quot;,sigval=TRUE, orderqty=&#39;all&#39;, ordertype=&#39;stoptrailing&#39;, orderside=&#39;long&#39;, threshold=-1,tmult=FALSE, orderset=&#39;exit2&#39;),	type=&#39;chain&#39;, parent=&#39;enter&#39;, label=&#39;trailingexit&#39;)
+## &gt; 
+## &gt; # exit
+## &gt; add.rule(strat.st,name=&#39;ruleSignal&#39;, 
+## +     		 arguments = list(sigcol=&quot;signal.lt.zero&quot;,
+## +     				              sigval=TRUE, 
+## +     						          orderqty=&#39;all&#39;, 
+## +     						          ordertype=&#39;market&#39;, 
+## +     						          orderside=&#39;long&#39;, 
+## +     						          threshold=NULL,
+## +     						          orderset=&#39;exit2&#39;),
+## +          type=&#39;exit&#39;,
+## +     		 label=&#39;exit&#39;
+## + )
+## [1] &quot;macd&quot;
+## 
+## &gt; #end rules
+## &gt; ####
+## &gt; 
+## &gt; getSymbols(stock.str,from=startDate, to=&#39;2014-06-01&#39;, src=&#39;yahoo&#39;)
+## [1] &quot;AAPL&quot;
+## 
+## &gt; start_t&lt;-Sys.time()
+## 
+## &gt; out&lt;-applyStrategy(strat.st , portfolios=portfolio.st,parameters=list(nFast=fastMA, nSlow=slowMA, nSig=signalMA,maType=maType),verbose=TRUE)
+## [1] &quot;2007-03-16 00:00:00 AAPL 100 @ 3.19964289665222&quot;
+## [1] &quot;2007-08-17 00:00:00 AAPL -100 @ 4.35928583145142&quot;
+## [1] &quot;2007-09-05 00:00:00 AAPL 100 @ 4.88428592681885&quot;
+## [1] &quot;2008-01-16 00:00:00 AAPL -100 @ 5.70142889022827&quot;
+## [1] &quot;2008-03-31 00:00:00 AAPL 100 @ 5.125&quot;
+## [1] &quot;2008-06-26 00:00:00 AAPL -100 @ 6.00928592681885&quot;
+## [1] &quot;2008-08-20 00:00:00 AAPL 100 @ 6.28000020980835&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-02-06 00:00:00 AAPL 100 @ 3.56142902374268&quot;
+## [1] &quot;2009-03-04 00:00:00 AAPL -100 @ 3.25607109069824&quot;
+## [1] &quot;2009-03-19 00:00:00 AAPL 100 @ 3.62928605079651&quot;
+## [1] &quot;2009-12-15 00:00:00 AAPL -100 @ 6.93464279174805&quot;
+## [1] &quot;2009-12-29 00:00:00 AAPL 100 @ 7.46785688400269&quot;
+## [1] &quot;2010-02-03 00:00:00 AAPL -100 @ 7.11535692214966&quot;
+## [1] &quot;2010-03-04 00:00:00 AAPL 100 @ 7.52535676956177&quot;
+## [1] &quot;2010-07-16 00:00:00 AAPL -100 @ 8.92500019073486&quot;
+## [1] &quot;2010-08-03 00:00:00 AAPL 100 @ 9.35464286804199&quot;
+## [1] &quot;2010-08-17 00:00:00 AAPL -100 @ 8.99892902374268&quot;
+## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
+## [1] &quot;2011-03-22 00:00:00 AAPL -100 @ 12.1857137680054&quot;
+## [1] &quot;2011-05-03 00:00:00 AAPL 100 @ 12.4357137680054&quot;
+## [1] &quot;2011-05-23 00:00:00 AAPL -100 @ 11.9428567886353&quot;
+## [1] &quot;2011-07-11 00:00:00 AAPL 100 @ 12.6428565979004&quot;
+## [1] &quot;2011-11-16 00:00:00 AAPL -100 @ 13.7417860031128&quot;
+## [1] &quot;2011-12-27 00:00:00 AAPL 100 @ 14.518928527832&quot;
+## [1] &quot;2012-05-09 00:00:00 AAPL -100 @ 20.3278560638428&quot;
+## [1] &quot;2012-06-20 00:00:00 AAPL 100 @ 20.9192867279053&quot;
+## [1] &quot;2012-10-12 00:00:00 AAPL -100 @ 22.4896430969238&quot;
+## [1] &quot;2013-05-09 00:00:00 AAPL 100 @ 16.3132133483887&quot;
+## [1] &quot;2013-06-19 00:00:00 AAPL -100 @ 15.1071434020996&quot;
+## [1] &quot;2013-07-26 00:00:00 AAPL 100 @ 15.7496433258057&quot;
+## [1] &quot;2014-01-22 00:00:00 AAPL -100 @ 19.6967868804932&quot;
+## [1] &quot;2014-01-24 00:00:00 AAPL 100 @ 19.5025005340576&quot;
+## [1] &quot;2014-01-29 00:00:00 AAPL -100 @ 17.8839282989502&quot;
+## [1] &quot;2014-03-26 00:00:00 AAPL 100 @ 19.2778568267822&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## 
+## &gt; end_t&lt;-Sys.time()
+## 
+## &gt; print(end_t-start_t)
+## Time difference of 0.4833009 secs
+## 
+## &gt; start_t&lt;-Sys.time()
+## 
+## &gt; updatePortf(Portfolio=portfolio.st,Dates=paste(&#39;::&#39;,as.Date(Sys.time()),sep=&#39;&#39;))</code></pre>
+<pre><code>## [1] &quot;macd&quot;
+## 
+## &gt; end_t&lt;-Sys.time()
+## 
+## &gt; print(&quot;trade blotter portfolio update:&quot;)
+## [1] &quot;trade blotter portfolio update:&quot;
+## 
+## &gt; print(end_t-start_t)
+## Time difference of 0.03172684 secs
+## 
+## &gt; chart.Posn(Portfolio=portfolio.st,Symbol=stock.str)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/MACDParameter-1.png" width="672" /></p>
+<pre><code>## 
+## &gt; plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA,maType=&quot;EMA&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/MACDParameter-2.png" width="672" /></p>
+<pre><code>## 
+## &gt; #look at the order book
+## &gt; obook&lt;-getOrderBook(&#39;macd&#39;)
+## 
+## &gt; # set tz as it was before the demo
+## &gt; Sys.setenv(TZ=oldtz)
+## 
+## &gt; ###############################################################################
+## &gt; # R (http://r-project.org/) Quantitative Strategy Model Framework
+## &gt; #
+## &gt; # Copyright (c) 2009-2012
+## &gt; # Peter Carl, Dirk Eddelbuettel, Brian G. Peterson, Jeffrey Ryan, and Joshua Ulrich 
+## &gt; #
+## &gt; # This library is distributed under the terms of the GNU Public License (GPL)
+## &gt; # for full details see the file COPYING
+## &gt; #
+## &gt; # $Id$
+## &gt; #
+## &gt; ##############################################################################</code></pre>
+<pre class="r"><code># 并行计算初始化（可选）：启用后可加速参数组合测试，适合大规模参数搜索
+# 推荐使用doParallel、doMC等包，默认使用物理核心数-1的线程提升效率
+# require(doParallel)
+# registerDoParallel()
+
+
+# 从环境中获取MACD策略对象（内置demo中已定义并存储策略，label为&#39;macd&#39;）
+strategy.st &lt;- &#39;macd&#39;
+
+### 设置参数搜索范围
+.FastMA = (1:20)   # MACD快速EMA周期候选值（1到20日）：反映短期价格动量
+.SlowMA = (30:80)  # MACD慢速EMA周期候选值（30到80日）：反映中长期价格趋势
+.nsamples = 30     # 随机抽样的参数组合数量：减少全量测试的计算成本，同时覆盖关键组合
+
+
+### 定义参数分布与约束
+# 为策略添加快速EMA周期的参数分布
+add.distribution(
+  strategy.st,               # 目标策略名称
+  paramset.label = &#39;MA&#39;,     # 参数集标签（用于标识该组参数）
+  component.type = &#39;indicator&#39;,  # 组件类型：指标（此处为MACD的快速EMA）
+  component.label = &#39;_&#39;,     # 指标在策略中的标识（对应MACD指标的默认标签）
+  variable = list(n = .FastMA),  # 待测试的参数：快速EMA周期，取值范围1-20
+  label = &#39;nFAST&#39;            # 参数标签（用于后续约束与结果识别）
+)</code></pre>
+<pre><code>## [1] &quot;macd&quot;</code></pre>
+<pre class="r"><code># 为策略添加慢速EMA周期的参数分布
+add.distribution(
+  strategy.st,
+  paramset.label = &#39;MA&#39;,
+  component.type = &#39;indicator&#39;,
+  component.label = &#39;_&#39;,
+  variable = list(n = .SlowMA),  # 待测试的参数：慢速EMA周期，取值范围30-80
+  label = &#39;nSLOW&#39;               # 参数标签
+)</code></pre>
+<pre><code>## [1] &quot;macd&quot;</code></pre>
+<pre class="r"><code># 添加参数约束：确保快速EMA周期小于慢速EMA周期（MACD指标的核心逻辑要求）
+add.distribution.constraint(
+  strategy.st,
+  paramset.label = &#39;MA&#39;,
+  distribution.label.1 = &#39;nFAST&#39;,  # 第一个参数：快速EMA周期
+  distribution.label.2 = &#39;nSLOW&#39;,  # 第二个参数：慢速EMA周期
+  operator = &#39;&lt;&#39;,                  # 约束关系：nFAST &lt; nSLOW
+  label = &#39;MA&#39;                     # 约束标签
+)</code></pre>
+<pre><code>## [1] &quot;macd&quot;</code></pre>
+<pre class="r"><code>### 执行参数优化并分析结果
+.audit  &lt;- new.env()  # 创建环境存储审计信息，用于后续有效性验证
+
+# 应用参数集测试策略表现
+results &lt;- apply.paramset(
+  strategy.st,               # 策略名称
+  paramset.label = &#39;MA&#39;,     # 使用的参数集标签
+  portfolio.st = portfolio.st,  # 组合名称（来自内置MACD演示）
+  account.st = account.st,    # 账户名称（来自内置MACD演示）
+  nsamples = .nsamples,       # 随机抽样的参数组合数量（30组）
+  audit = .audit,             # 存储审计数据的环境
+  store = TRUE,               # 保存结果到策略环境
+  verbose = TRUE              # 输出详细过程信息
+)</code></pre>
+<pre><code>## evaluation # 1:
+## $param.combo
+##     nFAST nSLOW
+## 701     1    65
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-04 00:00:00 AAPL -100 @ 5.47249984741211&quot;
+## [1] &quot;2008-08-27 00:00:00 AAPL 100 @ 6.23821401596069&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-02 00:00:00 AAPL -100 @ 9.00607109069824&quot;
+## [1] &quot;2010-09-14 00:00:00 AAPL 100 @ 9.57357120513916&quot;
+## [1] &quot;2011-06-10 00:00:00 AAPL -100 @ 11.6392860412598&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-20 00:00:00 AAPL -100 @ 14.1410713195801&quot;
+## [1] &quot;2011-12-23 00:00:00 AAPL 100 @ 14.4046430587769&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-05 00:00:00 AAPL -100 @ 19.0128574371338&quot;
+## [1] &quot;2014-03-27 00:00:00 AAPL 100 @ 19.1949996948242&quot;
+## [1] &quot;2014-04-21 00:00:00 AAPL -100 @ 18.9703578948975&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb650af240&gt;
+## got results for task 1
+## numValues: 1, numResults: 1, stopped: FALSE
+## returning status FALSE
+## evaluation # 2:
+## $param.combo
+##     nFAST nSLOW
+## 722     2    66
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-04 00:00:00 AAPL -100 @ 5.47249984741211&quot;
+## [1] &quot;2008-08-27 00:00:00 AAPL 100 @ 6.23821401596069&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-02 00:00:00 AAPL -100 @ 9.00607109069824&quot;
+## [1] &quot;2010-09-14 00:00:00 AAPL 100 @ 9.57357120513916&quot;
+## [1] &quot;2011-06-10 00:00:00 AAPL -100 @ 11.6392860412598&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-21 00:00:00 AAPL -100 @ 14.1589288711548&quot;
+## [1] &quot;2011-12-22 00:00:00 AAPL 100 @ 14.2339286804199&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-06 00:00:00 AAPL -100 @ 18.9553565979004&quot;
+## [1] &quot;2014-03-26 00:00:00 AAPL 100 @ 19.2778568267822&quot;
+## [1] &quot;2014-04-21 00:00:00 AAPL -100 @ 18.9703578948975&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb650af320&gt;
+## got results for task 2
+## numValues: 2, numResults: 2, stopped: FALSE
+## returning status FALSE
+## evaluation # 3:
+## $param.combo
+##     nFAST nSLOW
+## 483     3    54
+## 
+## [1] &quot;2008-04-22 00:00:00 AAPL 100 @ 5.72142887115479&quot;
+## [1] &quot;2008-07-30 00:00:00 AAPL -100 @ 5.71000003814697&quot;
+## [1] &quot;2008-08-29 00:00:00 AAPL 100 @ 6.05464315414429&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-26 00:00:00 AAPL 100 @ 3.92392897605896&quot;
+## [1] &quot;2010-08-30 00:00:00 AAPL -100 @ 8.6607141494751&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-05-31 00:00:00 AAPL -100 @ 12.4224996566772&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-02 00:00:00 AAPL -100 @ 13.917857170105&quot;
+## [1] &quot;2011-12-29 00:00:00 AAPL 100 @ 14.4685707092285&quot;
+## [1] &quot;2012-11-05 00:00:00 AAPL -100 @ 20.8792858123779&quot;
+## [1] &quot;2013-08-08 00:00:00 AAPL 100 @ 16.4646434783936&quot;
+## [1] &quot;2014-02-12 00:00:00 AAPL -100 @ 19.1399993896484&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb650b0f68&gt;
+## got results for task 3
+## numValues: 3, numResults: 3, stopped: FALSE
+## returning status FALSE
+## evaluation # 4:
+## $param.combo
+##     nFAST nSLOW
+## 683     3    64
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-01 00:00:00 AAPL -100 @ 5.59499979019165&quot;
+## [1] &quot;2008-08-28 00:00:00 AAPL 100 @ 6.20499992370605&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-02 00:00:00 AAPL -100 @ 9.00607109069824&quot;
+## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
+## [1] &quot;2011-06-10 00:00:00 AAPL -100 @ 11.6392860412598&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-19 00:00:00 AAPL -100 @ 13.6503572463989&quot;
+## [1] &quot;2011-12-23 00:00:00 AAPL 100 @ 14.4046430587769&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-04 00:00:00 AAPL -100 @ 18.9728565216064&quot;
+## [1] &quot;2014-03-27 00:00:00 AAPL 100 @ 19.1949996948242&quot;
+## [1] &quot;2014-04-21 00:00:00 AAPL -100 @ 18.9703578948975&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb679dbaa0&gt;
+## got results for task 4
+## numValues: 4, numResults: 4, stopped: FALSE
+## returning status FALSE
+## evaluation # 5:
+## $param.combo
+##     nFAST nSLOW
+## 364     4    48
+## 
+## [1] &quot;2008-04-21 00:00:00 AAPL 100 @ 6.00571393966675&quot;
+## [1] &quot;2008-07-29 00:00:00 AAPL -100 @ 5.6100001335144&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-25 00:00:00 AAPL 100 @ 3.80321407318115&quot;
+## [1] &quot;2010-08-27 00:00:00 AAPL -100 @ 8.62928581237793&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-20 00:00:00 AAPL -100 @ 12.228928565979&quot;
+## [1] &quot;2011-05-02 00:00:00 AAPL 100 @ 12.3671426773071&quot;
+## [1] &quot;2011-05-26 00:00:00 AAPL -100 @ 11.9642858505249&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-11-30 00:00:00 AAPL -100 @ 13.6499996185303&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-02 00:00:00 AAPL -100 @ 20.6000003814697&quot;
+## [1] &quot;2013-08-07 00:00:00 AAPL 100 @ 16.6064281463623&quot;
+## [1] &quot;2014-02-10 00:00:00 AAPL -100 @ 18.8924999237061&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb679d3c98&gt;
+## got results for task 5
+## numValues: 5, numResults: 5, stopped: FALSE
+## returning status FALSE
+## evaluation # 6:
+## $param.combo
+##     nFAST nSLOW
+## 484     4    54
+## 
+## [1] &quot;2008-04-22 00:00:00 AAPL 100 @ 5.72142887115479&quot;
+## [1] &quot;2008-07-30 00:00:00 AAPL -100 @ 5.71000003814697&quot;
+## [1] &quot;2008-08-29 00:00:00 AAPL 100 @ 6.05464315414429&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-26 00:00:00 AAPL 100 @ 3.92392897605896&quot;
+## [1] &quot;2010-08-30 00:00:00 AAPL -100 @ 8.6607141494751&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-05-31 00:00:00 AAPL -100 @ 12.4224996566772&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-02 00:00:00 AAPL -100 @ 13.917857170105&quot;
+## [1] &quot;2011-12-29 00:00:00 AAPL 100 @ 14.4685707092285&quot;
+## [1] &quot;2012-11-05 00:00:00 AAPL -100 @ 20.8792858123779&quot;
+## [1] &quot;2013-08-08 00:00:00 AAPL 100 @ 16.4646434783936&quot;
+## [1] &quot;2014-02-12 00:00:00 AAPL -100 @ 19.1399993896484&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb6551e0a0&gt;
+## got results for task 6
+## numValues: 6, numResults: 6, stopped: FALSE
+## returning status FALSE
+## evaluation # 7:
+## $param.combo
+##     nFAST nSLOW
+## 466     6    53
+## 
+## [1] &quot;2008-04-22 00:00:00 AAPL 100 @ 5.72142887115479&quot;
+## [1] &quot;2008-07-30 00:00:00 AAPL -100 @ 5.71000003814697&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-26 00:00:00 AAPL 100 @ 3.92392897605896&quot;
+## [1] &quot;2010-08-30 00:00:00 AAPL -100 @ 8.6607141494751&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-05-31 00:00:00 AAPL -100 @ 12.4224996566772&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-01 00:00:00 AAPL -100 @ 13.854642868042&quot;
+## [1] &quot;2011-12-29 00:00:00 AAPL 100 @ 14.4685707092285&quot;
+## [1] &quot;2012-11-05 00:00:00 AAPL -100 @ 20.8792858123779&quot;
+## [1] &quot;2013-08-07 00:00:00 AAPL 100 @ 16.6064281463623&quot;
+## [1] &quot;2014-02-12 00:00:00 AAPL -100 @ 19.1399993896484&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb65516298&gt;
+## got results for task 7
+## numValues: 7, numResults: 7, stopped: FALSE
+## returning status FALSE
+## evaluation # 8:
+## $param.combo
+##    nFAST nSLOW
+## 27     7    31
+## 
+## [1] &quot;2007-03-29 00:00:00 AAPL 100 @ 3.34821391105652&quot;
+## [1] &quot;2008-01-24 00:00:00 AAPL -100 @ 4.84285688400269&quot;
+## [1] &quot;2008-04-11 00:00:00 AAPL 100 @ 5.25500011444092&quot;
+## [1] &quot;2008-07-21 00:00:00 AAPL -100 @ 5.93892908096313&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-02-18 00:00:00 AAPL 100 @ 3.37035703659058&quot;
+## [1] &quot;2009-03-06 00:00:00 AAPL -100 @ 3.0464289188385&quot;
+## [1] &quot;2009-03-20 00:00:00 AAPL 100 @ 3.62821388244629&quot;
+## [1] &quot;2010-02-12 00:00:00 AAPL -100 @ 7.15642881393433&quot;
+## [1] &quot;2010-03-08 00:00:00 AAPL 100 @ 7.82428598403931&quot;
+## [1] &quot;2010-08-23 00:00:00 AAPL -100 @ 8.77857112884521&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-13 00:00:00 AAPL -100 @ 12.0046434402466&quot;
+## [1] &quot;2011-05-09 00:00:00 AAPL 100 @ 12.41428565979&quot;
+## [1] &quot;2011-05-24 00:00:00 AAPL -100 @ 11.8639287948608&quot;
+## [1] &quot;2011-07-14 00:00:00 AAPL 100 @ 12.7775001525879&quot;
+## [1] &quot;2011-11-25 00:00:00 AAPL -100 @ 12.9846429824829&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-05-24 00:00:00 AAPL -100 @ 20.1900005340576&quot;
+## [1] &quot;2012-06-26 00:00:00 AAPL 100 @ 20.4296436309814&quot;
+## [1] &quot;2012-10-24 00:00:00 AAPL -100 @ 22.0296421051025&quot;
+## [1] &quot;2013-05-28 00:00:00 AAPL 100 @ 15.7657136917114&quot;
+## [1] &quot;2013-06-24 00:00:00 AAPL -100 @ 14.376428604126&quot;
+## [1] &quot;2013-08-05 00:00:00 AAPL 100 @ 16.7660713195801&quot;
+## [1] &quot;2014-02-04 00:00:00 AAPL -100 @ 18.171070098877&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb6551e1b8&gt;
+## got results for task 8
+## numValues: 8, numResults: 8, stopped: FALSE
+## returning status FALSE
+## evaluation # 9:
+## $param.combo
+##     nFAST nSLOW
+## 447     7    52
+## 
+## [1] &quot;2008-04-22 00:00:00 AAPL 100 @ 5.72142887115479&quot;
+## [1] &quot;2008-07-30 00:00:00 AAPL -100 @ 5.71000003814697&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-26 00:00:00 AAPL 100 @ 3.92392897605896&quot;
+## [1] &quot;2010-08-30 00:00:00 AAPL -100 @ 8.6607141494751&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-05-27 00:00:00 AAPL -100 @ 12.0503568649292&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-01 00:00:00 AAPL -100 @ 13.854642868042&quot;
+## [1] &quot;2011-12-29 00:00:00 AAPL 100 @ 14.4685707092285&quot;
+## [1] &quot;2012-11-05 00:00:00 AAPL -100 @ 20.8792858123779&quot;
+## [1] &quot;2013-08-07 00:00:00 AAPL 100 @ 16.6064281463623&quot;
+## [1] &quot;2014-02-11 00:00:00 AAPL -100 @ 19.141429901123&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb679cbaa0&gt;
+## got results for task 9
+## numValues: 9, numResults: 9, stopped: FALSE
+## returning status FALSE
+## evaluation # 10:
+## $param.combo
+##     nFAST nSLOW
+## 949     9    77
+## 
+## [1] &quot;2008-04-28 00:00:00 AAPL 100 @ 6.15142917633057&quot;
+## [1] &quot;2008-08-05 00:00:00 AAPL -100 @ 5.73714303970337&quot;
+## [1] &quot;2008-08-25 00:00:00 AAPL 100 @ 6.16249990463257&quot;
+## [1] &quot;2008-09-11 00:00:00 AAPL -100 @ 5.45178604125977&quot;
+## [1] &quot;2009-04-02 00:00:00 AAPL 100 @ 4.02535676956177&quot;
+## [1] &quot;2011-06-15 00:00:00 AAPL -100 @ 11.6696434020996&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2012-11-09 00:00:00 AAPL -100 @ 19.5378570556641&quot;
+## [1] &quot;2013-08-13 00:00:00 AAPL 100 @ 17.4846439361572&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb679bdc98&gt;
+## got results for task 10
+## numValues: 10, numResults: 10, stopped: FALSE
+## returning status FALSE
+## evaluation # 11:
+## $param.combo
+##     nFAST nSLOW
+## 290    10    44
+## 
+## [1] &quot;2008-04-17 00:00:00 AAPL 100 @ 5.51749992370605&quot;
+## [1] &quot;2008-07-28 00:00:00 AAPL -100 @ 5.51428604125977&quot;
+## [1] &quot;2008-09-03 00:00:00 AAPL 100 @ 5.96285676956177&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-24 00:00:00 AAPL 100 @ 3.80357098579407&quot;
+## [1] &quot;2010-08-26 00:00:00 AAPL -100 @ 8.58142852783203&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-19 00:00:00 AAPL -100 @ 12.0664291381836&quot;
+## [1] &quot;2011-05-04 00:00:00 AAPL 100 @ 12.4846429824829&quot;
+## [1] &quot;2011-05-25 00:00:00 AAPL -100 @ 12.0278568267822&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-29 00:00:00 AAPL -100 @ 13.3285713195801&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-01 00:00:00 AAPL -100 @ 21.3050003051758&quot;
+## [1] &quot;2013-06-11 00:00:00 AAPL 100 @ 15.6285705566406&quot;
+## [1] &quot;2013-06-17 00:00:00 AAPL -100 @ 15.4285707473755&quot;
+## [1] &quot;2013-08-06 00:00:00 AAPL 100 @ 16.6160717010498&quot;
+## [1] &quot;2014-02-07 00:00:00 AAPL -100 @ 18.5599994659424&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67d22ea0&gt;
+## got results for task 11
+## numValues: 11, numResults: 11, stopped: FALSE
+## returning status FALSE
+## evaluation # 12:
+## $param.combo
+##     nFAST nSLOW
+## 111    11    35
+## 
+## [1] &quot;2007-04-03 00:00:00 AAPL 100 @ 3.375&quot;
+## [1] &quot;2008-01-25 00:00:00 AAPL -100 @ 4.64321422576904&quot;
+## [1] &quot;2008-04-14 00:00:00 AAPL 100 @ 5.27785682678223&quot;
+## [1] &quot;2008-07-23 00:00:00 AAPL -100 @ 5.93785715103149&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-02-19 00:00:00 AAPL 100 @ 3.23714303970337&quot;
+## [1] &quot;2009-03-04 00:00:00 AAPL -100 @ 3.25607109069824&quot;
+## [1] &quot;2009-03-23 00:00:00 AAPL 100 @ 3.84500002861023&quot;
+## [1] &quot;2010-02-16 00:00:00 AAPL -100 @ 7.26428604125977&quot;
+## [1] &quot;2010-03-05 00:00:00 AAPL 100 @ 7.81964302062988&quot;
+## [1] &quot;2010-08-24 00:00:00 AAPL -100 @ 8.56892871856689&quot;
+## [1] &quot;2010-09-20 00:00:00 AAPL 100 @ 10.1153573989868&quot;
+## [1] &quot;2011-04-14 00:00:00 AAPL -100 @ 11.872142791748&quot;
+## [1] &quot;2011-05-09 00:00:00 AAPL 100 @ 12.41428565979&quot;
+## [1] &quot;2011-05-24 00:00:00 AAPL -100 @ 11.8639287948608&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-28 00:00:00 AAPL -100 @ 13.4328565597534&quot;
+## [1] &quot;2012-01-03 00:00:00 AAPL 100 @ 14.686785697937&quot;
+## [1] &quot;2012-05-30 00:00:00 AAPL -100 @ 20.684642791748&quot;
+## [1] &quot;2012-06-25 00:00:00 AAPL 100 @ 20.3846435546875&quot;
+## [1] &quot;2012-10-26 00:00:00 AAPL -100 @ 21.5714282989502&quot;
+## [1] &quot;2013-05-31 00:00:00 AAPL 100 @ 16.0617866516113&quot;
+## [1] &quot;2013-06-21 00:00:00 AAPL -100 @ 14.7678565979004&quot;
+## [1] &quot;2013-08-05 00:00:00 AAPL 100 @ 16.7660713195801&quot;
+## [1] &quot;2014-02-05 00:00:00 AAPL -100 @ 18.3067855834961&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67d1b098&gt;
+## got results for task 12
+## numValues: 12, numResults: 12, stopped: FALSE
+## returning status FALSE
+## evaluation # 13:
+## $param.combo
+##     nFAST nSLOW
+## 131    11    36
+## 
+## [1] &quot;2007-04-03 00:00:00 AAPL 100 @ 3.375&quot;
+## [1] &quot;2008-01-25 00:00:00 AAPL -100 @ 4.64321422576904&quot;
+## [1] &quot;2008-04-14 00:00:00 AAPL 100 @ 5.27785682678223&quot;
+## [1] &quot;2008-07-23 00:00:00 AAPL -100 @ 5.93785715103149&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-02-20 00:00:00 AAPL 100 @ 3.25714302062988&quot;
+## [1] &quot;2009-03-04 00:00:00 AAPL -100 @ 3.25607109069824&quot;
+## [1] &quot;2009-03-23 00:00:00 AAPL 100 @ 3.84500002861023&quot;
+## [1] &quot;2010-02-17 00:00:00 AAPL -100 @ 7.23392915725708&quot;
+## [1] &quot;2010-03-05 00:00:00 AAPL 100 @ 7.81964302062988&quot;
+## [1] &quot;2010-08-24 00:00:00 AAPL -100 @ 8.56892871856689&quot;
+## [1] &quot;2010-09-20 00:00:00 AAPL 100 @ 10.1153573989868&quot;
+## [1] &quot;2011-04-14 00:00:00 AAPL -100 @ 11.872142791748&quot;
+## [1] &quot;2011-05-09 00:00:00 AAPL 100 @ 12.41428565979&quot;
+## [1] &quot;2011-05-24 00:00:00 AAPL -100 @ 11.8639287948608&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-28 00:00:00 AAPL -100 @ 13.4328565597534&quot;
+## [1] &quot;2012-01-03 00:00:00 AAPL 100 @ 14.686785697937&quot;
+## [1] &quot;2012-05-31 00:00:00 AAPL -100 @ 20.6332149505615&quot;
+## [1] &quot;2012-06-22 00:00:00 AAPL 100 @ 20.78928565979&quot;
+## [1] &quot;2012-10-26 00:00:00 AAPL -100 @ 21.5714282989502&quot;
+## [1] &quot;2013-06-03 00:00:00 AAPL 100 @ 16.0971431732178&quot;
+## [1] &quot;2013-06-21 00:00:00 AAPL -100 @ 14.7678565979004&quot;
+## [1] &quot;2013-08-05 00:00:00 AAPL 100 @ 16.7660713195801&quot;
+## [1] &quot;2014-02-05 00:00:00 AAPL -100 @ 18.3067855834961&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb6566d418&gt;
+## got results for task 13
+## numValues: 13, numResults: 13, stopped: FALSE
+## returning status FALSE
+## evaluation # 14:
+## $param.combo
+##     nFAST nSLOW
+## 311    11    45
+## 
+## [1] &quot;2008-04-18 00:00:00 AAPL 100 @ 5.75142908096313&quot;
+## [1] &quot;2008-07-28 00:00:00 AAPL -100 @ 5.51428604125977&quot;
+## [1] &quot;2008-09-03 00:00:00 AAPL 100 @ 5.96285676956177&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-24 00:00:00 AAPL 100 @ 3.80357098579407&quot;
+## [1] &quot;2010-08-26 00:00:00 AAPL -100 @ 8.58142852783203&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-19 00:00:00 AAPL -100 @ 12.0664291381836&quot;
+## [1] &quot;2011-05-04 00:00:00 AAPL 100 @ 12.4846429824829&quot;
+## [1] &quot;2011-05-26 00:00:00 AAPL -100 @ 11.9642858505249&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-30 00:00:00 AAPL -100 @ 13.6499996185303&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-01 00:00:00 AAPL -100 @ 21.3050003051758&quot;
+## [1] &quot;2013-08-06 00:00:00 AAPL 100 @ 16.6160717010498&quot;
+## [1] &quot;2014-02-07 00:00:00 AAPL -100 @ 18.5599994659424&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb5c227aa0&gt;
+## got results for task 14
+## numValues: 14, numResults: 14, stopped: FALSE
+## returning status FALSE
+## evaluation # 15:
+## $param.combo
+##     nFAST nSLOW
+## 331    11    46
+## 
+## [1] &quot;2008-04-18 00:00:00 AAPL 100 @ 5.75142908096313&quot;
+## [1] &quot;2008-07-29 00:00:00 AAPL -100 @ 5.6100001335144&quot;
+## [1] &quot;2008-09-03 00:00:00 AAPL 100 @ 5.96285676956177&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-24 00:00:00 AAPL 100 @ 3.80357098579407&quot;
+## [1] &quot;2010-08-26 00:00:00 AAPL -100 @ 8.58142852783203&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-19 00:00:00 AAPL -100 @ 12.0664291381836&quot;
+## [1] &quot;2011-05-03 00:00:00 AAPL 100 @ 12.4357137680054&quot;
+## [1] &quot;2011-05-26 00:00:00 AAPL -100 @ 11.9642858505249&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-30 00:00:00 AAPL -100 @ 13.6499996185303&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-01 00:00:00 AAPL -100 @ 21.3050003051758&quot;
+## [1] &quot;2013-08-06 00:00:00 AAPL 100 @ 16.6160717010498&quot;
+## [1] &quot;2014-02-10 00:00:00 AAPL -100 @ 18.8924999237061&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67cfea98&gt;
+## got results for task 15
+## numValues: 15, numResults: 15, stopped: FALSE
+## returning status FALSE
+## evaluation # 16:
+## $param.combo
+##     nFAST nSLOW
+## 551    11    57
+## 
+## [1] &quot;2008-04-23 00:00:00 AAPL 100 @ 5.81750011444092&quot;
+## [1] &quot;2008-07-31 00:00:00 AAPL -100 @ 5.67678594589233&quot;
+## [1] &quot;2008-08-29 00:00:00 AAPL 100 @ 6.05464315414429&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-27 00:00:00 AAPL 100 @ 3.81607103347778&quot;
+## [1] &quot;2010-08-31 00:00:00 AAPL -100 @ 8.68214321136475&quot;
+## [1] &quot;2010-09-16 00:00:00 AAPL 100 @ 9.8774995803833&quot;
+## [1] &quot;2011-06-01 00:00:00 AAPL -100 @ 12.3396425247192&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-05 00:00:00 AAPL -100 @ 14.0360708236694&quot;
+## [1] &quot;2011-12-28 00:00:00 AAPL 100 @ 14.3800001144409&quot;
+## [1] &quot;2012-11-06 00:00:00 AAPL -100 @ 20.8160705566406&quot;
+## [1] &quot;2013-08-08 00:00:00 AAPL 100 @ 16.4646434783936&quot;
+## [1] &quot;2014-02-13 00:00:00 AAPL -100 @ 19.4439296722412&quot;
+## [1] &quot;2014-04-01 00:00:00 AAPL 100 @ 19.3446426391602&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67d82ea0&gt;
+## got results for task 16
+## numValues: 16, numResults: 16, stopped: FALSE
+## returning status FALSE
+## evaluation # 17:
+## $param.combo
+##      nFAST nSLOW
+## 1011    11    80
+## 
+## [1] &quot;2008-04-28 00:00:00 AAPL 100 @ 6.15142917633057&quot;
+## [1] &quot;2008-08-06 00:00:00 AAPL -100 @ 5.86392879486084&quot;
+## [1] &quot;2008-08-22 00:00:00 AAPL 100 @ 6.31392908096313&quot;
+## [1] &quot;2008-09-12 00:00:00 AAPL -100 @ 5.31928586959839&quot;
+## [1] &quot;2009-04-03 00:00:00 AAPL 100 @ 4.14249992370605&quot;
+## [1] &quot;2011-06-16 00:00:00 AAPL -100 @ 11.6128568649292&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2012-11-09 00:00:00 AAPL -100 @ 19.5378570556641&quot;
+## [1] &quot;2013-08-14 00:00:00 AAPL 100 @ 17.8035717010498&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67d7b098&gt;
+## got results for task 17
+## numValues: 17, numResults: 17, stopped: FALSE
+## returning status FALSE
+## evaluation # 18:
+## $param.combo
+##    nFAST nSLOW
+## 73    13    33
+## 
+## [1] &quot;2007-04-02 00:00:00 AAPL 100 @ 3.34464311599731&quot;
+## [1] &quot;2008-01-25 00:00:00 AAPL -100 @ 4.64321422576904&quot;
+## [1] &quot;2008-04-11 00:00:00 AAPL 100 @ 5.25500011444092&quot;
+## [1] &quot;2008-07-22 00:00:00 AAPL -100 @ 5.78642892837524&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-02-18 00:00:00 AAPL 100 @ 3.37035703659058&quot;
+## [1] &quot;2009-03-06 00:00:00 AAPL -100 @ 3.0464289188385&quot;
+## [1] &quot;2009-03-20 00:00:00 AAPL 100 @ 3.62821388244629&quot;
+## [1] &quot;2010-02-16 00:00:00 AAPL -100 @ 7.26428604125977&quot;
+## [1] &quot;2010-03-08 00:00:00 AAPL 100 @ 7.82428598403931&quot;
+## [1] &quot;2010-08-24 00:00:00 AAPL -100 @ 8.56892871856689&quot;
+## [1] &quot;2010-09-20 00:00:00 AAPL 100 @ 10.1153573989868&quot;
+## [1] &quot;2011-04-13 00:00:00 AAPL -100 @ 12.0046434402466&quot;
+## [1] &quot;2011-05-09 00:00:00 AAPL 100 @ 12.41428565979&quot;
+## [1] &quot;2011-05-24 00:00:00 AAPL -100 @ 11.8639287948608&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-25 00:00:00 AAPL -100 @ 12.9846429824829&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-05-25 00:00:00 AAPL -100 @ 20.0817852020264&quot;
+## [1] &quot;2012-06-26 00:00:00 AAPL 100 @ 20.4296436309814&quot;
+## [1] &quot;2012-10-25 00:00:00 AAPL -100 @ 21.7692852020264&quot;
+## [1] &quot;2013-05-29 00:00:00 AAPL 100 @ 15.8910713195801&quot;
+## [1] &quot;2013-06-21 00:00:00 AAPL -100 @ 14.7678565979004&quot;
+## [1] &quot;2013-08-05 00:00:00 AAPL 100 @ 16.7660713195801&quot;
+## [1] &quot;2014-02-05 00:00:00 AAPL -100 @ 18.3067855834961&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb63154ea0&gt;
+## got results for task 18
+## numValues: 18, numResults: 18, stopped: FALSE
+## returning status FALSE
+## evaluation # 19:
+## $param.combo
+##     nFAST nSLOW
+## 333    13    46
+## 
+## [1] &quot;2008-04-18 00:00:00 AAPL 100 @ 5.75142908096313&quot;
+## [1] &quot;2008-07-29 00:00:00 AAPL -100 @ 5.6100001335144&quot;
+## [1] &quot;2008-09-03 00:00:00 AAPL 100 @ 5.96285676956177&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-24 00:00:00 AAPL 100 @ 3.80357098579407&quot;
+## [1] &quot;2010-08-26 00:00:00 AAPL -100 @ 8.58142852783203&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-19 00:00:00 AAPL -100 @ 12.0664291381836&quot;
+## [1] &quot;2011-05-03 00:00:00 AAPL 100 @ 12.4357137680054&quot;
+## [1] &quot;2011-05-26 00:00:00 AAPL -100 @ 11.9642858505249&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-30 00:00:00 AAPL -100 @ 13.6499996185303&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-01 00:00:00 AAPL -100 @ 21.3050003051758&quot;
+## [1] &quot;2013-08-06 00:00:00 AAPL 100 @ 16.6160717010498&quot;
+## [1] &quot;2014-02-10 00:00:00 AAPL -100 @ 18.8924999237061&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb679cdaa0&gt;
+## got results for task 19
+## numValues: 19, numResults: 19, stopped: FALSE
+## returning status FALSE
+## evaluation # 20:
+## $param.combo
+##     nFAST nSLOW
+## 634    14    61
+## 
+## [1] &quot;2008-04-23 00:00:00 AAPL 100 @ 5.81750011444092&quot;
+## [1] &quot;2008-08-01 00:00:00 AAPL -100 @ 5.59499979019165&quot;
+## [1] &quot;2008-08-28 00:00:00 AAPL 100 @ 6.20499992370605&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-27 00:00:00 AAPL 100 @ 3.81607103347778&quot;
+## [1] &quot;2010-09-01 00:00:00 AAPL -100 @ 8.94035720825195&quot;
+## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
+## [1] &quot;2011-06-08 00:00:00 AAPL -100 @ 11.8657140731812&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-06 00:00:00 AAPL -100 @ 13.9624996185303&quot;
+## [1] &quot;2011-12-28 00:00:00 AAPL 100 @ 14.3800001144409&quot;
+## [1] &quot;2012-11-06 00:00:00 AAPL -100 @ 20.8160705566406&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-02-27 00:00:00 AAPL -100 @ 18.8453578948975&quot;
+## [1] &quot;2014-03-31 00:00:00 AAPL 100 @ 19.1692867279053&quot;
+## [1] &quot;2014-04-17 00:00:00 AAPL -100 @ 18.7478561401367&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb5dee9c98&gt;
+## got results for task 20
+## numValues: 20, numResults: 20, stopped: FALSE
+## returning status FALSE
+## evaluation # 21:
+## $param.combo
+##     nFAST nSLOW
+## 934    14    76
+## 
+## [1] &quot;2008-04-28 00:00:00 AAPL 100 @ 6.15142917633057&quot;
+## [1] &quot;2008-08-05 00:00:00 AAPL -100 @ 5.73714303970337&quot;
+## [1] &quot;2008-08-25 00:00:00 AAPL 100 @ 6.16249990463257&quot;
+## [1] &quot;2008-09-11 00:00:00 AAPL -100 @ 5.45178604125977&quot;
+## [1] &quot;2009-04-02 00:00:00 AAPL 100 @ 4.02535676956177&quot;
+## [1] &quot;2011-06-15 00:00:00 AAPL -100 @ 11.6696434020996&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2012-11-09 00:00:00 AAPL -100 @ 19.5378570556641&quot;
+## [1] &quot;2013-08-13 00:00:00 AAPL 100 @ 17.4846439361572&quot;
+## [1] &quot;2014-04-24 00:00:00 AAPL -100 @ 20.2775001525879&quot;
+## [1] &quot;2014-04-25 00:00:00 AAPL 100 @ 20.4264297485352&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb638574a0&gt;
+## got results for task 21
+## numValues: 21, numResults: 21, stopped: FALSE
+## returning status FALSE
+## evaluation # 22:
+## $param.combo
+##     nFAST nSLOW
+## 596    16    59
+## 
+## [1] &quot;2008-04-23 00:00:00 AAPL 100 @ 5.81750011444092&quot;
+## [1] &quot;2008-07-31 00:00:00 AAPL -100 @ 5.67678594589233&quot;
+## [1] &quot;2008-08-29 00:00:00 AAPL 100 @ 6.05464315414429&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-27 00:00:00 AAPL 100 @ 3.81607103347778&quot;
+## [1] &quot;2010-08-31 00:00:00 AAPL -100 @ 8.68214321136475&quot;
+## [1] &quot;2010-09-16 00:00:00 AAPL 100 @ 9.8774995803833&quot;
+## [1] &quot;2011-06-02 00:00:00 AAPL -100 @ 12.3607139587402&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-05 00:00:00 AAPL -100 @ 14.0360708236694&quot;
+## [1] &quot;2011-12-28 00:00:00 AAPL 100 @ 14.3800001144409&quot;
+## [1] &quot;2012-11-06 00:00:00 AAPL -100 @ 20.8160705566406&quot;
+## [1] &quot;2013-08-08 00:00:00 AAPL 100 @ 16.4646434783936&quot;
+## [1] &quot;2014-02-25 00:00:00 AAPL -100 @ 18.6450004577637&quot;
+## [1] &quot;2014-03-31 00:00:00 AAPL 100 @ 19.1692867279053&quot;
+## [1] &quot;2014-04-17 00:00:00 AAPL -100 @ 18.7478561401367&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb6384f698&gt;
+## got results for task 22
+## numValues: 22, numResults: 22, stopped: FALSE
+## returning status FALSE
+## evaluation # 23:
+## $param.combo
+##     nFAST nSLOW
+## 736    16    66
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-04 00:00:00 AAPL -100 @ 5.47249984741211&quot;
+## [1] &quot;2008-08-27 00:00:00 AAPL 100 @ 6.23821401596069&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-02 00:00:00 AAPL -100 @ 9.00607109069824&quot;
+## [1] &quot;2010-09-14 00:00:00 AAPL 100 @ 9.57357120513916&quot;
+## [1] &quot;2011-06-10 00:00:00 AAPL -100 @ 11.6392860412598&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-21 00:00:00 AAPL -100 @ 14.1589288711548&quot;
+## [1] &quot;2011-12-22 00:00:00 AAPL 100 @ 14.2339286804199&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-06 00:00:00 AAPL -100 @ 18.9553565979004&quot;
+## [1] &quot;2014-03-26 00:00:00 AAPL 100 @ 19.2778568267822&quot;
+## [1] &quot;2014-04-21 00:00:00 AAPL -100 @ 18.9703578948975&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67e290a0&gt;
+## got results for task 23
+## numValues: 23, numResults: 23, stopped: FALSE
+## returning status FALSE
+## evaluation # 24:
+## $param.combo
+##    nFAST nSLOW
+## 77    17    33
+## 
+## [1] &quot;2007-04-02 00:00:00 AAPL 100 @ 3.34464311599731&quot;
+## [1] &quot;2008-01-25 00:00:00 AAPL -100 @ 4.64321422576904&quot;
+## [1] &quot;2008-04-11 00:00:00 AAPL 100 @ 5.25500011444092&quot;
+## [1] &quot;2008-07-22 00:00:00 AAPL -100 @ 5.78642892837524&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-02-18 00:00:00 AAPL 100 @ 3.37035703659058&quot;
+## [1] &quot;2009-03-06 00:00:00 AAPL -100 @ 3.0464289188385&quot;
+## [1] &quot;2009-03-20 00:00:00 AAPL 100 @ 3.62821388244629&quot;
+## [1] &quot;2010-02-16 00:00:00 AAPL -100 @ 7.26428604125977&quot;
+## [1] &quot;2010-03-08 00:00:00 AAPL 100 @ 7.82428598403931&quot;
+## [1] &quot;2010-08-24 00:00:00 AAPL -100 @ 8.56892871856689&quot;
+## [1] &quot;2010-09-20 00:00:00 AAPL 100 @ 10.1153573989868&quot;
+## [1] &quot;2011-04-13 00:00:00 AAPL -100 @ 12.0046434402466&quot;
+## [1] &quot;2011-05-09 00:00:00 AAPL 100 @ 12.41428565979&quot;
+## [1] &quot;2011-05-24 00:00:00 AAPL -100 @ 11.8639287948608&quot;
+## [1] &quot;2011-07-15 00:00:00 AAPL 100 @ 13.0328569412231&quot;
+## [1] &quot;2011-11-25 00:00:00 AAPL -100 @ 12.9846429824829&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-05-25 00:00:00 AAPL -100 @ 20.0817852020264&quot;
+## [1] &quot;2012-06-26 00:00:00 AAPL 100 @ 20.4296436309814&quot;
+## [1] &quot;2012-10-25 00:00:00 AAPL -100 @ 21.7692852020264&quot;
+## [1] &quot;2013-05-29 00:00:00 AAPL 100 @ 15.8910713195801&quot;
+## [1] &quot;2013-06-21 00:00:00 AAPL -100 @ 14.7678565979004&quot;
+## [1] &quot;2013-08-05 00:00:00 AAPL 100 @ 16.7660713195801&quot;
+## [1] &quot;2014-02-05 00:00:00 AAPL -100 @ 18.3067855834961&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb657c5ca0&gt;
+## got results for task 24
+## numValues: 24, numResults: 24, stopped: FALSE
+## returning status FALSE
+## evaluation # 25:
+## $param.combo
+##     nFAST nSLOW
+## 558    18    57
+## 
+## [1] &quot;2008-04-23 00:00:00 AAPL 100 @ 5.81750011444092&quot;
+## [1] &quot;2008-07-31 00:00:00 AAPL -100 @ 5.67678594589233&quot;
+## [1] &quot;2008-08-29 00:00:00 AAPL 100 @ 6.05464315414429&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-27 00:00:00 AAPL 100 @ 3.81607103347778&quot;
+## [1] &quot;2010-08-31 00:00:00 AAPL -100 @ 8.68214321136475&quot;
+## [1] &quot;2010-09-16 00:00:00 AAPL 100 @ 9.8774995803833&quot;
+## [1] &quot;2011-06-01 00:00:00 AAPL -100 @ 12.3396425247192&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-05 00:00:00 AAPL -100 @ 14.0360708236694&quot;
+## [1] &quot;2011-12-28 00:00:00 AAPL 100 @ 14.3800001144409&quot;
+## [1] &quot;2012-11-06 00:00:00 AAPL -100 @ 20.8160705566406&quot;
+## [1] &quot;2013-08-08 00:00:00 AAPL 100 @ 16.4646434783936&quot;
+## [1] &quot;2014-02-13 00:00:00 AAPL -100 @ 19.4439296722412&quot;
+## [1] &quot;2014-04-01 00:00:00 AAPL 100 @ 19.3446426391602&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb657bbe98&gt;
+## got results for task 25
+## numValues: 25, numResults: 25, stopped: FALSE
+## returning status FALSE
+## evaluation # 26:
+## $param.combo
+##     nFAST nSLOW
+## 678    18    63
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-01 00:00:00 AAPL -100 @ 5.59499979019165&quot;
+## [1] &quot;2008-08-28 00:00:00 AAPL 100 @ 6.20499992370605&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-01 00:00:00 AAPL -100 @ 8.94035720825195&quot;
+## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
+## [1] &quot;2011-06-09 00:00:00 AAPL -100 @ 11.8389291763306&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-08 00:00:00 AAPL -100 @ 13.9521427154541&quot;
+## [1] &quot;2011-12-27 00:00:00 AAPL 100 @ 14.518928527832&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-03 00:00:00 AAPL -100 @ 18.8485717773438&quot;
+## [1] &quot;2014-03-28 00:00:00 AAPL 100 @ 19.1735706329346&quot;
+## [1] &quot;2014-04-17 00:00:00 AAPL -100 @ 18.7478561401367&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67df6ea0&gt;
+## got results for task 26
+## numValues: 26, numResults: 26, stopped: FALSE
+## returning status FALSE
+## evaluation # 27:
+## $param.combo
+##     nFAST nSLOW
+## 679    19    63
+## 
+## [1] &quot;2008-04-24 00:00:00 AAPL 100 @ 6.03357076644897&quot;
+## [1] &quot;2008-08-01 00:00:00 AAPL -100 @ 5.59499979019165&quot;
+## [1] &quot;2008-08-28 00:00:00 AAPL 100 @ 6.20499992370605&quot;
+## [1] &quot;2008-09-10 00:00:00 AAPL -100 @ 5.41464281082153&quot;
+## [1] &quot;2009-03-30 00:00:00 AAPL 100 @ 3.73178601264954&quot;
+## [1] &quot;2010-09-01 00:00:00 AAPL -100 @ 8.94035720825195&quot;
+## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
+## [1] &quot;2011-06-09 00:00:00 AAPL -100 @ 11.8389291763306&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-08 00:00:00 AAPL -100 @ 13.9521427154541&quot;
+## [1] &quot;2011-12-27 00:00:00 AAPL 100 @ 14.518928527832&quot;
+## [1] &quot;2012-11-07 00:00:00 AAPL -100 @ 19.9285717010498&quot;
+## [1] &quot;2013-08-09 00:00:00 AAPL 100 @ 16.2303562164307&quot;
+## [1] &quot;2014-03-03 00:00:00 AAPL -100 @ 18.8485717773438&quot;
+## [1] &quot;2014-03-28 00:00:00 AAPL 100 @ 19.1735706329346&quot;
+## [1] &quot;2014-04-17 00:00:00 AAPL -100 @ 18.7478561401367&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67def098&gt;
+## got results for task 27
+## numValues: 27, numResults: 27, stopped: FALSE
+## returning status FALSE
+## evaluation # 28:
+## $param.combo
+##     nFAST nSLOW
+## 859    19    72
+## 
+## [1] &quot;2008-04-25 00:00:00 AAPL 100 @ 6.06178617477417&quot;
+## [1] &quot;2008-08-05 00:00:00 AAPL -100 @ 5.73714303970337&quot;
+## [1] &quot;2008-08-26 00:00:00 AAPL 100 @ 6.20142889022827&quot;
+## [1] &quot;2008-09-11 00:00:00 AAPL -100 @ 5.45178604125977&quot;
+## [1] &quot;2009-04-01 00:00:00 AAPL 100 @ 3.88178610801697&quot;
+## [1] &quot;2011-06-14 00:00:00 AAPL -100 @ 11.872857093811&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2012-11-08 00:00:00 AAPL -100 @ 19.2053565979004&quot;
+## [1] &quot;2013-08-12 00:00:00 AAPL 100 @ 16.6914291381836&quot;
+## [1] &quot;2014-04-23 00:00:00 AAPL -100 @ 18.7410717010498&quot;
+## [1] &quot;2014-04-28 00:00:00 AAPL 100 @ 21.2175006866455&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb67e370a0&gt;
+## got results for task 28
+## numValues: 28, numResults: 28, stopped: FALSE
+## returning status FALSE
+## evaluation # 29:
+## $param.combo
+##     nFAST nSLOW
+## 400    20    49
+## 
+## [1] &quot;2008-04-21 00:00:00 AAPL 100 @ 6.00571393966675&quot;
+## [1] &quot;2008-07-29 00:00:00 AAPL -100 @ 5.6100001335144&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-08 00:00:00 AAPL -100 @ 5.6399998664856&quot;
+## [1] &quot;2009-03-25 00:00:00 AAPL 100 @ 3.80321407318115&quot;
+## [1] &quot;2010-08-27 00:00:00 AAPL -100 @ 8.62928581237793&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-04-21 00:00:00 AAPL -100 @ 12.5249996185303&quot;
+## [1] &quot;2011-05-02 00:00:00 AAPL 100 @ 12.3671426773071&quot;
+## [1] &quot;2011-05-27 00:00:00 AAPL -100 @ 12.0503568649292&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-11-30 00:00:00 AAPL -100 @ 13.6499996185303&quot;
+## [1] &quot;2011-12-30 00:00:00 AAPL 100 @ 14.4642858505249&quot;
+## [1] &quot;2012-11-02 00:00:00 AAPL -100 @ 20.6000003814697&quot;
+## [1] &quot;2013-08-07 00:00:00 AAPL 100 @ 16.6064281463623&quot;
+## [1] &quot;2014-02-10 00:00:00 AAPL -100 @ 18.8924999237061&quot;
+## [1] &quot;2014-04-03 00:00:00 AAPL 100 @ 19.2425003051758&quot;
+## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb5c30e4a0&gt;
+## got results for task 29
+## numValues: 29, numResults: 29, stopped: FALSE
+## returning status FALSE
+## evaluation # 30:
+## $param.combo
+##     nFAST nSLOW
+## 460    20    52
+## 
+## [1] &quot;2008-04-22 00:00:00 AAPL 100 @ 5.72142887115479&quot;
+## [1] &quot;2008-07-30 00:00:00 AAPL -100 @ 5.71000003814697&quot;
+## [1] &quot;2008-09-02 00:00:00 AAPL 100 @ 5.93535709381104&quot;
+## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
+## [1] &quot;2009-03-26 00:00:00 AAPL 100 @ 3.92392897605896&quot;
+## [1] &quot;2010-08-30 00:00:00 AAPL -100 @ 8.6607141494751&quot;
+## [1] &quot;2010-09-17 00:00:00 AAPL 100 @ 9.83464336395264&quot;
+## [1] &quot;2011-05-27 00:00:00 AAPL -100 @ 12.0503568649292&quot;
+## [1] &quot;2011-07-18 00:00:00 AAPL 100 @ 13.3500003814697&quot;
+## [1] &quot;2011-12-01 00:00:00 AAPL -100 @ 13.854642868042&quot;
+## [1] &quot;2011-12-29 00:00:00 AAPL 100 @ 14.4685707092285&quot;
+## [1] &quot;2012-11-05 00:00:00 AAPL -100 @ 20.8792858123779&quot;
+## [1] &quot;2013-08-07 00:00:00 AAPL 100 @ 16.6064281463623&quot;
+## [1] &quot;2014-02-11 00:00:00 AAPL -100 @ 19.141429901123&quot;
+## [1] &quot;2014-04-02 00:00:00 AAPL 100 @ 19.3767852783203&quot;
+## [1] &quot;2014-04-16 00:00:00 AAPL -100 @ 18.5360717773438&quot;
+## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;
+## result of evaluating expression:
+## &lt;environment: 0x7fbb5c304698&gt;
+## got results for task 30
+## numValues: 30, numResults: 30, stopped: FALSE
+## first call to combine function
+## evaluating call object to combine results:
+##   fun(result.1, result.2, result.3, result.4, result.5, result.6, 
+##     result.7, result.8, result.9, result.10, result.11, result.12, 
+##     result.13, result.14, result.15, result.16, result.17, result.18, 
+##     result.19, result.20, result.21, result.22, result.23, result.24, 
+##     result.25, result.26, result.27, result.28, result.29, result.30)
+## returning status FALSE
+## numValues: 30, numResults: 30, stopped: TRUE</code></pre>
+<pre class="r"><code># 提取关键统计结果
+df    &lt;- degrees.of.freedom(&#39;macd&#39;, &#39;macd&#39;)  # 计算策略的自由度（评估过拟合风险）
+tstats &lt;- results$tradeStats  # 交易统计数据（胜率、盈亏比等）
+defSR &lt;- SharpeRatio.deflated(&#39;macd&#39;, strategy=&#39;macd&#39;, audit=.audit)  # 修正后的夏普比率（考虑过拟合）
+hcSR  &lt;- SharpeRatio.haircut(&#39;macd&#39;, strategy=&#39;macd&#39;, audit=.audit)   # 调整后的夏普比率（降低过拟合影响）
+
+# 打印结果
+print(tstats)  # 输出交易统计</code></pre>
+<pre><code>##      nFAST nSLOW       Portfolio Symbol Num.Txns Num.Trades Net.Trading.PL
+## 701      1    65  macd.train.701   AAPL       17          8       1628.072
+## 722      2    66  macd.train.722   AAPL       17          8       1632.893
+## 483      3    54  macd.train.483   AAPL       17          8       1694.143
+## 683      3    64  macd.train.683   AAPL       17          8       1582.857
+## 364      4    48  macd.train.364   AAPL       19          9       1555.679
+## 484      4    54  macd.train.484   AAPL       17          8       1694.143
+## 466      6    53  macd.train.466   AAPL       17          8       1685.572
+## 27       7    31   macd.train.27   AAPL       29         14       1556.143
+## 447      7    52  macd.train.447   AAPL       17          8       1648.500
+## 949      9    77  macd.train.949   AAPL        9          4       1814.679
+## 290     10    44  macd.train.290   AAPL       21         10       1581.572
+## 111     11    35  macd.train.111   AAPL       29         14       1556.678
+## 131     11    36  macd.train.131   AAPL       29         14       1502.500
+## 311     11    45  macd.train.311   AAPL       19          9       1603.964
+## 331     11    46  macd.train.331   AAPL       19          9       1651.679
+## 551     11    57  macd.train.551   AAPL       17          8       1729.536
+## 1011    11    80 macd.train.1011   AAPL        9          4       1749.679
+## 73      13    33   macd.train.73   AAPL       29         14       1496.536
+## 333     13    46  macd.train.333   AAPL       19          9       1651.679
+## 634     14    61  macd.train.634   AAPL       17          8       1702.107
+## 934     14    76  macd.train.934   AAPL       11          5       1799.786
+## 596     16    59  macd.train.596   AAPL       17          8       1690.464
+## 736     16    66  macd.train.736   AAPL       17          8       1632.893
+## 77      17    33   macd.train.77   AAPL       29         14       1496.536
+## 558     18    57  macd.train.558   AAPL       17          8       1729.536
+## 678     18    63  macd.train.678   AAPL       17          8       1582.465
+## 679     19    63  macd.train.679   AAPL       17          8       1582.465
+## 859     19    72  macd.train.859   AAPL       11          5       1621.143
+## 400     20    49  macd.train.400   AAPL       19          9       1593.893
+## 460     20    52  macd.train.460   AAPL       17          8       1648.500
+##      Avg.Trade.PL Med.Trade.PL Largest.Winner Largest.Loser Gross.Profits
+## 701     185.35271    142.83929       552.3929     -82.35712      1643.750
+## 722     185.95538    143.73217       569.4643     -82.35712      1656.857
+## 483     193.61158    157.78565       641.0715     -84.07135      1697.857
+## 683     179.70091    114.44645       552.3929     -79.03571      1582.964
+## 364     156.71429     29.99992       613.5715     -74.39289      1594.214
+## 484     193.61158    157.78565       641.0715     -84.07135      1697.857
+## 466     192.54017    151.91069       641.0715     -84.07135      1677.357
+## 27      100.77806     81.91071       572.5715    -138.92851      1776.893
+## 447     187.90627    136.01780       641.0715     -84.07135      1640.286
+## 949     325.60717    304.53570       764.4287     -71.07139      1414.929
+## 290     143.63214     14.62502       684.0714     -74.39289      1609.000
+## 111     100.81630     70.46430       599.7857    -129.39301      1699.786
+## 131      96.94642     70.46430       594.6429    -132.92866      1649.250
+## 311     162.07936     61.71427       684.0714     -74.39289      1641.143
+## 331     167.38096     61.71427       684.0714     -74.39289      1674.393
+## 551     198.03571    157.41067       643.6070     -80.85709      1742.964
+## 1011    317.33034    310.87499       747.0357     -99.46432      1397.536
+## 73       96.52040     63.80358       561.7499    -112.32147      1659.786
+## 333     167.38096     61.71427       684.0714     -74.39289      1674.393
+## 634     194.60712    141.37497       643.6070     -79.03571      1700.286
+## 934     316.34286    279.28562       764.4287     -71.07139      1694.214
+## 596     193.15174    143.32137       643.6070     -63.75003      1665.178
+## 736     185.95538    143.73217       569.4643     -82.35712      1656.857
+## 77       96.52040     63.80358       561.7499    -112.32147      1659.786
+## 558     198.03571    157.41067       643.6070     -80.85709      1742.964
+## 678     179.65181    139.51788       540.9643     -79.03571      1602.679
+## 679     179.65181    139.51788       540.9643     -79.03571      1602.679
+## 859     296.43568    204.96426       799.1071     -74.96428      1589.607
+## 400     160.96031     29.99992       613.5715     -74.39289      1623.821
+## 460     187.90627    136.01780       641.0715     -84.07135      1640.286
+##      Gross.Losses Std.Dev.Trade.PL Std.Err.Trade.PL Percent.Positive
+## 701     -160.9284         252.2079         89.16897         62.50000
+## 722     -169.2141         256.3990         90.65074         62.50000
+## 483     -148.9643         264.1330         93.38512         62.50000
+## 683     -145.3570         253.3528         89.57374         62.50000
+## 364     -183.7857         252.0982         84.03274         55.55556
+## 484     -148.9643         264.1330         93.38512         62.50000
+## 466     -137.0357         262.4695         92.79697         62.50000
+## 27      -365.9998         190.7260         50.97368         64.28571
+## 447     -137.0357         261.4606         92.44028         62.50000
+## 949     -112.5000         443.5421        221.77105         50.00000
+## 290     -172.6786         255.4878         80.79233         50.00000
+## 111     -288.3573         187.4699         50.10343         71.42857
+## 131     -292.0002         186.5365         49.85397         64.28571
+## 311     -182.4286         264.8250         88.27499         55.55556
+## 331     -167.9643         264.2260         88.07535         55.55556
+## 551     -158.6785         267.8382         94.69512         62.50000
+## 1011    -128.2144         443.1471        221.57357         50.00000
+## 73      -308.5000         184.6163         49.34077         57.14286
+## 333     -167.9643         264.2260         88.07535         55.55556
+## 634     -143.4288         268.2088         94.82611         62.50000
+## 934     -112.5000         384.6769        172.03275         60.00000
+## 596     -119.9645         259.8087         91.85625         62.50000
+## 736     -169.2141         256.3990         90.65074         62.50000
+## 77      -308.5000         184.6163         49.34077         57.14286
+## 558     -158.6785         267.8382         94.69512         62.50000
+## 678     -165.4643         249.5075         88.21422         62.50000
+## 679     -165.4643         249.5075         88.21422         62.50000
+## 859     -107.4286         384.2972        171.86295         60.00000
+## 400     -175.1786         252.6666         84.22219         55.55556
+## 460     -137.0357         261.4606         92.44028         62.50000
+##      Percent.Negative Profit.Factor Avg.Win.Trade Med.Win.Trade
+## 701          37.50000     10.214171      328.7500      278.2501
+## 722          37.50000      9.791484      331.3714      272.5000
+## 483          37.50000     11.397747      339.5714      267.5356
+## 683          37.50000     10.890184      316.5929      274.2500
+## 364          44.44444      8.674312      318.8428      239.4285
+## 484          37.50000     11.397747      339.5714      267.5356
+## 466          37.50000     12.240296      335.4714      258.7856
+## 27           35.71429      4.854900      197.4325      149.4643
+## 447          37.50000     11.969774      328.0572      253.5002
+## 949          50.00000     12.577144      707.4643      707.4643
+## 290          50.00000      9.317891      321.8000      223.1786
+## 111          28.57143      5.894720      169.9786      122.7499
+## 131          35.71429      5.648114      183.2500      126.8214
+## 311          44.44444      8.996083      328.2286      223.1786
+## 331          44.44444      9.968744      334.8786      227.6428
+## 551          37.50000     10.984247      348.5928      297.9286
+## 1011         50.00000     10.899994      698.7679      698.7679
+## 73           42.85714      5.380181      207.4732      144.0178
+## 333          44.44444      9.968744      334.8786      227.6428
+## 634          37.50000     11.854563      340.0572      261.5002
+## 934          40.00000     15.059683      564.7381      650.5000
+## 596          37.50000     13.880593      333.0357      248.3214
+## 736          37.50000      9.791484      331.3714      272.5000
+## 77           42.85714      5.380181      207.4732      144.0178
+## 558          37.50000     10.984247      348.5928      297.9286
+## 678          37.50000      9.685951      320.5358      261.8216
+## 679          37.50000      9.685951      320.5358      261.8216
+## 859          40.00000     14.796870      529.8690      585.5356
+## 400          44.44444      9.269520      324.7643      269.0356
+## 460          37.50000     11.969774      328.0572      253.5002
+##      Avg.Losing.Trade Med.Losing.Trade Avg.Daily.PL Med.Daily.PL
+## 701         -53.64280        -56.10709    185.35271    142.83929
+## 722         -56.40470        -56.10709    185.95538    143.73217
+## 483         -49.65475        -63.75003    193.61158    157.78565
+## 683         -48.45233        -43.85710    179.70091    114.44645
+## 364         -45.94642        -39.92853    156.71429     29.99992
+## 484         -49.65475        -63.75003    193.61158    157.78565
+## 466         -45.67855        -51.82142    192.54017    151.91069
+## 27          -73.19996        -55.03569    100.77806     81.91071
+## 447         -45.67855        -51.82142    187.90627    136.01780
+## 949         -56.25000        -56.25000    325.60717    304.53570
+## 290         -34.53571        -32.28569    143.63214     14.62502
+## 111         -72.08933        -64.71429    100.81630     70.46430
+## 131         -58.40003        -55.03569     96.94642     70.46430
+## 311         -45.60715        -42.16070    162.07936     61.71427
+## 331         -41.99107        -39.71424    167.38096     61.71427
+## 551         -52.89284        -63.75003    198.03571    157.41067
+## 1011        -64.10718        -64.10718    317.33034    310.87499
+## 73          -51.41666        -43.71425     96.52040     63.80358
+## 333         -41.99107        -39.71424    167.38096     61.71427
+## 634         -47.80960        -42.14306    194.60712    141.37497
+## 934         -56.25000        -56.25000    316.34286    279.28562
+## 596         -39.98817        -42.14306    193.15174    143.32137
+## 736         -56.40470        -56.10709    185.95538    143.73217
+## 77          -51.41666        -43.71425     96.52040     63.80358
+## 558         -52.89284        -63.75003    198.03571    157.41067
+## 678         -55.15475        -43.85710    179.65181    139.51788
+## 679         -55.15475        -43.85710    179.65181    139.51788
+## 859         -53.71430        -53.71430    296.43568    204.96426
+## 400         -43.79464        -35.62498    160.96031     29.99992
+## 460         -45.67855        -51.82142    187.90627    136.01780
+##      Std.Dev.Daily.PL Std.Err.Daily.PL Ann.Sharpe Max.Drawdown
+## 701          252.2079         89.16897  11.666497    -530.1071
+## 722          256.3990         90.65074  11.513111    -530.1071
+## 483          264.1330         93.38512  11.636140    -458.4644
+## 683          253.3528         89.57374  11.259649    -530.1071
+## 364          252.0982         84.03274   9.868226    -500.5714
+## 484          264.1330         93.38512  11.636140    -458.4644
+## 466          262.4695         92.79697  11.645090    -472.6429
+## 27           190.7260         50.97368   8.387959    -512.5001
+## 447          261.4606         92.44028  11.408677    -472.6429
+## 949          443.5421        221.77105  11.653580    -694.6074
+## 290          255.4878         80.79233   8.924456    -451.0358
+## 111          187.4699         50.10343   8.536888    -548.7860
+## 131          186.5365         49.85397   8.250273    -552.3216
+## 311          264.8250         88.27499   9.715587    -431.0358
+## 331          264.2260         88.07535  10.056126    -431.0358
+## 551          267.8382         94.69512  11.737381    -464.7860
+## 1011         443.1471        221.57357  11.367473    -726.5001
+## 73           184.6163         49.34077   8.299452    -511.9287
+## 333          264.2260         88.07535  10.056126    -431.0358
+## 634          268.2088         94.82611  11.518238    -447.5000
+## 934          384.6769        172.03275  13.054558    -694.6074
+## 596          259.8087         91.85625  11.801717    -464.7860
+## 736          256.3990         90.65074  11.513111    -530.1071
+## 77           184.6163         49.34077   8.299452    -511.9287
+## 558          267.8382         94.69512  11.737381    -464.7860
+## 678          249.5075         88.21422  11.430054    -530.1071
+## 679          249.5075         88.21422  11.430054    -530.1071
+## 859          384.2972        171.86295  12.245132    -648.5359
+## 400          252.6666         84.22219  10.112797    -500.5714
+## 460          261.4606         92.44028  11.408677    -472.6429
+##      Profit.To.Max.Draw Avg.WinLoss.Ratio Med.WinLoss.Ratio Max.Equity
+## 701            3.071213          6.128502          4.959268   1741.679
+## 722            3.080308          5.874890          4.856784   1760.536
+## 483            3.695255          6.838648          4.196635   1785.000
+## 683            2.985920          6.534110          6.253264   1700.464
+## 364            3.107806          6.939449          5.996427   1703.714
+## 484            3.695255          6.838648          4.196635   1785.000
+## 466            3.566269          7.344178          4.993796   1790.607
+## 27             3.036376          2.697167          2.715771   1801.679
+## 447            3.487835          7.181864          4.891803   1753.393
+## 949            2.612524         12.577144         12.577144   1856.143
+## 290            3.506532          9.317891          6.912616   1713.322
+## 111            2.836586          2.357888          1.896798   1811.500
+## 131            2.720335          3.137841          2.304349   1760.857
+## 311            3.721186          7.196866          5.293521   1715.714
+## 331            3.831883          7.974996          5.732020   1730.179
+## 551            3.721145          6.590548          4.673388   1793.107
+## 1011           2.408366         10.899994         10.899994   1823.036
+## 73             2.923328          4.035135          3.294527   1714.500
+## 333            3.831883          7.974996          5.732020   1730.179
+## 634            3.803591          7.112738          6.205059   1763.393
+## 934            2.591084         10.039788         11.564445   1856.143
+## 596            3.637081          8.328356          5.892345   1795.214
+## 736            3.080308          5.874890          4.856784   1760.536
+## 77             2.923328          4.035135          3.294527   1714.500
+## 558            3.721145          6.590548          4.673388   1793.107
+## 678            2.985179          5.811571          5.969879   1732.607
+## 679            2.985179          5.811571          5.969879   1732.607
+## 859            2.499696          9.864580         10.900926   1864.179
+## 400            3.184147          7.415616          7.551881   1741.929
+## 460            3.487835          7.181864          4.891803   1753.393
+##      Min.Equity End.Equity
+## 701  -138.46421   1628.072
+## 722  -138.46421   1632.893
+## 483   -84.10721   1694.143
+## 683  -122.89281   1582.857
+## 364   -76.24991   1555.679
+## 484   -84.10721   1694.143
+## 466   -72.17860   1685.572
+## 27    -12.53569   1556.143
+## 447   -72.17860   1648.500
+## 949  -116.21432   1814.679
+## 290   -39.78558   1581.572
+## 111   -15.21430   1556.678
+## 131   -15.21430   1502.500
+## 311   -63.17849   1603.964
+## 331   -53.60708   1651.679
+## 551   -86.24995   1729.536
+## 1011 -131.75006   1749.679
+## 73    -12.17861   1496.536
+## 333   -53.60708   1651.679
+## 634  -109.71425   1702.107
+## 934  -116.21432   1799.786
+## 596   -86.24995   1690.464
+## 736  -138.46421   1632.893
+## 77    -12.17861   1496.536
+## 558   -86.24995   1729.536
+## 678  -122.89281   1582.465
+## 679  -122.89281   1582.465
+## 859  -111.14292   1621.143
+## 400   -76.24991   1593.893
+## 460   -72.17860   1648.500</code></pre>
+<pre class="r"><code>print(df)      # 输出自由度</code></pre>
+<pre><code>## 
+##  Degrees of freedom report for strategy: macd 
+##  Total market observations: 1865 
+##  Degrees of freedom consumed by strategy: 234 
+##  Total degrees of freedom remaining: 1631 
+##  % Degrees of Freedom:  87.45 %</code></pre>
+<pre class="r"><code>print(defSR)   # 输出修正夏普比率</code></pre>
+<pre><code>##   obs.Sharpe max.Sharpe deflated.Sharpe     p.value nTrials
+## 1        1.1   2.169138        1.096078 0.003565088      38</code></pre>
+<pre class="r"><code>print(hcSR)    # 输出调整夏普比率</code></pre>
+<pre><code>## 
+##  Sharpe Ratio Haircut Report: 
+## 
+##  Frequency = Daily 
+##  Number of Observations = 1866 
+##  Observed Sharpe Ratio: 1.1 
+##  Autocorrelation: NaN 
+##  Sharpe Ratio corrected for autocorrelation: 1.1 
+##  Assumed number of tests: 38 
+##  Assumed Average Correlation: 0.2 
+## 
+##  Bonferroni Adjustment: 
+##  Adjusted P-value = 0.5742251 
+##  Haircut Sharpe Ratio = 0.2485153 
+##  Percentage Haircut = 0.774077 
+## 
+##  Holm Adjustment: 
+##  Adjusted P-value = 0.483558 
+##  Haircut Sharpe Ratio = 0.3101128 
+##  Percentage Haircut = 0.7180793 
+## 
+##  BHY Adjustment: 
+##  Adjusted P-value = 0.3133459 
+##  Haircut Sharpe Ratio = 0.4472566 
+##  Percentage Haircut = 0.5934031 
+## 
+##  Average Adjustment: 
+##  Adjusted P-value = 0.457043 
+##  Haircut Sharpe Ratio = 0.3292902 
+##  Percentage Haircut = 0.7006452</code></pre>
+</div>
+<div id="策略核心思路解析" class="section level1">
+<h1>策略核心思路解析</h1>
+<div id="参数优化的必要性与逻辑" class="section level2">
+<h2>参数优化的必要性与逻辑</h2>
+<p>MACD 策略的表现高度依赖于快速 EMA（短期趋势）和慢速 EMA（长期趋势）的周期参数。例如，快速 EMA 过短可能导致信号频繁且噪音大，过长则可能滞后于趋势；慢速 EMA 同理。若仅凭经验选择参数（如默认的 12/26 日），可能错过更优组合，或因参数适配特定历史数据而在未来失效。</p>
+<p>这段代码的核心是通过系统测试参数组合解决这一问题：首先定义合理的参数范围（快速 EMA 1-20 日、慢速 EMA 30-80 日），再通过add.distribution将参数引入策略，最后用apply.paramset批量测试不同组合的表现。这种方法避免了主观选择参数的盲目性，让数据决定最优解。</p>
+</div>
+<div id="macd-指标与参数约束的意义" class="section level2">
+<h2>MACD 指标与参数约束的意义</h2>
+<p>MACD（移动平均收敛散度）的核心是通过短期与长期趋势的差异捕捉价格动量，其计算逻辑为：
+- MACD 线 = 快速 EMA - 慢速 EMA（反映短期与长期趋势的偏离）
+- 信号线 = MACD 线的 9 日 EMA（平滑波动，生成交易信号）</p>
+<p>因此，快速 EMA 必须小于慢速 EMA—— 若快速周期大于慢速周期，MACD 线的物理意义将反转（变成长期减短期），无法正确反映趋势偏离。代码中add.distribution.constraint通过operator = ’&lt;’强制这一约束，确保参数逻辑的合理性。</p>
+</div>
+<div id="效率与有效性的平衡随机抽样与统计验证" class="section level2">
+<h2>效率与有效性的平衡：随机抽样与统计验证</h2>
+<p>全量测试 1-20 日（20 种）与 30-80 日（51 种）的参数组合，会产生 20×51=1020 种可能，计算成本极高。代码通过nsamples = 30随机抽样 30 组参数，在效率与覆盖度间取得平衡 —— 既避免全量测试的冗余，又能覆盖大概率有效的组合。</p>
+<p>更重要的是，代码引入了过拟合风险评估：
+degrees.of.freedom计算策略的自由度（参数数量与数据量的比值），自由度越高，过拟合风险越大；
+SharpeRatio.deflated和SharpeRatio.haircut对传统夏普比率进行修正，降低因过度优化导致的 “虚高收益” 影响，更真实反映策略的稳健性。</p>
+<p>这些指标让交易者不仅关注 “哪个参数组合收益最高”，更能判断 “该组合的收益是否可靠”。</p>
+</div>
+<div id="结果解读的核心价值" class="section level2">
+<h2>结果解读的核心价值</h2>
+<p>代码输出的tstats（交易统计）包含胜率、平均盈亏、最大回撤等指标，直观展示不同参数组合的表现；而修正后的夏普比率（defSR、hcSR）则提示哪些组合的收益是 “可复制的”，哪些可能是 “数据巧合”。
+例如，若某参数组合的传统夏普比率极高，但修正后大幅下降，说明其可能过度拟合历史数据，实盘表现大概率不佳；反之，修正前后差异小的组合，更可能在未来保持稳健。</p>
 </div>
 </div>
-<div id="example-parallel-initialization-for-doparallel.-this-or-domc-or-doredis-are" class="section level1">
-<h1>example parallel initialization for doParallel. this or doMC, or doRedis are</h1>
-</div>
-<div id="most-probably-preferable-to-dosmp" class="section level1">
-<h1>most probably preferable to doSMP</h1>
-<p>#require(doParallel)
-#registerDoParallel() # by default number of physical cores -1</p>
-<p>#please run macd demo before all these…</p>
-<p>#retrieve the strategy from the environment, since the ‘macd’ strategy uses store=TRUE
-strategy.st &lt;- ‘macd’</p>
-<div id="set-up-parameter-values" class="section level3">
-<h3>Set up Parameter Values</h3>
-<p>.FastMA = (1:20)
-.SlowMA = (30:80)
-.nsamples = 30 #for random parameter sampling, less important if you’re using doParallel or doMC</p>
-</div>
-<div id="ma-paramset" class="section level3">
-<h3>MA paramset</h3>
-<p>add.distribution(strategy.st,
-paramset.label = ‘MA’,
-component.type = ‘indicator’,
-component.label = ’_‘, #this is the label given to the indicator in the strat
-variable = list(n = .FastMA),
-label = ’nFAST’
-)</p>
-<p>add.distribution(strategy.st,
-paramset.label = ‘MA’,
-component.type = ‘indicator’,
-component.label = ’_‘, #this is the label given to the indicator in the strat
-variable = list(n = .SlowMA),
-label = ’nSLOW’
-)</p>
-<p>add.distribution.constraint(strategy.st,
-paramset.label = ‘MA’,
-distribution.label.1 = ‘nFAST’,
-distribution.label.2 = ‘nSLOW’,
-operator = ‘&lt;’,
-label = ‘MA’
-)</p>
-</div>
-<div id="section-1" class="section level3">
-<h3></h3>
-<p>.audit &lt;- new.env()</p>
-<p>results &lt;- apply.paramset(strategy.st,
-paramset.label=‘MA’,
-portfolio.st=portfolio.st,
-account.st=account.st,
-nsamples=.nsamples,
-audit=.audit,
-store=TRUE,
-verbose=TRUE)</p>
-<p>df &lt;- degrees.of.freedom(‘macd’,‘macd’)</p>
-<p>tstats &lt;- results$tradeStats</p>
-<p>defSR &lt;- SharpeRatio.deflated(‘macd’,strategy=‘macd’,audit=.audit)</p>
-<p>hcSR &lt;- SharpeRatio.haircut(‘macd’,strategy=‘macd’,audit=.audit)</p>
-<p>print(tstats)</p>
-<p>print(df)</p>
-<p>print(defSR)</p>
-<p>print(hcSR)</p>
-</div>
+<div id="科学参数优化的意义" class="section level1">
+<h1>科学参数优化的意义</h1>
+<p>这段代码展示了量化交易中 “参数优化” 的标准化流程：从定义合理参数范围、施加逻辑约束，到高效抽样测试、统计验证有效性，每一步都围绕 “降低主观干扰、提升策略稳健性” 展开。</p>
+<p>对交易者而言，这种方法的价值在于：它不仅能找到历史表现优异的参数，更能通过统计指标识别参数的可靠性，避免 “回测神话” 与实盘失效的鸿沟。在量化交易中，“能解释的收益” 比 “高收益” 更重要 —— 而科学的参数优化，正是通往可解释、可复制收益的关键一步。</p>
 </div>
