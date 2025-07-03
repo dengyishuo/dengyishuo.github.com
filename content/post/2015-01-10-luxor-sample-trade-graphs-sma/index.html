@@ -13,30 +13,37 @@ tags:
 
 
 
-<p>#!/usr/bin/Rscript –vanilla
+<p>在量化交易策略开发中，参数优化对提升策略表现至关重要。Jan Humme 基于《A new approach to system development and portfolio optimisation》中的 Luxor 交易策略开发的 R 脚本，通过三维可视化技术帮助交易者直观分析不同参数组合对策略绩效的影响。</p>
+<p>该脚本使用 quantstrat 和 rgl 包实现双均线 (SMA) 参数扫描的 3D 可视化，让交易者能直观观察不同快速 / 慢速 SMA 参数组合下的策略表现。</p>
+<p>脚本先加载 quantstrat 包并引入预计算的参数扫描结果数据，这些数据包含了 Luxor 策略在快速 SMA 周期 1-10、慢速 SMA 周期 30-55 不同组合下的回测结果。</p>
+<p>核心功能由 tradeGraphs 函数基于 rgl 包创建交互式 3D 图形实现，其中 X 轴表示快速 SMA 周期，Y 轴表示慢速 SMA 周期，Z 轴可切换展示不同绩效指标，支持同时展示净交易盈亏、最大回撤、平均每笔交易盈亏、交易次数、盈亏比等关键绩效指标。</p>
+<pre class="r"><code>#!/usr/bin/Rscript --vanilla
 #
-# Jan Humme (<span class="citation">@opentrades</span>) - August 2012, revised April 2013
+# Jan Humme (@opentrades) - August 2012, revised April 2013
 #
 # Tested and found to work correctly using blotter r1457
 #
 # After Jaekle &amp; Tamasini: A new approach to system development and portfolio optimisation (ISBN 978-1-905641-79-6)
 #
-# 3D SMA graph example</p>
-<p>require(quantstrat)
-require(rgl)</p>
-<div id="load-stats-back-into-.globalenv" class="section level3">
-<h3>load ‘stats’ back into .GlobalEnv</h3>
-<p>load(paste0(
-path.package(‘quantstrat’),
-‘/data/luxor.parameters.1-10.30-55.RData’)
-)</p>
-</div>
-<div id="show-trade-graphs-from-stats" class="section level3">
-<h3>show trade graphs from stats</h3>
-<p>tradeGraphs (
-stats = stats,
-free.params = c(“Param.indicator.1.nFast”, “Param.indicator.2.nSlow”),
-statistics = c(“Net.Trading.PL”, “maxDrawdown”, “Avg.Trade.PL”, “Num.Trades”, “Profit.Factor”),
-title = ‘Luxor SMA Parameter Scan’
-)</p>
-</div>
+# 3D SMA graph example
+
+require(quantstrat)
+require(rgl)
+
+### load &#39;stats&#39; back into .GlobalEnv
+
+load(paste0(
+	path.package(&#39;quantstrat&#39;),
+	&#39;/data/luxor.parameters.1-10.30-55.RData&#39;)
+)
+
+### show trade graphs from stats
+
+tradeGraphs (
+	stats = stats,
+	free.params = c(&quot;Param.indicator.1.nFast&quot;, &quot;Param.indicator.2.nSlow&quot;),
+	statistics = c(&quot;Net.Trading.PL&quot;, &quot;maxDrawdown&quot;, &quot;Avg.Trade.PL&quot;, &quot;Num.Trades&quot;, &quot;Profit.Factor&quot;),
+	title = &#39;Luxor SMA Parameter Scan&#39;
+)</code></pre>
+<p>这种可视化方法在交易策略优化中具有重要作用。通过 3D 图形能直观看到哪些参数区域对策略绩效影响大、哪些区域表现稳健，例如有些参数组合可能带来高收益但伴随高回撤，而有些组合收益适中文更加稳定。交易者还能通过观察图形峰值区域快速定位使特定绩效指标最大化的参数组合，并结合多个指标图形找到综合表现最优的参数区间。此外，分析不同参数组合下绩效指标的变化趋势，有助于评估策略的鲁棒性，参数区域绩效指标波动小说明策略对该参数不敏感，在实盘应用中更可靠。
+该方法还可进一步扩展应用，交易者可根据需要修改 statistics 参数单独分析特定绩效指标分布，利用 rgl 包交互功能从不同角度深入分析数据，也可扩展该方法比较不同交易策略在相同参数扫描下的表现差异。这种参数扫描的 3D 可视化方法为交易者提供了直观高效的策略优化工具，能通过数据驱动方式提升交易决策的科学性和准确性。</p>
