@@ -1,5 +1,5 @@
 ---
-title: “MACD 趋势跟踪策略的实现与解析：基于 AAPL 的量化回测”
+title: MACD 趋势跟踪策略的实现与解析：基于 AAPL 的量化回测
 author: MatrixSpk
 date: '2017-07-10'
 slug: macdrebalancing
@@ -276,7 +276,7 @@ out &lt;- applyStrategy.rebalancing(
 <pre><code>## [1] &quot;2025-03-13 00:00:00 AAPL -93 @ 209.679992675781&quot;</code></pre>
 <pre class="r"><code>end_t &lt;- Sys.time()  # 记录回测结束时间
 print(end_t - start_t)  # 打印回测耗时</code></pre>
-<pre><code>## Time difference of 9.944597 secs</code></pre>
+<pre><code>## Time difference of 9.843882 secs</code></pre>
 <pre class="r"><code># 更新组合数据：将交易记录同步到组合与账户
 start_t &lt;- Sys.time()
 updatePortf(
@@ -288,7 +288,7 @@ updatePortf(
 print(&quot;trade blotter portfolio update:&quot;)</code></pre>
 <pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
 <pre class="r"><code>print(end_t - start_t)  # 打印更新耗时</code></pre>
-<pre><code>## Time difference of 0.04022193 secs</code></pre>
+<pre><code>## Time difference of 0.04634905 secs</code></pre>
 <pre class="r"><code># 可视化回测结果：绘制持仓变化与MACD指标
 chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 展示AAPL的持仓变化</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-1.png" width="672" /></p>

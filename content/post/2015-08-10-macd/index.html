@@ -208,7 +208,7 @@ out &lt;- applyStrategy(
 ## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;</code></pre>
 <pre class="r"><code>end_t &lt;- Sys.time()  # 回测结束时间
 print(end_t - start_t)  # 打印回测耗时</code></pre>
-<pre><code>## Time difference of 0.5025551 secs</code></pre>
+<pre><code>## Time difference of 0.593574 secs</code></pre>
 <pre class="r"><code># 更新组合与账户数据
 start_t &lt;- Sys.time()
 updatePortf(Portfolio = portfolio.st, Dates = paste(&#39;::&#39;, as.Date(Sys.time()), sep = &#39;&#39;))  # 更新至当前日期</code></pre>
@@ -217,7 +217,7 @@ updatePortf(Portfolio = portfolio.st, Dates = paste(&#39;::&#39;, as.Date(Sys.ti
 print(&quot;trade blotter portfolio update:&quot;)</code></pre>
 <pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
 <pre class="r"><code>print(end_t - start_t)  # 打印数据更新耗时</code></pre>
-<pre><code>## Time difference of 0.03589392 secs</code></pre>
+<pre><code>## Time difference of 0.04657793 secs</code></pre>
 <pre class="r"><code># 可视化回测结果
 chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 绘制AAPL的持仓变化图</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-1.png" width="672" /></p>

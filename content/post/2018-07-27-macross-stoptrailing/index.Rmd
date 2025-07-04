@@ -1,7 +1,7 @@
 ---
 title: "基于双均线交叉与追踪止损的交易策略"
 author: MatrixSpk
-date: '2015-07-27'
+date: '2018-07-27'
 slug: macross-stoptrailing
 categories:
   - 量化投资
