@@ -38,7 +38,7 @@ $$
 
 下面是使用 R 语言实现 LPPL 模型分析纳斯达克指数的完整代码：
 
-```{R LPPL}
+```{R LPPL, message=FALSE, warning=FALSE}
 
 # 加载必要的包
 library(quantmod)
@@ -47,7 +47,7 @@ library(ggplot2)
 library(reshape2)
 
 # 获取纳斯达克指数数据
-getSymbols("^IXIC", from = "2010-01-01", to = Sys.Date())
+getSymbols("^IXIC", from = "2024-01-01", to = Sys.Date())
 nasdaq <- IXIC$IXIC.Close
 names(nasdaq) <- "Close"
 
@@ -193,7 +193,7 @@ print(p3)
 # 输出关键参数
 cat("LPPL模型参数估计结果:\n")
 print(best_params)
-cat("\n预测的临界时间点:", as.Date(dates[1]) + best_params["tc"], "\n")
+cat("\n预测的临界时间点:", as.character(as.Date(dates[1] + round(best_params["tc"]))), "\n")
 ```
 
 # 实证分析结果
