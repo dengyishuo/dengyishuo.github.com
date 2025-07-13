@@ -34,12 +34,12 @@ y &lt;- cumsum(c(0, x)) </code></pre>
 ##   PARAMETER:
 ##     Lag Order: 1
 ##   STATISTIC:
-##     Dickey-Fuller: -22.8387
+##     Dickey-Fuller: -22.8055
 ##   P VALUE:
 ##     0.01 
 ## 
 ## Description:
-##  Thu May 22 12:40:47 2025 by user:</code></pre>
+##  Sat Jul 12 18:50:55 2025 by user:</code></pre>
 <p>注意上述结果中的P值。</p>
 <p>对序列y进行adf检验：</p>
 <pre class="r"><code>adfTest(y) </code></pre>
@@ -51,12 +51,12 @@ y &lt;- cumsum(c(0, x)) </code></pre>
 ##   PARAMETER:
 ##     Lag Order: 1
 ##   STATISTIC:
-##     Dickey-Fuller: 0.2124
+##     Dickey-Fuller: -0.2478
 ##   P VALUE:
-##     0.684 
+##     0.5373 
 ## 
 ## Description:
-##  Thu May 22 12:40:47 2025 by user:</code></pre>
+##  Sat Jul 12 18:50:55 2025 by user:</code></pre>
 <p>注意上述结果的p值，跟x序列的结果有什么区别？</p>
 <p>对序列x和序列y进行单位根检验，观察下两者的区别。</p>
 <pre class="r"><code>unitrootTest(x)</code></pre>
@@ -68,13 +68,13 @@ y &lt;- cumsum(c(0, x)) </code></pre>
 ##   PARAMETER:
 ##     Lag Order: 1
 ##   STATISTIC:
-##     DF: -22.8387
+##     DF: -22.8055
 ##   P VALUE:
 ##     t: &lt; 2.2e-16 
-##     n: 0.0007873 
+##     n: 0.0007945 
 ## 
 ## Description:
-##  Thu May 22 12:40:47 2025 by user:</code></pre>
+##  Sat Jul 12 18:50:55 2025 by user:</code></pre>
 <pre class="r"><code>unitrootTest(y)</code></pre>
 <pre><code>## 
 ## Title:
@@ -84,11 +84,11 @@ y &lt;- cumsum(c(0, x)) </code></pre>
 ##   PARAMETER:
 ##     Lag Order: 1
 ##   STATISTIC:
-##     DF: 0.2124
+##     DF: -0.2478
 ##   P VALUE:
-##     t: 0.7478 
-##     n: 0.7349 
+##     t: 0.5969 
+##     n: 0.6244 
 ## 
 ## Description:
-##  Thu May 22 12:40:47 2025 by user:</code></pre>
+##  Sat Jul 12 18:50:55 2025 by user:</code></pre>
 </div>

@@ -294,8 +294,8 @@ results = apply.paramset.signal.analysis(
     mai=c(1,1,0.3,0.5),   # 图形边距设置（下左上右）
     h=0                   # 水平参考线位置（0轴）
     )                 </code></pre>
-<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 39613.69 
-## GAMLSS-RS iteration 2: Global Deviance = 39613.69</code></pre>
+<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 40273.91 
+## GAMLSS-RS iteration 2: Global Deviance = 40273.91</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code># 绘制XLE标的信号的参数组合面板图（5行4列布局）
 
@@ -359,8 +359,8 @@ distributional.boxplot(signal=results.w$sigret.by.asset$IYT$paramset.5.20,
                        xlim=c(0, 10),
                        mai=c(1,1,0.3,0.5),
                        h=0)</code></pre>
-<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 8067.488 
-## GAMLSS-RS iteration 2: Global Deviance = 8067.488</code></pre>
+<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 8096.692 
+## GAMLSS-RS iteration 2: Global Deviance = 8096.692</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <pre class="r"><code># 绘制周线信号分析可视化面板
 signal.plot(results.w$sigret.by.asset$XLE, rows=5, columns = 4)
@@ -410,8 +410,8 @@ distributional.boxplot(signal=results.m$sigret.by.asset$IYT$paramset.5.20,
                        xlim=c(0, 5),
                        mai=c(1,1,0.3,0.5),
                        h=0)</code></pre>
-<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 4588.769 
-## GAMLSS-RS iteration 2: Global Deviance = 4588.769</code></pre>
+<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 4646.631 
+## GAMLSS-RS iteration 2: Global Deviance = 4646.631</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <pre class="r"><code># 绘制月线信号面板图
 signal.plot(results.m$sigret.by.asset$XLE, rows=5, columns = 4)

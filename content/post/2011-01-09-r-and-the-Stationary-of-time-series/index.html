@@ -58,7 +58,7 @@ library(tseries) #载入tseries包</code></pre>
 ## 	Augmented Dickey-Fuller Test
 ## 
 ## data:  x
-## Dickey-Fuller = -8.7828, Lag order = 7, p-value = 0.01
+## Dickey-Fuller = -7.6448, Lag order = 7, p-value = 0.01
 ## alternative hypothesis: stationary</code></pre>
 <p>P值等于0.01，拒绝x是原假设（原假设为非平稳），即可以认为x是平稳的。</p>
 <pre class="r"><code>adf.test(y)</code></pre>
@@ -66,7 +66,7 @@ library(tseries) #载入tseries包</code></pre>
 ## 	Augmented Dickey-Fuller Test
 ## 
 ## data:  y
-## Dickey-Fuller = -1.9566, Lag order = 7, p-value = 0.5967
+## Dickey-Fuller = -2.1277, Lag order = 7, p-value = 0.5243
 ## alternative hypothesis: stationary</code></pre>
 <p>P值等于0.303，因此y是非平稳的。</p>
 <p>还可以用urca包中的ur.df()函数来完成上述过程：</p>
@@ -74,16 +74,14 @@ library(tseries) #载入tseries包</code></pre>
 
 library(urca)#载入urca包
 
-?ur.df#查看ur.df()函数的帮助文档
+# ?ur.df#查看ur.df()函数的帮助文档
 
 #用uroot包中的ADF.test()函数来完成上述过程
 
 # install.packages(&#39;uroot&#39;)  #没有安装的话
 
 library(uroot)  #载入uroot包
-?ADF.test#查看ADF.test()函数的帮助文档</code></pre>
-<pre><code>## No documentation for &#39;ADF.test&#39; in specified packages and libraries:
-## you could try &#39;??ADF.test&#39;</code></pre>
+# ?ADF.test#查看ADF.test()函数的帮助文档</code></pre>
 </div>
 <div id="pp检验" class="section level2">
 <h2>PP检验</h2>
@@ -95,7 +93,7 @@ pp.test(x)</code></pre>
 ## 	Phillips-Perron Unit Root Test
 ## 
 ## data:  x
-## Dickey-Fuller Z(alpha) = -491.33, Truncation lag parameter = 5, p-value
+## Dickey-Fuller Z(alpha) = -509.06, Truncation lag parameter = 5, p-value
 ## = 0.01
 ## alternative hypothesis: stationary</code></pre>
 <p>P值等于0.01，拒绝x为非平稳序列的假设。</p>
@@ -104,8 +102,8 @@ pp.test(x)</code></pre>
 ## 	Phillips-Perron Unit Root Test
 ## 
 ## data:  y
-## Dickey-Fuller Z(alpha) = -15.064, Truncation lag parameter = 5, p-value
-## = 0.2694
+## Dickey-Fuller Z(alpha) = -7.4233, Truncation lag parameter = 5, p-value
+## = 0.6956
 ## alternative hypothesis: stationary</code></pre>
 <p>P值等于0.2056，不能拒绝x是非平稳序列的假设，即x非平稳。</p>
 <p>也可以用stats包中的PP.test()函数来完成PP检验。</p>

@@ -82,26 +82,26 @@ summary(ur.df(prices$log_AAPL, type=&quot;drift&quot;, lags=5)) #P-value大于0.
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.197472 -0.008979  0.000178  0.010309  0.141543 
+## -0.197501 -0.008928  0.000173  0.010279  0.141519 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  0.0016435  0.0008127   2.022   0.0432 *
-## z.lag.1     -0.0002110  0.0002251  -0.937   0.3488  
-## z.diff.lag1 -0.0305922  0.0147142  -2.079   0.0377 *
-## z.diff.lag2 -0.0150303  0.0146911  -1.023   0.3063  
-## z.diff.lag3 -0.0094694  0.0146928  -0.644   0.5193  
-## z.diff.lag4  0.0243825  0.0146916   1.660   0.0971 .
-## z.diff.lag5  0.0126530  0.0146884   0.861   0.3890  
+## (Intercept)  0.0016280  0.0008077   2.016   0.0439 *
+## z.lag.1     -0.0002046  0.0002228  -0.918   0.3586  
+## z.diff.lag1 -0.0309391  0.0146581  -2.111   0.0349 *
+## z.diff.lag2 -0.0144787  0.0146349  -0.989   0.3226  
+## z.diff.lag3 -0.0097327  0.0146358  -0.665   0.5061  
+## z.diff.lag4  0.0244759  0.0146348   1.672   0.0945 .
+## z.diff.lag5  0.0123868  0.0146327   0.847   0.3973  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.01993 on 4613 degrees of freedom
-## Multiple R-squared:  0.002168,	Adjusted R-squared:  0.0008705 
-## F-statistic: 1.671 on 6 and 4613 DF,  p-value: 0.1239
+## Residual standard error: 0.01988 on 4647 degrees of freedom
+## Multiple R-squared:  0.002169,	Adjusted R-squared:  0.0008807 
+## F-statistic: 1.684 on 6 and 4647 DF,  p-value: 0.1207
 ## 
 ## 
-## Value of test-statistic is: -0.9371 5.4518 
+## Value of test-statistic is: -0.9182 5.5276 
 ## 
 ## Critical values for test statistics: 
 ##       1pct  5pct 10pct
@@ -122,26 +122,26 @@ summary(ur.df(prices$log_MSFT, type=&quot;drift&quot;, lags=5))  </code></pre>
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.148286 -0.008040  0.000167  0.008823  0.160869 
+## -0.148239 -0.008016  0.000193  0.008785  0.160888 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  7.972e-05  1.002e-03   0.080  0.93662    
-## z.lag.1      1.734e-04  2.332e-04   0.744  0.45718    
-## z.diff.lag1 -1.087e-01  1.473e-02  -7.379 1.88e-13 ***
-## z.diff.lag2 -4.171e-02  1.480e-02  -2.819  0.00484 ** 
-## z.diff.lag3  5.266e-03  1.481e-02   0.356  0.72219    
-## z.diff.lag4 -4.285e-02  1.480e-02  -2.896  0.00380 ** 
-## z.diff.lag5 -1.780e-02  1.472e-02  -1.209  0.22684    
+## (Intercept) -2.476e-05  9.916e-04  -0.025  0.98008    
+## z.lag.1      2.029e-04  2.298e-04   0.883  0.37734    
+## z.diff.lag1 -1.091e-01  1.467e-02  -7.438 1.22e-13 ***
+## z.diff.lag2 -4.145e-02  1.474e-02  -2.811  0.00495 ** 
+## z.diff.lag3  5.242e-03  1.476e-02   0.355  0.72246    
+## z.diff.lag4 -4.286e-02  1.474e-02  -2.907  0.00367 ** 
+## z.diff.lag5 -1.773e-02  1.467e-02  -1.208  0.22698    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.01754 on 4613 degrees of freedom
-## Multiple R-squared:  0.0147,	Adjusted R-squared:  0.01342 
-## F-statistic: 11.47 on 6 and 4613 DF,  p-value: 8.848e-13
+## Residual standard error: 0.01749 on 4647 degrees of freedom
+## Multiple R-squared:  0.0148,	Adjusted R-squared:  0.01353 
+## F-statistic: 11.64 on 6 and 4647 DF,  p-value: 5.603e-13
 ## 
 ## 
-## Value of test-statistic is: 0.7436 5.0339 
+## Value of test-statistic is: 0.8829 5.4633 
 ## 
 ## Critical values for test statistics: 
 ##       1pct  5pct 10pct
@@ -167,21 +167,21 @@ summary(ur.df(diff_aapl, type=&quot;none&quot;))  </code></pre>
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.197881 -0.007933  0.001141  0.011329  0.140816 
+## -0.197906 -0.007926  0.001139  0.011314  0.140820 
 ## 
 ## Coefficients:
 ##            Estimate Std. Error t value Pr(&gt;|t|)    
-## z.lag.1    -1.03871    0.02107 -49.300   &lt;2e-16 ***
-## z.diff.lag  0.01294    0.01471   0.879    0.379    
+## z.lag.1    -1.03847    0.02099 -49.471   &lt;2e-16 ***
+## z.diff.lag  0.01235    0.01465   0.843    0.399    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.01999 on 4621 degrees of freedom
-## Multiple R-squared:  0.5127,	Adjusted R-squared:  0.5125 
-## F-statistic:  2431 on 2 and 4621 DF,  p-value: &lt; 2.2e-16
+## Residual standard error: 0.01995 on 4655 degrees of freedom
+## Multiple R-squared:  0.513,	Adjusted R-squared:  0.5128 
+## F-statistic:  2452 on 2 and 4655 DF,  p-value: &lt; 2.2e-16
 ## 
 ## 
-## Value of test-statistic is: -49.3002 
+## Value of test-statistic is: -49.4715 
 ## 
 ## Critical values for test statistics: 
 ##       1pct  5pct 10pct
@@ -200,21 +200,21 @@ summary(ur.df(diff_aapl, type=&quot;none&quot;))  </code></pre>
 ## 
 ## Residuals:
 ##       Min        1Q    Median        3Q       Max 
-## -0.149182 -0.007348  0.000788  0.009501  0.165492 
+## -0.149102 -0.007303  0.000807  0.009489  0.165495 
 ## 
 ## Coefficients:
 ##            Estimate Std. Error t value Pr(&gt;|t|)    
-## z.lag.1    -1.14611    0.02183 -52.500  &lt; 2e-16 ***
-## z.diff.lag  0.03934    0.01470   2.676  0.00747 ** 
+## z.lag.1    -1.14598    0.02175 -52.682  &lt; 2e-16 ***
+## z.diff.lag  0.03892    0.01465   2.658  0.00789 ** 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.01757 on 4621 degrees of freedom
-## Multiple R-squared:  0.552,	Adjusted R-squared:  0.5518 
-## F-statistic:  2847 on 2 and 4621 DF,  p-value: &lt; 2.2e-16
+## Residual standard error: 0.01752 on 4655 degrees of freedom
+## Multiple R-squared:  0.5522,	Adjusted R-squared:  0.552 
+## F-statistic:  2870 on 2 and 4655 DF,  p-value: &lt; 2.2e-16
 ## 
 ## 
-## Value of test-statistic is: -52.5003 
+## Value of test-statistic is: -52.6816 
 ## 
 ## Critical values for test statistics: 
 ##       1pct  5pct 10pct
@@ -232,18 +232,18 @@ summary(coint_model)  # 显示回归系数与R-squared</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.20571 -0.17989  0.03816  0.22289  0.77262 
+## -1.20751 -0.18362  0.04112  0.22171  0.77095 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -1.338879   0.020565   -65.1   &lt;2e-16 ***
-## log_MSFT     1.130783   0.004781   236.5   &lt;2e-16 ***
+## (Intercept) -1.325284   0.020386  -65.01   &lt;2e-16 ***
+## log_MSFT     1.126951   0.004721  238.73   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.3604 on 4624 degrees of freedom
-## Multiple R-squared:  0.9237,	Adjusted R-squared:  0.9236 
-## F-statistic: 5.595e+04 on 1 and 4624 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.3602 on 4658 degrees of freedom
+## Multiple R-squared:  0.9244,	Adjusted R-squared:  0.9244 
+## F-statistic: 5.699e+04 on 1 and 4658 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre class="r"><code># 提取残差序列
 residuals &lt;- residuals(coint_model)
 
@@ -251,11 +251,11 @@ residuals &lt;- residuals(coint_model)
 adf_test &lt;- ur.df(residuals, type=&quot;none&quot;, lags=5)
 print(adf_test@teststat)    # ADF统计量</code></pre>
 <pre><code>##                tau1
-## statistic -2.863684</code></pre>
+## statistic -2.823904</code></pre>
 <pre class="r"><code>print(adf_test@cval)        # 临界值</code></pre>
 <pre><code>##       1pct  5pct 10pct
 ## tau1 -2.58 -1.95 -1.62</code></pre>
-<p>ADF统计量为-2.8636844,小于1%置信水平对应的临界值-2.58，故拒绝原假设，说明残差序列平稳，两股票存在协整关系。</p>
+<p>ADF统计量为-2.8239042,小于1%置信水平对应的临界值-2.58，故拒绝原假设，说明残差序列平稳，两股票存在协整关系。</p>
 </div>
 <div id="对协整关系进行可视化" class="section level2">
 <h2>对协整关系进行可视化</h2>

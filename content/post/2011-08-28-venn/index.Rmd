@@ -36,11 +36,15 @@ tmp <- venn(input, simplify=TRUE)
 tmp
 
 venn(input, showSetLogicLabel=TRUE)
+```
 
+```{R}
 # asbio包
 library(asbio)
 Venn(A=.3,B=.2,AandB=.06)
+```
 
+```{R}
 # limma包
 # install.packages("BiocManager")
 # BiocManager::install("limma")
@@ -57,9 +61,11 @@ print(a)
 vennDiagram(a)
 
 vennDiagram(results,include=c("up","down"),counts.col=c("red","green"))
+```
 
+```{R}
 # venneuler包
-
+library(rJava)
 library(venneuler)
 vd <- venneuler(c(A=0.3, B=0.3, C=1.1, "A&B"=0.1, "A&C"=0.2, "B&C"=0.1 ,"A&B&C"=0.1))
 
@@ -80,7 +86,9 @@ plot(v)
 v <- venneuler(m)
 
 plot(v)
+```
 
+```{R}
 # Vennerable包
 
 # BiocManager::install("graph")

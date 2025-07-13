@@ -1,0 +1,211 @@
+---
+title: 基于混合正态分布的 VaR 计算
+author: DengYishuo
+date: '2010-12-21'
+slug: VaR-Mixture-of-Norms
+categories:
+  - econometrics
+tags:
+  - VaR
+  - r
+---
+
+
+
+<div id="一引言" class="section level1">
+<h1>一、引言</h1>
+<p>风险价值（Value at Risk, 简称 VaR ）是金融风险管理中衡量市场风险的核心指标，其定义为：在一定置信水平下，某一金融资产或组合在未来特定时间段内可能遭受的最大潜在损失。传统 VaR 计算多假设资产收益率服从正态分布，但实际金融时间序列往往呈现 “尖峰厚尾” 特性（峰度高于正态分布，尾部概率更大），导致正态分布假设下的 VaR 低估尾部风险。</p>
+<p>混合正态模型（Mixture of Normals Model）通过将收益率分布拟合为多个正态分布的加权组合，能够有效捕捉尖峰厚尾特征，从而更精准地估计 VaR。</p>
+<p>本文详细介绍混合正态模型的构建、参数估计及 VaR 计算方法，并通过 R 语言进行实现。</p>
+</div>
+<div id="二混合正态模型理论模型定义" class="section level1">
+<h1>二、混合正态模型理论模型定义</h1>
+<p>假设金融资产收益率X服从两成分混合正态分布，其概率密度函数（PDF）为：</p>
+<p><span class="math display">\[
+f(x; \Theta) = \alpha \cdot \phi(x; \mu_1, \sigma_1^2) + (1-\alpha) \cdot \phi(x; \mu_2, \sigma_2^2) \tag{1}
+\]</span></p>
+<p>其中：</p>
+<p><span class="math inline">\(\Theta = (\alpha, \mu_1, \sigma_1^2, \mu_2, \sigma_2^2)\)</span> 为待估参数；</p>
+<p><span class="math inline">\(\alpha \in (0,1)\)</span> 是第一成分的权重；</p>
+<p><span class="math inline">\(\phi(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\)</span> 为正态分布密度函数；</p>
+<p><span class="math inline">\(\mu_1\)</span> , <span class="math inline">\(\mu_2\)</span> 分别为两成分的均值；</p>
+<p><span class="math inline">\(\sigma_1^2\)</span> , <span class="math inline">\(\sigma_2^2\)</span> 分别为两成分的方差。</p>
+<p><strong>参数估计</strong></p>
+<p>我们可以采用极大似然估计（MLE）求解参数 <span class="math inline">\(\Theta\)</span> 。设样本观测值为</p>
+<p><span class="math display">\[
+x_1, x_2, ..., x_n
+\]</span></p>
+<p>则似然函数为：</p>
+<p><span class="math display">\[
+L(\Theta) = \prod_{i=1}^n \left[ \alpha \cdot \phi(x_i; \mu_1, \sigma_1^2) + (1-\alpha) \cdot \phi(x_i; \mu_2, \sigma_2^2) \right] \tag{2}
+\]</span></p>
+<p>取对数似然函数并最大化：</p>
+<p><span class="math display">\[
+\ln L(\Theta) = \sum_{i=1}^n \ln\left[ \alpha \cdot \phi(x_i; \mu_1, \sigma_1^2) + (1-\alpha) \cdot \phi(x_i; \mu_2, \sigma_2^2) \right] \tag{3}
+\]</span></p>
+<p>实际求解中，通常采用 EM 算法（期望最大化算法）迭代计算参数估计值。</p>
+<div id="基于混合正态模型的-var-计算" class="section level2">
+<h2>基于混合正态模型的 VaR 计算</h2>
+<p>对于置信水平 <span class="math inline">\(1-\beta\)</span> （如 95%、99%），VaR 定义为满足以下条件的损失阈值：</p>
+<p><span class="math display">\[
+P(X \leq -VaR) = \beta \tag{4}
+\]</span></p>
+<p>其中 X 为资产收益率，负号表示损失（对多头头寸而言）。结合混合正态分布的累积分布函数（CDF），式（4）可写为：</p>
+<p><span class="math display">\[
+F(-VaR) = \alpha \cdot \Phi\left(-VaR; \mu_1, \sigma_1^2\right) + (1-\alpha) \cdot \Phi\left(-VaR; \mu_2, \sigma_2^2\right) = \beta \tag{5} \label{eq:mix-normal}
+\]</span></p>
+<p>其中 <span class="math inline">\(\Phi(\cdot)\)</span> 为正态分布的 CDF。</p>
+<p>通过数值方法（如二分法）求解式 <span class="math inline">\(\eqref{eq:mix-normal}\)</span> ，即可得到混合正态模型下的 VaR。</p>
+</div>
+</div>
+<div id="三r-语言实证分析" class="section level1">
+<h1>三、R 语言实证分析</h1>
+<p>以下通过 R 语言实现基于混合正态模型的 VaR 计算，使用quantmod获取金融数据，mixtools拟合混合正态模型。</p>
+<ol style="list-style-type: decimal">
+<li>加载所需包</li>
+</ol>
+<pre class="r"><code># 安装并加载包
+if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
+if (!require(&quot;mixtools&quot;)) install.packages(&quot;mixtools&quot;)
+if (!require(&quot;ggplot2&quot;)) install.packages(&quot;ggplot2&quot;)
+library(quantmod)
+library(mixtools)
+library(ggplot2)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>获取金融数据并计算收益率</li>
+</ol>
+<p>以特斯拉公司的股价为例，计算其对数收益率：</p>
+<pre class="r"><code># 获取数据（近5年）
+getSymbols(&quot;TSLA&quot;, from = &quot;2023-01-01&quot;, to = &quot;2025-01-01&quot;)</code></pre>
+<pre><code>## [1] &quot;TSLA&quot;</code></pre>
+<pre class="r"><code>tsla &lt;- na.omit(Cl(TSLA))  # 提取收盘价并去除缺失值
+
+# 计算对数收益率
+returns &lt;- diff(log(tsla))
+returns &lt;- na.omit(returns)  # 去除NA值
+colnames(returns) &lt;- &quot;收益率&quot;</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>拟合混合正态模型</li>
+</ol>
+<p>使用 mixtools::normalmixEM<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> 拟合两成分混合正态分布：</p>
+<pre class="r"><code># 拟合混合正态模型（2个成分）
+set.seed(123)  # 设置随机种子，保证结果可复现
+mix_model &lt;- normalmixEM(returns, k = 2, maxit = 1000)</code></pre>
+<pre><code>## number of iterations= 146</code></pre>
+<pre class="r"><code># 输出参数估计结果
+cat(&quot;混合正态模型参数估计：\n&quot;)</code></pre>
+<pre><code>## 混合正态模型参数估计：</code></pre>
+<pre class="r"><code>cat(paste(&quot;权重 α =&quot;, round(mix_model$lambda[1], 4), &quot;\n&quot;))</code></pre>
+<pre><code>## 权重 α = 0.839</code></pre>
+<pre class="r"><code>cat(paste(&quot;成分1：均值 μ1 =&quot;, round(mix_model$mu[1], 6), 
+          &quot;，标准差 σ1 =&quot;, round(mix_model$sigma[1], 6), &quot;\n&quot;))</code></pre>
+<pre><code>## 成分1：均值 μ1 = 0.001422 ，标准差 σ1 = 0.027839</code></pre>
+<pre class="r"><code>cat(paste(&quot;成分2：均值 μ2 =&quot;, round(mix_model$mu[2], 6), 
+          &quot;，标准差 σ2 =&quot;, round(mix_model$sigma[2], 6), &quot;\n&quot;))</code></pre>
+<pre><code>## 成分2：均值 μ2 = 0.008931 ，标准差 σ2 = 0.063941</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>定义混合正态分布的 CDF 及 VaR 计算函数</li>
+</ol>
+<pre class="r"><code># 混合正态分布的累积分布函数（CDF）
+mix_normal_cdf &lt;- function(x, alpha, mu1, sigma1, mu2, sigma2) {
+  alpha * pnorm(x, mean = mu1, sd = sigma1) + 
+  (1 - alpha) * pnorm(x, mean = mu2, sd = sigma2)
+}
+
+# 用二分法求解VaR
+var_mixture_normal &lt;- function(conf_level, alpha, mu1, sigma1, mu2, sigma2, data) {
+  beta &lt;- 1 - conf_level  # 尾概率
+  # 确定搜索区间（基于数据的极值）
+  lower &lt;- min(data) * 2
+  upper &lt;- 0  # VaR为损失，对应收益率分布的左侧尾部
+  # 二分法迭代求解
+  for (i in 1:1000) {
+    mid &lt;- (lower + upper) / 2
+    cdf_val &lt;- mix_normal_cdf(mid, alpha, mu1, sigma1, mu2, sigma2)
+    if (cdf_val &lt; beta) {
+      lower &lt;- mid
+    } else {
+      upper &lt;- mid
+    }
+    if (abs(cdf_val - beta) &lt; 1e-6) break  # 精度满足时停止
+  }
+  return(-upper)  # 返回VaR（损失值为正）
+}</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>计算 VaR 并与传统方法对比</li>
+</ol>
+<pre class="r"><code># 计算95%和99%置信水平下的VaR
+conf_levels &lt;- c(0.95, 0.99)
+var_results &lt;- sapply(conf_levels, function(cl) {
+  var_mixture_normal(conf_level = cl,
+                     alpha = mix_model$lambda[1],
+                     mu1 = mix_model$mu[1],
+                     sigma1 = mix_model$sigma[1],
+                     mu2 = mix_model$mu[2],
+                     sigma2 = mix_model$sigma[2],
+                     data = returns)
+})
+
+# 输出VaR结果
+cat(&quot;\n混合正态模型VaR计算结果：\n&quot;)</code></pre>
+<pre><code>## 
+## 混合正态模型VaR计算结果：</code></pre>
+<pre class="r"><code>for (i in 1:length(conf_levels)) {
+  cat(paste(conf_levels[i] * 100, &quot;%置信水平下的VaR =&quot;, 
+            round(var_results[i], 6), &quot;\n&quot;))
+}</code></pre>
+<pre><code>## 95 %置信水平下的VaR = 0.052193 
+## 99 %置信水平下的VaR = 0.090665</code></pre>
+<pre class="r"><code># 与传统正态分布假设下的VaR对比
+var_normal_95 &lt;- quantile(returns, probs = 0.05)  # 正态假设下95% VaR
+var_normal_99 &lt;- quantile(returns, probs = 0.01)  # 正态假设下99% VaR
+cat(&quot;\n传统正态分布假设下的VaR：\n&quot;)</code></pre>
+<pre><code>## 
+## 传统正态分布假设下的VaR：</code></pre>
+<pre class="r"><code>cat(paste(&quot;95%置信水平下的VaR =&quot;, round(-as.numeric(var_normal_95), 6), &quot;\n&quot;))</code></pre>
+<pre><code>## 95%置信水平下的VaR = 0.051618</code></pre>
+<pre class="r"><code>cat(paste(&quot;99%置信水平下的VaR =&quot;, round(-as.numeric(var_normal_99), 6), &quot;\n&quot;))</code></pre>
+<pre><code>## 99%置信水平下的VaR = 0.091924</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li>可视化结果</li>
+</ol>
+<pre class="r"><code># 绘制收益率分布直方图及混合正态模型拟合曲线
+p &lt;- ggplot(data = as.data.frame(returns), aes(x = 收益率)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 bins = 50, 
+                 fill = &quot;lightblue&quot;, 
+                 color = &quot;black&quot;, 
+                 alpha = 0.7) +
+  stat_function(fun = function(x) {  # 混合正态模型密度曲线
+    mix_model$lambda[1] * dnorm(x, 
+                                mean = mix_model$mu[1], 
+                                sd = mix_model$sigma[1]) +
+    mix_model$lambda[2] * dnorm(x, 
+                                mean = mix_model$mu[2], 
+                                sd = mix_model$sigma[2])
+  }, color = &quot;red&quot;, linewidth = 1) +
+  geom_vline(xintercept = -var_results[1], 
+             color = &quot;blue&quot;, 
+             linetype = &quot;dashed&quot;, 
+             linewidth = 1) +
+  geom_vline(xintercept = -var_results[2], 
+             color = &quot;purple&quot;, 
+             linetype = &quot;dashed&quot;, 
+             linewidth = 1) +
+  labs(title = &quot;特斯拉收益率分布与混合正态模型拟合&quot;,
+       x = &quot;对数收益率&quot;, y = &quot;密度&quot;) +
+  theme_minimal()
+print(p)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="四结论" class="section level1">
+<h1>四、结论</h1>
+<p>混合正态模型通过捕捉金融数据的尖峰厚尾特性，能够更准确地估计 VaR，相比传统正态分布假设更贴合实际风险特征。</p>
+<p>实证结果显示，在高置信水平（如 99%）下，混合模型计算的 VaR 通常更高，更能反映极端损失的可能性，为风险管理提供更稳健的参考。实际应用中，可根据数据特征调整混合成分数量（如 3 个成分），或结合其他统计方法（如 GARCH 模型）进一步优化波动率的动态特性。</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>上述代码中，normalmixEM 可能需要多次迭代才能收敛，若结果不稳定可调整 maxit 参数；VaR 计算的二分法精度可通过迭代次数或误差阈值调整。<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

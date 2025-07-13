@@ -39,8 +39,8 @@ library(mgarch)</code></pre>
 <p>运行以下命令可以模拟一个MGARCH-BEKK过程：</p>
 <pre class="r"><code>set.seed(123)
 sim = mvBEKK.sim(series.count = 3, T = 1000)</code></pre>
-<pre><code>## Class attributes are accessible through following names:
-## length series.count order params true.params eigenvalues uncond.cov.matrix white.noise eps cor sd</code></pre>
+<pre><code>## Class attributes accessible via:
+##  length series.count order params true.params eigenvalues uncond.cov.matrix white.noise eps cor sd</code></pre>
 <p>合并模拟的时间序列：</p>
 <pre class="r"><code>eps = data.frame(sim$eps[[1]], sim$eps[[2]], sim$eps[[3]]) 
 head(eps)</code></pre>
@@ -64,7 +64,6 @@ head(eps)</code></pre>
 <pre><code>## H IS SINGULAR!...
 ## H IS SINGULAR!...
 ## H IS SINGULAR!...</code></pre>
-<pre><code>## Warning in mvBEKK.est(eps): negative inverted hessian matrix element</code></pre>
 <p>查看估计结果包含哪些信息：</p>
 <pre class="r"><code>names(est)</code></pre>
 <pre><code>##  [1] &quot;eps&quot;               &quot;series.length&quot;     &quot;estimation.time&quot;  
@@ -74,74 +73,78 @@ head(eps)</code></pre>
 ## [13] &quot;eigenvalues&quot;       &quot;uncond.cov.matrix&quot; &quot;residuals&quot;</code></pre>
 <p>模型诊断：</p>
 <pre class="r"><code>mvBEKK.diag(est)</code></pre>
-<pre><code>## 	Number of estimated series :  3 
-## 	Length of estimated series :  1000 
-## 	Estimation Time            :  23.53347 
-## 	Total Time                 :  23.95345 
-## 	BEKK order                 :  1 1 
-## 	Eigenvalues                :  0.8982855 0.5101535 0.4535976 0.3020472 0.2611067 0.2258987 0.1373383 0.05469751 0.05280793 
-## 	aic                        :  4163.509 
-## 	unconditional cov. matrix  :  2.654942 -0.4582163 0.8566066 -0.4582163 2.38067 0.1093766 0.8566066 0.1093766 2.01 
-## 	var(resid 1 )                :  0.999399 
-## 	mean(resid 1 )               :  -0.03860414 
-## 	var(resid 2 )                :  0.9988757 
-## 	mean(resid 2 )               :  0.04335019 
-## 	var(resid 3 )                :  0.997348 
-## 	mean(resid 3 )               :  0.02152967 
-## 	Estimated parameters       :
+<pre><code>## 
+## ===== BEKK(p,q) Model Diagnostics ===== 
+## 	Number of series:  3 
+## 	Series length:  1000 
+## 	Estimation time:  24.24306 
+## 	Total time:  24.24319 
+## 	BEKK order: p = 1 , q = 1 
+## 	Eigenvalues:  0.8983, 0.5102, 0.4536, 0.302, 0.2611, 0.2259, 0.1373, 0.0547, 0.0528 
+## 	AIC:  4163.509 
+## 	Unconditional covariance matrix:
+##         [,1]    [,2]   [,3]
+## [1,]  2.6549 -0.4582 0.8566
+## [2,] -0.4582  2.3807 0.1094
+## [3,]  0.8566  0.1094 2.0100
 ## 
-## 	C estimates:
-##           [,1]      [,2]       [,3]
-## [1,] 0.8909642 0.3328637 0.34152387
-## [2,] 0.0000000 0.9827892 0.05270326
-## [3,] 0.0000000 0.0000000 1.01236445
+## ===== Residual Statistics ===== 
+## 	Series 1 residuals: 
+## 	  Variance:  0.9994 
+## 	  Mean:  -0.0386 
+## 	Series 2 residuals: 
+## 	  Variance:  0.9989 
+## 	  Mean:  0.0434 
+## 	Series 3 residuals: 
+## 	  Variance:  0.9973 
+## 	  Mean:  0.0215 
 ## 
-## 	ARCH estimates:
-##              [,1]        [,2]       [,3]
-## [1,]  0.340809760  0.06992293 0.07918491
-## [2,] -0.064873614  0.36049917 0.35553210
-## [3,] -0.008381618 -0.06665216 0.50150310
+## ===== Model Parameters ===== 
+## 	C matrix (constant term):
+##       [,1]   [,2]   [,3]
+## [1,] 0.891 0.3329 0.3415
+## [2,] 0.000 0.9828 0.0527
+## [3,] 0.000 0.0000 1.0124
 ## 
-## 	GARCH estimates:
-##            [,1]       [,2]       [,3]
-## [1,] -0.3353086 0.37376137 -0.5032390
-## [2,]  0.2151724 0.03756262  0.4608374
-## [3,]  0.1756196 0.01577004 -0.4594647
+## 	ARCH parameters (A matrices):
+## 	  A 1 :
+##         [,1]    [,2]   [,3]
+## [1,]  0.3408  0.0699 0.0792
+## [2,] -0.0649  0.3605 0.3555
+## [3,] -0.0084 -0.0667 0.5015
 ## 
-## 	asy.se.coef                : 
+## 	GARCH parameters (B matrices):
+## 	  B 1 :
+##         [,1]   [,2]    [,3]
+## [1,] -0.3353 0.3738 -0.5032
+## [2,]  0.2152 0.0376  0.4608
+## [3,]  0.1756 0.0158 -0.4595
 ## 
-## 	C estimates, standard errors:
-##            [,1]      [,2]      [,3]
-## [1,] 0.07738385 0.1351731 0.2359051
-## [2,] 0.00000000 0.1141723 0.2671477
-## [3,] 0.00000000 0.0000000 0.2311768
+## ===== Asymptotic Standard Errors ===== 
+## 	C matrix standard errors:
+##        [,1]   [,2]   [,3]
+## [1,] 0.0774 0.1352 0.2359
+## [2,] 0.0000 0.1142 0.2671
+## [3,] 0.0000 0.0000 0.2312
 ## 
-## 	ARCH estimates, standard errors:
-##            [,1]       [,2]       [,3]
-## [1,] 0.05481912 0.05484527 0.07796872
-## [2,] 0.04677913 0.05338068 0.07267995
-## [3,] 0.02304154 0.02555282 0.04677987
+## 	ARCH parameters standard errors:
+## 	  A 1 :
+##        [,1]   [,2]   [,3]
+## [1,] 0.0548 0.0548 0.0780
+## [2,] 0.0468 0.0534 0.0727
+## [3,] 0.0230 0.0256 0.0468
 ## 
-## 	GARCH estimates, standard errors:
-##            [,1]       [,2]       [,3]
-## [1,] 0.17105425 0.19123870 0.31018515
-## [2,] 0.17509179 0.26972309 0.33665408
-## [3,] 0.05380941 0.07028591 0.09210273
-## Called from: mvBEKK.diag(est)
-## debug: for (i in 1:length(estimation$eps)) {
-##     plot(estimation$residuals[[i]])
-##     browser()
-##     dev.off()
-## }
-## debug: plot(estimation$residuals[[i]])</code></pre>
-<pre><code>## debug: browser()
-## debug: dev.off()
-## debug: plot(estimation$residuals[[i]])</code></pre>
-<pre><code>## debug: browser()
-## debug: dev.off()
-## debug: plot(estimation$residuals[[i]])</code></pre>
-<pre><code>## debug: browser()
-## debug: dev.off()</code></pre>
+## 	GARCH parameters standard errors:
+## 	  B 1 :
+##        [,1]   [,2]   [,3]
+## [1,] 0.1711 0.1912 0.3102
+## [2,] 0.1751 0.2697 0.3367
+## [3,] 0.0538 0.0703 0.0921
+## 
+## ===== Residual Diagnostics ===== 
+## 	(Interactive plots can be uncommented in the function code)
+## 
+## ===== Diagnostic Complete =====</code></pre>
 </div>
 <div id="mgarchbekk包及其示例" class="section level2">
 <h2>mgarchBEKK包及其示例</h2>
@@ -250,8 +253,8 @@ estimated &lt;- BEKK(simulated)</code></pre>
 diagnoseBEKK(estimated)</code></pre>
 <pre><code>## 	Number of estimated series :  2000 
 ## 	Length of estimated series :  1000 
-## 	Estimation Time            :  2.130957 
-## 	Total Time                 :  2.22815 
+## 	Estimation Time            :  2.422605 
+## 	Total Time                 :  2.519008 
 ## 	BEKK order                 :  1 1 
 ## 	Eigenvalues                :  0.7940983 0.7122278 0.5839173 0.5353965 
 ## 	aic                        :  4614.775 

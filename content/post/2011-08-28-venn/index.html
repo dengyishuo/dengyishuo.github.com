@@ -49,58 +49,63 @@ input&lt;-data.frame(A,B,C,D)
 venn(input)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 <pre class="r"><code>tmp &lt;- venn(input, simplify=TRUE)</code></pre>
-<pre><code>## Warning in drawVennDiagram(data = counts, small = small, showSetLogicLabel = showSetLogicLabel, : Not shown: 0101 contains 5</code></pre>
+<pre><code>## Warning in drawVennDiagram(data = counts, small = small, showSetLogicLabel = showSetLogicLabel, : Not shown: 0101 contains 4</code></pre>
+<pre><code>## Warning in drawVennDiagram(data = counts, small = small, showSetLogicLabel = showSetLogicLabel, : Not shown: 1010 contains 1</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
 <pre class="r"><code>tmp</code></pre>
 <pre><code>##      num A B C D
 ## 0000   0 0 0 0 0
-## 0001   2 0 0 0 1
-## 0010   4 0 0 1 0
-## 0011   0 0 0 1 1
-## 0100  38 0 1 0 0
-## 0101   5 0 1 0 1
-## 0110  11 0 1 1 0
-## 0111   2 0 1 1 1
-## 1000   5 1 0 0 0
-## 1001   1 1 0 0 1
-## 1010   0 1 0 1 0
+## 0001   0 0 0 0 1
+## 0010   3 0 0 1 0
+## 0011   1 0 0 1 1
+## 0100  40 0 1 0 0
+## 0101   4 0 1 0 1
+## 0110   8 0 1 1 0
+## 0111   3 0 1 1 1
+## 1000   7 1 0 0 0
+## 1001   0 1 0 0 1
+## 1010   1 1 0 1 0
 ## 1011   0 1 0 1 1
 ## 1100   9 1 1 0 0
-## 1101   0 1 1 0 1
-## 1110   3 1 1 1 0
+## 1101   1 1 1 0 1
+## 1110   1 1 1 1 0
 ## 1111   0 1 1 1 1
 ## attr(,&quot;intersections&quot;)
 ## attr(,&quot;intersections&quot;)$A
-## [1] &quot;20&quot; &quot;25&quot; &quot;31&quot; &quot;42&quot; &quot;55&quot;
+## [1] &quot;19&quot; &quot;25&quot; &quot;41&quot; &quot;52&quot; &quot;56&quot; &quot;58&quot; &quot;90&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$B
-##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;7&quot;  &quot;9&quot;  &quot;10&quot; &quot;21&quot; &quot;23&quot; &quot;27&quot; &quot;28&quot; &quot;29&quot; &quot;35&quot; &quot;39&quot;
-## [16] &quot;43&quot; &quot;44&quot; &quot;46&quot; &quot;47&quot; &quot;50&quot; &quot;51&quot; &quot;54&quot; &quot;57&quot; &quot;59&quot; &quot;63&quot; &quot;71&quot; &quot;72&quot; &quot;74&quot; &quot;75&quot; &quot;76&quot;
-## [31] &quot;78&quot; &quot;79&quot; &quot;86&quot; &quot;87&quot; &quot;88&quot; &quot;93&quot; &quot;96&quot; &quot;97&quot;
+##  [1] &quot;4&quot;   &quot;7&quot;   &quot;11&quot;  &quot;14&quot;  &quot;15&quot;  &quot;16&quot;  &quot;18&quot;  &quot;22&quot;  &quot;23&quot;  &quot;24&quot;  &quot;30&quot;  &quot;31&quot; 
+## [13] &quot;34&quot;  &quot;35&quot;  &quot;37&quot;  &quot;38&quot;  &quot;40&quot;  &quot;42&quot;  &quot;47&quot;  &quot;49&quot;  &quot;50&quot;  &quot;51&quot;  &quot;53&quot;  &quot;55&quot; 
+## [25] &quot;57&quot;  &quot;59&quot;  &quot;61&quot;  &quot;62&quot;  &quot;63&quot;  &quot;65&quot;  &quot;68&quot;  &quot;69&quot;  &quot;71&quot;  &quot;77&quot;  &quot;81&quot;  &quot;83&quot; 
+## [37] &quot;84&quot;  &quot;93&quot;  &quot;99&quot;  &quot;100&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$C
-## [1] &quot;16&quot; &quot;49&quot; &quot;61&quot; &quot;66&quot;
-## 
-## attr(,&quot;intersections&quot;)$D
-## [1] &quot;30&quot; &quot;38&quot;
+## [1] &quot;2&quot;  &quot;80&quot; &quot;82&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$`A:B`
-## [1] &quot;24&quot; &quot;33&quot; &quot;53&quot; &quot;58&quot; &quot;64&quot; &quot;69&quot; &quot;83&quot; &quot;91&quot; &quot;92&quot;
+## [1] &quot;3&quot;  &quot;5&quot;  &quot;20&quot; &quot;26&quot; &quot;45&quot; &quot;73&quot; &quot;74&quot; &quot;75&quot; &quot;86&quot;
 ## 
-## attr(,&quot;intersections&quot;)$`A:D`
-## [1] &quot;81&quot;
+## attr(,&quot;intersections&quot;)$`A:C`
+## [1] &quot;92&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$`B:C`
-##  [1] &quot;14&quot; &quot;15&quot; &quot;17&quot; &quot;26&quot; &quot;41&quot; &quot;48&quot; &quot;70&quot; &quot;73&quot; &quot;77&quot; &quot;85&quot; &quot;90&quot;
+## [1] &quot;9&quot;  &quot;10&quot; &quot;21&quot; &quot;28&quot; &quot;32&quot; &quot;54&quot; &quot;60&quot; &quot;88&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$`B:D`
-## [1] &quot;12&quot; &quot;18&quot; &quot;52&quot; &quot;56&quot; &quot;84&quot;
+## [1] &quot;29&quot; &quot;66&quot; &quot;95&quot; &quot;98&quot;
+## 
+## attr(,&quot;intersections&quot;)$`C:D`
+## [1] &quot;36&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$`A:B:C`
-## [1] &quot;22&quot; &quot;45&quot; &quot;62&quot;
+## [1] &quot;72&quot;
+## 
+## attr(,&quot;intersections&quot;)$`A:B:D`
+## [1] &quot;12&quot;
 ## 
 ## attr(,&quot;intersections&quot;)$`B:C:D`
-## [1] &quot;60&quot; &quot;65&quot;
+## [1] &quot;17&quot; &quot;67&quot; &quot;79&quot;
 ## 
 ## attr(,&quot;class&quot;)
 ## [1] &quot;venn&quot;</code></pre>
@@ -110,7 +115,7 @@ venn(input)</code></pre>
 library(asbio)</code></pre>
 <pre><code>## Loading required package: tcltk</code></pre>
 <pre class="r"><code>Venn(A=.3,B=.2,AandB=.06)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code># limma包
 # install.packages(&quot;BiocManager&quot;)
 # BiocManager::install(&quot;limma&quot;)
@@ -125,9 +130,9 @@ a &lt;- vennCounts(results)
 print(a)</code></pre>
 <pre><code>##   x1 x2 x3 Counts
 ## 1  0  0  0     86
-## 2  0  0  1     12
-## 3  0  1  0      0
-## 4  0  1  1      2
+## 2  0  0  1      7
+## 3  0  1  0      4
+## 4  0  1  1      3
 ## 5  1  0  0      0
 ## 6  1  0  1      0
 ## 7  1  1  0      0
@@ -135,33 +140,32 @@ print(a)</code></pre>
 ## attr(,&quot;class&quot;)
 ## [1] &quot;VennCounts&quot;</code></pre>
 <pre class="r"><code>vennDiagram(a)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-6.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <pre class="r"><code>vennDiagram(results,include=c(&quot;up&quot;,&quot;down&quot;),counts.col=c(&quot;red&quot;,&quot;green&quot;))</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-7.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
 <pre class="r"><code># venneuler包
-
-library(venneuler)</code></pre>
-<pre><code>## Loading required package: rJava</code></pre>
-<pre class="r"><code>vd &lt;- venneuler(c(A=0.3, B=0.3, C=1.1, &quot;A&amp;B&quot;=0.1, &quot;A&amp;C&quot;=0.2, &quot;B&amp;C&quot;=0.1 ,&quot;A&amp;B&amp;C&quot;=0.1))
+library(rJava)
+library(venneuler)
+vd &lt;- venneuler(c(A=0.3, B=0.3, C=1.1, &quot;A&amp;B&quot;=0.1, &quot;A&amp;C&quot;=0.2, &quot;B&amp;C&quot;=0.1 ,&quot;A&amp;B&amp;C&quot;=0.1))
 
 plot(vd)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-8.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>m &lt;- data.frame(elements=c(&quot;1&quot;,&quot;2&quot;,&quot;2&quot;,&quot;2&quot;,&quot;3&quot;),sets=c(&quot;A&quot;,&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;C&quot;))
   
 v &lt;- venneuler(m)
 
 plot(v)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-9.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
 <pre class="r"><code>m &lt;- as.matrix(data.frame(A=c(1.5, 0.2, 0.4, 0, 0),B=c(0, 0.2, 0, 1, 0), C=c(0, 0, 0.3, 0, 1)))
 
 v &lt;- venneuler(m &gt; 0)
 
 plot(v)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-10.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
 <pre class="r"><code>v &lt;- venneuler(m)
 
 plot(v)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-11.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-4.png" width="672" /></p>
 <pre class="r"><code># Vennerable包
 
 # BiocManager::install(&quot;graph&quot;)
@@ -216,14 +220,14 @@ library(Vennerable)</code></pre>
 ## 000 100 010 110 001 101 011 111 
 ##   1   1   1   1   1   1   1   1</code></pre>
 <pre class="r"><code>plot(Venn(n=3))</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-12.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code>data(StemCell)
 w &lt;- Venn(Sets=StemCell[1:2])
 Weights(w)</code></pre>
 <pre><code>##  00  10  01  11 
 ##   0 219 875 404</code></pre>
 <pre class="r"><code>plot(w)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-13.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 <pre class="r"><code>Weights(w) &lt;- 1:4
 plot(w)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-14.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>

@@ -12,7 +12,7 @@ tags:
 - 风险度量
 ---
 
-```{R setup, message=FALSE, warning=FALSE}
+```{R setup}
 library(showtext)
 font_add("SimHei", "SimHei.ttf")
 showtext_auto()

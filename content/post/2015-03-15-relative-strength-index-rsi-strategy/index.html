@@ -1,8 +1,8 @@
 ---
-title: 基于 RSI 指标的双向交易策略：实现与回测分析
+title: "基于 RSI 指标的双向交易策略：实现与回测分析"
 author: MatrixSpk
 date: '2015-03-15'
-slug: relative-strength-index-rsi-strategy-demonstrating-long-only-threshold-actions
+slug: relative-strength-index-rsi-strategy
 categories:
   - quant
 tags: 
@@ -17,7 +17,8 @@ tags:
 
 <p>在量化交易领域，相对强弱指数（RSI）作为一种经典的技术指标，常被用于识别市场的超买与超卖状态，为交易决策提供参考。</p>
 <p>本文所解析的 R 语言代码，便围绕 RSI 指标构建了一套完整的双向交易策略，并通过系统化的回测流程，验证其在多个行业 ETF 上的表现。</p>
-<p>该策略的核心设计思路，是利用 RSI 指标的阈值穿越信号触发交易动作。首先，代码通过 TTR 包中的 RSI 函数计算价格数据的相对强弱指数，默认采用 2 日周期（相较于常用的 14 日周期，更敏感地捕捉短期市场波动）。在此基础上，策略设定了两个关键阈值：当 RSI 上穿 70 时，判定市场进入超买状态，生成做空信号；当 RSI 下穿 30 时，判定市场进入超卖状态，生成做多信号。为避免信号频繁触发，代码通过 “cross=TRUE” 参数确保，只有当 RSI 真正穿越阈值时才产生有效信号。</p>
+<p>该策略的核心设计思路，是利用 RSI 指标的阈值穿越信号触发交易动作。</p>
+<p>首先，代码通过 TTR 包中的 RSI 函数计算价格数据的相对强弱指数，默认采用 2 日周期（相较于常用的 14 日周期，更敏感地捕捉短期市场波动）。在此基础上，策略设定了两个关键阈值：当 RSI 上穿 70 时，判定市场进入超买状态，生成做空信号；当 RSI 下穿 30 时，判定市场进入超卖状态，生成做多信号。为避免信号频繁触发，代码通过 “cross=TRUE” 参数确保，只有当 RSI 真正穿越阈值时才产生有效信号。</p>
 <p>基于上述信号，策略进一步定义了四套交易规则：RSI 上穿 70 时卖出 1000 股（做空入场），RSI 下穿 30 时平掉全部空头仓位（做空离场）；RSI 下穿 30 时买入 1000 股（做多入场），RSI 上穿 70 时平掉全部多头仓位（做多离场）。</p>
 <p>这一设计使得策略既能在市场超买时捕捉下跌机会，也能在超卖时把握反弹可能，实现双向交易的灵活性。</p>
 <p>为确保回测的严谨性，代码构建了完整的回测系统。在环境初始化阶段，通过清理旧策略数据、创建新的策略对象与交易环境，避免残留信息干扰结果。数据准备环节则选取了 9 个 SPDR 行业 ETF 作为交易标的，从雅虎财经获取 1998 年以来的历史价格数据，并完成货币单位与合约属性的设置。</p>
@@ -222,26 +223,26 @@ applySignals(strategy = stratRSI,
 ##     This note is displayed once per session</code></pre>
 <pre><code>##            XLF.Open XLF.High  XLF.Low XLF.Close XLF.Volume XLF.Adjusted
 ## 1998-12-22 19.05209 19.05209 18.84900  18.93785      55887     11.29712
-## 1998-12-23 18.86170 19.21710 18.86170  19.21710      78784     11.46371
+## 1998-12-23 18.86170 19.21710 18.86170  19.21710      78784     11.46370
 ## 1998-12-24 19.21710 19.34403 19.15364  19.34403      43824     11.53942
-## 1998-12-28 19.33134 19.33134 19.03940  19.09017      51948     11.38798
-## 1998-12-29 19.11556 19.29326 18.88708  19.29326     100819     11.50913
-## 1998-12-30 19.19171 19.31864 19.09017  19.21710     154614     11.46371
-## 1998-12-31 19.21710 19.24249 19.03940  19.03940      65366     11.35770
-## 1999-01-04 18.81093 19.35672 18.81093  19.03940     250632     11.35770
-## 1999-01-05 18.96324 19.24249 18.96324  19.21710      47763     11.46371
+## 1998-12-28 19.33134 19.33134 19.03940  19.09017      51948     11.38799
+## 1998-12-29 19.11556 19.29326 18.88708  19.29326     100819     11.50914
+## 1998-12-30 19.19171 19.31864 19.09017  19.21710     154614     11.46370
+## 1998-12-31 19.21710 19.24249 19.03940  19.03940      65366     11.35769
+## 1999-01-04 18.81093 19.35672 18.81093  19.03940     250632     11.35769
+## 1999-01-05 18.96324 19.24249 18.96324  19.21710      47763     11.46370
 ## 1999-01-06 19.57250 19.85175 19.44557  19.82636     129871     11.82715
 ##        ...                                                             
-## 2025-06-18 50.22000 50.77000 50.15000  50.22000   45728200     50.04848
-## 2025-06-20 50.37000 50.58000 50.22000  50.36000   44456100     50.18800
-## 2025-06-23 50.20000 50.84000 49.84000  50.82000   43022700     50.82000
-## 2025-06-24 51.32000 51.77000 51.28000  51.58000   41225000     51.58000
-## 2025-06-25 51.59000 51.60000 51.30000  51.41000   33123900     51.41000
-## 2025-06-26 51.44000 51.83000 51.41000  51.79000   37866000     51.79000
 ## 2025-06-27 51.75000 52.23000 51.70000  51.94000   38954100     51.94000
 ## 2025-06-30 52.18000 52.44000 52.14000  52.37000   42472900     52.37000
 ## 2025-07-01 52.24000 52.77000 52.21000  52.66000   33844800     52.66000
-## 2025-07-02 52.75000 52.76000 52.34000  52.62000   40786900     52.62000
+## 2025-07-02 52.75000 52.76000 52.34000  52.62000   40791100     52.62000
+## 2025-07-03 52.75000 53.27000 52.70000  53.19000   25904800     53.19000
+## 2025-07-07 53.13000 53.25000 52.42000  52.68000   34049000     52.68000
+## 2025-07-08 52.56000 52.60000 52.18000  52.21000   53715000     52.21000
+## 2025-07-09 52.48000 52.50000 52.14000  52.40000   36634900     52.40000
+## 2025-07-10 52.28000 52.76000 52.28000  52.71000   27992600     52.71000
+## 2025-07-11 52.36000 52.41000 52.08000  52.16000   30289100     52.16000
 ##              rsi.RSI RSI.gt.70 RSI.lt.30
 ## 1998-12-22        NA        NA        NA
 ## 1998-12-23        NA        NA        NA
@@ -254,16 +255,16 @@ applySignals(strategy = stratRSI,
 ## 1999-01-05  76.07362         1         0
 ## 1999-01-06  95.81094         0         0
 ##        ...                              
-## 2025-06-18  32.76166         0         0
-## 2025-06-20  58.70704         0         0
-## 2025-06-23  88.32125         1         0
-## 2025-06-24  96.53429         0         0
-## 2025-06-25  73.43171         0         0
-## 2025-06-26  87.16441         0         0
 ## 2025-06-27  90.88419         0         0
 ## 2025-06-30  96.57501         0         0
 ## 2025-07-01  98.14067         0         0
-## 2025-07-02  87.15041         0         0</code></pre>
+## 2025-07-02  87.15041         0         0
+## 2025-07-03  96.93436         0         0
+## 2025-07-07  41.02973         0         0
+## 2025-07-08  19.88845         0         1
+## 2025-07-09  43.44814         0         0
+## 2025-07-10  71.14156         1         0
+## 2025-07-11  25.98632         0         1</code></pre>
 <pre class="r"><code>##############################
 ### 回测引擎配置
 ##############################
@@ -5102,6 +5103,8 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-09 00:00:00 XLE -300 @ 83.5699996948242&quot;
 ## [1] &quot;2025-06-24 00:00:00 XLE 300 @ 84.9100036621094&quot;
 ## [1] &quot;2025-06-24 00:00:00 XLE 300 @ 84.9100036621094&quot;
+## [1] &quot;2025-07-03 00:00:00 XLE -300 @ 87.0299987792969&quot;
+## [1] &quot;2025-07-03 00:00:00 XLE -300 @ 87.0299987792969&quot;
 ## [1] &quot;1998-12-30 00:00:00 XLF -300 @ 19.2171001434326&quot;
 ## [1] &quot;1999-01-04 00:00:00 XLF 300 @ 19.0393981933594&quot;
 ## [1] &quot;1999-01-04 00:00:00 XLF 300 @ 19.0393981933594&quot;
@@ -7527,6 +7530,10 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-16 00:00:00 XLF 300 @ 50.5299987792969&quot;
 ## [1] &quot;2025-06-24 00:00:00 XLF -300 @ 51.5800018310547&quot;
 ## [1] &quot;2025-06-24 00:00:00 XLF -300 @ 51.5800018310547&quot;
+## [1] &quot;2025-07-09 00:00:00 XLF 300 @ 52.4000015258789&quot;
+## [1] &quot;2025-07-09 00:00:00 XLF 300 @ 52.4000015258789&quot;
+## [1] &quot;2025-07-11 00:00:00 XLF -300 @ 52.1599998474121&quot;
+## [1] &quot;2025-07-11 00:00:00 XLF -300 @ 52.1599998474121&quot;
 ## [1] &quot;1999-01-06 00:00:00 XLI -300 @ 25.25&quot;
 ## [1] &quot;1999-01-13 00:00:00 XLI 300 @ 24.0625&quot;
 ## [1] &quot;1999-01-13 00:00:00 XLI 300 @ 24.0625&quot;
@@ -14808,6 +14815,8 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-26 00:00:00 XLP 300 @ 80.1699981689453&quot;
 ## [1] &quot;2025-07-01 00:00:00 XLP -300 @ 81.9800033569336&quot;
 ## [1] &quot;2025-07-01 00:00:00 XLP -300 @ 81.9800033569336&quot;
+## [1] &quot;2025-07-09 00:00:00 XLP 300 @ 80.8199996948242&quot;
+## [1] &quot;2025-07-09 00:00:00 XLP 300 @ 80.8199996948242&quot;
 ## [1] &quot;1998-12-30 00:00:00 XLU -300 @ 30.34375&quot;
 ## [1] &quot;1999-01-05 00:00:00 XLU 300 @ 30.109375&quot;
 ## [1] &quot;1999-01-05 00:00:00 XLU 300 @ 30.109375&quot;
@@ -17265,6 +17274,14 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-26 00:00:00 XLU 300 @ 81.1699981689453&quot;
 ## [1] &quot;2025-07-01 00:00:00 XLU -300 @ 81.9400024414062&quot;
 ## [1] &quot;2025-07-01 00:00:00 XLU -300 @ 81.9400024414062&quot;
+## [1] &quot;2025-07-03 00:00:00 XLU 300 @ 81.8399963378906&quot;
+## [1] &quot;2025-07-03 00:00:00 XLU 300 @ 81.8399963378906&quot;
+## [1] &quot;2025-07-08 00:00:00 XLU -300 @ 81.1399993896484&quot;
+## [1] &quot;2025-07-08 00:00:00 XLU -300 @ 81.1399993896484&quot;
+## [1] &quot;2025-07-09 00:00:00 XLU 300 @ 81.9000015258789&quot;
+## [1] &quot;2025-07-09 00:00:00 XLU 300 @ 81.9000015258789&quot;
+## [1] &quot;2025-07-11 00:00:00 XLU -300 @ 82.4499969482422&quot;
+## [1] &quot;2025-07-11 00:00:00 XLU -300 @ 82.4499969482422&quot;
 ## [1] &quot;1998-12-30 00:00:00 XLV -300 @ 25.71875&quot;
 ## [1] &quot;1999-01-14 00:00:00 XLV 300 @ 26.46875&quot;
 ## [1] &quot;1999-01-14 00:00:00 XLV 300 @ 26.46875&quot;
@@ -19662,6 +19679,10 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-18 00:00:00 XLV 300 @ 133.240005493164&quot;
 ## [1] &quot;2025-06-25 00:00:00 XLV -300 @ 133.899993896484&quot;
 ## [1] &quot;2025-06-25 00:00:00 XLV -300 @ 133.899993896484&quot;
+## [1] &quot;2025-07-08 00:00:00 XLV 300 @ 134.970001220703&quot;
+## [1] &quot;2025-07-08 00:00:00 XLV 300 @ 134.970001220703&quot;
+## [1] &quot;2025-07-10 00:00:00 XLV -300 @ 136.320007324219&quot;
+## [1] &quot;2025-07-10 00:00:00 XLV -300 @ 136.320007324219&quot;
 ## [1] &quot;1998-12-30 00:00:00 XLY -300 @ 26.15625&quot;
 ## [1] &quot;1999-01-05 00:00:00 XLY 300 @ 26.40625&quot;
 ## [1] &quot;1999-01-05 00:00:00 XLY 300 @ 26.40625&quot;
@@ -22058,12 +22079,16 @@ out &lt;- try(applyStrategy(
 ## [1] &quot;2025-06-16 00:00:00 XLY 300 @ 214.020004272461&quot;
 ## [1] &quot;2025-06-16 00:00:00 XLY 300 @ 214.020004272461&quot;
 ## [1] &quot;2025-06-24 00:00:00 XLY -300 @ 215.589996337891&quot;
-## [1] &quot;2025-06-24 00:00:00 XLY -300 @ 215.589996337891&quot;</code></pre>
+## [1] &quot;2025-06-24 00:00:00 XLY -300 @ 215.589996337891&quot;
+## [1] &quot;2025-07-09 00:00:00 XLY 300 @ 218.949996948242&quot;
+## [1] &quot;2025-07-09 00:00:00 XLY 300 @ 218.949996948242&quot;
+## [1] &quot;2025-07-11 00:00:00 XLY -300 @ 221.429992675781&quot;
+## [1] &quot;2025-07-11 00:00:00 XLY -300 @ 221.429992675781&quot;</code></pre>
 <pre class="r"><code>end_t &lt;- Sys.time()
 print(&quot;Strategy Loop:&quot;)</code></pre>
 <pre><code>## [1] &quot;Strategy Loop:&quot;</code></pre>
 <pre class="r"><code>print(end_t - start_t)  # 输出策略执行时间</code></pre>
-<pre><code>## Time difference of 6.880908 mins</code></pre>
+<pre><code>## Time difference of 53.60858 mins</code></pre>
 <pre class="r"><code># 查看订单簿（调试用）
 # print(getOrderBook(port.st))
 
@@ -22074,47 +22099,47 @@ updatePortf(
   Dates = paste(&#39;::&#39;, as.Date(Sys.time()), sep = &#39;&#39;)  # 更新至最新日期
 )</code></pre>
 <pre><code>## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.</code></pre>
 <pre><code>## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
-## Could not parse ::2025-07-03 as ISO8601 string, or one/bothends of the range
-## were outside the available prices: 1998-12-22/2025-07-02. Using all data
+## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
+## were outside the available prices: 1998-12-22/2025-07-11. Using all data
 ## instead.</code></pre>
 <pre><code>## [1] &quot;RSI&quot;</code></pre>
 <pre class="r"><code>end_t &lt;- Sys.time()
 print(&quot;trade blotter portfolio update:&quot;)</code></pre>
 <pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
 <pre class="r"><code>print(end_t - start_t)  # 输出更新时间</code></pre>
-<pre><code>## Time difference of 0.418767 secs</code></pre>
+<pre><code>## Time difference of 0.434164 secs</code></pre>
 <pre class="r"><code>##############################
 ### 可视化与绩效分析
 ##############################

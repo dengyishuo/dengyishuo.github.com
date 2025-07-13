@@ -274,9 +274,10 @@ out &lt;- applyStrategy.rebalancing(
 <pre><code>## [1] &quot;2025-01-21 00:00:00 AAPL -97 @ 222.639999389648&quot;</code></pre>
 <pre><code>## [1] &quot;2025-02-24 00:00:00 AAPL 93 @ 247.100006103516&quot;</code></pre>
 <pre><code>## [1] &quot;2025-03-13 00:00:00 AAPL -93 @ 209.679992675781&quot;</code></pre>
+<pre><code>## [1] &quot;2025-07-07 00:00:00 AAPL 107 @ 209.949996948242&quot;</code></pre>
 <pre class="r"><code>end_t &lt;- Sys.time()  # 记录回测结束时间
 print(end_t - start_t)  # 打印回测耗时</code></pre>
-<pre><code>## Time difference of 9.843882 secs</code></pre>
+<pre><code>## Time difference of 8.527371 secs</code></pre>
 <pre class="r"><code># 更新组合数据：将交易记录同步到组合与账户
 start_t &lt;- Sys.time()
 updatePortf(
@@ -288,7 +289,7 @@ updatePortf(
 print(&quot;trade blotter portfolio update:&quot;)</code></pre>
 <pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
 <pre class="r"><code>print(end_t - start_t)  # 打印更新耗时</code></pre>
-<pre><code>## Time difference of 0.04634905 secs</code></pre>
+<pre><code>## Time difference of 0.03819585 secs</code></pre>
 <pre class="r"><code># 可视化回测结果：绘制持仓变化与MACD指标
 chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 展示AAPL的持仓变化</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-1.png" width="672" /></p>
@@ -299,207 +300,49 @@ getOrderBook(&#39;macd&#39;)</code></pre>
 <pre><code>## $macd
 ## $macd$AAPL
 ##            Order.Qty      Order.Price Order.Type Order.Side Order.Threshold
-## 2007-03-15      6619 3.19892907142639     market       long            &lt;NA&gt;
-## 2007-08-16       all 4.18035697937012     market       long            &lt;NA&gt;
-## 2007-09-04      4075  5.1485710144043     market       long            &lt;NA&gt;
-## 2008-01-15       all 6.03714323043823     market       long            &lt;NA&gt;
-## 2008-03-28      4529 5.10750007629395     market       long            &lt;NA&gt;
-## 2008-06-25       all 6.33535718917847     market       long            &lt;NA&gt;
-## 2008-08-19      3576 6.19750022888184     market       long            &lt;NA&gt;
-## 2008-09-08       all  5.6399998664856     market       long            &lt;NA&gt;
-## 2009-02-05      6287  3.4449999332428     market       long            &lt;NA&gt;
-## 2009-03-03       all 3.15607094764709     market       long            &lt;NA&gt;
-## 2009-03-18      6330 3.62571406364441     market       long            &lt;NA&gt;
-## 2009-12-14       all 7.03499984741211     market       long            &lt;NA&gt;
-## 2009-12-28      2892 7.55749988555908     market       long            &lt;NA&gt;
-## 2010-02-02       all 6.99499988555908     market       long            &lt;NA&gt;
-## 2010-03-03      2819 7.47607088088989     market       long            &lt;NA&gt;
-## 2010-07-15       all 8.98035717010498     market       long            &lt;NA&gt;
-## 2010-08-02      2251 9.35178565979004     market       long            &lt;NA&gt;
-## 2010-08-16       all 8.84428596496582     market       long            &lt;NA&gt;
-## 2010-09-14      2380 9.57357120513916     market       long            &lt;NA&gt;
-## 2011-03-21       all 12.1178569793701     market       long            &lt;NA&gt;
-## 2011-05-02      1662 12.3671426773071     market       long            &lt;NA&gt;
-## 2011-05-20       all 11.9721431732178     market       long            &lt;NA&gt;
-## 2011-07-08      1732 12.8467855453491     market       long            &lt;NA&gt;
-## 2011-11-15       all 13.8867864608765     market       long            &lt;NA&gt;
-## 2011-12-23      1524 14.4046430587769     market       long            &lt;NA&gt;
-## 2012-05-08       all  20.292142868042     market       long            &lt;NA&gt;
-## 2012-06-19      1017 20.9789295196533     market       long            &lt;NA&gt;
-## 2012-10-11       all 22.4321422576904     market       long            &lt;NA&gt;
-## 2013-05-08      1329 16.5657138824463     market       long            &lt;NA&gt;
-## 2013-06-18       all 15.4203567504883     market       long            &lt;NA&gt;
-## 2013-07-25      1481 15.6607141494751     market       long            &lt;NA&gt;
-## 2014-01-21       all 19.6096439361572     market       long            &lt;NA&gt;
-## 2014-01-23      1053 19.8635711669922     market       long            &lt;NA&gt;
-## 2014-01-28       all 18.0892868041992     market       long            &lt;NA&gt;
-## 2014-03-25      1121 19.4639282226562     market       long            &lt;NA&gt;
-## 2014-04-14       all 18.6314296722412     market       long            &lt;NA&gt;
-## 2014-04-28      1099 21.2175006866455     market       long            &lt;NA&gt;
-## 2014-10-16       all 24.0650005340576     market       long            &lt;NA&gt;
-## 2014-10-24       839 26.3050003051758     market       long            &lt;NA&gt;
-## 2015-01-05       all          26.5625     market       long            &lt;NA&gt;
-## 2015-01-30       721 29.2900009155273     market       long            &lt;NA&gt;
-## 2015-06-18       all 31.9699993133545     market       long            &lt;NA&gt;
-## 2015-10-26       767 28.8199996948242     market       long            &lt;NA&gt;
-## 2015-12-15       all 27.6224994659424     market       long            &lt;NA&gt;
-## 2016-03-08       874 25.2574996948242     market       long            &lt;NA&gt;
-## 2016-04-29       all 23.4349994659424     market       long            &lt;NA&gt;
-## 2016-07-19       883 24.9675006866455     market       long            &lt;NA&gt;
-## 2016-11-08       all 27.7649993896484     market       long            &lt;NA&gt;
-## 2016-12-14       766 28.7975006103516     market       long            &lt;NA&gt;
-## 2017-06-19       all 36.5849990844727     market       long            &lt;NA&gt;
-## 2017-07-24       591 38.0224990844727     market       long            &lt;NA&gt;
-## 2017-09-26       all 38.2849998474121     market       long            &lt;NA&gt;
-## 2017-10-23       552 39.0424995422363     market       long            &lt;NA&gt;
-## 2018-02-01       all 41.9449996948242     market       long            &lt;NA&gt;
-## 2018-02-28       478 44.5299987792969     market       long            &lt;NA&gt;
-## 2018-03-29       all 41.9449996948242     market       long            &lt;NA&gt;
-## 2018-04-18       507 44.4599990844727     market       long            &lt;NA&gt;
-## 2018-04-24       all 40.7350006103516     market       long            &lt;NA&gt;
-## 2018-05-08       514 46.5125007629395     market       long            &lt;NA&gt;
-## 2018-07-05       all 46.3499984741211     market       long            &lt;NA&gt;
-## 2018-07-10       459 47.5875015258789     market       long            &lt;NA&gt;
-## 2018-10-26       all 54.0750007629395     market       long            &lt;NA&gt;
-## 2019-02-07       512 42.7350006103516     market       long            &lt;NA&gt;
-## 2019-05-20       all 45.7724990844727     market       long            &lt;NA&gt;
-## 2019-06-20       487 49.8650016784668     market       long            &lt;NA&gt;
-## 2020-02-28       all 68.3399963378906     market       long            &lt;NA&gt;
-## 2020-04-22       339 69.0250015258789     market       long            &lt;NA&gt;
-## 2020-09-24       all 108.220001220703     market       long            &lt;NA&gt;
-## 2020-10-12       189 124.400001525879     market       long            &lt;NA&gt;
-## 2020-11-02       all 108.769996643066     market       long            &lt;NA&gt;
-## 2020-11-13       201  119.26000213623     market       long            &lt;NA&gt;
-## 2021-02-24       all 125.349998474121     market       long            &lt;NA&gt;
-## 2021-04-13       179 134.429992675781     market       long            &lt;NA&gt;
-## 2021-05-17       all 126.269996643066     market       long            &lt;NA&gt;
-## 2021-06-18       175 130.460006713867     market       long            &lt;NA&gt;
-## 2021-09-24       all 146.919998168945     market       long            &lt;NA&gt;
-## 2021-10-26       154 149.320007324219     market       long            &lt;NA&gt;
-## 2022-01-25       all 159.779998779297     market       long            &lt;NA&gt;
-## 2022-02-09       125 176.279998779297     market       long            &lt;NA&gt;
-## 2022-02-23       all 160.070007324219     market       long            &lt;NA&gt;
-## 2022-03-29       132 178.960006713867     market       long            &lt;NA&gt;
-## 2022-04-25       all 162.880004882812     market       long            &lt;NA&gt;
-## 2022-07-18       160 147.070007324219     market       long            &lt;NA&gt;
-## 2022-09-12       all 163.429992675781     market       long            &lt;NA&gt;
-## 2022-11-22       142 150.179992675781     market       long            &lt;NA&gt;
-## 2022-12-07       all 140.940002441406     market       long            &lt;NA&gt;
-## 2023-01-27       168 145.929992675781     market       long            &lt;NA&gt;
-## 2023-08-11       all 177.789993286133     market       long            &lt;NA&gt;
-## 2023-11-10       128 186.399993896484     market       long            &lt;NA&gt;
-## 2024-01-09       all 185.139999389648     market       long            &lt;NA&gt;
-## 2024-01-29       114 191.729995727539     market       long            &lt;NA&gt;
-## 2024-02-05       all 187.679992675781     market       long            &lt;NA&gt;
-## 2024-05-07       129 182.399993896484     market       long            &lt;NA&gt;
-## 2024-08-13       all 221.270004272461     market       long            &lt;NA&gt;
-## 2024-08-15        99 224.720001220703     market       long            &lt;NA&gt;
-## 2024-11-08       all 226.960006713867     market       long            &lt;NA&gt;
-## 2024-11-26        97 235.059997558594     market       long            &lt;NA&gt;
-## 2025-01-17       all 229.979995727539     market       long            &lt;NA&gt;
-## 2025-02-21        93 245.550003051758     market       long            &lt;NA&gt;
-## 2025-03-12       all 216.979995727539     market       long            &lt;NA&gt;
+## 2007-03-15      6619 3.19892907142639     market       long              NA
+## 2007-08-16      all  4.18035697937012     market       long              NA
+## 2007-09-04      4075 5.1485710144043      market       long              NA
+## 2008-01-15      all  6.03714323043823     market       long              NA
+## 2008-03-28      4529 5.10750007629395     market       long              NA
+## 2008-06-25      all  6.33535718917847     market       long              NA
+## 2008-08-19      3576 6.19750022888184     market       long              NA
+## 2008-09-08      all  5.6399998664856      market       long              NA
+## 2009-02-05      6287 3.4449999332428      market       long              NA
+## 2009-03-03      all  3.15607094764709     market       long              NA
+##        ...                                                                 
+## 2024-02-05      all  187.679992675781     market       long              NA
+## 2024-05-07      129  182.399993896484     market       long              NA
+## 2024-08-13      all  221.270004272461     market       long              NA
+## 2024-08-15      99   224.720001220703     market       long              NA
+## 2024-11-08      all  226.960006713867     market       long              NA
+## 2024-11-26      97   235.059997558594     market       long              NA
+## 2025-01-17      all  229.979995727539     market       long              NA
+## 2025-02-21      93   245.550003051758     market       long              NA
+## 2025-03-12      all  216.979995727539     market       long              NA
+## 2025-07-03      107  213.550003051758     market       long              NA
 ##            Order.Status    Order.StatusTime Prefer Order.Set Txn.Fees  Rule
-## 2007-03-15       closed 2007-03-16 00:00:00             &lt;NA&gt;        0 enter
-## 2007-08-16       closed 2007-08-17 00:00:00            exit2        0  exit
-## 2007-09-04       closed 2007-09-05 00:00:00             &lt;NA&gt;        0 enter
-## 2008-01-15       closed 2008-01-16 00:00:00            exit2        0  exit
-## 2008-03-28       closed 2008-03-31 00:00:00             &lt;NA&gt;        0 enter
-## 2008-06-25       closed 2008-06-26 00:00:00            exit2        0  exit
-## 2008-08-19       closed 2008-08-20 00:00:00             &lt;NA&gt;        0 enter
-## 2008-09-08       closed 2008-09-09 00:00:00            exit2        0  exit
-## 2009-02-05       closed 2009-02-06 00:00:00             &lt;NA&gt;        0 enter
-## 2009-03-03       closed 2009-03-04 00:00:00            exit2        0  exit
-## 2009-03-18       closed 2009-03-19 00:00:00             &lt;NA&gt;        0 enter
-## 2009-12-14       closed 2009-12-15 00:00:00            exit2        0  exit
-## 2009-12-28       closed 2009-12-29 00:00:00             &lt;NA&gt;        0 enter
-## 2010-02-02       closed 2010-02-03 00:00:00            exit2        0  exit
-## 2010-03-03       closed 2010-03-04 00:00:00             &lt;NA&gt;        0 enter
-## 2010-07-15       closed 2010-07-16 00:00:00            exit2        0  exit
-## 2010-08-02       closed 2010-08-03 00:00:00             &lt;NA&gt;        0 enter
-## 2010-08-16       closed 2010-08-17 00:00:00            exit2        0  exit
-## 2010-09-14       closed 2010-09-15 00:00:00             &lt;NA&gt;        0 enter
-## 2011-03-21       closed 2011-03-22 00:00:00            exit2        0  exit
-## 2011-05-02       closed 2011-05-03 00:00:00             &lt;NA&gt;        0 enter
-## 2011-05-20       closed 2011-05-23 00:00:00            exit2        0  exit
-## 2011-07-08       closed 2011-07-11 00:00:00             &lt;NA&gt;        0 enter
-## 2011-11-15       closed 2011-11-16 00:00:00            exit2        0  exit
-## 2011-12-23       closed 2011-12-27 00:00:00             &lt;NA&gt;        0 enter
-## 2012-05-08       closed 2012-05-09 00:00:00            exit2        0  exit
-## 2012-06-19       closed 2012-06-20 00:00:00             &lt;NA&gt;        0 enter
-## 2012-10-11       closed 2012-10-12 00:00:00            exit2        0  exit
-## 2013-05-08       closed 2013-05-09 00:00:00             &lt;NA&gt;        0 enter
-## 2013-06-18       closed 2013-06-19 00:00:00            exit2        0  exit
-## 2013-07-25       closed 2013-07-26 00:00:00             &lt;NA&gt;        0 enter
-## 2014-01-21       closed 2014-01-22 00:00:00            exit2        0  exit
-## 2014-01-23       closed 2014-01-24 00:00:00             &lt;NA&gt;        0 enter
-## 2014-01-28       closed 2014-01-29 00:00:00            exit2        0  exit
-## 2014-03-25       closed 2014-03-26 00:00:00             &lt;NA&gt;        0 enter
-## 2014-04-14       closed 2014-04-15 00:00:00            exit2        0  exit
-## 2014-04-28       closed 2014-04-29 00:00:00             &lt;NA&gt;        0 enter
-## 2014-10-16       closed 2014-10-17 00:00:00            exit2        0  exit
-## 2014-10-24       closed 2014-10-27 00:00:00             &lt;NA&gt;        0 enter
-## 2015-01-05       closed 2015-01-06 00:00:00            exit2        0  exit
-## 2015-01-30       closed 2015-02-02 00:00:00             &lt;NA&gt;        0 enter
-## 2015-06-18       closed 2015-06-19 00:00:00            exit2        0  exit
-## 2015-10-26       closed 2015-10-27 00:00:00             &lt;NA&gt;        0 enter
-## 2015-12-15       closed 2015-12-16 00:00:00            exit2        0  exit
-## 2016-03-08       closed 2016-03-09 00:00:00             &lt;NA&gt;        0 enter
-## 2016-04-29       closed 2016-05-02 00:00:00            exit2        0  exit
-## 2016-07-19       closed 2016-07-20 00:00:00             &lt;NA&gt;        0 enter
-## 2016-11-08       closed 2016-11-09 00:00:00            exit2        0  exit
-## 2016-12-14       closed 2016-12-15 00:00:00             &lt;NA&gt;        0 enter
-## 2017-06-19       closed 2017-06-20 00:00:00            exit2        0  exit
-## 2017-07-24       closed 2017-07-25 00:00:00             &lt;NA&gt;        0 enter
-## 2017-09-26       closed 2017-09-27 00:00:00            exit2        0  exit
-## 2017-10-23       closed 2017-10-24 00:00:00             &lt;NA&gt;        0 enter
-## 2018-02-01       closed 2018-02-02 00:00:00            exit2        0  exit
-## 2018-02-28       closed 2018-03-01 00:00:00             &lt;NA&gt;        0 enter
-## 2018-03-29       closed 2018-04-02 00:00:00            exit2        0  exit
-## 2018-04-18       closed 2018-04-19 00:00:00             &lt;NA&gt;        0 enter
-## 2018-04-24       closed 2018-04-25 00:00:00            exit2        0  exit
-## 2018-05-08       closed 2018-05-09 00:00:00             &lt;NA&gt;        0 enter
-## 2018-07-05       closed 2018-07-06 00:00:00            exit2        0  exit
-## 2018-07-10       closed 2018-07-11 00:00:00             &lt;NA&gt;        0 enter
-## 2018-10-26       closed 2018-10-29 00:00:00            exit2        0  exit
-## 2019-02-07       closed 2019-02-08 00:00:00             &lt;NA&gt;        0 enter
-## 2019-05-20       closed 2019-05-21 00:00:00            exit2        0  exit
-## 2019-06-20       closed 2019-06-21 00:00:00             &lt;NA&gt;        0 enter
-## 2020-02-28       closed 2020-03-02 00:00:00            exit2        0  exit
-## 2020-04-22       closed 2020-04-23 00:00:00             &lt;NA&gt;        0 enter
-## 2020-09-24       closed 2020-09-25 00:00:00            exit2        0  exit
-## 2020-10-12       closed 2020-10-13 00:00:00             &lt;NA&gt;        0 enter
-## 2020-11-02       closed 2020-11-03 00:00:00            exit2        0  exit
-## 2020-11-13       closed 2020-11-16 00:00:00             &lt;NA&gt;        0 enter
-## 2021-02-24       closed 2021-02-25 00:00:00            exit2        0  exit
-## 2021-04-13       closed 2021-04-14 00:00:00             &lt;NA&gt;        0 enter
-## 2021-05-17       closed 2021-05-18 00:00:00            exit2        0  exit
-## 2021-06-18       closed 2021-06-21 00:00:00             &lt;NA&gt;        0 enter
-## 2021-09-24       closed 2021-09-27 00:00:00            exit2        0  exit
-## 2021-10-26       closed 2021-10-27 00:00:00             &lt;NA&gt;        0 enter
-## 2022-01-25       closed 2022-01-26 00:00:00            exit2        0  exit
-## 2022-02-09       closed 2022-02-10 00:00:00             &lt;NA&gt;        0 enter
-## 2022-02-23       closed 2022-02-24 00:00:00            exit2        0  exit
-## 2022-03-29       closed 2022-03-30 00:00:00             &lt;NA&gt;        0 enter
-## 2022-04-25       closed 2022-04-26 00:00:00            exit2        0  exit
-## 2022-07-18       closed 2022-07-19 00:00:00             &lt;NA&gt;        0 enter
-## 2022-09-12       closed 2022-09-13 00:00:00            exit2        0  exit
-## 2022-11-22       closed 2022-11-23 00:00:00             &lt;NA&gt;        0 enter
-## 2022-12-07       closed 2022-12-08 00:00:00            exit2        0  exit
-## 2023-01-27       closed 2023-01-30 00:00:00             &lt;NA&gt;        0 enter
-## 2023-08-11       closed 2023-08-14 00:00:00            exit2        0  exit
-## 2023-11-10       closed 2023-11-13 00:00:00             &lt;NA&gt;        0 enter
-## 2024-01-09       closed 2024-01-10 00:00:00            exit2        0  exit
-## 2024-01-29       closed 2024-01-30 00:00:00             &lt;NA&gt;        0 enter
-## 2024-02-05       closed 2024-02-06 00:00:00            exit2        0  exit
-## 2024-05-07       closed 2024-05-08 00:00:00             &lt;NA&gt;        0 enter
-## 2024-08-13       closed 2024-08-14 00:00:00            exit2        0  exit
-## 2024-08-15       closed 2024-08-16 00:00:00             &lt;NA&gt;        0 enter
-## 2024-11-08       closed 2024-11-11 00:00:00            exit2        0  exit
-## 2024-11-26       closed 2024-11-27 00:00:00             &lt;NA&gt;        0 enter
-## 2025-01-17       closed 2025-01-21 00:00:00            exit2        0  exit
-## 2025-02-21       closed 2025-02-24 00:00:00             &lt;NA&gt;        0 enter
-## 2025-03-12       closed 2025-03-13 00:00:00            exit2        0  exit
+## 2007-03-15       closed 2007-03-16 00:00:00            NA           0 enter
+## 2007-08-16       closed 2007-08-17 00:00:00            exit2        0 exit 
+## 2007-09-04       closed 2007-09-05 00:00:00            NA           0 enter
+## 2008-01-15       closed 2008-01-16 00:00:00            exit2        0 exit 
+## 2008-03-28       closed 2008-03-31 00:00:00            NA           0 enter
+## 2008-06-25       closed 2008-06-26 00:00:00            exit2        0 exit 
+## 2008-08-19       closed 2008-08-20 00:00:00            NA           0 enter
+## 2008-09-08       closed 2008-09-09 00:00:00            exit2        0 exit 
+## 2009-02-05       closed 2009-02-06 00:00:00            NA           0 enter
+## 2009-03-03       closed 2009-03-04 00:00:00            exit2        0 exit 
+##        ...                                                                 
+## 2024-02-05       closed 2024-02-06 00:00:00            exit2        0 exit 
+## 2024-05-07       closed 2024-05-08 00:00:00            NA           0 enter
+## 2024-08-13       closed 2024-08-14 00:00:00            exit2        0 exit 
+## 2024-08-15       closed 2024-08-16 00:00:00            NA           0 enter
+## 2024-11-08       closed 2024-11-11 00:00:00            exit2        0 exit 
+## 2024-11-26       closed 2024-11-27 00:00:00            NA           0 enter
+## 2025-01-17       closed 2025-01-21 00:00:00            exit2        0 exit 
+## 2025-02-21       closed 2025-02-24 00:00:00            NA           0 enter
+## 2025-03-12       closed 2025-03-13 00:00:00            exit2        0 exit 
+## 2025-07-03       closed 2025-07-07 00:00:00            NA           0 enter
 ##            Time.In.Force
 ## 2007-03-15              
 ## 2007-08-16              
@@ -511,87 +354,7 @@ getOrderBook(&#39;macd&#39;)</code></pre>
 ## 2008-09-08              
 ## 2009-02-05              
 ## 2009-03-03              
-## 2009-03-18              
-## 2009-12-14              
-## 2009-12-28              
-## 2010-02-02              
-## 2010-03-03              
-## 2010-07-15              
-## 2010-08-02              
-## 2010-08-16              
-## 2010-09-14              
-## 2011-03-21              
-## 2011-05-02              
-## 2011-05-20              
-## 2011-07-08              
-## 2011-11-15              
-## 2011-12-23              
-## 2012-05-08              
-## 2012-06-19              
-## 2012-10-11              
-## 2013-05-08              
-## 2013-06-18              
-## 2013-07-25              
-## 2014-01-21              
-## 2014-01-23              
-## 2014-01-28              
-## 2014-03-25              
-## 2014-04-14              
-## 2014-04-28              
-## 2014-10-16              
-## 2014-10-24              
-## 2015-01-05              
-## 2015-01-30              
-## 2015-06-18              
-## 2015-10-26              
-## 2015-12-15              
-## 2016-03-08              
-## 2016-04-29              
-## 2016-07-19              
-## 2016-11-08              
-## 2016-12-14              
-## 2017-06-19              
-## 2017-07-24              
-## 2017-09-26              
-## 2017-10-23              
-## 2018-02-01              
-## 2018-02-28              
-## 2018-03-29              
-## 2018-04-18              
-## 2018-04-24              
-## 2018-05-08              
-## 2018-07-05              
-## 2018-07-10              
-## 2018-10-26              
-## 2019-02-07              
-## 2019-05-20              
-## 2019-06-20              
-## 2020-02-28              
-## 2020-04-22              
-## 2020-09-24              
-## 2020-10-12              
-## 2020-11-02              
-## 2020-11-13              
-## 2021-02-24              
-## 2021-04-13              
-## 2021-05-17              
-## 2021-06-18              
-## 2021-09-24              
-## 2021-10-26              
-## 2022-01-25              
-## 2022-02-09              
-## 2022-02-23              
-## 2022-03-29              
-## 2022-04-25              
-## 2022-07-18              
-## 2022-09-12              
-## 2022-11-22              
-## 2022-12-07              
-## 2023-01-27              
-## 2023-08-11              
-## 2023-11-10              
-## 2024-01-09              
-## 2024-01-29              
+##        ...              
 ## 2024-02-05              
 ## 2024-05-07              
 ## 2024-08-13              
@@ -601,6 +364,7 @@ getOrderBook(&#39;macd&#39;)</code></pre>
 ## 2025-01-17              
 ## 2025-02-21              
 ## 2025-03-12              
+## 2025-07-03              
 ## 
 ## 
 ## attr(,&quot;class&quot;)

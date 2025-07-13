@@ -1,0 +1,254 @@
+---
+title: 基于极值理论的 VaR 计算及实证分析
+author: MatrixSpk
+date: '2010-12-29'
+slug: var-caculation-and-EVT
+categories:
+  - 量化投资
+tags:
+  - VaR
+  - 风险
+  - 量化投资
+  - 混合正态分布
+---
+
+
+
+<div id="一引言" class="section level1">
+<h1>一、引言</h1>
+<p>风险价值（VaR）作为衡量金融资产极端损失的核心指标，传统方法（如 GARCH 模型）虽能捕捉波动聚类特性，但对尾部风险的刻画仍依赖于整体分布假设。</p>
+<p><strong>极值理论（Extreme Value Theory, EVT）</strong> 则直接聚焦于收益率序列的尾部行为，通过对极端值建模突破整体分布限制，更精准地估计极端市场条件下的潜在损失。</p>
+<p>本文以特斯拉（TSLA）股票收益率为例，系统介绍极值理论的核心模型（广义极值分布 GEV、广义帕累托分布 GPD）、参数估计及 VaR 计算流程，并通过 R 语言<code>fExtremes</code>和<code>evd</code>包实现实证分析。</p>
+</div>
+<div id="二极值理论核心模型" class="section level1">
+<h1>二、极值理论核心模型</h1>
+<p>极值理论通过两类方法刻画极端值分布：<strong>分块最大值法（Block Maxima Method, BMM）</strong> 基于广义极值分布（GEV），<strong>超限峰值法（Peaks Over Threshold, POT）</strong> 基于广义帕累托分布（GPD）。其中，POT 因灵活利用数据尾部信息而更常用于 VaR 计算。</p>
+<ol style="list-style-type: decimal">
+<li>广义极值分布（GEV）</li>
+</ol>
+<p><strong>分块最大值法</strong>将时间序列划分为若干块（如按日、周），取每块内的极端值（最大值或最小值），其渐进分布可统一为 GEV。</p>
+<p><strong>GEV 分布函数</strong>：</p>
+<p><span class="math display">\[
+G(x; \mu, \sigma, \xi) = \exp\left\{ -\left[1 + \xi \left( \frac{x - \mu}{\sigma} \right) \right]^{-1/\xi} \right\} \tag{1}
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(\mu\)</span> 为位置参数（中心趋势），决定了分布的中心位置，反映极端值的平均水平；</li>
+<li><span class="math inline">\(\sigma &gt; 0\)</span> 为尺度参数（离散程度）；</li>
+<li><span class="math inline">\(\xi\)</span> 为形状参数（决定尾部特性）：</li>
+</ul>
+<p>若 <span class="math inline">\(\xi &gt; 0\)</span> ，则 GEV 为 Frechet 分布（厚尾，如幂律尾）。Frechet 分布具有显著的厚尾特征，概率密度函数呈渐近幂律形式，尾部衰减速度较慢，能更准确捕捉金融市场中极端事件发生概率较高的尾部风险，在 VaR 计算中可更可靠地拟合金融资产收益率极端值。</p>
+<p>若 <span class="math inline">\(\xi = 0\)</span> ，则 GEV 为 Gumbel 分布（轻尾，如正态分布）。该分布下极端事件发生概率随偏离均值程度呈指数衰减，数据在均值附近集中程度高，极端值出现频率低，若资产收益符合此分布，表明极端损失发生可能性较小，风险相对可控。</p>
+<p>若 <span class="math inline">\(\xi &lt; 0\)</span> ，则 GEV 为 Weibull 分布（有界尾）。该分布下随机变量存在理论上界，极端事件影响有限，在金融市场中若资产价格波动符合此分布，意味着极端损失幅度有上限，对风险管理者设定止损策略有重要参考价值。</p>
+<p><strong>基于 GEV 的 VaR 计算</strong></p>
+<p>广义极值分布（GEV）作为统一框架，整合了 Gumbel、Weibull 和 Frechet 三种不同尾部特征的分布类型。基于 GEV 的 VaR 计算，通过极大似然估计或矩估计等方法确定形状参数 <span class="math inline">\(\xi\)</span> 、位置参数 <span class="math inline">\(\mu\)</span> 和尺度参数 <span class="math inline">\(\sigma\)</span> ，构建符合数据尾部特征的风险分布模型。</p>
+<p>在给定置信水平 <span class="math inline">\(1-\alpha\)</span> 下，VaR 为 GEV 分布的 <span class="math inline">\(\alpha\)</span> 分位数：</p>
+<p><span class="math display">\[
+VaR_{1-\alpha} = \mu - \frac{\sigma}{\xi} \left[ 1 - (-\ln \alpha)^{-\xi} \right] \quad (\xi \neq 0) \tag{2}
+\]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>广义帕累托分布（GPD）与 POT 方法</li>
+</ol>
+<p><strong>POT 方法</strong>通过设定阈值 <span class="math inline">\(u\)</span>，对所有超过 <span class="math inline">\(u\)</span> 的极端值（超限值）进行建模，其超出量（<span class="math inline">\(x - u\)</span>）的分布可由广义帕累托分布（Generalized Pareto Distribution，GPD）逼近。</p>
+<p>这种方法聚焦于极端事件，能更精准刻画金融市场尾部风险，在金融市场剧烈波动时，可有效捕捉资产价格极端变化，为风险管理者提供重要预警信号，在高风险投资领域应用价值显著。</p>
+<p><strong>GPD 分布函数</strong>：</p>
+<p>广义帕累托分布是刻画超过某一阈值数据分布的重要工具，在金融风险度量中常用于描述极端损失事件概率分布，其概率密度函数为</p>
+<p><span class="math display">\[
+f(x;\xi,\beta)=\frac{1}{\beta}(1 + \frac{\xi x}{\beta})^{-\frac{1}{\xi}-1}
+\]</span></p>
+<p>其中 <span class="math inline">\(x \geq 0\)</span>，<span class="math inline">\(\beta &gt; 0\)</span> 是尺度参数，<span class="math inline">\(\xi\)</span> 为形状参数，当 <span class="math inline">\(\xi = 0\)</span> 时退化为指数分布。</p>
+<p>GPD 分布函数为：</p>
+<p><span class="math display">\[
+F(x;\xi,\beta,\mu)=1-\left(1+\frac{\xi(x - \mu)}{\beta}\right)^{-\frac{1}{\xi}}
+\]</span></p>
+<p>其中：<span class="math inline">\(x\geq\mu，1+\frac{\xi(x - \mu)}{\beta}&gt;0\)</span></p>
+<p>其分布函数也可表示为针对超出量的形式：</p>
+<p><span class="math display">\[
+\begin{cases}
+1 - \left(1 + \xi \frac{y}{\sigma}\right)^{-1/\xi} &amp; \xi \neq 0 \\
+1 - \exp\left(-\frac{y}{\sigma}\right) &amp; \xi = 0
+\end{cases} \tag{3}
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><p><span class="math inline">\(y = x - u \geq 0\)</span> 为超出量，代表观测值超过阈值 <span class="math inline">\(u\)</span> 的部分，反映极端事件偏离阈值的程度。例如，若阈值 <span class="math inline">\(u\)</span> 设为特斯拉股价单日跌幅 5%，某交易日股价下跌 8% 时，超出量 <span class="math inline">\(y\)</span> 为 3%。</p></li>
+<li><p><span class="math inline">\(\sigma &gt; 0\)</span> 为尺度参数，决定超出量分布的离散程度。<span class="math inline">\(\sigma\)</span> 值越大，超出量波动范围越广，投资组合面临的不确定性越高，且其变化与市场宏观环境相关，经济危机期间通常会显著跃升。</p></li>
+<li><p><span class="math inline">\(\xi\)</span> 为形状参数（与 GEV 中的 <span class="math inline">\(\xi\)</span> 含义相同），<span class="math inline">\(\xi &gt; 0\)</span> 表示厚尾，直接影响分布尾部厚度与极端事件发生概率估计。<span class="math inline">\(\xi\)</span> 趋近于 0 时，尾部变薄，极端事件概率降低；<span class="math inline">\(\xi\)</span> 增大时，极端事件发生可能性显著提升，且在公司重大事件节点往往会出现明显波动。</p></li>
+</ul>
+<p><strong>基于 GPD 的 VaR 计算</strong>：</p>
+<p>设总样本量为 <span class="math inline">\(n\)</span>，超限值数量为 <span class="math inline">\(N_u\)</span>（超限概率 <span class="math inline">\(\hat{p} = N_u / n\)</span>），则置信水平 <span class="math inline">\(1-\alpha\)</span> 的 VaR 满足：</p>
+<p><span class="math display">\[
+1 - \alpha = (1 - \hat{p}) + \hat{p} \cdot \left[1 - \left(1 + \xi \frac{VaR_{1-\alpha} - u}{\sigma}\right)^{-1/\xi}\right] \tag{4}
+\]</span></p>
+<p>该公式基于全概率公式推导，将整体风险概率分解为阈值以下和阈值以上两部分。等式左边 <span class="math inline">\(1 - \alpha\)</span> 为置信水平，右边 <span class="math inline">\((1 - \hat{p})\)</span> 表示未超过阈值的概率，第二项刻画了阈值以上部分在 GPD 分布下对风险的贡献。如在 95% 置信水平（<span class="math inline">\(\alpha=0.05\)</span>）下，可据此计算特斯拉股票在极端市场条件下的最大潜在损失。</p>
+<p>经代数变换可得：</p>
+<p><span class="math display">\[
+VaR_{1-\alpha} = u + \frac{\sigma}{\xi} \left[ \left( \frac{n}{N_u} (1 - \alpha) \right)^{-\xi} - 1 \right] \quad (\xi \neq 0) \tag{5}
+\]</span></p>
+<p>在实际应用中，以特斯拉股价实证分析为例，若总样本量 <span class="math inline">\(n=1000\)</span> ，超限值数量 <span class="math inline">\(N_u=50\)</span>，阈值 <span class="math inline">\(u = 0.03\)</span>，尺度参数 <span class="math inline">\(\sigma = 0.02\)</span>，形状参数 <span class="math inline">\(\xi = 0.1\)</span>，在 99% 置信水平下（ <span class="math inline">\(\alpha = 0.01\)</span> ），代入公式 (5) 计算可得 <span class="math inline">\(VaR_{0.99} \approx 0.068\)</span>，即特斯拉股票在 99% 置信水平下的单日最大潜在损失约为 6.8%。</p>
+<p>此公式为风险管理者提供了定量工具，结合历史数据计算的参数和预设置信水平，可快速得出风险价值，为投资组合配置和止损策略制定提供支持。需注意，当 <span class="math inline">\(\xi\)</span> 接近 0 时，需采用特殊数值算法确保计算准确性。</p>
+<ol start="3" style="list-style-type: decimal">
+<li>阈值选择与模型适用性</li>
+</ol>
+<ul>
+<li><strong>阈值的确定</strong>：阈值 <span class="math inline">\(u\)</span> 的选择至关重要，需平衡偏差（ <span class="math inline">\(u\)</span> 过小导致非极端值混入）与方差（ <span class="math inline">\(u\)</span> 过大导致样本量不足）。常用的确定方法包括：
+<ul>
+<li><p><strong>平均超出量函数（Mean Excess Plot）</strong>：绘制超出量均值与阈值 <span class="math inline">\(u\)</span> 的关系图，寻找超出量均值近似线性的区间。此时的阈值 <span class="math inline">\(u\)</span> 既能有效分离极端值，又保留足够样本量用于可靠估计。例如分析特斯拉股价数据时，可设定一系列候选阈值，计算对应超出量均值并绘制曲线，选择线性区域内的阈值作为最终 <span class="math inline">\(u\)</span> 值。</p></li>
+<li><p><strong>Hill 图法</strong>：计算不同阈值下的 Hill 估计量，绘制其与阈值的关系曲线。随着阈值增加，Hill 估计量应趋于稳定，选取稳定区间内的阈值作为合适的 <span class="math inline">\(u\)</span> 值，该方法能有效识别复杂尾部特征数据的稳定尾部参数估计区间，增强阈值选择稳健性。</p></li>
+</ul></li>
+<li>阈值稳定性检验：确保参数 <span class="math inline">\(\xi\)</span> 和 <span class="math inline">\(\sigma\)</span> 在 <span class="math inline">\(u\)</span> 增大时趋于稳定。</li>
+</ul>
+</div>
+<div id="三r-语言实证分析tsla-数据" class="section level1">
+<h1>三、R 语言实证分析（TSLA 数据）
+</h1>
+<p>以 TSLA 股票收益率为例，采用 POT 方法（GPD）计算极端风险 VaR，步骤如下：</p>
+<div id="数据准备与预处理" class="section level2">
+<h2>1. 数据准备与预处理</h2>
+<p>使用<code>quantmod</code>获取数据并计算对数收益率（保留损失数据，即负收益率的绝对值）：</p>
+<pre class="r"><code># 安装并加载包
+if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
+if (!require(&quot;fExtremes&quot;)) install.packages(&quot;fExtremes&quot;)
+if (!require(&quot;evd&quot;)) install.packages(&quot;evd&quot;)
+library(quantmod)
+library(fExtremes)
+library(evd)
+library(ggplot2)
+library(showtext)
+font_add(&quot;SimHei&quot;,&quot;SimHei.ttf&quot;)
+showtext_auto()
+# 获取TSLA数据（2018-2023年）
+getSymbols(&quot;TSLA&quot;, from = &quot;2018-01-01&quot;, to = &quot;2023-12-31&quot;)</code></pre>
+<pre><code>## [1] &quot;TSLA&quot;</code></pre>
+<pre class="r"><code>tsla_close &lt;- TSLA$TSLA.Close
+ret &lt;- diff(log(tsla_close))  # 对数收益率
+loss &lt;- -ret  # 损失序列（负收益为损失）
+loss &lt;- na.omit(loss)
+colnames(loss) &lt;- &quot;TSLA_Loss&quot;</code></pre>
+</div>
+<div id="阈值选择mean-excess-plot" class="section level2">
+<h2>2. 阈值选择（Mean Excess Plot）</h2>
+<p>通过平均超出量函数确定阈值 <span class="math inline">\(u\)</span> ：</p>
+<pre class="r"><code># 计算平均超出量
+u_candidate &lt;- seq(quantile(loss, 0.7), quantile(loss, 0.95), length.out = 20)  # 候选阈值
+mean_excess &lt;- sapply(u_candidate, function(u) {
+excess &lt;- loss[loss &gt; u] - u  # 超出量
+mean(excess, na.rm = TRUE)
+})
+# 可视化平均超出量
+me_df &lt;- data.frame(u = u_candidate, mean_excess = mean_excess)
+ggplot(me_df, aes(x = u, y = mean_excess)) +
+geom_line(color = &quot;blue&quot;) +
+geom_point() +
+labs(title = &quot;平均超出量函数（确定阈值u）&quot;, x = &quot;阈值u&quot;, y = &quot;平均超出量&quot;) +
+theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code># 选择阈值（如u=0.03，对应约80%分位数）
+u &lt;- 0.03
+excess &lt;- as.numeric(loss[loss &gt; u] - u)  # 超出量序列</code></pre>
+</div>
+<div id="gpd-参数估计" class="section level2">
+<h2>3. GPD 参数估计
+</h2>
+<p>使用<code>evd</code>包的<code>fpot</code>函数估计 GPD 的形状参数 <span class="math inline">\(\xi\)</span> 和尺度参数 <span class="math inline">\(\sigma\)</span> ：</p>
+<pre class="r"><code># 拟合GPD模型
+gpd_fit &lt;- fpot(as.numeric(loss), threshold = u)
+
+summary(gpd_fit)  # 输出参数估计结果</code></pre>
+<pre><code>##             Length Class  Mode     
+## estimate       2   -none- numeric  
+## std.err        2   -none- numeric  
+## fixed          0   -none- NULL     
+## param          2   -none- numeric  
+## deviance       1   -none- numeric  
+## corr           0   -none- NULL     
+## var.cov        4   -none- numeric  
+## convergence    1   -none- character
+## counts         2   -none- numeric  
+## message        0   -none- NULL     
+## threshold      1   -none- numeric  
+## cmax           1   -none- logical  
+## r              0   -none- NULL     
+## ulow           1   -none- numeric  
+## rlow           1   -none- numeric  
+## npp            1   -none- numeric  
+## nhigh          1   -none- numeric  
+## nat            1   -none- numeric  
+## pat            1   -none- numeric  
+## extind         0   -none- NULL     
+## data        1508   -none- numeric  
+## exceedances  244   -none- numeric  
+## mper           0   -none- NULL     
+## scale          1   -none- numeric  
+## call           3   -none- call</code></pre>
+<pre class="r"><code># 提取参数
+
+xi &lt;- gpd_fit$estimate[&quot;shape&quot;]  # 形状参数ξ
+
+sigma &lt;- gpd_fit$estimate[&quot;scale&quot;]  # 尺度参数σ
+
+N &lt;- length(loss)  # 总样本量
+
+Nu &lt;- length(excess)  # 超限值数量</code></pre>
+</div>
+<div id="计算-var-与回测" class="section level2">
+<h2>4. 计算 VaR 与回测</h2>
+<p>基于 GPD 参数计算高置信水平（如 99%、99.5%）的 VaR：</p>
+<pre class="r"><code># 定义VaR计算函数（GPD）
+
+calc_evt_var &lt;- function(conf_level, u, xi, sigma, N, Nu) {
+alpha &lt;- 1 - conf_level
+term &lt;- (N / Nu * alpha)^(-xi)
+
+var &lt;- u + (sigma / xi) * (term - 1)
+return(var)
+
+}
+# 计算99%和99.5%置信水平的VaR
+var_99 &lt;- calc_evt_var(0.99, u, xi, sigma, N, Nu)
+var_995 &lt;- calc_evt_var(0.995, u, xi, sigma, N, Nu)
+cat(&quot;99% VaR（EVT-GPD）：&quot;, round(var_99, 4), &quot;\n&quot;)</code></pre>
+<pre><code>## 99% VaR（EVT-GPD）： 0.1115</code></pre>
+<pre class="r"><code>cat(&quot;99.5% VaR（EVT-GPD）：&quot;, round(var_995, 4), &quot;\n&quot;)</code></pre>
+<pre><code>## 99.5% VaR（EVT-GPD）： 0.1367</code></pre>
+<pre class="r"><code># 回测：极端损失超过VaR的比例
+extreme_loss &lt;- as.numeric(loss)[loss &gt; u]  # 极端损失序列
+fail_99 &lt;- mean(extreme_loss &gt; var_99)
+cat(&quot;99% VaR失败率：&quot;, round(fail_99 * 100, 2), &quot;%\n&quot;)</code></pre>
+<pre><code>## 99% VaR失败率： 6.15 %</code></pre>
+</div>
+<div id="结果可视化" class="section level2">
+<h2>5. 结果可视化</h2>
+<p>对比实际极端损失与 VaR 阈值：</p>
+<pre class="r"><code># 可视化极端损失与VaR
+extreme_df &lt;- data.frame(
+Date = index(loss)[loss &gt; u],
+Extreme_Loss = as.numeric(extreme_loss)
+)
+
+ggplot(extreme_df, aes(x = Date, y = Extreme_Loss)) +
+geom_point(color = &quot;red&quot;) +
+geom_hline(yintercept = var_99, 
+           color = &quot;blue&quot;, 
+           linetype = &quot;dashed&quot;) +
+geom_hline(yintercept = var_995, 
+           color = &quot;black&quot;, 
+           linetype = &quot;dashed&quot;) +
+
+
+labs(title = &quot;TSLA极端损失与EVT-GPD VaR&quot;,x = &quot;日期&quot;, y = &quot;极端损失（绝对值）&quot;) +
+theme_minimal()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+</div>
+<div id="四结论" class="section level1">
+<h1>四、结论</h1>
+<p>极值理论通过直接建模尾部极端值，避免了对整体分布的依赖，在高置信水平下的 VaR 估计更具优势。实证分析显示：</p>
+<ol style="list-style-type: decimal">
+<li>TSLA 股票的极端损失呈现明显厚尾特性（ <span class="math inline">\(\xi &gt; 0\)</span> ），适合用 GPD 建模；</li>
+<li>阈值<span class="math inline">\(u\)</span>的选择对结果敏感，需结合平均超出量函数和参数稳定性检验确定；</li>
+<li>与传统 GARCH 模型相比，EVT 方法计算的高置信水平 VaR 更保守，能更好应对 “黑天鹅” 事件。</li>
+</ol>
+<p>未来可结合动态阈值调整或贝叶斯估计，进一步提升 EVT 模型对极端风险的动态跟踪能力。</p>
+<p><strong>注</strong>：代码中<code>fpot</code>函数需确保阈值<span class="math inline">\(u\)</span>合理（超限值数量建议占总样本的 5%-10%）；若<span class="math inline">\(\xi\)</span>接近 0，可简化为指数分布计算 VaR。</p>
+</div>

@@ -98,7 +98,7 @@ var_normal &lt;- quantile(portfolio_loss_normal, probs = confidence_level)
 
 # 格式化输出
 cat(&quot;蒙特卡洛模拟VaR（正态分布假设）:&quot;, round(var_normal, 2), &quot;USD\n&quot;)</code></pre>
-<pre><code>## 蒙特卡洛模拟VaR（正态分布假设）: 27234.9 USD</code></pre>
+<pre><code>## 蒙特卡洛模拟VaR（正态分布假设）: 26774.95 USD</code></pre>
 <pre class="r"><code># 可视化比较
 hist(portfolio_loss_normal, breaks = 50, main = &quot;正态分布模拟损失&quot;, 
      xlab = &quot;损失金额(USD)&quot;, col = &quot;lightblue&quot;)
@@ -278,11 +278,11 @@ cat(sprintf(&quot;\n【增强版蒙特卡洛模拟结果】(%d天持有期)\n&qu
 <pre class="r"><code>cat(sprintf(&quot;▪ 投资组合规模: $%s\n&quot;, format(V0, big.mark=&quot;,&quot;)))</code></pre>
 <pre><code>## ▪ 投资组合规模: $1e+06</code></pre>
 <pre class="r"><code>cat(sprintf(&quot;▪ VaR(%d%%置信水平): $%s\n&quot;, alpha*100, format(round(VaR), big.mark=&quot;,&quot;)))</code></pre>
-<pre><code>## ▪ VaR(99%置信水平): $124,301</code></pre>
+<pre><code>## ▪ VaR(99%置信水平): $122,762</code></pre>
 <pre class="r"><code>cat(sprintf(&quot;▪ 预期损失(ES): $%s\n&quot;, format(round(ES), big.mark=&quot;,&quot;)))</code></pre>
-<pre><code>## ▪ 预期损失(ES): $143,105</code></pre>
+<pre><code>## ▪ 预期损失(ES): $141,760</code></pre>
 <pre class="r"><code>cat(sprintf(&quot;▪ 最大可能损失: $%s\n&quot;, format(round(max(losses)), big.mark=&quot;,&quot;)))</code></pre>
-<pre><code>## ▪ 最大可能损失: $237,342</code></pre>
+<pre><code>## ▪ 最大可能损失: $217,287</code></pre>
 </div>
 <div id="基于混合多元正态分布优化蒙特卡洛模拟法" class="section level2">
 <h2>基于混合多元正态分布优化蒙特卡洛模拟法</h2>
@@ -421,12 +421,12 @@ for (i in 1:n_sim) {
 # 查看模拟结果摘要
 summary(sim_returns)  # 不应有NA或极端值</code></pre>
 <pre><code>##        V1                  V2                   V3            
-##  Min.   :-0.131830   Min.   :-0.1257738   Min.   :-0.1237321  
-##  1st Qu.:-0.010104   1st Qu.:-0.0103409   1st Qu.:-0.0097094  
-##  Median : 0.001295   Median : 0.0009476   Median : 0.0008647  
-##  Mean   : 0.001201   Mean   : 0.0009752   Mean   : 0.0009755  
-##  3rd Qu.: 0.012592   3rd Qu.: 0.0121794   3rd Qu.: 0.0114663  
-##  Max.   : 0.128666   Max.   : 0.1216745   Max.   : 0.1163181</code></pre>
+##  Min.   :-0.131656   Min.   :-0.1269922   Min.   :-0.1240683  
+##  1st Qu.:-0.010040   1st Qu.:-0.0102925   1st Qu.:-0.0095584  
+##  Median : 0.001253   Median : 0.0010419   Median : 0.0009168  
+##  Mean   : 0.001204   Mean   : 0.0009863   Mean   : 0.0010128  
+##  3rd Qu.: 0.012530   3rd Qu.: 0.0122023   3rd Qu.: 0.0114441  
+##  Max.   : 0.128863   Max.   : 0.1220257   Max.   : 0.1161537</code></pre>
 <pre class="r"><code># 计算VaR
 portfolio_returns &lt;- sim_returns %*% weights
 
@@ -447,14 +447,14 @@ if (length(br) &lt; 10) br &lt;- seq(min(portfolio_returns), max(portfolio_retur
 
 
 cat(&quot;95% VaR:&quot;, round(VaR, 2), &quot;元\n&quot;)</code></pre>
-<pre><code>## 95% VaR: -28414.95 元</code></pre>
+<pre><code>## 95% VaR: -27955.21 元</code></pre>
 <pre class="r"><code>cat(&quot;95% ES:&quot;,round(ES, 2),&quot;元\n&quot;)</code></pre>
-<pre><code>## 95% ES: -28415.35 元</code></pre>
+<pre><code>## 95% ES: -27955.74 元</code></pre>
 <pre class="r"><code># 验证VaR计算合理性
 cat(&quot;VaR占组合比例:&quot;, round(VaR/portfolio_value*100, 2), &quot;%\n&quot;) </code></pre>
-<pre><code>## VaR占组合比例: -2.84 %</code></pre>
+<pre><code>## VaR占组合比例: -2.8 %</code></pre>
 <pre class="r"><code>cat(&quot;ES占组合比例:&quot;, round(ES/portfolio_value*100,2),&quot;%\n&quot;)</code></pre>
-<pre><code>## ES占组合比例: -2.84 %</code></pre>
+<pre><code>## ES占组合比例: -2.8 %</code></pre>
 <pre class="r"><code># 正常范围通常在1%-10%之间
 
 showtext_auto()  # 启用中文字体支持

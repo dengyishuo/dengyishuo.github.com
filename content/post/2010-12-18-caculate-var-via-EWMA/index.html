@@ -113,7 +113,7 @@ VaR &lt;- portfolio_value * z_score * ewma_vol
 # 获取最新VaR值
 latest_VaR &lt;- tail(VaR, 1)
 cat(&quot;最新EWMA VaR（95%置信度）:&quot;, round(latest_VaR, 2), &quot;美元\n&quot;)</code></pre>
-<pre><code>## 最新EWMA VaR（95%置信度）: -438733.4 美元</code></pre>
+<pre><code>## 最新EWMA VaR（95%置信度）: -221163.9 美元</code></pre>
 <pre class="r"><code># 可视化结果
 results &lt;- data.frame(
   Date = index(GSPC)[-1], 
@@ -230,7 +230,7 @@ VaR_series &lt;- -portfolio_value * z_score * annual_vol
 # 输出最新VaR
 cat(&quot;Latest Portfolio EWMA VaR (95%):&quot;, 
     round(tail(VaR_series, 1), 2), &quot;USD\n&quot;)</code></pre>
-<pre><code>## Latest Portfolio EWMA VaR (95%): -4553984 USD</code></pre>
+<pre><code>## Latest Portfolio EWMA VaR (95%): -2331808 USD</code></pre>
 <pre class="r"><code># 可视化协方差矩阵变化
 cov_df &lt;- data.frame(
   Date = index(returns),
