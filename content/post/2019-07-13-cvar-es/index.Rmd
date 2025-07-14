@@ -67,6 +67,9 @@ $$
 library(quantmod)
 library(PerformanceAnalytics)
 library(xts)
+library(tibble)
+library(dplyr)
+library(ggplot2)
 library(showtext)  # 用于设置中文字体
 
 # 设置中文字体
@@ -95,8 +98,6 @@ risk_results <- list()
 
 ```{r}
 # 使用PerformanceAnalytics包计算ES
-library(PerformanceAnalytics)
-
 
 VaR_historical <- PerformanceAnalytics::VaR(returns, p = alpha , method = "historical")
 VaR_gaussian <- PerformanceAnalytics::VaR(returns, p = alpha , method = "gaussian")
@@ -222,12 +223,8 @@ risk_results[["rugarch"]] <- list(
 
 ```{R}
 # 加载必要的包
-library(quantmod)
 library(gets)
-library(xts)
 
-# 获取纳斯达克指数数据并计算收益率
-getSymbols("^IXIC", from = "2020-01-01", to = Sys.Date())
 returns <- diff(log(Cl(IXIC))) 
 returns <- as.vector(na.omit(returns))  # 强制转换为普通向量
 
@@ -269,15 +266,9 @@ risk_results[["MSGARCH"]] <- list(
 ```{R}
 if (!require("VaRES")) install.packages("VaRES")
 library(VaRES)
-# 加载必要的包
-library(quantmod)
 
-# 获取纳斯达克指数数据并计算收益率
-getSymbols("^IXIC", from = "2020-01-01", to = Sys.Date())
 returns <- diff(log(Cl(IXIC))) 
 returns <- as.vector(na.omit(returns))  # 强制转换为普通向量
-
-library(VaRES)
 
 # 手动计算 VaR 和 ES（假设 df = 4）
 df <- 4
