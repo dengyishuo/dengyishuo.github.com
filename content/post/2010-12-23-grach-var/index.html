@@ -1,7 +1,7 @@
 ---
 title: 基于GRACH模型计算VaR
 author: DengYishuo
-date: '2025-07-12'
+date: '2010-12-23'
 slug: grach-var
 categories: [economics]
 tags: [VaR, GARCH]
@@ -185,7 +185,7 @@ print(garch_fit_norm)  # 输出参数估计结果</code></pre>
 ## 4    50    129.67    3.238e-09
 ## 
 ## 
-## Elapsed time : 0.1378891</code></pre>
+## Elapsed time : 0.1193922</code></pre>
 <pre class="r"><code># 扩展：拟合GARCH-t和GARCH-GED
 garch_spec_t &lt;- ugarchspec(variance.model = list(model = &quot;sGARCH&quot;, garchOrder = c(1,1)),
                            mean.model = list(armaOrder = c(0,0)),

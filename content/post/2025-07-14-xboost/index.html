@@ -1,0 +1,436 @@
+---
+title: 使用机器学习模型(xgboost）来预测纳斯达克 100 指数
+author: DengYishuo
+date: '2025-07-14'
+slug: xboost
+categories: [economics]
+tags: [NASDAQ, R, xgboost]
+---
+
+<script src="{{< blogdown/postref >}}index_files/core-js/shim.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/react/react.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/react/react-dom.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/reactwidget/react-tools.js"></script>
+<link href="{{< blogdown/postref >}}index_files/htmltools-fill/fill.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<link href="{{< blogdown/postref >}}index_files/reactable/reactable.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/reactable-binding/reactable.js"></script>
+
+
+<div id="引言" class="section level1">
+<h1>引言</h1>
+<p>XGBoost（eXtreme Gradient Boosting）是一种高效的梯度提升算法，在数据科学和机器学习领域广泛应用，尤其擅长处理结构化数据的回归和分类问题。以下从数学原理、发展历程、使用方法和竞争算法四个方面进行详细介绍：</p>
+</div>
+<div id="一数学原理" class="section level1">
+<h1>一、数学原理</h1>
+<p>XGBoost 是梯度提升框架（Gradient Boosting）的优化实现，其核心思想是迭代地训练多个弱学习器（通常是决策树），并将它们组合成一个强学习器。</p>
+<p>具体数学原理如下：</p>
+<p>1.目标函数</p>
+<p>XGBoost 的目标函数由两部分组成：</p>
+<p><strong>损失函数</strong>：衡量模型预测值与真实值之间的误差（如均方误差 MSE、对数损失 log loss 等）。
+<strong>正则化项</strong>：控制模型复杂度，防止过拟合，包括树的数量、深度、叶子节点数等。</p>
+<p>目标函数表达式：</p>
+<p><span class="math display">\[
+\text{Obj}(\theta) = \sum_{i=1}^n L(y_i, \hat{y}_i) + \sum_{k=1}^K \Omega(f_k)
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(L(y_i, \hat{y}_i)\)</span> 是样本 <span class="math inline">\(i\)</span> 的损失函数，<span class="math inline">\(\hat{y}_i\)</span> 是预测值，<span class="math inline">\(y_i\)</span> 是真实值。</li>
+<li><span class="math inline">\(\Omega(f_k)\)</span> 是第 <span class="math inline">\(k\)</span> 棵树的正则化项，通常包括树的复杂度（如叶子节点数、叶子节点权重的 L2 正则化）。</li>
+</ul>
+<p>2.梯度提升迭代</p>
+<p>XGBoost 通过迭代方式逐步优化目标函数：</p>
+<p>初始化模型为常数预测： <span class="math inline">\(\hat{y}_i^{(0)} = \text{argmin}_c \sum_{i=1}^n L(y_i, c)\)</span> 。</p>
+<p>对于每一轮迭代 <span class="math inline">\(t\)</span> ：</p>
+<ul>
+<li>计算损失函数关于当前预测值的梯度（一阶导数）和海森矩阵（二阶导数）。</li>
+<li>训练一棵新的决策树 <span class="math inline">\(f_t\)</span> ，拟合这些梯度（即预测梯度方向）。</li>
+<li>更新预测值：<span class="math inline">\(\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(x_i)\)</span> ，其中 <span class="math inline">\(\eta\)</span> 是学习率（控制每次迭代的步长）。</li>
+</ul>
+<p>3.决策树优化</p>
+<p>XGBoost 在构建决策树时采用了以下优化策略：</p>
+<ul>
+<li><strong>精确贪心算法</strong>：通过枚举所有特征的所有可能分割点，找到最优分割。</li>
+<li><strong>近似算法</strong>：对于大规模数据，使用直方图近似快速找到分割点。</li>
+<li><strong>缺失值处理</strong>：自动学习缺失值的最优分裂方向。</li>
+<li><strong>正则化剪枝</strong>：通过正则化项控制树的复杂度，避免过拟合。</li>
+</ul>
+</div>
+<div id="二发展历程" class="section level1">
+<h1>二、发展历程</h1>
+<ul>
+<li><p>2014 年：陈天奇（Tianqi Chen）在华盛顿大学读博期间开发了 XGBoost 的原型，最初作为研究项目用于解决大规模机器学习问题。</p></li>
+<li><p>2015 年：XGBoost 作为开源项目发布，因其在 Kaggle 竞赛中的优异表现迅速走红，成为数据科学领域的主流算法之一。</p></li>
+<li><p>2016 年：陈天奇加入微软，带领团队进一步优化 XGBoost，支持分布式计算和云计算平台。</p></li>
+<li><p>2017 年至今：XGBoost 持续更新，增加了更多功能（如 DART、GPU 加速、特征重要性分析等），并被集成到多种编程语言和工具中（如 Python、R、Scala 等）。</p></li>
+</ul>
+</div>
+<div id="三如何使用" class="section level1">
+<h1>三、如何使用</h1>
+<p>我们将用联邦基金有效利率和失业率为输入参数，按照 xgboost 模型对纳斯达克 100 指数月度数据进行建模。</p>
+<pre class="r"><code># 加载必要的R包
+library(tidyquant)      # 获取数据</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## ── Attaching core tidyquant packages ────────────────── tidyquant 1.0.11.9000 ──
+## ✔ PerformanceAnalytics 2.0.8      ✔ TTR                  0.24.4
+## ✔ quantmod             0.4.28     ✔ xts                  0.14.1
+## ── Conflicts ────────────────────────────────────────── tidyquant_conflicts() ──
+## ✖ zoo::as.Date()                 masks base::as.Date()
+## ✖ zoo::as.Date.numeric()         masks base::as.Date.numeric()
+## ✖ PerformanceAnalytics::legend() masks graphics::legend()
+## ✖ quantmod::summary()            masks base::summary()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(tidyverse)      # 数据处理与可视化的核心包集合</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
+## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.4     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::first()  masks xts::first()
+## ✖ dplyr::lag()    masks stats::lag()
+## ✖ dplyr::last()   masks xts::last()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(tidymodels)     # 机器学习建模框架</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────── tidymodels 1.3.0 ──
+## ✔ broom        1.0.8     ✔ rsample      1.3.0
+## ✔ dials        1.4.0     ✔ tune         1.3.0
+## ✔ infer        1.0.9     ✔ workflows    1.2.0
+## ✔ modeldata    1.4.0     ✔ workflowsets 1.1.1
+## ✔ parsnip      1.3.2     ✔ yardstick    1.3.2
+## ✔ recipes      1.3.1     
+## ── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+## ✖ scales::discard() masks purrr::discard()
+## ✖ dplyr::filter()   masks stats::filter()
+## ✖ dplyr::first()    masks xts::first()
+## ✖ recipes::fixed()  masks stringr::fixed()
+## ✖ dplyr::lag()      masks stats::lag()
+## ✖ dplyr::last()     masks xts::last()
+## ✖ dials::momentum() masks TTR::momentum()
+## ✖ yardstick::spec() masks readr::spec()
+## ✖ recipes::step()   masks stats::step()</code></pre>
+<pre class="r"><code>library(modeltime)      # 时间序列建模与预测</code></pre>
+<pre><code>## 
+## Attaching package: &#39;modeltime&#39;
+## 
+## The following object is masked from &#39;package:TTR&#39;:
+## 
+##     growth</code></pre>
+<pre class="r"><code>library(timetk)         # 时间序列数据处理工具</code></pre>
+<pre><code>## 
+## Attaching package: &#39;timetk&#39;
+## 
+## The following object is masked from &#39;package:tidyquant&#39;:
+## 
+##     FANG</code></pre>
+<pre class="r"><code># 获取失业率数据 (UNRATE)
+df_unrate &lt;- 
+  tq_get(&quot;UNRATE&quot;, get = &quot;economic.data&quot;) %&gt;% 
+  select(date, unrate = price)  # 重命名价格列为unrate
+
+# 获取联邦基金有效利率数据 (FEDFUNDS)
+df_fedfunds &lt;- 
+  tq_get(&quot;FEDFUNDS&quot;, get = &quot;economic.data&quot;) %&gt;% 
+  select(date, fedfunds = price)  # 重命名价格列为fedfunds
+
+# 获取纳斯达克100指数数据
+df_nasdaq &lt;- 
+  tq_get(&quot;^NDX&quot;) %&gt;% 
+  tq_transmute(select = close,         # 选择收盘价
+               mutate_fun = to.monthly, # 转换为月度数据
+               col_rename = &quot;nasdaq&quot;) %&gt;%  # 重命名列
+  mutate(date = as.Date(date))         # 确保日期格式正确
+
+# 合并三个数据集
+df_merged &lt;- 
+  df_unrate %&gt;% 
+  left_join(df_fedfunds) %&gt;% 
+  left_join(df_nasdaq) %&gt;% 
+  drop_na()  # 删除包含缺失值的行</code></pre>
+<pre><code>## Joining with `by = join_by(date)`
+## Joining with `by = join_by(date)`</code></pre>
+<pre class="r"><code># 时间序列数据分割
+splits &lt;- 
+  time_series_split(
+    df_merged,
+    assess     = &quot;1 year&quot;,  # 测试集为1年数据
+    cumulative = TRUE      # 训练集包含所有历史数据
+  )</code></pre>
+<pre><code>## Using date_var: date</code></pre>
+<pre class="r"><code>df_train &lt;- training(splits)  # 提取训练集
+df_test &lt;- testing(splits)    # 提取测试集
+
+# 创建机器学习预处理配方
+recipe_ml &lt;- 
+  recipe(nasdaq ~ ., df_train) %&gt;%  # 以nasdaq为目标变量
+  step_date(date, features = &quot;month&quot;, ordinal = FALSE) %&gt;%  # 从日期提取月份特征
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) %&gt;%  # 将分类变量转为虚拟变量
+  step_mutate(date_num = as.numeric(date)) %&gt;%  # 将日期转换为数值型
+  step_normalize(all_numeric_predictors()) %&gt;%  # 标准化数值预测变量
+  step_rm(date)  # 移除原始日期列
+
+# 定义XGBoost提升树模型规格，设置超参数为待调优
+mod_spec &lt;- 
+  boost_tree(trees = tune(),         # 树的数量
+             min_n = tune(),         # 节点最小样本量
+             tree_depth = tune(),    # 树的最大深度
+             learn_rate = tune()) %&gt;%  # 学习率
+  set_engine(&quot;xgboost&quot;) %&gt;%          # 使用xgboost引擎
+  set_mode(&quot;regression&quot;)             # 设置为回归模式
+
+# 提取模型的超参数集
+mod_param &lt;- extract_parameter_set_dials(mod_spec)
+
+# 设置随机种子确保结果可复现
+set.seed(1234)
+
+# 创建随机超参数网格（50种组合）
+model_tbl &lt;- 
+  mod_param %&gt;% 
+  grid_random(size = 50) %&gt;%
+  create_model_grid(
+    f_model_spec = boost_tree,
+    engine_name  = &quot;xgboost&quot;,
+    mode         = &quot;regression&quot;
+  )
+
+# 从网格中提取模型列表
+model_list &lt;- model_tbl$.models
+
+# 创建工作流集，将预处理配方与不同模型规格组合
+model_wfset &lt;- 
+  workflow_set(
+    preproc = list(recipe_ml),  # 使用之前定义的预处理配方
+    models = model_list,        # 使用超参数网格生成的模型列表
+    cross = TRUE                # 交叉组合配方和模型
+  )
+
+# 使用并行计算加速模型训练
+model_parallel_tbl &lt;- 
+  model_wfset %&gt;%
+  modeltime_fit_workflowset(
+    data    = df_train,  # 使用训练集数据
+    control = control_fit_workflowset(
+      verbose   = TRUE,      # 显示训练进度
+      allow_par = TRUE       # 允许并行计算
+    )
+  )</code></pre>
+<pre><code>## ℹ Fitting Model: 1
+## ✔ Model Successfully Fitted: 1
+## ℹ Fitting Model: 2
+## ✔ Model Successfully Fitted: 2
+## ℹ Fitting Model: 3
+## ✔ Model Successfully Fitted: 3
+## ℹ Fitting Model: 4
+## ✔ Model Successfully Fitted: 4
+## ℹ Fitting Model: 5
+## ✔ Model Successfully Fitted: 5
+## ℹ Fitting Model: 6
+## ✔ Model Successfully Fitted: 6
+## ℹ Fitting Model: 7
+## ✔ Model Successfully Fitted: 7
+## ℹ Fitting Model: 8
+## ✔ Model Successfully Fitted: 8
+## ℹ Fitting Model: 9
+## ✔ Model Successfully Fitted: 9
+## ℹ Fitting Model: 10
+## ✔ Model Successfully Fitted: 10
+## ℹ Fitting Model: 11
+## ✔ Model Successfully Fitted: 11
+## ℹ Fitting Model: 12
+## ✔ Model Successfully Fitted: 12
+## ℹ Fitting Model: 13
+## ✔ Model Successfully Fitted: 13
+## ℹ Fitting Model: 14
+## ✔ Model Successfully Fitted: 14
+## ℹ Fitting Model: 15
+## ✔ Model Successfully Fitted: 15
+## ℹ Fitting Model: 16
+## ✔ Model Successfully Fitted: 16
+## ℹ Fitting Model: 17
+## ✔ Model Successfully Fitted: 17
+## ℹ Fitting Model: 18
+## ✔ Model Successfully Fitted: 18
+## ℹ Fitting Model: 19
+## ✔ Model Successfully Fitted: 19
+## ℹ Fitting Model: 20
+## ✔ Model Successfully Fitted: 20
+## ℹ Fitting Model: 21
+## ✔ Model Successfully Fitted: 21
+## ℹ Fitting Model: 22
+## ✔ Model Successfully Fitted: 22
+## ℹ Fitting Model: 23
+## ✔ Model Successfully Fitted: 23
+## ℹ Fitting Model: 24
+## ✔ Model Successfully Fitted: 24
+## ℹ Fitting Model: 25
+## ✔ Model Successfully Fitted: 25
+## ℹ Fitting Model: 26
+## ✔ Model Successfully Fitted: 26
+## ℹ Fitting Model: 27
+## ✔ Model Successfully Fitted: 27
+## ℹ Fitting Model: 28
+## ✔ Model Successfully Fitted: 28
+## ℹ Fitting Model: 29
+## ✔ Model Successfully Fitted: 29
+## ℹ Fitting Model: 30
+## ✔ Model Successfully Fitted: 30
+## ℹ Fitting Model: 31
+## ✔ Model Successfully Fitted: 31
+## ℹ Fitting Model: 32
+## ✔ Model Successfully Fitted: 32
+## ℹ Fitting Model: 33
+## ✔ Model Successfully Fitted: 33
+## ℹ Fitting Model: 34
+## ✔ Model Successfully Fitted: 34
+## ℹ Fitting Model: 35
+## ✔ Model Successfully Fitted: 35
+## ℹ Fitting Model: 36
+## ✔ Model Successfully Fitted: 36
+## ℹ Fitting Model: 37
+## ✔ Model Successfully Fitted: 37
+## ℹ Fitting Model: 38
+## ✔ Model Successfully Fitted: 38
+## ℹ Fitting Model: 39
+## ✔ Model Successfully Fitted: 39
+## ℹ Fitting Model: 40
+## ✔ Model Successfully Fitted: 40
+## ℹ Fitting Model: 41
+## ✔ Model Successfully Fitted: 41
+## ℹ Fitting Model: 42
+## ✔ Model Successfully Fitted: 42
+## ℹ Fitting Model: 43
+## ✔ Model Successfully Fitted: 43
+## ℹ Fitting Model: 44
+## ✔ Model Successfully Fitted: 44
+## ℹ Fitting Model: 45
+## ✔ Model Successfully Fitted: 45
+## ℹ Fitting Model: 46
+## ✔ Model Successfully Fitted: 46
+## ℹ Fitting Model: 47
+## ✔ Model Successfully Fitted: 47
+## ℹ Fitting Model: 48
+## ✔ Model Successfully Fitted: 48
+## ℹ Fitting Model: 49
+## ✔ Model Successfully Fitted: 49
+## ℹ Fitting Model: 50
+## ✔ Model Successfully Fitted: 50
+## Total time | 22.065 seconds</code></pre>
+<pre class="r"><code># 评估模型在测试集上的准确性
+model_parallel_tbl %&gt;% 
+  modeltime_calibrate(new_data = df_test) %&gt;%  # 校准模型
+  modeltime_accuracy() %&gt;%                     # 计算准确性指标
+  table_modeltime_accuracy()                   # 以表格形式展示结果</code></pre>
+<pre><code>## Warning: There were 12 warnings in `dplyr::mutate()`.
+## The first warning was:
+## ℹ In argument: `.nested.col = purrr::map(...)`.
+## Caused by warning:
+## ! A correlation computation is required, but `estimate` is constant and has 0
+## standard deviation, resulting in a divide by 0 error. `NA` will be returned.
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 11 remaining warnings.</code></pre>
+<div class="reactable html-widget html-fill-item" id="htmlwidget-1" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"tag":{"name":"Reactable","attribs":{"data":{".model_id":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],".model_desc":["RECIPE_BOOST_TREE_1","RECIPE_BOOST_TREE_2","RECIPE_BOOST_TREE_3","RECIPE_BOOST_TREE_4","RECIPE_BOOST_TREE_5","RECIPE_BOOST_TREE_6","RECIPE_BOOST_TREE_7","RECIPE_BOOST_TREE_8","RECIPE_BOOST_TREE_9","RECIPE_BOOST_TREE_10","RECIPE_BOOST_TREE_11","RECIPE_BOOST_TREE_12","RECIPE_BOOST_TREE_13","RECIPE_BOOST_TREE_14","RECIPE_BOOST_TREE_15","RECIPE_BOOST_TREE_16","RECIPE_BOOST_TREE_17","RECIPE_BOOST_TREE_18","RECIPE_BOOST_TREE_19","RECIPE_BOOST_TREE_20","RECIPE_BOOST_TREE_21","RECIPE_BOOST_TREE_22","RECIPE_BOOST_TREE_23","RECIPE_BOOST_TREE_24","RECIPE_BOOST_TREE_25","RECIPE_BOOST_TREE_26","RECIPE_BOOST_TREE_27","RECIPE_BOOST_TREE_28","RECIPE_BOOST_TREE_29","RECIPE_BOOST_TREE_30","RECIPE_BOOST_TREE_31","RECIPE_BOOST_TREE_32","RECIPE_BOOST_TREE_33","RECIPE_BOOST_TREE_34","RECIPE_BOOST_TREE_35","RECIPE_BOOST_TREE_36","RECIPE_BOOST_TREE_37","RECIPE_BOOST_TREE_38","RECIPE_BOOST_TREE_39","RECIPE_BOOST_TREE_40","RECIPE_BOOST_TREE_41","RECIPE_BOOST_TREE_42","RECIPE_BOOST_TREE_43","RECIPE_BOOST_TREE_44","RECIPE_BOOST_TREE_45","RECIPE_BOOST_TREE_46","RECIPE_BOOST_TREE_47","RECIPE_BOOST_TREE_48","RECIPE_BOOST_TREE_49","RECIPE_BOOST_TREE_50"],".type":["Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test"],"mae":[3427.41,3693.7,4332.08,5324.17,3338.1,3204.96,3078.92,3418.09,3493.16,1435.28,2400.65,3591.03,7976.25,4047.48,3561.98,2942.64,2727.6,4147.96,4218.05,6301.8,1883.95,2620.27,11907.92,9158.61,16641.88,2622.77,1123.06,3291.36,3731.53,3267.55,3298.09,3999.73,7986.47,7091.48,2850.35,9948.4,3882.81,1403.43,4618.44,3618.64,1903.92,3483.62,1946.15,6692.92,3249.41,2129.04,6187.97,3329.09,3447.82,3949.36],"mape":[16.38,17.81,20.81,25.67,16.07,15.32,14.81,16.46,16.7,6.75,11.5,17.16,38.76,19.55,17.16,14.04,13.1,20.04,20.22,30.57,8.94,12.58,57.97,44.54,81.12,12.51,5.26,15.77,18,15.67,15.88,19.32,38.74,34.37,13.63,48.4,18.75,6.61,22.21,17.45,9.06,16.78,9.27,32.43,15.65,10.16,30.01,15.87,16.62,18.92],"mase":[4.68,5.04,5.91,7.27,4.56,4.38,4.2,4.67,4.77,1.96,3.28,4.9,10.89,5.53,4.86,4.02,3.72,5.66,5.76,8.6,2.57,3.58,16.26,12.51,22.72,3.58,1.53,4.49,5.09,4.46,4.5,5.46,10.9,9.68,3.89,13.58,5.3,1.92,6.31,4.94,2.6,4.76,2.66,9.14,4.44,2.91,8.45,4.55,4.71,5.39],"smape":[18.33,19.67,23.89,29.94,17.6,17.01,16.11,18.06,18.7,7.15,12.31,19.3,48.15,21.77,18.9,15.55,14.17,22.38,23.06,36.18,9.53,13.57,81.7,57.37,136.48,13.62,5.52,17.42,19.89,17.26,17.37,21.48,48.27,41.72,14.88,63.92,20.79,6.97,25.45,19.23,9.61,18.44,9.84,38.89,17.08,10.83,35.41,17.82,18.23,21.48],"rmse":[3924.06,3839.53,4835.9,5645.15,3501.61,3680.14,3244.57,3580.67,3989.87,1859.11,2604.44,4107.19,8039.09,4169.95,3720.66,3484.57,2954.76,4267.55,4687.98,6381.15,2236.95,2843.35,11950.1,9213.39,16672.09,3017.81,1530.27,3645.34,3875.05,3574.1,3467.13,4123.62,8099.8,7216.69,3197.56,9998.86,4010.32,1782.33,4981.11,3757.13,2169.9,3640.02,2221.36,6810.63,3402.37,2380.42,6268.77,3943.18,3590.8,4460.67],"rsq":[0.22,0.09,0.11,0.21,0.06,0.19,0.01,0.09,0.25,0.09,0.09,0.27,"NA","NA",0.09,0.15,0,"NA",0.28,"NA",0.09,0.01,"NA","NA","NA",0.14,0.08,0.19,0.09,0.14,0.06,"NA",0.24,0.23,0.18,"NA","NA",0.09,0.25,0.09,0.09,0.09,0.09,0.23,0.09,0.09,"NA",0.28,"NA",0.21]},"columns":[{"id":".model_id","name":".model_id","type":"numeric"},{"id":".model_desc","name":".model_desc","type":"character"},{"id":".type","name":".type","type":"character"},{"id":"mae","name":"mae","type":"numeric"},{"id":"mape","name":"mape","type":"numeric"},{"id":"mase","name":"mase","type":"numeric"},{"id":"smape","name":"smape","type":"numeric"},{"id":"rmse","name":"rmse","type":"numeric"},{"id":"rsq","name":"rsq","type":"numeric"}],"searchable":true,"defaultExpanded":true,"showSortable":true,"dataKey":"719a9363636e9045a4bf916efdc2e3a3"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code># 选择表现最好的模型（这里假设是RECIPE_BOOST_TREE_27）
+# 并在测试集上进行校准
+calibration_tbl &lt;- 
+  model_parallel_tbl %&gt;%
+  filter(.model_desc == &quot;RECIPE_BOOST_TREE_27&quot;) %&gt;% 
+  modeltime_calibrate(df_test)
+
+# 生成预测并绘制预测区间
+calibration_tbl %&gt;% 
+  modeltime_forecast(
+    new_data = df_test,  # 在测试集上进行预测
+    actual_data = df_merged %&gt;%
+      filter(date &gt;= as.Date(&quot;2024-07-01&quot;))  # 实际数据从2024-07-01开始
+  ) %&gt;%
+  plot_modeltime_forecast(
+    .interactive = FALSE,     # 生成静态图表
+    .legend_show = FALSE,     # 不显示图例
+    .line_size = 1.5,         # 设置线条粗细
+    .color_lab = &quot;&quot;,          # 设置颜色标签
+    .title = &quot;NASDAQ 100&quot;     # 设置图表标题
+  ) +
+  # 添加副标题（使用markdown格式）
+  labs(subtitle = &quot;&lt;span style = &#39;color:dimgrey;&#39;&gt;预测区间&lt;/span&gt;&lt;br&gt;&lt;span style = &#39;color:red;&#39;&gt;机器学习模型&lt;/span&gt;&quot;) + 
+  # 设置x轴（日期）格式
+  scale_x_date(
+    expand = expansion(mult = c(.1, .15)),  # 设置x轴扩展
+    labels = scales::label_date(format = &quot;%b&#39;%y&quot;)  # 设置日期标签格式
+  ) +
+  # 设置y轴（纳斯达克指数）格式为货币格式
+  scale_y_continuous(labels = scales::label_currency()) +
+  # 设置图表主题
+  theme_minimal(base_family = &quot;Roboto Slab&quot;, base_size = 20) +
+  theme(
+    legend.position = &quot;none&quot;,  # 不显示图例
+    plot.background = element_rect(fill = &quot;azure&quot;, color = &quot;azure&quot;),  # 设置背景颜色
+    plot.title = element_text(face = &quot;bold&quot;),  # 设置标题字体为粗体
+    axis.text = element_text(face = &quot;bold&quot;),  # 设置坐标轴标签字体为粗体
+    plot.subtitle = ggtext::element_markdown(face = &quot;bold&quot;)  # 设置副标题为markdown格式并加粗
+  )</code></pre>
+<pre><code>## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+</div>
+<div id="四竞争算法" class="section level1">
+<h1>四、竞争算法</h1>
+<p>XGBoost 的主要竞争对手包括：</p>
+<div id="lightgbm" class="section level2">
+<h2>1. LightGBM</h2>
+<p>开发者：微软（2017 年发布）。</p>
+<p>特点：</p>
+<ul>
+<li>基于直方图的决策树构建，速度比 XGBoost 更快。</li>
+<li>支持 Leaf-wise（按叶子生长）的树生长策略，而不是 XGBoost 的 Level-wise（按层生长）。</li>
+<li>内存占用更小，适合大规模数据集。</li>
+<li>适用场景：超大规模数据集、需要快速迭代的场景。</li>
+</ul>
+</div>
+<div id="catboost" class="section level2">
+<h2>2. CatBoost</h2>
+<p>开发者：Yandex（2017 年发布）。</p>
+<p>特点：</p>
+<ul>
+<li>自动处理类别特征（无需手动编码）。</li>
+<li>采用对称树结构，减少过拟合风险。</li>
+<li>支持 GPU 加速和分布式训练。</li>
+</ul>
+<p>适用场景：包含大量类别特征的数据集（如推荐系统、广告点击预测）。</p>
+</div>
+<div id="random-forest" class="section level2">
+<h2>3. Random Forest</h2>
+<p>特点：</p>
+<ul>
+<li>基于 Bagging 思想的集成学习算法，并行训练多棵决策树。</li>
+<li>对异常值和过拟合更鲁棒。</li>
+<li>计算复杂度较低，但预测精度可能低于 Boosting 算法。</li>
+</ul>
+<p>适用场景：快速 baseline 模型、对解释性要求较高的场景。</p>
+</div>
+<div id="neural-networks神经网络" class="section level2">
+<h2>4. Neural Networks（神经网络）</h2>
+<p>特点：</p>
+<ul>
+<li>适用于非结构化数据（如图像、文本、语音）。</li>
+<li>需要大量数据才能表现良好。</li>
+<li>计算资源消耗大，训练时间长。</li>
+</ul>
+<p>适用场景：深度学习擅长的领域（如计算机视觉、自然语言处理）。</p>
+</div>
+</div>
+<div id="五算法选择建议" class="section level1">
+<h1>五、算法选择建议</h1>
+<ul>
+<li>数据规模较小：可尝试 Random Forest 或 CatBoost（处理类别特征更方便）。</li>
+<li>数据规模中等：XGBoost 和 LightGBM 均可，XGBoost 更成熟，LightGBM 速度更快。</li>
+<li>包含大量类别特征：优先使用 CatBoost。</li>
+<li>追求极致速度：选择 LightGBM。</li>
+<li>非结构化数据：考虑神经网络（如 CNN、Transformer）。</li>
+</ul>
+<p>XGBoost 的优势在于其高效性、灵活性和广泛的应用场景，尤其在 Kaggle 竞赛和工业界的结构化数据分析中表现突出。</p>
+</div>
