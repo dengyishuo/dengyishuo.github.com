@@ -1,0 +1,712 @@
+---
+title: 大同
+author: Simon Urbanek
+date: '2025-07-15'
+slug: datong
+categories: []
+tags: []
+---
+
+```{R pkg, message=FALSE, warning=FALSE, include=FALSE}
+# 加载必要的包
+library(sf)          # 处理地理空间数据
+library(ggplot2)     # 绘图
+library(ggrepel)     # 避免标签重叠
+library(dplyr)       # 数据处理
+library(showtext)    # 中文字体支持
+library(here) 
+
+# 设置中文字体（确保系统兼容）
+font_add("SimHei", "SimHei.ttf")
+showtext_auto()
+```
+
+
+决定去山西一趟。虽然地图上山西和北京近在咫尺，不知为啥脑海中总觉得千山万水似的。
+
+
+```{R shanxi, echo=FALSE, message=FALSE, warning=FALSE}
+# 修复几何数据问题
+fix_geometries <- function(sf_object) {
+  if (!all(st_is_valid(sf_object))) {
+    sf_object <- st_make_valid(sf_object)
+  }
+  return(sf_object)
+}
+
+
+# 读取并修复地图数据
+china_map <- st_read(here("assets", "data", "china.json"), quiet = TRUE) %>% 
+  fix_geometries() %>% 
+  st_transform(crs = 4326)
+
+shanxi_map <- st_read(here("assets", "data", "shanxi.json"), quiet = TRUE) %>% 
+  fix_geometries() %>% 
+  st_transform(crs = 4326)
+
+beijing_map <- st_read(here("assets", "data", "beijing.json"), quiet = TRUE) %>% 
+  fix_geometries() %>% 
+  st_transform(crs = 4326)
+
+datong_map <- st_read(here("assets", "data", "datong.json"), quiet = TRUE) %>% 
+  fix_geometries() %>% 
+  st_transform(crs = 4326)
+
+# ----------------------------
+# 地图数据处理
+# ----------------------------
+
+# 定义要高亮的省份
+highlight_provinces <- c("山西省", "北京市")
+
+# 计算城市中心点坐标 (使用点表面保证点在多边形内)
+beijing_center <- beijing_map %>% 
+  st_point_on_surface() %>% 
+  mutate(name = "北京市") %>%
+  slice(1)
+
+datong_center <- datong_map %>% 
+  st_point_on_surface() %>% 
+  mutate(name = "大同市") %>%
+  slice(1)
+
+# 提取坐标点数据
+cities_coords <- rbind(beijing_center, datong_center) %>% 
+  cbind(st_coordinates(.)) %>% 
+  st_drop_geometry()
+
+# 创建连接线数据
+connection_line <- st_sfc(
+  st_linestring(rbind(
+    st_coordinates(datong_center),
+    st_coordinates(beijing_center)
+  )),
+  crs = 4326
+) %>% 
+  st_as_sf()
+
+# ----------------------------
+# 地图绘制
+# ----------------------------
+
+# 创建地图
+china_highlight_map <- ggplot() +
+  # 绘制中国其他省份（浅灰色）
+  geom_sf(
+    data = china_map %>% filter(!(name %in% highlight_provinces)), 
+    fill = "lightgray", 
+    color = "white", 
+    size = 0.2
+  ) +
+  
+  # 高亮山西省和北京市
+  geom_sf(
+    data = china_map %>% filter(name %in% highlight_provinces), 
+    aes(fill = name), 
+    color = "white", 
+    size = 0.2
+  ) +
+  
+  # 添加城市连接线
+  geom_sf(
+    data = connection_line,
+    color = "blue",
+    size = 1.2,
+    linetype = "solid",
+    lineend = "round"
+  ) +
+  
+  # 添加城市标记点
+  geom_sf(
+    data = rbind(beijing_center, datong_center),
+    aes(fill = name),
+    shape = 21,
+    color = "black",
+    size = 1,
+    stroke = 1,
+    show.legend = FALSE
+  ) +
+  
+  # 添加城市标签
+  ggrepel::geom_label_repel(
+    data = cities_coords,
+    aes(X, Y, label = name),
+    size = 4.8,
+    fontface = "bold",
+    label.size = 0.3,
+    label.padding = unit(0.35, "lines"),
+    fill = alpha("white", 0.85),
+    box.padding = unit(0.5, "lines"),
+    segment.color = "grey30",
+    segment.size = 0.3,
+    min.segment.length = 0,
+    nudge_x = c(5, -5),  # 调整标签位置
+    nudge_y = c(3, -3)
+  ) +
+              # 添加距离文本
+              geom_text(
+                data = data.frame(
+                  x = mean(c(cities_coords$X[1], cities_coords$X[2])),
+                  y = mean(c(cities_coords$Y[1], cities_coords$Y[2])) + 1,
+                  label = "约330公里"
+                ),
+                aes(x, y, label = label),
+                color = "red",
+                size = 4.5,
+                fontface = "bold",
+              ) +
+              
+              # 设置填充颜色
+              scale_fill_manual(
+                values = c("山西省" = "#FF9999", "北京市" = "#99CCFF", 
+                           "大同市" = "#FF6666", "北京市" = "#66B2FF"), 
+                name = "地区"
+              ) +
+              
+              # 设置标题和坐标轴标签
+              labs(
+                title = "山西省与北京市地理关系",
+                subtitle = "大同市与北京市位置及距离示意",
+                x = "经度",
+                y = "纬度"
+              ) +
+              
+              # 设置主题
+              theme_minimal() +
+              theme(
+                plot.title = element_text(hjust = 0.5, size = 18),
+                plot.subtitle = element_text(hjust = 0.5, size = 14, color = "grey30"),
+                legend.position = "bottom",
+                panel.grid = element_line(color = "gray90", linetype = "dashed"),
+                axis.text = element_text(size = 10),
+              ) +
+              
+              # 调整坐标范围
+              coord_sf(
+                xlim = c(min(cities_coords$X) - 10, max(cities_coords$X) + 8),
+                ylim = c(min(cities_coords$Y) - 15,max(cities_coords$Y) + 4)
+              )
+      
+            # 显示地图
+            print(china_highlight_map)
+```
+
+这次要去的目的地是大同市。拜《黑神话·悟空》所赐，大同火了。查了查大同的景点还是很多的。
+
+```{R datong, echo=FALSE, message=FALSE, warning=FALSE}
+# ----------------------
+# 2. 整理全区域景点数据（含市区、恒山、悬空寺、应县木塔）
+# ----------------------
+datong_attractions <- data.frame(
+  name = c(
+    # 平城区主要景点
+    "华严寺", "善化寺", "九龙壁", "大同古城墙", "大同市博物馆",
+    # 云冈区主要景点
+    "云冈石窟",
+    # 浑源县景点（恒山、悬空寺）
+    "北岳恒山", "悬空寺",
+    # 应县景点（应县木塔，属朔州市，但毗邻大同，常纳入大同旅游线）
+    "应县木塔"
+  ),
+  lon = c(          # 经度（WGS84坐标系）
+    113.2788, 113.2758, 113.2782, 113.2817, 113.3160,  # 平城区
+    113.0869,                                           # 云冈区
+    113.7100, 113.7350,                                 # 浑源县
+    113.1167                                            # 应县（应县木塔）
+  ),
+  lat = c(          # 纬度
+    40.0972, 40.0961, 40.0970, 40.0944, 40.0830,        # 平城区
+    40.0645,                                            # 云冈区
+    39.7400, 39.7410,                                   # 浑源县
+    39.5167                                             # 应县
+  ),
+  # 标记景点所属区域（用于颜色区分）
+  area = c(
+    rep("平城区", 5), "云冈区", "浑源县", "浑源县", "应县（毗邻）"
+  )
+)
+
+# 转换为空间点对象
+attractions_sf <- st_as_sf(
+  datong_attractions,
+  coords = c("lon", "lat"),
+  crs = 4326  # 与地图坐标系一致
+)
+
+# ----------------------
+# 3. 绘制大同区域地图及全景点
+# ----------------------
+# 计算地图中心（平衡市区与周边景点）
+center_lon <- mean(datong_attractions$lon)
+center_lat <- mean(datong_attractions$lat)
+
+ggplot() +
+  # 绘制大同市边界（含所有区县）
+  geom_sf(data = datong_map, fill = "#f5f7fa", color = "#2c3e50", linewidth = 0.8) +
+  
+  # 标记景点（按区域区分颜色）
+  geom_sf(
+    data = attractions_sf,
+    aes(color = area, size = area == "应县（毗邻）"),  # 应县木塔稍大，突出显示
+    alpha = 0.9
+  ) +
+  # 自定义颜色（区域区分明显）
+  scale_color_manual(
+    values = c(
+      "平城区" = "#e74c3c", 
+      "云冈区" = "#3498db", 
+      "浑源县" = "#2ecc71", 
+      "应县（毗邻）" = "#f39c12"
+    )
+  ) +
+  scale_size_manual(values = c(3, 3)) + # 应县木塔稍大
+  
+  # 添加景点标签（自动避重叠）
+  geom_label_repel(
+    data = datong_attractions,
+    aes(x = lon, y = lat, label = name),
+    family = "SimHei",
+    size = 3,
+    fill = "white",
+    color = "#34495e",
+    segment.color = "#95a5a6",
+    max.overlaps = 15,  # 允许适度重叠，确保所有标签显示
+    box.padding = 0.3
+  ) +
+  
+  # 调整地图范围（覆盖所有景点）
+  coord_sf(
+    xlim = c(112.8, 114.0),  # 经度范围（含应县、浑源、市区）
+    ylim = c(39.4, 40.2)     # 纬度范围
+  ) +
+  
+  # 标题与主题设置
+  ggtitle("大同及周边主要景点分布（含应县木塔）") +
+  labs(color = "所属区域", size = "") +  # 图例说明
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      family = "SimHei", size = 16, 
+      hjust = 0.5, margin = margin(b = 15)
+    ),
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.text = element_text(family = "SimHei", size = 10),
+    legend.title = element_text(family = "SimHei", size = 11),
+    panel.grid.major = element_line(color = "#ecf0f1", linewidth = 0.3)
+  ) +
+  guides(
+    color = guide_legend(nrow = 1),  # 图例横向排列
+    size = "none"  # 隐藏大小图例（仅用于突出应县木塔）
+  )
+```
+
+
+
+最主要的景点是**云冈石窟**，在大同市云冈区，当然不能只去**云冈石窟**，把周围的景点也一并视察了。
+
+-   **云冈石窟**：是云冈区最著名的景点，距今已有 1500 年历史，是佛教艺术东传中国后，第一次由一个民族用一个朝代雕琢而成皇家风范的佛教艺术宝库，也是公元 5 世纪中西文化融合的历史丰碑。1
+    961 年被列为首批全国重点文物保护单位，2001 年列入 “世界文化遗产” 名录，2007 年成为国家首批 5A 级旅游景区。石
+    窟内佛像雕刻精美，如第 5 窟的主尊坐佛是云冈的第一大佛，第 6 窟是云冈石窟中规模最大、设计最完整的洞窟。
+
+-   **晋华宫国家矿山公园**：我国首批国家矿山公园之一，也是 “中国工业旅游示范点”“全国科普教育基地” 和国家 4A 级旅游景区。公
+    园与云冈石窟隔河相望，以 “煤都井下探秘游” 项目为依托，游客可在此体验煤矿开采的历史文化，观赏罕见的侏罗纪煤层地质奇观。
+
+-   **焦山寺石窟**：位于高山镇高山村北约 1000 米处，依山而建，前临十里河。石
+    窟开凿于北魏年间，辽金时期在窟前增建木构窟檐，明嘉靖年间有所修复。寺
+    址坐北朝南，依山势辟五层平地，窟龛分布在崖面上，窟内有壁画和泥塑佛像，第五层建有六角三层楼阁砖塔。
+
+-   **高山古城**：位于高山镇高山村，与云冈石窟同处云冈域峪，在云冈石窟以西 16 公里。古
+    城是明清时期九边大同重镇十三卫所之一，占地约 1200 亩，是大同市重要的古城遗址。这
+    里有 400 余米的明城墙、瓮城和怀德桥等，见证了曾经的辉煌。
+
+-   **魏都水世界**：坐落于西韩岭乡马辛庄村北，总占地面积 34 万平方米。景
+    区集亲水娱乐、药浴理疗、主题游乐、特色美食等功能于一体，是山西省乃至华北地区规模最大、项目设施最完备的室内水上乐园，也是华北地区最全面的生态旅游休闲综合体。
+
+-   **大同煤矿 “万人坑” 纪念馆**：是全国爱国主义教育基地、全国重点文物保护单位，座落在煤峪口南沟。纪
+    念馆占地 33.7 万平方米，分为苦难展示区、文物保护区、煤炭历史展览区等部分，展现了侵华日军的残暴罪行。
+
+-   **禅房寺砖塔**：是云冈区的国家级重点文物保护单位之一。该
+    塔具有较高的历史文化价值，其建筑风格独特，体现了当时的建筑工艺和艺术水平，吸引着众多专家学者和游客前来参观。
+    
+```{R yungang, echo=FALSE, message=FALSE, warning=FALSE}
+# ----------------------
+# 1. 数据准备（确保坐标正确且路线顺序清晰）
+# ----------------------
+# 读取云冈区地图边界
+yungang_map <- datong_map %>% filter(adcode == "140214")  # 云冈区adcode
+
+# 景点及起点坐标（精确到小数点后4位）
+locations <- data.frame(
+  id = 1:7,  # 用于强制路线顺序
+  name = c(
+    "平城区出发点（华严寺附近）",  # 起点
+    "云冈石窟", 
+    "晋华宫国家矿山公园", 
+    "大同煤矿'万人坑'纪念馆", 
+    "禅房寺砖塔", 
+    "焦山寺石窟", 
+    "高山古城"
+  ),
+  lon = c(113.2788, 113.0869, 113.0920, 113.1875, 113.0520, 112.9512, 112.9485),
+  lat = c(40.0972, 40.0645, 40.0610, 40.0530, 40.0120, 40.0580, 40.0575)
+)
+
+# 明确路线顺序（按游览先后排序）
+route_data <- locations[order(c(1, 2, 3, 4, 5, 6, 7)), ]  # 1=起点，2-7=游览顺序
+
+# ----------------------
+# 2. 绘制地图（确保路线可见）
+# ----------------------
+ggplot() +
+  # 1. 云冈区底图（最底层）
+  geom_sf(data = yungang_map, fill = "#f0f0f0", color = "#333", linewidth = 0.8) +
+  
+  # 2. 路线连线（中层，确保在底图之上）
+  geom_path(
+    data = route_data,
+    aes(x = lon, y = lat, group = 1),  # group=1强制连为一条线
+    color = "#e63946",  # 红色路线更醒目
+    linewidth = 1, 
+    linetype = "solid",
+    arrow = arrow(length = unit(0.15, "inches"), type = "closed")  # 闭合箭头更清晰
+  ) +
+  
+  # 3. 标记景点和起点（顶层，避免被路线遮挡）
+  geom_point(
+    data = locations,
+    aes(x = lon, 
+        y = lat, 
+        size = name == "平城区出发点（华严寺附近）"),
+    shape = 21,  # 带边框的圆点
+    fill = ifelse(locations$name == "平城区出发点（华严寺附近）", "#4caf50", "#ff9800"),
+    color = "black",
+    stroke = 1.2
+  ) +
+  scale_size_manual(values = c(3, 3)) + # 起点稍大（7），景点稍小（5）
+
+# 4. 标签（避免重叠）
+geom_label_repel(
+  data = locations,
+  aes(x = lon, y = lat, label = name),
+  family = "SimHei",
+  size = 3,
+  fill = "white",
+  color = "#333",
+  segment.color = "#999",
+  max.overlaps = 10
+) +
+  
+  # 5. 标题和主题
+  ggtitle("从平城区出发的云冈区游览路线（1日）") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "SimHei", hjust = 0.5, size = 14, margin = margin(b = 10)),
+    legend.position = "none",  # 隐藏大小图例
+    panel.grid = element_line(color = "#ddd", linewidth = 0.3)
+  ) +
+  # 聚焦路线覆盖区域，避免地图过大
+  coord_sf(xlim = c(112.9, 113.3), ylim = c(39.95, 40.1))
+```
+
+
+古城区也值得一看。景点众多。
+
+**景点**：
+
+-   **华严寺**：位于大同市古城内西南隅，因佛教经典《华严经》而得名。始建于辽代，现存最早建筑为薄伽教藏殿，以殿宇巍峨、气势壮观闻名于世。
+-   **善化寺**：位于平城区南街西侧，始建于唐代，是中国现存规模最大、最为完整的辽金时期建筑。
+-   **九龙壁**：是明代王府照壁，位于古城内，其造型精美，工艺精湛，是中国古代琉璃建筑的杰出代表。
+-   **大同古城墙**：位于古城中心位置，轮廓呈正方形，是明代大同府城城墙，历经修缮，展现出古朴厚重的历史风貌。
+-   **法华寺**：是大同市唯一一座覆钵式琉璃喇嘛塔，寺内建筑风格独特，具有较高的艺术价值。
+-   **北魏明堂遗址公园**：位于平城区南环路与向阳街之间，是重要的北魏文化遗存，也是少数民族政权和华夏多民族融合的产物。
+-   **大同方特欢乐世界**：是晋冀蒙地区的高科技主题乐园，以科幻和互动体验为特色，园区由 20 多个主题项目区组成，适合各年龄段游客游玩。
+
+**博物馆**：
+
+-   **大同市博物馆**：位于御东新区太和路，是一座地志性综合博物馆，馆藏文物七万余件，基本陈列有 “沧桑代地”“魏都平城”“辽金西京”“明清重镇” 等。
+-   **梁思成纪念馆**：位于御河西路和阳北门，是国内唯一一座独立纪念梁思成的展馆，展览主题为 “大师・大同”，展示了梁思成先生为保护中国古建筑所做出的贡献。
+-   **平城记忆馆**：位于御河南路 1 号，以 “昨天・今天” 为主题，通过老照片、老影像等唤醒大同人的城市记忆。
+-   **北朝艺术博物馆**：位于明堂公园北门，是全国唯一一家以北朝文物为专题的博物馆，展品显示出北魏时期杰出的艺术成就和高超的工匠技艺。
+-   **辽金元民族融合博物馆**：位于清远街 37 号，展厅共分 “京华・锁钥”“法相・庄严” 等五个篇章，展出辽金元时期的各类礼器，展现了当时大同的经济文化面貌。
+-   **大同红色记忆馆**：位于县楼南街 6 号四合院，通过 “曙光初照”“共赴国难” 等四个展示单元，回顾了大同地区革命历史。
+-   **古代铜造艺术博物馆**：位于鼓楼东街 11-12 号，以明清风格建筑展现大同地区明清两代的铜造技艺和文化发展历程。
+
+**艺术馆**：
+
+-   **念夏文化艺术中心**：位于南邑历史文化街区，是古城内较大的现代艺术中心，设有 “洞窟”“星海”“叠峰” 等展示区域，展示漫威、日漫、变形金刚等主题雕塑作品。
+
+
+大同平冈区主要景点：
+
+```{R pingcheng, echo=FALSE, message=FALSE, warning=FALSE}
+pingcheng_map <- datong_map[datong_map$adcode == 140213, ]
+
+attractions <- data.frame(
+  name = c(
+    "华严寺", "善化寺", "法华寺", 
+    "大同清真大寺", "大同纯阳宫", "大同文庙", 
+    "大同关帝庙", "大同代王府", "大同九龙壁", "梁思成博物馆", 
+    "大同市美术馆", "大同市图书馆", "大同市博物馆"
+  ),
+  lon = c(          # 市区精确经度（WGS84）
+    113.2788, 113.2758, 113.3002,
+    113.2726, 113.2805, 113.2865,
+    113.2776, 113.2790, 113.2782, 113.2820,
+    113.3150, 113.3145, 113.3160
+  ),
+  lat = c(          # 市区精确纬度（WGS84）
+    40.0972, 40.0961, 40.1045,
+    40.0935, 40.0950, 40.1005,
+    40.0968, 40.0975, 40.0970, 40.0920,
+    40.0820, 40.0815, 40.0830
+  )
+)
+
+ggplot() +
+  # 绘制平城区地图
+  geom_sf(data = pingcheng_map, fill = "#f0f9ff", color = "#2563eb", linewidth = 1) +
+  # 标记景点
+  geom_point(data = attractions, aes(x = lon, y = lat), color = "red", size = 3) +
+  # 添加景点标签
+  geom_text(data = attractions, aes(x = lon, y = lat, label = name), 
+            nudge_y = 0.01, # 稍微向上调整标签位置，避免覆盖景点标记点
+            size = 3, color = "black") +
+  theme_void() +  # 去除默认的坐标轴等元素
+  ggtitle("大同平城区地图及主要景点")
+```
+
+聚焦景点附近：
+
+```{R zoom, echo=FALSE, message=FALSE, warning=FALSE}
+# 绘制聚焦版地图
+ggplot() +
+  # 绘制平城区边界（仅核心区域）
+  geom_sf(data = pingcheng_map, 
+          fill = "#f0f9ff", 
+          color = "#2563eb", 
+          linewidth = 1) +
+  
+  # 标记景点（增大点大小，更突出）
+  geom_point(data = attractions, 
+             aes(x = lon, y = lat), 
+             color = "red", 
+             size = 1) +
+  
+  # 优化标签位置（避免重叠）
+  geom_text_repel(
+    data = attractions,
+    aes(x = lon, y = lat, label = name),
+    nudge_y = 0.005,  # 微调标签位置
+    size = 2, 
+    color = "black",
+    segment.size = 0.3  # 添加连接点与标签的细线
+  ) +
+  
+  # 缩小地图范围至平城区核心（景点密集区）
+  xlim(113.27, 113.31) +  # 经度范围缩小
+  ylim(40.09, 40.11)      # 纬度范围缩小
+  theme_void() +
+  ggtitle("大同平城区核心景点分布") +
+  theme(plot.title = element_text(hjust = 0.5))  # 标题居中
+```
+
+
+浑源县也有景点：
+
+-   **北岳恒山**：位于浑源县城南 4 公里处，海拔 2016.1 米，是中华五岳之一，自古为华夷之限、中原屏障，素有 “人天北柱”“绝塞名山” 之美誉。恒
+    山以奇险秀丽的自然风光和开放包容的历史文化闻名天下，庙群规模宏大，清乾隆年间曾有 “三寺四祠九亭阁、七宫八洞十二庙” 的盛况，是道教圣地和旅游胜地。
+
+-   **悬空寺**：始建于北魏时期，距今已有 1500 多年历史。它
+    宛如一幅精美的浮雕镶嵌在悬崖峭壁之上，以半插飞梁为基，借岩石暗托，做到梁柱一体、廊栏相连，布局精巧。寺
+    内三教殿供奉着佛教释迦牟尼、儒家孔子和道家老子，体现了 “三教合一” 的独特思想文化，被明代大旅行家徐霞客赞为 “天下巨观”。
+
+-   **浑源古城**：坐落在恒山脚下，距离悬空寺 3.5 公里。古
+    城内有金代圆觉寺砖塔、元代永安寺、元代扩建文庙等三处国家级文物保护单位。此
+    外，还有浑源州署以及麻家大院、栗家府大院等 60 多处明清大院，古街古巷纵横交错，尽显岁月沧桑。
+
+-   **龙蓬峪景区**：与恒山、悬空寺相连，东隔金龙峡与恒山主峰相望。峪
+    内山形陡峭，唐河水穿峪而过，两岸植被丰茂。峪
+    北灵鹫崖上现存金代石刻三世佛像，尤以断崖 “滴泪佛” 奇观为胜，是一处集自然风貌、人文景观、古建为一体的风景区。
+
+-   **千佛岭**：位于千佛岭乡，方圆十几公里范围内林木茂盛、山水交融。千
+    佛寺、碧峰寺等佛教建筑掩映其中，奇峰、怪石、林海、幽寺并称 “佛岭四绝”。文
+    物景点星罗棋布，距今 1000 多年的千佛洞最为著名。
+
+-   **大云寺**：位于县城西南十里处的荆庄村，始建于北魏后期，大殿主体构架为金代所建，元、明、清历代均有修缮和增补，殿内壁画精美，为国家级重点文物保护单位。
+
+-   **神溪湿地公园**：这里遍布池塘、芦苇、游鱼，形成了独特的塞北水乡风光。公
+    园内一层为黄芪博物馆和黄芪加工互动展销区，游客可在此了解恒山黄芪的前世今生，还能参与体验黄芪生产过程、加工技艺。
+
+-   **浑源凉粉文化园**：是一个集浑源凉粉文化展示与旅游餐饮、休闲为一体的综合园区。园
+    区运用文字、实物以及声光电等技术，展示浑源凉粉的历史、传承和发展，同时设置有浑源凉粉及浑源美食体验区。
+    
+    
+```{R hunyuan, echo=FALSE, message=FALSE, warning=FALSE}
+# 筛选浑源县地图（adcode=140225）
+hunyuan_map <- datong_map %>%
+  filter(adcode == "140225")
+
+# ----------------------
+# 2. 浑源县景点数据（精确坐标）
+# ----------------------
+hunyuan_attractions <- data.frame(
+  name = c(
+    "北岳恒山", "悬空寺", "浑源古城", "龙蓬峪景区", 
+    "千佛岭", "大云寺", "神溪湿地公园", "浑源凉粉文化园"
+  ),
+  lon = c(          # 经度（WGS84）
+    113.7100, 113.7350, 113.7180, 113.7420,
+    113.8560, 113.6350, 113.6920, 113.7150
+  ),
+  lat = c(          # 纬度
+    39.7400, 39.7410, 39.7320, 39.7380,
+    39.6250, 39.6850, 39.7100, 39.7280
+  ),
+  type = c(         # 景点类型（用于颜色区分）
+    "自然与人文", "人文奇观", "古城", "自然与人文",
+    "自然与人文", "古迹", "自然与文化", "美食文化"
+  )
+)
+
+# 转换为空间点对象
+attractions_sf <- st_as_sf(
+  hunyuan_attractions,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+# ----------------------
+# 3. 推荐游览路线（2日游）
+# ----------------------
+# 路线顺序（按游览先后排序）
+route_order <- c(
+  "浑源古城", "悬空寺", "北岳恒山", "龙蓬峪景区",  # 第一天
+  "神溪湿地公园", "浑源凉粉文化园", "大云寺", "千佛岭"  # 第二天（千佛岭较远，最后前往）
+)
+
+# 提取路线数据（按顺序排列）
+route_data <- hunyuan_attractions %>%
+  filter(name %in% route_order) %>%
+  arrange(factor(name, levels = route_order))
+
+# ----------------------
+# 4. 绘图：浑源县地图+景点+路线
+# ----------------------
+# 绘制浑源县放大图（主图）
+p_hunyuan <- ggplot() +
+  # 浑源县边界
+  geom_sf(data = hunyuan_map, fill = "#f8f9fa", color = "#343a40", linewidth = 1) +
+  
+  # 路线连线（带箭头）
+  geom_path(
+    data = route_data,
+    aes(x = lon, y = lat, group = 1),
+    color = "#e74c3c", linewidth = 1.2,
+    arrow = arrow(length = unit(0.12, "inches"), type = "closed"),
+    lineend = "round"
+  ) +
+  
+  # 景点标记（按类型区分颜色）
+  geom_sf(
+    data = attractions_sf,
+    aes(color = type),
+    size = 4, alpha = 0.9
+  ) +
+  scale_color_brewer(palette = "Set2") +
+  
+  # 景点标签（防重叠）
+  geom_label_repel(
+    data = hunyuan_attractions,
+    aes(x = lon, y = lat, label = name),
+    family = "SimHei", size = 3.2,
+    fill = "white", color = "#212529",
+    segment.color = "#6c757d", segment.size = 0.3,
+    max.overlaps = 15
+  ) +
+  
+  # 标题与主题
+  ggtitle("浑源县景点分布及2日游推荐路线") +
+  labs(color = "景点类型") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "SimHei", hjust = 0.5, size = 14, margin = margin(b = 10)),
+    legend.position = "bottom",
+    legend.text = element_text(family = "SimHei"),
+    legend.title = element_text(family = "SimHei", face = "bold"),
+    panel.grid = element_line(color = "#e9ecef", linewidth = 0.3)
+  ) +
+  guides(color = guide_legend(nrow = 2)) +  # 图例分2行
+  coord_sf(xlim = c(113.55, 113.95), ylim = c(39.6, 39.85))  # 聚焦浑源县核心区
+
+# ----------------------
+# 5. 绘图：大同市地图（显示浑源县位置，辅助定位）
+# ----------------------
+p_datong <- ggplot() +
+  # 大同市边界
+  geom_sf(data = datong_map, fill = "#e9ecef", color = "#495059", linewidth = 0.6) +
+  
+  # 突出显示浑源县
+  geom_sf(data = hunyuan_map, fill = "#dee2e6", color = "#212529", linewidth = 1.2) +
+  
+  # 标记浑源县位置（文字标注）
+  geom_text(
+    data = data.frame(lon = 113.7, lat = 39.7),  # 浑源县中心
+    aes(x = lon, y = lat, label = "浑源县"),
+    family = "SimHei", size = 5, fontface = "bold", color = "#e74c3c"
+  ) +
+  
+  # 标题与主题
+  ggtitle("大同市地图（红色标注为浑源县）") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "SimHei", hjust = 0.5, size = 12),
+    panel.grid = element_blank()
+  )
+
+# ----------------------
+# 6. 组合地图（大同市定位图 + 浑源县详细图）
+# ----------------------
+library(patchwork)  # 用于组合图形
+p_datong | p_hunyuan  # 上小下大布局
+
+```
+
+### **第一天：云冈区之旅**
+
+-   **上午**：前往**云冈石窟**，这是云冈区的核心景点，可花费 3 - 4 小时仔细参观，欣赏精美的佛像雕刻，重点参观第 5 窟、第 6 窟等经典洞窟，感受千年佛教艺术的魅力。
+
+-   **中午**：在云冈石窟附近的餐厅用餐，品尝大同特色美食，如刀削面、羊杂等。
+
+-   **下午**：步行或乘坐短途交通工具前往**晋华宫国家矿山公园**，与云冈石窟隔河相望，在这里体验 “煤都井下探秘游”，了解煤矿开采历史文化，观赏侏罗纪煤层地质奇观，预计游玩 2 - 3 小时1。之
+    后前往**焦山寺石窟**，欣赏北魏年间开凿的石窟、壁画和泥塑佛像，参观六角三层楼阁砖塔，游玩时间约 1 小时。
+
+-   **晚上**：如果还有精力，可前往**魏都水世界**，享受亲水娱乐、药浴理疗等项目，放松身心，也可在此享用晚餐。若
+    感觉疲惫，可直接返回住处休息。
+
+### **第二天：平城区之行**
+
+-   **上午**：参观**华严寺**，欣赏辽代建筑风格和精美的佛教造像，尤其是薄伽教藏殿内的华严经柜和 “天宫楼阁”，游玩时间约 2 小时。接
+    着前往相邻的**善化寺**，这是中国现存规模最大、最为完整的辽金时期建筑，参观时间约 1.5 小时4。
+
+-   **中午**：在古城内找一家餐馆就餐，品尝大同传统美食。
+
+-   **下午**：游览**九龙壁**，欣赏这座明代王府照壁的精美造型和精湛工艺，游玩时间约半小时。然
+    后登上**大同古城墙**，漫步城墙之上，俯瞰古城风貌，可选择从一个城门上，另一个城门下，游玩时间约 2 小时。之
+    后前往**北魏明堂遗址公园**，了解北魏文化，参观明堂建筑，游玩时间约 1.5 小时2。
+
+-   **晚上**：前往平城区的特色街区，如鼓楼东街，逛逛古街，参观**古代铜造艺术博物馆**，感受大同的历史文化氛围，还可在此享用晚餐，品尝小吃。
+
+### **第三天：浑源县之旅**
+
+-   **上午**：前往浑源县，先参观**悬空寺**，这是一处独特的建筑奇观，可花费 2 小时左右参观，体验 “天下巨观” 的震撼，感受 “三教合一” 的文化内涵。
+
+-   **中午**：在悬空寺附近就餐，品尝浑源当地美食，如浑源凉粉等。
+
+-   **下午**：前往距离悬空寺不远的**北岳恒山**，可选择乘坐索道上山，然后徒步游览恒山庙群等景点，欣赏奇险秀丽的自然风光，游玩时间约 3 - 4 小时。如
+    果时间充裕，还可顺道参观**浑源古城**，感受古城的历史韵味，参观圆觉寺砖塔、永安寺等古迹。
+
+-   **晚上**：结束行程，返回出发地或前往下一个目的地。
+
+
+
