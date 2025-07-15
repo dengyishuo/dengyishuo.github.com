@@ -13,9 +13,9 @@ library(sf)          # 处理地理空间数据
 library(ggplot2)     # 绘图
 library(ggrepel)     # 避免标签重叠
 library(dplyr)       # 数据处理
+library(here)        # 自动引用数据
+library(patchwork)   # 组合图形
 library(showtext)    # 中文字体支持
-library(here) 
-
 # 设置中文字体（确保系统兼容）
 font_add("SimHei", "SimHei.ttf")
 showtext_auto()
@@ -440,8 +440,11 @@ geom_label_repel(
 大同平冈区主要景点：
 
 ```{R pingcheng, echo=FALSE, message=FALSE, warning=FALSE}
-pingcheng_map <- datong_map[datong_map$adcode == 140213, ]
+# 筛选平城区地图（adcode=140213）
+pingcheng_map <- datong_map %>%
+  filter(adcode == 140213)  # 使用dplyr筛选更简洁
 
+# 平城区景点数据
 attractions <- data.frame(
   name = c(
     "华严寺", "善化寺", "法华寺", 
@@ -460,57 +463,118 @@ attractions <- data.frame(
     40.0935, 40.0950, 40.1005,
     40.0968, 40.0975, 40.0970, 40.0920,
     40.0820, 40.0815, 40.0830
+  ),
+  type = c(         # 新增：景点类型（用于颜色区分）
+    "佛教寺庙", "佛教寺庙", "佛教寺庙",
+    "清真寺", "道教宫观", "文庙",
+    "关帝庙", "王府遗址", "古迹", "名人纪念馆",
+    "现代场馆", "现代场馆", "现代场馆"
   )
 )
 
-ggplot() +
-  # 绘制平城区地图
+# 转换为空间点对象（便于后续空间操作）
+attractions_sf <- st_as_sf(
+  attractions,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+# ----------------------
+# 推荐游览路线（按区域和合理性排序）
+# ----------------------
+route_order <- c(
+  # 第一天：古城核心区（步行可达）
+  "华严寺", "大同九龙壁", "大同代王府", "大同关帝庙", 
+  "善化寺", "大同纯阳宫", "大同清真大寺",
+  # 第二天：东部及现代场馆区
+  "大同文庙", "法华寺", "梁思成博物馆", 
+  "大同市博物馆", "大同市美术馆", "大同市图书馆"
+)
+
+# 提取路线数据（按顺序排列）
+route_data <- attractions %>%
+  filter(name %in% route_order) %>%
+  arrange(factor(name, levels = route_order))
+
+# ----------------------
+# 绘图：平城区地图+景点+路线（详细图）
+# ----------------------
+p_pingcheng <- ggplot() +
+  # 平城区边界
   geom_sf(data = pingcheng_map, fill = "#f0f9ff", color = "#2563eb", linewidth = 1) +
-  # 标记景点
-  geom_point(data = attractions, aes(x = lon, y = lat), color = "red", size = 3) +
-  # 添加景点标签
-  geom_text(data = attractions, aes(x = lon, y = lat, label = name), 
-            nudge_y = 0.01, # 稍微向上调整标签位置，避免覆盖景点标记点
-            size = 3, color = "black") +
-  theme_void() +  # 去除默认的坐标轴等元素
-  ggtitle("大同平城区地图及主要景点")
-```
-
-聚焦景点附近：
-
-```{R zoom, echo=FALSE, message=FALSE, warning=FALSE}
-# 绘制聚焦版地图
-ggplot() +
-  # 绘制平城区边界（仅核心区域）
-  geom_sf(data = pingcheng_map, 
-          fill = "#f0f9ff", 
-          color = "#2563eb", 
-          linewidth = 1) +
   
-  # 标记景点（增大点大小，更突出）
-  geom_point(data = attractions, 
-             aes(x = lon, y = lat), 
-             color = "red", 
-             size = 1) +
-  
-  # 优化标签位置（避免重叠）
-  geom_text_repel(
-    data = attractions,
-    aes(x = lon, y = lat, label = name),
-    nudge_y = 0.005,  # 微调标签位置
-    size = 2, 
-    color = "black",
-    segment.size = 0.3  # 添加连接点与标签的细线
+  # 路线连线（带箭头，区分两天）
+  geom_path(
+    data = route_data,
+    aes(x = lon, y = lat, group = 1),
+    color = "#dc2626", linewidth = 1,
+    arrow = arrow(length = unit(0.12, "inches"), type = "closed"),
+    lineend = "round"
   ) +
   
-  # 缩小地图范围至平城区核心（景点密集区）
-  xlim(113.27, 113.31) +  # 经度范围缩小
-  ylim(40.09, 40.11)      # 纬度范围缩小
-  theme_void() +
-  ggtitle("大同平城区核心景点分布") +
-  theme(plot.title = element_text(hjust = 0.5))  # 标题居中
-```
+  # 景点标记（按类型区分颜色）
+  geom_sf(
+    data = attractions_sf,
+    aes(color = type),
+    size = 2, alpha = 0.9, shape = 21, fill = "white", stroke = 1.5
+  ) +
+  scale_color_brewer(palette = "Set3", name = "景点类型") +
+  
+  # 景点标签（防重叠）
+  geom_label_repel(
+    data = attractions,
+    aes(x = lon, y = lat, label = name),
+    family = "SimHei", size = 2,
+    fill = "white", color = "#1e293b",
+    segment.color = "#64748b", segment.size = 0.3,
+    max.overlaps = 20,  # 允许更多标签不重叠
+    box.padding = 0.5    # 标签与点的距离
+  ) +
+  
+  # 标题与主题
+  ggtitle("大同平城区景点分布及推荐游览路线") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "SimHei", hjust = 0.5, size = 14, 
+                             face = "bold", margin = margin(b = 10)),
+    legend.position = "bottom",
+    legend.title = element_text(family = "SimHei", face = "bold"),
+    legend.text = element_text(family = "SimHei"),
+    panel.grid = element_line(color = "#dbeafe", linewidth = 0.3)  # 淡蓝色网格线
+  ) +
+  guides(color = guide_legend(nrow = 2)) +  # 图例分2行显示
+  coord_sf(xlim = c(113.25, 113.33), ylim = c(40.07, 40.11))  # 聚焦平城区核心区
 
+# ----------------------
+# 绘图：大同市地图（显示平城区位置，辅助定位）
+# ----------------------
+p_datong_locator <- ggplot() +
+  # 大同市边界
+  geom_sf(data = datong_map, fill = "#f1f5f9", color = "#64748b", linewidth = 0.6) +
+  
+  # 突出显示平城区
+  geom_sf(data = pingcheng_map, fill = "#dbeafe", color = "#2563eb", linewidth = 1.2) +
+  
+  # 标记平城区位置（文字标注）
+  geom_text(
+    data = data.frame(lon = 113.28, lat = 40.09),  # 平城区中心
+    aes(x = lon, y = lat, label = "平城区"),
+    family = "SimHei", size = 3, fontface = "bold", color = "#2563eb"
+  ) +
+  
+  # 标题与主题
+  ggtitle("大同市地图（蓝色标注为平城区）") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "SimHei", hjust = 0.5, size = 12),
+    panel.grid = element_blank()  # 定位图无需网格线
+  )
+
+# ----------------------
+# 组合地图（定位图 + 详细图）
+# ----------------------
+print(p_datong_locator | p_pingcheng) # 左右布局（左小右大）
+```
 
 浑源县也有景点：
 
@@ -548,7 +612,7 @@ hunyuan_map <- datong_map %>%
   filter(adcode == "140225")
 
 # ----------------------
-# 2. 浑源县景点数据（精确坐标）
+# 浑源县景点数据（精确坐标）
 # ----------------------
 hunyuan_attractions <- data.frame(
   name = c(
@@ -577,7 +641,7 @@ attractions_sf <- st_as_sf(
 )
 
 # ----------------------
-# 3. 推荐游览路线（2日游）
+# 推荐游览路线
 # ----------------------
 # 路线顺序（按游览先后排序）
 route_order <- c(
@@ -591,7 +655,7 @@ route_data <- hunyuan_attractions %>%
   arrange(factor(name, levels = route_order))
 
 # ----------------------
-# 4. 绘图：浑源县地图+景点+路线
+# 绘图：浑源县地图+景点+路线
 # ----------------------
 # 绘制浑源县放大图（主图）
 p_hunyuan <- ggplot() +
@@ -640,7 +704,7 @@ p_hunyuan <- ggplot() +
   coord_sf(xlim = c(113.55, 113.95), ylim = c(39.6, 39.85))  # 聚焦浑源县核心区
 
 # ----------------------
-# 5. 绘图：大同市地图（显示浑源县位置，辅助定位）
+# 绘图：大同市地图（显示浑源县位置，辅助定位）
 # ----------------------
 p_datong <- ggplot() +
   # 大同市边界
@@ -665,11 +729,10 @@ p_datong <- ggplot() +
   )
 
 # ----------------------
-# 6. 组合地图（大同市定位图 + 浑源县详细图）
+# 组合地图（大同市定位图 + 浑源县详细图）
 # ----------------------
 library(patchwork)  # 用于组合图形
 p_datong | p_hunyuan  # 上小下大布局
-
 ```
 
 ### **第一天：云冈区之旅**
