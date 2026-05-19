@@ -1,4 +1,4 @@
-baseurl: http://gewutang.com
+baseurl: http://gewutang.cn
 languageCode: en-US
 title: 格物堂
 theme: hugo-lithium
@@ -11,7 +11,7 @@ permalinks:
 menu:
   main:
     - name: 博客
-      url: http://gewutang.com
+      url: http://gewutang.cn
     - name: 关于我
       url: /about/
     - name: 主页
