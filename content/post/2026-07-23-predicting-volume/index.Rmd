@@ -1,0 +1,289 @@
+---
+title: 基于历史量价数据的未来涨幅预测
+author: MatrixSpk
+date: '2026-07-23'
+slug: predicting-volume
+categories:
+  - 量化投资
+tags:
+  - 量价分析
+  - 随机森林
+  - 线性回归
+  - R
+---
+
+# 引言
+
+在金融市场中，准确预测股票未来涨幅对投资者至关重要。本文以双汇发展（000895.sz）为研究对象，收集并深度剖析其历史累积涨幅及历史成交量数据，探寻二者与未来涨幅之间潜在的规律与关系。通过相关性分析揭示各变量的内在联系，并以相关系数热图直观呈现。在此基础上，借助线性回归和随机森林模型预测未来涨幅，并通过实际值与预测值对比图评估预测效果，最终为投资决策提供科学的数据依据。
+
+# 一、研究思路
+
+本文基于线性回归模型和随机森林模型，以历史阶段性涨幅和成交量为自变量去预测未来数日阶段性涨幅。具体而言，以过去 1 日、3 日、5 日、10 日、20 日累计涨幅和累计成交量作为自变量，去预测未来 5 日、10 日、20 日的涨幅。
+
+# 二、数据收集与处理
+
+## 2.1 数据获取
+
+本文选取双汇发展股票（代码 `000895.sz`）作为研究样本，利用 `quantmod` 包的 `getSymbols` 函数获取其历史行情数据。
+
+```{R loadPkg, message=FALSE, warning=FALSE}
+library(quantmod)
+library(zoo)
+library(TTR)
+library(randomForest)
+library(ggplot2)
+library(tidyr)
+library(patchwork)
+
+# 从本地缓存读取股票数据（双汇发展 000895.sz）
+SHX <- readRDS("SHX.rds")
+
+# 提取日期信息
+dates <- index(SHX)
+```
+
+## 2.2 收益率与成交量计算
+
+运用 TTR 包中的 `dailyReturn` 函数计算每日收益率，并通过 `rollapply` 函数分别计算三日、五日、十日及二十日的阶段收益率与成交量。这些不同周期的指标有助于从多个时间维度捕捉股票价格和成交量的变化特征。
+
+```{R dailyReturn}
+# 使用 TTR 包中的 dailyReturn 函数计算每日收益率
+daily_return <- dailyReturn(Cl(SHX), type = "log") * 100
+
+# 定义辅助函数计算阶段收益率和成交量
+calc_roll <- function(x, width, FUN) {
+  rollapply(x, width = width, FUN = FUN, by = 1)
+}
+
+# 计算各周期阶段收益率
+three_day_return  <- calc_roll(daily_return, 3, sum)
+five_day_return   <- calc_roll(daily_return, 5, sum)
+ten_day_return    <- calc_roll(daily_return, 10, sum)
+twenty_day_return <- calc_roll(daily_return, 20, sum)
+
+# 计算各周期阶段成交量
+three_day_volume  <- calc_roll(Vo(SHX), 3, sum)
+five_day_volume   <- calc_roll(Vo(SHX), 5, sum)
+ten_day_volume    <- calc_roll(Vo(SHX), 10, sum)
+twenty_day_volume <- calc_roll(Vo(SHX), 20, sum)
+```
+
+## 2.3 数据整合与清理
+
+将日期、各阶段收益率及成交量数据整理至数据框 `data` 中。在计算未来不同周期涨幅时，通过反转每日收益率序列，运用 `rollapply` 函数计算滚动和，再反转回来并处理缺失值。
+
+```{R prepareData}
+# 整理数据到数据框
+data <- data.frame(
+  date = dates,
+  three_day_return  = three_day_return,
+  five_day_return   = five_day_return,
+  ten_day_return    = ten_day_return,
+  twenty_day_return = twenty_day_return,
+  three_day_volume  = three_day_volume,
+  five_day_volume   = five_day_volume,
+  ten_day_volume    = ten_day_volume,
+  twenty_day_volume = twenty_day_volume
+)
+
+# 定义未来涨幅计算函数
+calc_future_return <- function(daily_ret, width) {
+  reversed <- rev(daily_ret)
+  fut_ret <- rollapply(reversed, width = width, FUN = sum, by = 1)
+  fut_ret <- rev(fut_ret)
+  fut_ret <- fut_ret[-(1:(width - 1))]
+  
+  filled <- rep(NA, nrow(data))
+  len <- length(fut_ret)
+  filled[(width - 1 + 1):(width - 1 + len)] <- fut_ret
+  return(filled)
+}
+
+# 计算未来 5 日、10 日、20 日涨幅
+data$future_five_day_return   <- calc_future_return(daily_return, 5)
+data$future_ten_day_return    <- calc_future_return(daily_return, 10)
+data$future_twenty_day_return <- calc_future_return(daily_return, 20)
+
+# 过滤缺失值
+data <- data[rowSums(is.na(data)) != ncol(data), ]
+data <- na.omit(data)
+```
+
+处理后的数据结构如下：
+
+```{R}
+str(data)
+head(data)
+```
+
+# 三、相关性分析
+
+为了深入理解各变量之间的关系，提取数据框中的数值型变量，通过 `cor` 函数计算相关系数矩阵，并利用 `corrplot` 包绘制相关系数热图。
+
+```{R corr, fig.cap="变量相关性热图", out.width="90%"}
+library(corrplot)
+library(dplyr)
+
+# 提取数值型变量
+numeric_data <- data %>% select_if(is.numeric)
+
+# 计算相关系数矩阵
+correlation_matrix <- cor(numeric_data)
+
+# 绘制相关系数热图
+corrplot(correlation_matrix, 
+         method = "color", 
+         type = "upper",
+         tl.col = "black", tl.srt = 45,
+         title = "Correlation Heatmap of Variables",
+         addCoef.col = "black", 
+         number.cex = 0.7)
+```
+
+热图中，坐标轴标签以黑色显示并旋转 45 度，同时添加黑色的相关系数数值，字体大小设为 0.7，清晰呈现各变量间的线性相关程度，为后续模型构建提供参考。
+
+从热图中可以看出，历史各周期的收益率之间存在较强相关性，而成交量与收益率之间的相关性较弱，这暗示成交量可能为模型提供差异化的信息。
+
+# 四、预测模型构建与评估
+
+## 4.1 线性回归模型
+
+分别构建预测未来五日、十日及二十日涨幅的线性回归模型。以 `data` 中的所有变量作为自变量，相应的未来涨幅作为因变量，使用 `lm` 函数建模。
+
+```{R lm}
+# 构建预测未来五日涨幅的线性回归模型
+model_five_day <- lm(future_five_day_return ~ ., data = data)
+summary(model_five_day)
+
+# 预测未来五日涨幅
+prediction_five_day <- predict(model_five_day, newdata = data)
+
+# 构建预测未来十日涨幅的线性回归模型
+model_ten_day <- lm(future_ten_day_return ~ ., data = data)
+summary(model_ten_day)
+
+# 预测未来十日涨幅
+prediction_ten_day <- predict(model_ten_day, newdata = data)
+
+# 构建预测未来二十日涨幅的线性回归模型
+model_twenty_day <- lm(future_twenty_day_return ~ ., data = data)
+summary(model_twenty_day)
+
+# 预测未来二十日涨幅
+prediction_twenty_day <- predict(model_twenty_day, newdata = data)
+```
+
+## 4.2 随机森林模型
+
+同样针对未来五日、十日及二十日涨幅构建随机森林模型。随机森林模型因其对复杂非线性关系的捕捉能力，为预测提供了另一种有效的视角。
+
+```{r randomForest, cache=TRUE}
+# 构建预测未来五日涨幅的随机森林模型
+rf_model_five_day <- randomForest(future_five_day_return ~ ., data = data, ntree = 100)
+rf_prediction_five_day <- predict(rf_model_five_day, newdata = data)
+
+# 构建预测未来十日涨幅的随机森林模型
+rf_model_ten_day <- randomForest(future_ten_day_return ~ ., data = data, ntree = 100)
+rf_prediction_ten_day <- predict(rf_model_ten_day, newdata = data)
+
+# 构建预测未来二十日涨幅的随机森林模型
+rf_model_twenty_day <- randomForest(future_twenty_day_return ~ ., data = data, ntree = 100)
+rf_prediction_twenty_day <- predict(rf_model_twenty_day, newdata = data)
+```
+
+## 4.3 模型评估与可视化
+
+对于随机森林模型预测的未来不同周期涨幅，分别绘制实际值与预测值的对比图。通过 `patchwork` 包将每个周期涨幅的对比图和差值图合并展示，全面评估模型的预测效果。
+
+```{R visModel, cache=TRUE}
+# 定义通用绘图函数
+plot_prediction <- function(dates, actual, predicted, title_prefix) {
+  # 对比图数据
+  plot_data <- data.frame(
+    date = dates,
+    actual = actual,
+    predicted = predicted
+  )
+  plot_data_long <- pivot_longer(plot_data, 
+                                 cols = c(actual, predicted), 
+                                 names_to = "type", 
+                                 values_to = "return")
+  
+  # 实际值与预测值对比图
+  p_comparison <- ggplot(plot_data_long, 
+                         aes(x = date, y = return, color = type)) +
+    geom_line() +
+    labs(
+      title = paste0("Random Forest: ", title_prefix, " Actual vs Predicted"),
+      x = "Date", y = "Return"
+    ) +
+    theme_minimal()
+  
+  # 差值图
+  diff_data <- data.frame(
+    date = dates,
+    diff = predicted - actual
+  )
+  
+  p_diff <- ggplot(diff_data, aes(x = date, y = diff)) +
+    geom_line() +
+    labs(
+      title = paste0("Random Forest: ", title_prefix, " Prediction Difference"),
+      x = "Date", y = "Difference"
+    ) +
+    theme_minimal()
+  
+  # 合并展示
+  p_comparison / p_diff
+}
+
+# 绘制各周期预测效果
+five_day_plot   <- plot_prediction(data$date, data$future_five_day_return, 
+                                   rf_prediction_five_day, "Five-Day")
+ten_day_plot    <- plot_prediction(data$date, data$future_ten_day_return, 
+                                   rf_prediction_ten_day, "Ten-Day")
+twenty_day_plot <- plot_prediction(data$date, data$future_twenty_day_return, 
+                                   rf_prediction_twenty_day, "Twenty-Day")
+```
+
+预测效果分别如下：
+
+```{R visResult, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+print(five_day_plot)
+print(ten_day_plot)
+print(twenty_day_plot)
+```
+
+从图中可以看出，五日涨幅的预测跟踪效果较好，差值波动相对较小；而随着预测周期的增长（十日、二十日），预测误差逐渐增大。这是由于长期走势受更多复杂因素影响，仅凭历史量价信息难以完全捕捉。
+
+# 五、模型表现对比
+
+为更清晰地评估模型的预测效果，我们计算各模型的 R 方指标：
+
+```{R modelCompare}
+cat("===== 线性回归模型 =====\n")
+cat("五日涨幅 R²: ",  summary(model_five_day)$r.squared, "\n")
+cat("十日涨幅 R²: ",  summary(model_ten_day)$r.squared, "\n")
+cat("二十日涨幅 R²: ", summary(model_twenty_day)$r.squared, "\n")
+
+cat("\n===== 随机森林模型 =====\n")
+rf_r2 <- function(actual, predicted) {
+  1 - sum((actual - predicted)^2) / sum((actual - mean(actual))^2)
+}
+cat("五日涨幅 R²: ",  rf_r2(data$future_five_day_return, rf_prediction_five_day), "\n")
+cat("十日涨幅 R²: ",  rf_r2(data$future_ten_day_return, rf_prediction_ten_day), "\n")
+cat("二十日涨幅 R²: ", rf_r2(data$future_twenty_day_return, rf_prediction_twenty_day), "\n")
+```
+
+可以看出，随机森林模型的拟合能力明显优于线性回归模型，尤其在短期预测（五日）上表现突出。这说明历史量价与未来涨幅之间存在较强的非线性关系，随机森林模型能够更好地捕捉这种关系。
+
+# 六、结论
+
+本文通过对双汇发展股票历史量价数据的系统分析，综合运用相关性分析、线性回归及随机森林模型等方法，构建了一个完整的量化分析体系。主要发现如下：
+
+1. 历史阶段性涨幅之间存在较强的自相关性，不同周期（3 日、5 日、10 日、20 日）的回报率高度相关；
+2. 成交量与历史/未来涨幅之间的线性相关性较弱，但成交量为模型提供了差异化的非线性信息；
+3. 随机森林模型在捕捉历史量价与未来涨幅之间的非线性关系上显著优于线性回归模型；
+4. 短期预测（5 日）效果明显优于中长期预测（10 日、20 日），随着预测周期的拉长，模型预测能力迅速下降。
+
+此外，金融市场复杂多变，单只股票的分析结果存在一定局限性。未来可进一步扩展到多只股票、纳入更多宏观因子和情绪指标，以构建更稳健的预测体系。

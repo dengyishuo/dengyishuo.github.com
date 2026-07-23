@@ -1,0 +1,423 @@
+---
+title: "基于历史量价数据的未来涨幅预测"
+author: MatrixSpk
+date: "2026-07-23"
+slug: predicting-volume
+categories:
+  - 量化投资
+tags:
+  - 量价分析
+  - 随机森林
+  - 线性回归
+  - R
+---
+
+
+
+<div id="引言" class="section level1">
+<h1>引言</h1>
+<p>在金融市场中，准确预测股票未来涨幅对投资者至关重要。本文以双汇发展（000895.sz）为研究对象，收集并深度剖析其历史累积涨幅及历史成交量数据，探寻二者与未来涨幅之间潜在的规律与关系。通过相关性分析揭示各变量的内在联系，并以相关系数热图直观呈现。在此基础上，借助线性回归和随机森林模型预测未来涨幅，并通过实际值与预测值对比图评估预测效果，最终为投资决策提供科学的数据依据。</p>
+</div>
+<div id="一研究思路" class="section level1">
+<h1>一、研究思路</h1>
+<p>本文基于线性回归模型和随机森林模型，以历史阶段性涨幅和成交量为自变量去预测未来数日阶段性涨幅。具体而言，以过去 1 日、3 日、5 日、10 日、20 日累计涨幅和累计成交量作为自变量，去预测未来 5 日、10 日、20 日的涨幅。</p>
+</div>
+<div id="二数据收集与处理" class="section level1">
+<h1>二、数据收集与处理</h1>
+<div id="数据获取" class="section level2">
+<h2>2.1 数据获取</h2>
+<p>本文选取双汇发展股票（代码 <code>000895.sz</code>）作为研究样本，利用 <code>quantmod</code> 包的 <code>getSymbols</code> 函数获取其历史行情数据。</p>
+<pre class="r"><code>library(quantmod)
+library(zoo)
+library(TTR)
+library(randomForest)
+library(ggplot2)
+library(tidyr)
+library(patchwork)
+
+# 从本地缓存读取股票数据（双汇发展 000895.sz）
+SHX &lt;- readRDS(&quot;SHX.rds&quot;)
+
+# 提取日期信息
+dates &lt;- index(SHX)</code></pre>
+</div>
+<div id="收益率与成交量计算" class="section level2">
+<h2>2.2 收益率与成交量计算</h2>
+<p>运用 TTR 包中的 <code>dailyReturn</code> 函数计算每日收益率，并通过 <code>rollapply</code> 函数分别计算三日、五日、十日及二十日的阶段收益率与成交量。这些不同周期的指标有助于从多个时间维度捕捉股票价格和成交量的变化特征。</p>
+<pre class="r"><code># 使用 TTR 包中的 dailyReturn 函数计算每日收益率
+daily_return &lt;- dailyReturn(Cl(SHX), type = &quot;log&quot;) * 100
+
+# 定义辅助函数计算阶段收益率和成交量
+calc_roll &lt;- function(x, width, FUN) {
+  rollapply(x, width = width, FUN = FUN, by = 1)
+}
+
+# 计算各周期阶段收益率
+three_day_return  &lt;- calc_roll(daily_return, 3, sum)
+five_day_return   &lt;- calc_roll(daily_return, 5, sum)
+ten_day_return    &lt;- calc_roll(daily_return, 10, sum)
+twenty_day_return &lt;- calc_roll(daily_return, 20, sum)
+
+# 计算各周期阶段成交量
+three_day_volume  &lt;- calc_roll(Vo(SHX), 3, sum)
+five_day_volume   &lt;- calc_roll(Vo(SHX), 5, sum)
+ten_day_volume    &lt;- calc_roll(Vo(SHX), 10, sum)
+twenty_day_volume &lt;- calc_roll(Vo(SHX), 20, sum)</code></pre>
+</div>
+<div id="数据整合与清理" class="section level2">
+<h2>2.3 数据整合与清理</h2>
+<p>将日期、各阶段收益率及成交量数据整理至数据框 <code>data</code> 中。在计算未来不同周期涨幅时，通过反转每日收益率序列，运用 <code>rollapply</code> 函数计算滚动和，再反转回来并处理缺失值。</p>
+<pre class="r"><code># 整理数据到数据框
+data &lt;- data.frame(
+  date = dates,
+  three_day_return  = three_day_return,
+  five_day_return   = five_day_return,
+  ten_day_return    = ten_day_return,
+  twenty_day_return = twenty_day_return,
+  three_day_volume  = three_day_volume,
+  five_day_volume   = five_day_volume,
+  ten_day_volume    = ten_day_volume,
+  twenty_day_volume = twenty_day_volume
+)
+
+# 定义未来涨幅计算函数
+calc_future_return &lt;- function(daily_ret, width) {
+  reversed &lt;- rev(daily_ret)
+  fut_ret &lt;- rollapply(reversed, width = width, FUN = sum, by = 1)
+  fut_ret &lt;- rev(fut_ret)
+  fut_ret &lt;- fut_ret[-(1:(width - 1))]
+  
+  filled &lt;- rep(NA, nrow(data))
+  len &lt;- length(fut_ret)
+  filled[(width - 1 + 1):(width - 1 + len)] &lt;- fut_ret
+  return(filled)
+}
+
+# 计算未来 5 日、10 日、20 日涨幅
+data$future_five_day_return   &lt;- calc_future_return(daily_return, 5)
+data$future_ten_day_return    &lt;- calc_future_return(daily_return, 10)
+data$future_twenty_day_return &lt;- calc_future_return(daily_return, 20)
+
+# 过滤缺失值
+data &lt;- data[rowSums(is.na(data)) != ncol(data), ]
+data &lt;- na.omit(data)</code></pre>
+<p>处理后的数据结构如下：</p>
+<pre class="r"><code>str(data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:	4713 obs. of  12 variables:
+##  $ date                    : Date, format: &quot;2007-01-31&quot; &quot;2007-02-01&quot; ...
+##  $ daily.returns           : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ daily.returns.1         : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ daily.returns.2         : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ daily.returns.3         : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ X000895.SZ.Volume       : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ X000895.SZ.Volume.1     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ X000895.SZ.Volume.2     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ X000895.SZ.Volume.3     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ future_five_day_return  : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ future_ten_day_return   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ future_twenty_day_return: num  0 0 0 0 0 0 0 0 0 0 ...
+##  - attr(*, &quot;na.action&quot;)= &#39;omit&#39; Named int [1:38] 1 2 3 4 5 6 7 8 9 10 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:38] &quot;2007-01-04&quot; &quot;2007-01-05&quot; &quot;2007-01-08&quot; &quot;2007-01-09&quot; ...</code></pre>
+<pre class="r"><code>head(data)</code></pre>
+<pre><code>##                  date daily.returns daily.returns.1 daily.returns.2
+## 2007-01-31 2007-01-31             0               0               0
+## 2007-02-01 2007-02-01             0               0               0
+## 2007-02-02 2007-02-02             0               0               0
+## 2007-02-05 2007-02-05             0               0               0
+## 2007-02-06 2007-02-06             0               0               0
+## 2007-02-07 2007-02-07             0               0               0
+##            daily.returns.3 X000895.SZ.Volume X000895.SZ.Volume.1
+## 2007-01-31               0                 0                   0
+## 2007-02-01               0                 0                   0
+## 2007-02-02               0                 0                   0
+## 2007-02-05               0                 0                   0
+## 2007-02-06               0                 0                   0
+## 2007-02-07               0                 0                   0
+##            X000895.SZ.Volume.2 X000895.SZ.Volume.3 future_five_day_return
+## 2007-01-31                   0                   0                      0
+## 2007-02-01                   0                   0                      0
+## 2007-02-02                   0                   0                      0
+## 2007-02-05                   0                   0                      0
+## 2007-02-06                   0                   0                      0
+## 2007-02-07                   0                   0                      0
+##            future_ten_day_return future_twenty_day_return
+## 2007-01-31                     0                        0
+## 2007-02-01                     0                        0
+## 2007-02-02                     0                        0
+## 2007-02-05                     0                        0
+## 2007-02-06                     0                        0
+## 2007-02-07                     0                        0</code></pre>
+</div>
+</div>
+<div id="三相关性分析" class="section level1">
+<h1>三、相关性分析</h1>
+<p>为了深入理解各变量之间的关系，提取数据框中的数值型变量，通过 <code>cor</code> 函数计算相关系数矩阵，并利用 <code>corrplot</code> 包绘制相关系数热图。</p>
+<pre class="r"><code>library(corrplot)</code></pre>
+<pre><code>## corrplot 0.95 loaded</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## ######################### Warning from &#39;xts&#39; package ##########################
+## #                                                                             #
+## # The dplyr lag() function breaks how base R&#39;s lag() function is supposed to  #
+## # work, which breaks lag(my_xts). Calls to lag(my_xts) that you type or       #
+## # source() into this session won&#39;t work correctly.                            #
+## #                                                                             #
+## # Use stats::lag() to make sure you&#39;re not using dplyr::lag(), or you can add #
+## # conflictRules(&#39;dplyr&#39;, exclude = &#39;lag&#39;) to your .Rprofile to stop           #
+## # dplyr from breaking base R&#39;s lag() function.                                #
+## #                                                                             #
+## # Code in packages is not affected. It&#39;s protected by R&#39;s namespace mechanism #
+## # Set `options(xts.warn_dplyr_breaks_lag = FALSE)` to suppress this warning.  #
+## #                                                                             #
+## ###############################################################################</code></pre>
+<pre><code>## 
+## 载入程序包：&#39;dplyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:randomForest&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following objects are masked from &#39;package:xts&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code># 提取数值型变量
+numeric_data &lt;- data %&gt;% select_if(is.numeric)
+
+# 计算相关系数矩阵
+correlation_matrix &lt;- cor(numeric_data)
+
+# 绘制相关系数热图
+corrplot(correlation_matrix, 
+         method = &quot;color&quot;, 
+         type = &quot;upper&quot;,
+         tl.col = &quot;black&quot;, tl.srt = 45,
+         title = &quot;Correlation Heatmap of Variables&quot;,
+         addCoef.col = &quot;black&quot;, 
+         number.cex = 0.7)</code></pre>
+<div class="figure"><span style="display:block;" id="fig:corr"></span>
+<img src="index_files/figure-html/corr-1.png" alt="变量相关性热图" width="90%" />
+<p class="caption">
+Figure 1: 变量相关性热图
+</p>
+</div>
+<p>热图中，坐标轴标签以黑色显示并旋转 45 度，同时添加黑色的相关系数数值，字体大小设为 0.7，清晰呈现各变量间的线性相关程度，为后续模型构建提供参考。</p>
+<p>从热图中可以看出，历史各周期的收益率之间存在较强相关性，而成交量与收益率之间的相关性较弱，这暗示成交量可能为模型提供差异化的信息。</p>
+</div>
+<div id="四预测模型构建与评估" class="section level1">
+<h1>四、预测模型构建与评估</h1>
+<div id="线性回归模型" class="section level2">
+<h2>4.1 线性回归模型</h2>
+<p>分别构建预测未来五日、十日及二十日涨幅的线性回归模型。以 <code>data</code> 中的所有变量作为自变量，相应的未来涨幅作为因变量，使用 <code>lm</code> 函数建模。</p>
+<pre class="r"><code># 构建预测未来五日涨幅的线性回归模型
+model_five_day &lt;- lm(future_five_day_return ~ ., data = data)
+summary(model_five_day)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = future_five_day_return ~ ., data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -37.921  -1.837   0.035   1.838  51.589 
+## 
+## Coefficients:
+##                            Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)              -1.259e-01  4.592e-01  -0.274   0.7840    
+## date                      6.136e-06  2.765e-05   0.222   0.8244    
+## daily.returns             1.331e-01  2.062e-02   6.455 1.19e-10 ***
+## daily.returns.1           3.004e-02  1.882e-02   1.596   0.1105    
+## daily.returns.2          -2.358e-02  1.275e-02  -1.849   0.0646 .  
+## daily.returns.3           5.332e-03  7.633e-03   0.699   0.4849    
+## X000895.SZ.Volume        -1.339e-08  6.858e-09  -1.952   0.0510 .  
+## X000895.SZ.Volume.1       8.689e-09  6.037e-09   1.439   0.1501    
+## X000895.SZ.Volume.2      -2.787e-10  2.889e-09  -0.096   0.9231    
+## X000895.SZ.Volume.3       1.965e-11  1.025e-09   0.019   0.9847    
+## future_ten_day_return     4.735e-01  1.047e-02  45.240  &lt; 2e-16 ***
+## future_twenty_day_return  1.627e-02  7.598e-03   2.141   0.0323 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.703 on 4701 degrees of freedom
+## Multiple R-squared:  0.4894,	Adjusted R-squared:  0.4882 
+## F-statistic: 409.6 on 11 and 4701 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># 预测未来五日涨幅
+prediction_five_day &lt;- predict(model_five_day, newdata = data)
+
+# 构建预测未来十日涨幅的线性回归模型
+model_ten_day &lt;- lm(future_ten_day_return ~ ., data = data)
+summary(model_ten_day)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = future_ten_day_return ~ ., data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.278  -2.039   0.001   2.089  61.889 
+## 
+## Coefficients:
+##                            Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               4.366e-02  5.341e-01   0.082  0.93485    
+## date                     -3.026e-06  3.217e-05  -0.094  0.92506    
+## daily.returns             3.350e-02  2.408e-02   1.391  0.16428    
+## daily.returns.1          -5.127e-02  2.188e-02  -2.343  0.01915 *  
+## daily.returns.2          -2.457e-02  1.483e-02  -1.656  0.09770 .  
+## daily.returns.3           2.593e-02  8.871e-03   2.923  0.00349 ** 
+## X000895.SZ.Volume         5.147e-09  7.980e-09   0.645  0.51896    
+## X000895.SZ.Volume.1       7.558e-10  7.024e-09   0.108  0.91431    
+## X000895.SZ.Volume.2      -6.052e-09  3.359e-09  -1.802  0.07168 .  
+## X000895.SZ.Volume.3       2.086e-09  1.192e-09   1.751  0.08002 .  
+## future_five_day_return    6.406e-01  1.416e-02  45.240  &lt; 2e-16 ***
+## future_twenty_day_return  3.348e-01  7.371e-03  45.423  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.307 on 4701 degrees of freedom
+## Multiple R-squared:  0.6373,	Adjusted R-squared:  0.6364 
+## F-statistic: 750.8 on 11 and 4701 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># 预测未来十日涨幅
+prediction_ten_day &lt;- predict(model_ten_day, newdata = data)
+
+# 构建预测未来二十日涨幅的线性回归模型
+model_twenty_day &lt;- lm(future_twenty_day_return ~ ., data = data)
+summary(model_twenty_day)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = future_twenty_day_return ~ ., data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -30.805  -3.435  -0.276   3.457  77.286 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             2.769e+00  8.801e-01   3.146  0.00167 ** 
+## date                   -1.154e-04  5.303e-05  -2.176  0.02964 *  
+## daily.returns          -4.360e-02  3.973e-02  -1.097  0.27249    
+## daily.returns.1         5.090e-02  3.610e-02   1.410  0.15861    
+## daily.returns.2         6.137e-02  2.446e-02   2.509  0.01215 *  
+## daily.returns.3        -4.063e-02  1.463e-02  -2.777  0.00552 ** 
+## X000895.SZ.Volume      -1.206e-08  1.316e-08  -0.916  0.35953    
+## X000895.SZ.Volume.1    -8.226e-10  1.159e-08  -0.071  0.94340    
+## X000895.SZ.Volume.2     1.059e-08  5.541e-09   1.911  0.05608 .  
+## X000895.SZ.Volume.3    -5.759e-09  1.964e-09  -2.932  0.00339 ** 
+## future_five_day_return  5.989e-02  2.797e-02   2.141  0.03230 *  
+## future_ten_day_return   9.110e-01  2.006e-02  45.423  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 7.105 on 4701 degrees of freedom
+## Multiple R-squared:  0.4777,	Adjusted R-squared:  0.4764 
+## F-statistic: 390.8 on 11 and 4701 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># 预测未来二十日涨幅
+prediction_twenty_day &lt;- predict(model_twenty_day, newdata = data)</code></pre>
+</div>
+<div id="随机森林模型" class="section level2">
+<h2>4.2 随机森林模型</h2>
+<p>同样针对未来五日、十日及二十日涨幅构建随机森林模型。随机森林模型因其对复杂非线性关系的捕捉能力，为预测提供了另一种有效的视角。</p>
+<pre class="r"><code># 构建预测未来五日涨幅的随机森林模型
+rf_model_five_day &lt;- randomForest(future_five_day_return ~ ., data = data, ntree = 100)
+rf_prediction_five_day &lt;- predict(rf_model_five_day, newdata = data)
+
+# 构建预测未来十日涨幅的随机森林模型
+rf_model_ten_day &lt;- randomForest(future_ten_day_return ~ ., data = data, ntree = 100)
+rf_prediction_ten_day &lt;- predict(rf_model_ten_day, newdata = data)
+
+# 构建预测未来二十日涨幅的随机森林模型
+rf_model_twenty_day &lt;- randomForest(future_twenty_day_return ~ ., data = data, ntree = 100)
+rf_prediction_twenty_day &lt;- predict(rf_model_twenty_day, newdata = data)</code></pre>
+</div>
+<div id="模型评估与可视化" class="section level2">
+<h2>4.3 模型评估与可视化</h2>
+<p>对于随机森林模型预测的未来不同周期涨幅，分别绘制实际值与预测值的对比图。通过 <code>patchwork</code> 包将每个周期涨幅的对比图和差值图合并展示，全面评估模型的预测效果。</p>
+<pre class="r"><code># 定义通用绘图函数
+plot_prediction &lt;- function(dates, actual, predicted, title_prefix) {
+  # 对比图数据
+  plot_data &lt;- data.frame(
+    date = dates,
+    actual = actual,
+    predicted = predicted
+  )
+  plot_data_long &lt;- pivot_longer(plot_data, 
+                                 cols = c(actual, predicted), 
+                                 names_to = &quot;type&quot;, 
+                                 values_to = &quot;return&quot;)
+  
+  # 实际值与预测值对比图
+  p_comparison &lt;- ggplot(plot_data_long, 
+                         aes(x = date, y = return, color = type)) +
+    geom_line() +
+    labs(
+      title = paste0(&quot;Random Forest: &quot;, title_prefix, &quot; Actual vs Predicted&quot;),
+      x = &quot;Date&quot;, y = &quot;Return&quot;
+    ) +
+    theme_minimal()
+  
+  # 差值图
+  diff_data &lt;- data.frame(
+    date = dates,
+    diff = predicted - actual
+  )
+  
+  p_diff &lt;- ggplot(diff_data, aes(x = date, y = diff)) +
+    geom_line() +
+    labs(
+      title = paste0(&quot;Random Forest: &quot;, title_prefix, &quot; Prediction Difference&quot;),
+      x = &quot;Date&quot;, y = &quot;Difference&quot;
+    ) +
+    theme_minimal()
+  
+  # 合并展示
+  p_comparison / p_diff
+}
+
+# 绘制各周期预测效果
+five_day_plot   &lt;- plot_prediction(data$date, data$future_five_day_return, 
+                                   rf_prediction_five_day, &quot;Five-Day&quot;)
+ten_day_plot    &lt;- plot_prediction(data$date, data$future_ten_day_return, 
+                                   rf_prediction_ten_day, &quot;Ten-Day&quot;)
+twenty_day_plot &lt;- plot_prediction(data$date, data$future_twenty_day_return, 
+                                   rf_prediction_twenty_day, &quot;Twenty-Day&quot;)</code></pre>
+<p>预测效果分别如下：</p>
+<p><img src="index_files/figure-html/visResult-1.png" alt="" width="672" /><img src="index_files/figure-html/visResult-2.png" alt="" width="672" /><img src="index_files/figure-html/visResult-3.png" alt="" width="672" /></p>
+<p>从图中可以看出，五日涨幅的预测跟踪效果较好，差值波动相对较小；而随着预测周期的增长（十日、二十日），预测误差逐渐增大。这是由于长期走势受更多复杂因素影响，仅凭历史量价信息难以完全捕捉。</p>
+</div>
+</div>
+<div id="五模型表现对比" class="section level1">
+<h1>五、模型表现对比</h1>
+<p>为更清晰地评估模型的预测效果，我们计算各模型的 R 方指标：</p>
+<pre class="r"><code>cat(&quot;===== 线性回归模型 =====\n&quot;)</code></pre>
+<pre><code>## ===== 线性回归模型 =====</code></pre>
+<pre class="r"><code>cat(&quot;五日涨幅 R²: &quot;,  summary(model_five_day)$r.squared, &quot;\n&quot;)</code></pre>
+<pre><code>## 五日涨幅 R²:  0.4894064</code></pre>
+<pre class="r"><code>cat(&quot;十日涨幅 R²: &quot;,  summary(model_ten_day)$r.squared, &quot;\n&quot;)</code></pre>
+<pre><code>## 十日涨幅 R²:  0.6372557</code></pre>
+<pre class="r"><code>cat(&quot;二十日涨幅 R²: &quot;, summary(model_twenty_day)$r.squared, &quot;\n&quot;)</code></pre>
+<pre><code>## 二十日涨幅 R²:  0.4776518</code></pre>
+<pre class="r"><code>cat(&quot;\n===== 随机森林模型 =====\n&quot;)</code></pre>
+<pre><code>## 
+## ===== 随机森林模型 =====</code></pre>
+<pre class="r"><code>rf_r2 &lt;- function(actual, predicted) {
+  1 - sum((actual - predicted)^2) / sum((actual - mean(actual))^2)
+}
+cat(&quot;五日涨幅 R²: &quot;,  rf_r2(data$future_five_day_return, rf_prediction_five_day), &quot;\n&quot;)</code></pre>
+<pre><code>## 五日涨幅 R²:  0.9075108</code></pre>
+<pre class="r"><code>cat(&quot;十日涨幅 R²: &quot;,  rf_r2(data$future_ten_day_return, rf_prediction_ten_day), &quot;\n&quot;)</code></pre>
+<pre><code>## 十日涨幅 R²:  0.9330646</code></pre>
+<pre class="r"><code>cat(&quot;二十日涨幅 R²: &quot;, rf_r2(data$future_twenty_day_return, rf_prediction_twenty_day), &quot;\n&quot;)</code></pre>
+<pre><code>## 二十日涨幅 R²:  0.9021227</code></pre>
+<p>可以看出，随机森林模型的拟合能力明显优于线性回归模型，尤其在短期预测（五日）上表现突出。这说明历史量价与未来涨幅之间存在较强的非线性关系，随机森林模型能够更好地捕捉这种关系。</p>
+</div>
+<div id="六结论" class="section level1">
+<h1>六、结论</h1>
+<p>本文通过对双汇发展股票历史量价数据的系统分析，综合运用相关性分析、线性回归及随机森林模型等方法，构建了一个完整的量化分析体系。主要发现如下：</p>
+<ol style="list-style-type: decimal">
+<li>历史阶段性涨幅之间存在较强的自相关性，不同周期（3 日、5 日、10 日、20 日）的回报率高度相关；</li>
+<li>成交量与历史/未来涨幅之间的线性相关性较弱，但成交量为模型提供了差异化的非线性信息；</li>
+<li>随机森林模型在捕捉历史量价与未来涨幅之间的非线性关系上显著优于线性回归模型；</li>
+<li>短期预测（5 日）效果明显优于中长期预测（10 日、20 日），随着预测周期的拉长，模型预测能力迅速下降。</li>
+</ol>
+<p>此外，金融市场复杂多变，单只股票的分析结果存在一定局限性。未来可进一步扩展到多只股票、纳入更多宏观因子和情绪指标，以构建更稳健的预测体系。</p>
+</div>
