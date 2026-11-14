@@ -1,28 +1,33 @@
 # 格物堂 · Netlify 构建配置
 #
-# 为什么需要装 dart-sass：
-#   Hugo 0.148+ 移除了内置 libsass，SCSS 只能借助外部 dart-sass 编译。
-#   当前主题（hugo-theme-stack）的样式是 SCSS，故构建前需安装 sass。
+# 两个硬要求：
 #
-# 为什么 HUGO_VERSION 必须 >= 0.158：
-#   主题使用了 Hugo 新版模板系统（_partials 目录、.Language.Direction、
-#   locale 配置项等），在 0.147 下会直接报错退出。
+# 1) HUGO_VERSION >= 0.158
+#    主题使用 Hugo 新版模板系统（_partials 目录、.Language.Direction、
+#    locale 配置项等），0.147 会直接报错退出。
+#    Netlify 通过 mise 安装，已验证 0.170.0 可用。
+#
+# 2) SCSS 需要外部 dart-sass
+#    Hugo 0.148+ 移除了内置 libsass，SCSS 只能交给外部 sass 编译。
+#    注意：不要用 `npm i -g sass` —— npm 装的 sass 是 node 脚本包装器，
+#    Hugo 执行时会报 “got unexpected EOF / must have read and execute
+#    permissions”，构建失败。改用官方 dart-sass 独立二进制（自带
+#    Dart 运行时，无 node 依赖），解压后放进 PATH 最稳妥。
 
 [build]
-command = 'npm install -g sass && hugo --gc --minify'
+command = 'curl -sSL https://github.com/sass/dart-sass/releases/download/1.77.8/dart-sass-1.77.8-linux-x64.tar.gz -o /tmp/ds.tgz && tar xzf /tmp/ds.tgz -C /tmp && chmod +x /tmp/dart-sass/sass && export PATH="/tmp/dart-sass:$PATH" && hugo --gc --minify'
 publish = 'public'
 
 [build.environment]
 HUGO_VERSION = '0.170.0'
 HUGO_ENV = 'production'
-NODE_VERSION = '20'
 
-# 分支与 PR 预览：不加 --minify，保留可读输出，并绑定部署 URL
+# 分支与 PR 预览：不压缩输出，并绑定部署 URL 以便预览域名下的资源路径正确
 [context.branch-deploy]
-command = 'npm install -g sass && hugo -F --gc -b $DEPLOY_PRIME_URL'
+command = 'curl -sSL https://github.com/sass/dart-sass/releases/download/1.77.8/dart-sass-1.77.8-linux-x64.tar.gz -o /tmp/ds.tgz && tar xzf /tmp/ds.tgz -C /tmp && chmod +x /tmp/dart-sass/sass && export PATH="/tmp/dart-sass:$PATH" && hugo -F --gc -b $DEPLOY_PRIME_URL'
 
 [context.deploy-preview]
-command = 'npm install -g sass && hugo -F --gc -b $DEPLOY_PRIME_URL'
+command = 'curl -sSL https://github.com/sass/dart-sass/releases/download/1.77.8/dart-sass-1.77.8-linux-x64.tar.gz -o /tmp/ds.tgz && tar xzf /tmp/ds.tgz -C /tmp && chmod +x /tmp/dart-sass/sass && export PATH="/tmp/dart-sass:$PATH" && hugo -F --gc -b $DEPLOY_PRIME_URL'
 
 [context.production]
 
