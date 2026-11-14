@@ -1,0 +1,82 @@
+toggleMenu = "منو"
+darkMode   = "حالت شب"
+
+[list]
+    section = "بخش"
+
+    [list.page]
+        one   = "{{ .Count }} صفحه"
+        other = "{{ .Count }} صفحه"
+
+    [list.subsection]
+        one   = "زیربخش"
+        other = "زیربخش"
+
+[article]
+    back            = "قبلی"
+    tableOfContents = "فهرست"
+    relatedContent  = "مطالب مرتبط"
+    lastUpdatedOn   = "آخرین بروزرسانی در"
+
+    [article.readingTime]
+        one   = "مطالعه در {{ .Count }} دقیقه"
+        other = "مطالعه در {{ .Count }} دقیقه"
+
+    [article.alert]
+        note      = "یادداشت"
+        tip       = "نکته"
+        important = "مهم"
+        warning   = "هشدار"
+        caution   = "احتیاط"
+
+    [article.codeblock]
+        copy   = "کپی"
+        copied = "کپی شد!"
+
+[notFound]
+    title    = "یافت نشد"
+    subtitle = "این صحه وجود ندارد"
+
+[widget]
+    [widget.archives]
+        title = "آرشیو"
+        more  = "بیشتر"
+
+    [widget.tagCloud]
+        title = "تگ ها"
+
+    [widget.categoriesCloud]
+        title = "دسته بندی"
+
+[search]
+    title       = "جستجو"
+    placeholder = "تایپ کنید ..."
+    resultTitle = "#PAGES_COUNT صفحه (#TIME_SECONDS ثانیه)"
+
+[footer]
+    builtWith  = "قدرت گرفته از {{ .Generator }}"
+    designedBy = "قالب {{ .Theme }} ساخته شده توسط {{ .DesignedBy }}"
+
+[cookies]
+    title             = "رضایت کوکی"
+    text              = "ما از کوکی‌ها برای بهبود تجربه مرورگری شما و تجزیه و تحلیل ترافیک سایت استفاده می‌کنیم."
+    acceptAll         = "پذیرش همه"
+    deny              = "رد کردن"
+    managePreferences = "مدیریت تنظیمات"
+    settingsTitle     = "تنظیمات کوکی"
+    savePreferences   = "ذخیره تنظیمات"
+    cancel            = "لغو"
+    footerLink        = "تنظیمات کوکی"
+    commentsDisabled  = "نظرات تا زمانی که کوکی‌های کاربردی را بپذیرید غیرفعال هستند."
+
+    [cookies.necessary]
+        title = "ضروری"
+        text  = "این کوکی‌ها برای عملکرد وب‌سایت الزامی هستند و نمی‌توان آنها را غیرفعال کرد."
+
+    [cookies.analytics]
+        title = "تجزیه و تحلیل"
+        text  = "این کوکی‌ها به ما کمک می‌کنند تا بفهمیم بازدیدکنندگان چگونه با وب‌سایت ما تعامل دارند."
+
+    [cookies.functional]
+        title = "کاربردی"
+        text  = "این کوکی‌ها ویژگی‌هایی مانند نظرات و محتوای جاسازی‌شده را فعال می‌کنند."

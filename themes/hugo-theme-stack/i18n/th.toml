@@ -1,0 +1,79 @@
+toggleMenu = "สลับเมนู"
+darkMode   = "ธีมมืด"
+
+[list]
+    section = "หมวดหมู่"
+
+    [list.page]
+        one   = "{{ .Count }} หน้า"
+        other = "{{ .Count }} หน้า"
+
+    [list.subsection]
+        one   = "หมวดหมู่ย่อย"
+        other = "หมวดหมู่ย่อยอื่นๆ"
+
+[article]
+    back            = "กลับไป"
+    tableOfContents = "สารบัญ"
+    relatedContent  = "เนื้อหาคล้ายคลึงกัน"
+    lastUpdatedOn   = "อัปเดตล่าสุดเมื่อ"
+
+    [article.readingTime]
+        one   = "น่าจะใช้เวลา {{ .Count }} นาทีในการอ่าน"
+        other = "น่าจะใช้เวลา {{ .Count }} นาทีในการอ่าน"
+
+    [article.alert]
+        note      = "หมายเหตุ"
+        tip       = "เคล็ดลับ"
+        important = "สำคัญ"
+        warning   = "คำเตือน"
+        caution   = "ระวัง"
+
+    [article.codeblock]
+        copy   = "คัดลอก"
+        copied = "คัดลอกแล้ว!"
+
+[notFound]
+    title    = "ไม่พบหัวข้อ"
+    subtitle = "ไม่พบหน้านี้ในระบบ"
+
+[widget]
+    [widget.archives]
+        title = "เนื้อหาที่เก็บถาวรแล้ว"
+        more  = "อื่นๆ นอกจากนี้"
+
+    [widget.tagCloud]
+        title = "แท็ก"
+
+[search]
+    title       = "ค้นหา"
+    placeholder = "พิมพ์เพื่อค้นหา ..."
+    resultTitle = "#PAGES_COUNT pages (#TIME_SECONDS seconds)"
+
+[footer]
+    builtWith  = "ถูกสร้างด้วย {{ .Generator }}"
+    designedBy = "ธีม {{ .Theme }} ออกแบบโดย {{ .DesignedBy }}"
+
+[cookies]
+    title             = "ความยินยอมคุกกี้"
+    text              = "เราใช้คุกกี้เพื่อปรับปรุงประสบการณ์การเรียกดูของคุณและวิเคราะห์การเข้าชมเว็บไซต์"
+    acceptAll         = "ยอมรับทั้งหมด"
+    deny              = "ปฏิเสธ"
+    managePreferences = "จัดการการตั้งค่า"
+    settingsTitle     = "การตั้งค่าคุกกี้"
+    savePreferences   = "บันทึกการตั้งค่า"
+    cancel            = "ยกเลิก"
+    footerLink        = "การตั้งค่าคุกกี้"
+    commentsDisabled  = "ความคิดเห็นถูกปิดการใช้งานจนกว่าคุณจะยอมรับคุกกี้เชิงหน้าที่"
+
+    [cookies.necessary]
+        title = "จำเป็น"
+        text  = "คุกกี้เหล่านี้จำเป็นสำหรับการทำงานของเว็บไซต์และไม่สามารถปิดการใช้งานได้"
+
+    [cookies.analytics]
+        title = "การวิเคราะห์"
+        text  = "คุกกี้เหล่านี้ช่วยให้เราเข้าใจว่าผู้เยี่ยมชมโต้ตอบกับเว็บไซต์ของเราอย่างไร"
+
+    [cookies.functional]
+        title = "เชิงหน้าที่"
+        text  = "คุกกี้เหล่านี้เปิดใช้งานคุณสมบัติต่างๆ เช่น ความคิดเห็นและเนื้อหาที่ฝังไว้"

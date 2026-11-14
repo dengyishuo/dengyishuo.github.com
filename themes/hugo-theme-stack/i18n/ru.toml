@@ -1,0 +1,83 @@
+toggleMenu = "Показать/скрыть меню"
+darkMode   = "Тёмный режим"
+
+[list]
+    section = "Раздел"
+
+    [list.page]
+        one   = "{{ .Count }} страница"
+        few   = "{{ .Count }} страницы"
+        many  = "{{ .Count }} страниц"
+        other = "{{ .Count }} страниц"
+
+    [list.subsection]
+        one   = "Подраздел"
+        few   = "Подразделы"
+        many  = "Подразделы"
+        other = "Подразделы"
+
+[article]
+    back            = "Назад"
+    relatedContent  = "Также рекомендуем"
+    lastUpdatedOn   = "Обновлено"
+    tableOfContents = "Содержание"
+    readingTime     = "Время чтения: {{ .Count }} мин."
+
+    [article.alert]
+        note      = "Примечание"
+        tip       = "Совет"
+        important = "Важно"
+        warning   = "Предупреждение"
+        caution   = "Осторожно"
+
+    [article.codeblock]
+        copy   = "Копировать"
+        copied = "Скопировано!"
+
+[notFound]
+    title    = "Не найдено"
+    subtitle = "Запрашиваемая страница не существует"
+
+[widget]
+    [widget.archives]
+        title = "Архивы"
+        more  = "Ещё"
+
+    [widget.tagCloud]
+        title = "Теги"
+
+    [widget.categoriesCloud]
+        title = "Категории"
+
+[search]
+    title       = "Поиск"
+    placeholder = "Введите что-нибудь..."
+    resultTitle = "Найдено #PAGES_COUNT страниц (за #TIME_SECONDS с.)"
+
+[footer]
+    builtWith  = "Создано при помощи {{ .Generator }}"
+    designedBy = "Тема {{ .Theme }}, дизайн {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Согласие на использование файлов cookie"
+    text              = "Мы используем файлы cookie для улучшения вашего опыта просмотра и анализа трафика сайта."
+    acceptAll         = "Принять все"
+    deny              = "Отклонить"
+    managePreferences = "Управление настройками"
+    settingsTitle     = "Настройки файлов cookie"
+    savePreferences   = "Сохранить настройки"
+    cancel            = "Отмена"
+    footerLink        = "Настройки файлов cookie"
+    commentsDisabled  = "Комментарии отключены, пока вы не примете функциональные файлы cookie."
+
+    [cookies.necessary]
+        title = "Необходимые"
+        text  = "Эти файлы cookie необходимы для работы сайта и не могут быть отключены."
+
+    [cookies.analytics]
+        title = "Аналитика"
+        text  = "Эти файлы cookie помогают нам понять, как посетители взаимодействуют с нашим сайтом."
+
+    [cookies.functional]
+        title = "Функциональные"
+        text  = "Эти файлы cookie включают такие функции, как комментарии и встроенный контент."

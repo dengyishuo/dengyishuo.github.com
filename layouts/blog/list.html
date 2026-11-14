@@ -1,0 +1,31 @@
+{{- /* 格物堂 · 博客列表（content/blog section 模板）
+     用首页同款卡片流 + 分页。
+     注意：文章已物理存放在 content/blog/ 下（permalinks 保持 /年/月/日/slug/），
+     因此这里用 .Pages，分页器才能正确拿到全部文章。 */ -}}
+{{ define "main" }}
+    {{- $pages := .Pages.ByDate.Reverse -}}
+    {{- $paginator := .Paginate $pages -}}
+
+    <header class="gt-page-head">
+        <h1 class="gt-page-title">{{ .Title }}</h1>
+        {{- with .Description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
+        <p class="gt-page-meta">
+            共 {{ len $pages }} 篇 · 第 {{ $paginator.PageNumber }} / {{ $paginator.TotalPages }} 页
+            <span class="gt-page-meta__sep">·</span>
+            <a href="{{ "/archives/" | relLangURL }}">按年份浏览</a>
+        </p>
+    </header>
+
+    <section class="article-list">
+        {{- range $paginator.Pages }}
+            {{ partial "article-list/default" . }}
+        {{- end }}
+    </section>
+
+    {{- partial "pagination.html" . -}}
+    {{- partial "footer/footer" . -}}
+{{ end }}
+
+{{ define "right-sidebar" }}
+    {{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}
+{{ end }}

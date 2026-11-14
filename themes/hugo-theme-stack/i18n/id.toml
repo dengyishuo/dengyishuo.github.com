@@ -1,0 +1,82 @@
+toggleMenu = "Tampilkan Menu"
+darkMode   = "Mode Gelap"
+
+[list]
+    section = "Bagian"
+
+    [list.page]
+        one   = "{{ .Count }} halaman"
+        other = "{{ .Count }} halaman"
+
+    [list.subsection]
+        one   = "Subbagian"
+        other = "Subbagian"
+
+[article]
+    back            = "Kembali"
+    tableOfContents = "Daftar Isi"
+    relatedContent  = "Konten terkait"
+    lastUpdatedOn   = "Terakhir diperbarui pada"
+
+    [article.readingTime]
+        one   = "Waktu Membaca: {{ .Count }} menit"
+        other = "Waktu Membaca: {{ .Count }} menit"
+
+    [article.alert]
+        note      = "Catatan"
+        tip       = "Tips"
+        important = "Penting"
+        warning   = "Peringatan"
+        caution   = "Perhatian"
+
+    [article.codeblock]
+        copy   = "Salin"
+        copied = "Disalin!"
+
+[notFound]
+    title    = "Tidak ditemukan"
+    subtitle = "Halaman yang Anda akses tidak ditemukan."
+
+[widget]
+    [widget.archives]
+        title = "Arsip"
+        more  = "Lebih"
+
+    [widget.tagCloud]
+        title = "Tag"
+
+    [widget.categoriesCloud]
+        title = "Kategori"
+
+[search]
+    title       = "Cari"
+    placeholder = "Ketik sesuatu..."
+    resultTitle = "#PAGES_COUNT halaman (#TIME_SECONDS detik)"
+
+[footer]
+    builtWith  = "Dibangun dengan {{ .Generator }}"
+    designedBy = "Tema {{ .Theme }} dirancang oleh {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Persetujuan Cookie"
+    text              = "Kami menggunakan cookie untuk meningkatkan pengalaman browsing Anda dan menganalisis lalu lintas situs."
+    acceptAll         = "Terima Semua"
+    deny              = "Tolak"
+    managePreferences = "Kelola preferensi"
+    settingsTitle     = "Preferensi Cookie"
+    savePreferences   = "Simpan preferensi"
+    cancel            = "Batal"
+    footerLink        = "Pengaturan cookie"
+    commentsDisabled  = "Komentar dinonaktifkan sampai Anda menerima cookie fungsional."
+
+    [cookies.necessary]
+        title = "Diperlukan"
+        text  = "Cookie ini diperlukan agar situs web berfungsi dan tidak dapat dinonaktifkan."
+
+    [cookies.analytics]
+        title = "Analitik"
+        text  = "Cookie ini membantu kami memahami bagaimana pengunjung berinteraksi dengan situs web kami."
+
+    [cookies.functional]
+        title = "Fungsional"
+        text  = "Cookie ini mengaktifkan fitur seperti komentar dan konten yang disematkan."

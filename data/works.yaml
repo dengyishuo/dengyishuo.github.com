@@ -1,0 +1,69 @@
+# 作品页数据
+# role: 译 / 著；status: published（已出版）/ writing（撰写中）/ planned（计划内）
+# url 可留空，留空则不显示外链。出版社等信息未填（避免写错），需要时补 note 字段。
+
+books:
+  - title: R核心技术手册
+    role: 译
+    status: published
+    note: ""
+    url: ""
+
+  - title: R数据可视化手册
+    role: 译
+    status: published
+    note: ""
+    url: ""
+
+  - title: R语言统计入门
+    role: 译
+    status: published
+    note: ""
+    url: ""
+
+  - title: 量化交易与R语言
+    role: 译
+    status: published
+    note: ""
+    url: ""
+
+  - title: 金融风险建模及投资组合优化：使用R语言
+    role: 译
+    status: published
+    note: ""
+    url: ""
+
+  - title: AI时代R与技术分析全景应用指南
+    role: 著
+    status: writing
+    note: ""
+    url: ""
+
+  - title: AI时代R与蜡烛图分析全景应用指南
+    role: 著
+    status: planned
+    note: ""
+    url: ""
+
+  - title: AI时代R与量化投资全景应用指南
+    role: 著
+    status: planned
+    note: ""
+    url: ""
+
+  - title: AI时代R与金融数据可视化全景应用指南
+    role: 著
+    status: planned
+    note: ""
+    url: ""
+
+packages:
+  - name: eTTR
+    repo: dengyishuo/eTTR
+    desc: R 环境下的技术分析与交易规则构建工具
+    url: https://github.com/dengyishuo/eTTR
+
+  - name: eTushare
+    repo: dengyishuo/eTushare
+    desc: 轻量的 R 版 Tushare 数据接口
+    url: https://github.com/dengyishuo/eTushare

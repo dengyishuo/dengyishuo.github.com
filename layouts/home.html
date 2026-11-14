@@ -1,0 +1,92 @@
+{{- /* 格物堂 · 首页（落地页）
+     首页不再是文章流（文章流已移到 /blog/），这里负责说清「这是谁的站、写什么、往哪走」。 */ -}}
+
+{{ define "body-class" }}gt-home{{ end }}
+
+{{ define "main" }}
+    {{- $posts := (where site.RegularPages "Section" "blog") -}}
+    {{- $total := len $posts -}}
+    {{- $oldest := (index ($posts.ByDate) 0).Date.Year -}}
+    {{- $newest := (index ($posts.ByDate.Reverse) 0).Date.Year -}}
+    {{- $works := hugo.Data.works -}}
+    {{- $bookCount := len $works.books -}}
+    {{- $pkgCount := len $works.packages -}}
+
+    <section class="gt-hero">
+        <div class="gt-hero__inner">
+            <p class="gt-hero__eyebrow">格物致知 · 让知识美好生活</p>
+            <h1 class="gt-hero__title">格物堂</h1>
+            <p class="gt-hero__lead">
+                这里是我（MatrixSpk）的长期写作空间。从 {{ $oldest }} 年写到现在，
+                存下的是关于 <strong>R 语言</strong>、<strong>量化投资</strong>、
+                <strong>数据分析</strong> 的实践笔记，也夹杂着读书、跑步与生活的随笔。
+            </p>
+            <p class="gt-hero__sub">
+                不追热点，不写水文。每一篇基本都来自真实的数据、真实的代码、真实的坑。
+            </p>
+
+            <div class="gt-hero__stats">
+                <div class="gt-stat">
+                    <span class="gt-stat__num">{{ $total }}</span>
+                    <span class="gt-stat__label">篇文章</span>
+                </div>
+                <div class="gt-stat">
+                    <span class="gt-stat__num">{{ $oldest }}–{{ $newest }}</span>
+                    <span class="gt-stat__label">持续写作</span>
+                </div>
+                <div class="gt-stat">
+                    <span class="gt-stat__num">{{ $bookCount }}</span>
+                    <span class="gt-stat__label">本书（译 / 著）</span>
+                </div>
+                <div class="gt-stat">
+                    <span class="gt-stat__num">{{ $pkgCount }}</span>
+                    <span class="gt-stat__label">个开源 R 包</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gt-doors">
+        <h2 class="gt-doors__title">你想看什么？</h2>
+        <div class="gt-doors__grid">
+            <a class="gt-door" href="{{ "/about/" | relLangURL }}">
+                <span class="gt-door__icon">{{ partial "helper/icon" "user" }}</span>
+                <span class="gt-door__name">想了解我</span>
+                <span class="gt-door__desc">教育、工作与社会经历，写过和正在写的书，以及我在做的事。</span>
+                <span class="gt-door__go">前往「关于我」</span>
+            </a>
+            <a class="gt-door" href="{{ "/blog/" | relLangURL }}">
+                <span class="gt-door__icon">{{ partial "helper/icon" "archives" }}</span>
+                <span class="gt-door__name">想看我的观点</span>
+                <span class="gt-door__desc">量化策略、风险管理、R 语言实务，以及对投资与阅读的零散思考。</span>
+                <span class="gt-door__go">前往「博客」</span>
+            </a>
+            <a class="gt-door" href="{{ "/works/" | relLangURL }}">
+                <span class="gt-door__icon">{{ partial "helper/icon" "hash" }}</span>
+                <span class="gt-door__name">想看我的作品</span>
+                <span class="gt-door__desc">已出版的译著、撰写中的新书，以及 eTTR、eTushare 两个开源包。</span>
+                <span class="gt-door__go">前往「作品」</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="gt-github">
+        <div class="gt-github__left">
+            <h2 class="gt-github__title">代码在这里</h2>
+            <p class="gt-github__desc">
+                书里的例子、文章里的脚本，以及两个 R 包，都放在 GitHub 上。欢迎提 issue，或者只是来看看。
+            </p>
+        </div>
+        <a class="gt-github__card" href="https://github.com/dengyishuo" target="_blank" rel="noopener">
+            <span class="gt-github__icon">{{ partial "helper/icon" "brand-github" }}</span>
+            <span class="gt-github__meta">
+                <span class="gt-github__handle">@dengyishuo</span>
+                <span class="gt-github__url">github.com/dengyishuo</span>
+            </span>
+        </a>
+    </section>
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

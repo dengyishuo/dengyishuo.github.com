@@ -1,17 +1,30 @@
+# 格物堂 · Netlify 构建配置
+#
+# 为什么需要装 dart-sass：
+#   Hugo 0.148+ 移除了内置 libsass，SCSS 只能借助外部 dart-sass 编译。
+#   当前主题（hugo-theme-stack）的样式是 SCSS，故构建前需安装 sass。
+#
+# 为什么 HUGO_VERSION 必须 >= 0.158：
+#   主题使用了 Hugo 新版模板系统（_partials 目录、.Language.Direction、
+#   locale 配置项等），在 0.147 下会直接报错退出。
+
 [build]
-command = 'hugo'
+command = 'npm install -g sass && hugo --gc --minify'
 publish = 'public'
 
 [build.environment]
-HUGO_VERSION = '0.147.7'
+HUGO_VERSION = '0.170.0'
+HUGO_ENV = 'production'
+NODE_VERSION = '20'
 
-[context]
+# 分支与 PR 预览：不加 --minify，保留可读输出，并绑定部署 URL
 [context.branch-deploy]
-command = 'hugo -F -b $DEPLOY_PRIME_URL'
+command = 'npm install -g sass && hugo -F --gc -b $DEPLOY_PRIME_URL'
 
 [context.deploy-preview]
-command = 'hugo -F -b $DEPLOY_PRIME_URL'
+command = 'npm install -g sass && hugo -F --gc -b $DEPLOY_PRIME_URL'
 
 [context.production]
+
 [context.production.environment]
 HUGO_ENV = 'production'

@@ -1,0 +1,77 @@
+toggleMenu = "Open Menu"
+darkMode   = "Donkere modus"
+
+[list]
+    section = "Sectie"
+
+    [list.page]
+        one   = "{{ .Count }} pagina"
+        other = "{{ .Count }} pagina's"
+
+    [list.subsection]
+        one   = "Subsectie"
+        other = "Subsecties"
+
+[article]
+    relatedContent = "Gerelateerde inhoud"
+    lastUpdatedOn  = "Laatst bijgewerkt op"
+    readingTime    = "{{ .Count }} leestijd"
+
+    [article.alert]
+        note      = "Opmerking"
+        tip       = "Tip"
+        important = "Belangrijk"
+        warning   = "Waarschuwing"
+        caution   = "Let op"
+
+    [article.codeblock]
+        copy   = "Kopiëren"
+        copied = "Gekopieerd!"
+
+[notFound]
+    title    = "Niet gevonden"
+    subtitle = "Deze pagina bestaat niet."
+
+[widget]
+    [widget.archives]
+        title = "Archief"
+        more  = "Meer"
+
+    [widget.tagCloud]
+        title = "Tags"
+
+    [widget.categoriesCloud]
+        title = "Categorie"
+
+[search]
+    title       = "Zoeken"
+    placeholder = "Typ iets"
+    resultTitle = "#PAGES_COUNT pagina's (#TIME_SECONDS seconden)"
+
+[footer]
+    builtWith  = "Gemaakt met {{ .Generator }}"
+    designedBy = "Theme {{ .Theme }} ontworpen door {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Cookie-toestemming"
+    text              = "We gebruiken cookies om uw browse-ervaring te verbeteren en siteverkeer te analyseren."
+    acceptAll         = "Accepteer alles"
+    deny              = "Weigeren"
+    managePreferences = "Voorkeuren beheren"
+    settingsTitle     = "Cookie-voorkeuren"
+    savePreferences   = "Voorkeuren opslaan"
+    cancel            = "Annuleren"
+    footerLink        = "Cookie-instellingen"
+    commentsDisabled  = "Reacties zijn uitgeschakeld totdat u functionele cookies accepteert."
+
+    [cookies.necessary]
+        title = "Noodzakelijk"
+        text  = "Deze cookies zijn vereist voor de werking van de website en kunnen niet worden uitgeschakeld."
+
+    [cookies.analytics]
+        title = "Analyse"
+        text  = "Deze cookies helpen ons begrijpen hoe bezoekers omgaan met onze website."
+
+    [cookies.functional]
+        title = "Functioneel"
+        text  = "Deze cookies maken functies mogelijk zoals reacties en ingesloten inhoud."

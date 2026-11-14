@@ -1,0 +1,64 @@
+.widget {
+    display: flex;
+    flex-direction: column;
+
+    .widget-icon {
+        svg {
+            width: var(--widget-icon-size);
+            height: var(--widget-icon-size);
+            stroke-width: 1.6;
+            color: var(--body-text-color);
+        }
+    }
+}
+
+/* Tag cloud widget */
+.tagCloud {
+    .tagCloud-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+
+        a {
+            @include card-style;
+            border-radius: var(--tag-border-radius);
+            padding: 8px 20px;
+            color: var(--card-text-color-main);
+            font-size: 1.4rem;
+            transition: box-shadow 0.3s ease;
+
+            &:hover {
+                box-shadow: var(--shadow-l2);
+            }
+        }
+    }
+}
+
+/* Archives widget */
+.widget.archives {
+    .widget-archive--list {
+        @include card-style;
+    }
+
+    .archives-year {
+        &:not(:last-of-type) {
+            border-bottom: 1.5px solid var(--card-separator-color);
+        }
+
+        a {
+            font-size: 1.4rem;
+            padding: 18px 25px;
+            display: flex;
+
+            span.year {
+                flex: 1;
+                color: var(--card-text-color-main);
+                font-weight: bold;
+            }
+
+            span.count {
+                color: var(--card-text-color-tertiary);
+            }
+        }
+    }
+}

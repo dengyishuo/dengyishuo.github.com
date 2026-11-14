@@ -1,0 +1,1405 @@
+/* ============================================================
+   格物堂 · 站点级样式覆盖
+   1) 文章块：分类标签缩小为轻量 chip，标签移至卡片右下角右对齐
+   2) 文章详情页：标签同样缩小
+   3) 右侧栏：归档 / 分类 / 标签云排版收紧
+   ============================================================ */
+
+/* ---- 配色令牌（跟随明暗模式）---- */
+:root {
+    --gt-tag-bg: rgba(52, 73, 94, 0.075);
+    --gt-tag-fg: #3f5c76;
+    --gt-tag-bg-hover: rgba(52, 73, 94, 0.15);
+}
+
+:root[data-scheme="dark"] {
+    --gt-tag-bg: rgba(236, 240, 241, 0.12);
+    --gt-tag-fg: rgba(236, 240, 241, 0.9);
+    --gt-tag-bg-hover: rgba(236, 240, 241, 0.22);
+}
+
+/* ============================================================
+   1. 文章块（首页 / 列表页）
+   ============================================================ */
+
+/* 分类：标题上方的小 chip */
+.article-category a {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 1.2rem;
+    line-height: 1.55;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    border-radius: 3px;
+    color: var(--gt-tag-fg);
+    background-color: var(--gt-tag-bg);
+    transition: background-color 0.25s ease;
+
+    &:hover {
+        color: var(--gt-tag-fg);
+        background-color: var(--gt-tag-bg-hover);
+    }
+}
+
+.article-header .article-category {
+    gap: 6px;
+    margin-bottom: 0;
+}
+
+/* 元信息行：日期在左，标签在右下角 */
+.article-meta--split {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+}
+
+/* 卡片右下角的标签组（提高权重以压过下方详情页规则） */
+.article-tags.article-tags--list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-left: auto;
+
+    a {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 1.15rem;
+        line-height: 1.6;
+        font-weight: 400;
+        border-radius: 3px;
+        color: var(--card-text-color-tertiary);
+        background-color: var(--gt-tag-bg);
+        transition: background-color 0.25s ease, color 0.25s ease;
+        white-space: nowrap;
+
+        &:hover {
+            color: var(--gt-tag-fg);
+            background-color: var(--gt-tag-bg-hover);
+        }
+    }
+
+    /* 超出显示上限时的 +N 计数 */
+    .gt-tag-more {
+        display: inline-block;
+        padding: 2px 6px;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: var(--card-text-color-tertiary);
+        opacity: 0.65;
+        cursor: default;
+    }
+}
+
+/* ============================================================
+   2. 文章详情页标签
+   ============================================================ */
+.article-tags a {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    font-weight: 500;
+    border-radius: 3px;
+    color: var(--gt-tag-fg);
+    background-color: var(--gt-tag-bg);
+    transition: background-color 0.25s ease;
+
+    &:hover {
+        color: var(--gt-tag-fg);
+        background-color: var(--gt-tag-bg-hover);
+    }
+}
+
+/* ============================================================
+   3. 右侧栏
+   设计取向：icon 与标题并排、用细分隔线代替白色卡片堆叠，
+              让侧栏退到背景层，不与正文争视觉重量。
+   ============================================================ */
+
+/* 侧栏专用色阶（明暗各一套） */
+:root {
+    --gt-rule: rgba(52, 73, 94, 0.13);
+    --gt-rule-soft: rgba(52, 73, 94, 0.07);
+    --gt-ink-soft: #56677a;
+}
+
+:root[data-scheme="dark"] {
+    --gt-rule: rgba(255, 255, 255, 0.15);
+    --gt-rule-soft: rgba(255, 255, 255, 0.08);
+    --gt-ink-soft: rgba(255, 255, 255, 0.72);
+}
+
+/* ---- 图标与标题并排（主题原为上下两行） ---- */
+.right-sidebar .widget:has(> .widget-icon) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 7px;
+    row-gap: 11px;
+
+    > .widget-icon {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        align-items: center;
+
+        svg {
+            width: 15px;
+            height: 15px;
+            stroke-width: 1.9;
+            color: var(--gt-ink-soft);
+            transition: color 0.2s ease;
+        }
+    }
+
+    > .widget-title {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 0;
+        font-size: 1.26rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        line-height: 1.4;
+        color: var(--card-text-color-main);
+
+        a {
+            color: inherit;
+
+            &:hover {
+                color: var(--accent-color);
+            }
+        }
+    }
+
+    /* 组件正文占满两列 */
+    > :not(.widget-icon):not(.widget-title) {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    &:hover > .widget-icon svg {
+        color: var(--accent-color);
+    }
+}
+
+/* ---- 归档：改为细分隔线列表 ---- */
+.right-sidebar .widget.archives {
+    .widget-archive--list {
+        background: transparent;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        border-top: 1px solid var(--gt-rule-soft);
+        padding: 0;
+    }
+
+    .archives-year {
+        border-bottom: 1px solid var(--gt-rule-soft) !important;
+
+        &:last-of-type {
+            border-bottom: 0 !important;
+        }
+
+        a {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 8px 1px;
+            font-size: 1.26rem;
+            transition: color 0.18s ease;
+
+            span.year {
+                flex: 1;
+                font-weight: 500;
+                letter-spacing: 0.02em;
+                color: var(--gt-ink-soft);
+                font-variant-numeric: tabular-nums;
+                transition: color 0.18s ease;
+            }
+
+            span.count {
+                padding: 1px 6px;
+                border-radius: 3px;
+                background: var(--gt-tag-bg);
+                color: var(--card-text-color-tertiary);
+                font-size: 1.08rem;
+                line-height: 1.55;
+                font-variant-numeric: tabular-nums;
+                transition: background-color 0.18s ease;
+            }
+
+            &:hover {
+                span.year {
+                    color: var(--accent-color);
+                }
+
+                span.count {
+                    background: var(--gt-tag-bg-hover);
+                }
+            }
+        }
+    }
+}
+
+/* ---- 标签云 / 分类：淡底 chip，去掉白卡与投影 ---- */
+.right-sidebar .widget.tagCloud {
+    .tagCloud-tags {
+        gap: 5px;
+
+        a {
+            background: var(--gt-tag-bg);
+            box-shadow: none;
+            border: 0;
+            border-radius: 3px;
+            padding: 3px 9px;
+            font-size: 1.18rem;
+            line-height: 1.6;
+            font-weight: 400;
+            color: var(--gt-ink-soft);
+            transition: background-color 0.18s ease, color 0.18s ease;
+
+            &:hover {
+                background: var(--gt-tag-bg-hover);
+                color: var(--gt-tag-fg);
+                box-shadow: none;
+            }
+        }
+    }
+}
+
+/* ---- 搜索框：细边框 + 填充底，焦点才描边 ---- */
+.right-sidebar .search-form.widget {
+    input {
+        background: var(--gt-tag-bg);
+        box-shadow: none;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        font-size: 1.35rem;
+        padding: 25px 16px 10px;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+
+        &::placeholder {
+            color: var(--card-text-color-tertiary);
+            opacity: 0.7;
+        }
+
+        &:focus {
+            outline: 0;
+            box-shadow: none;
+            border-color: var(--accent-color);
+            background: var(--card-background);
+        }
+    }
+
+    label {
+        font-size: 1.1rem;
+        letter-spacing: 0.06em;
+        color: var(--card-text-color-tertiary);
+    }
+
+    button svg {
+        transition: color 0.2s ease;
+    }
+
+    &:focus-within button svg {
+        color: var(--accent-color);
+    }
+}
+
+/* 组件间距由 --widget-separation 控制，这里只清掉多余外边距 */
+.right-sidebar .widget {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   4. 友情链接页
+   ============================================================ */
+.gt-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 1.5em 0;
+}
+
+.gt-link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--card-separator-color);
+    background: var(--card-background);
+    text-decoration: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-l1);
+        transform: translateY(-1px);
+    }
+
+    .gt-link-name {
+        font-size: 1.55rem;
+        font-weight: 600;
+        color: var(--card-text-color-main);
+        line-height: 1.4;
+    }
+
+    .gt-link-desc {
+        font-size: 1.25rem;
+        color: var(--card-text-color-secondary);
+        line-height: 1.5;
+    }
+
+    .gt-link-host {
+        font-size: 1.1rem;
+        color: var(--card-text-color-tertiary);
+        font-family: var(--code-font-family);
+        margin-top: 2px;
+    }
+}
+
+.gt-link-card--text {
+    opacity: 0.75;
+    cursor: default;
+
+    &:hover {
+        transform: none;
+        border-color: var(--card-separator-color);
+        box-shadow: none;
+    }
+}
+
+/* 二维码卡片（公众号等无网站场景） */
+.gt-link-card--qr {
+    cursor: default;
+    align-items: flex-start;
+
+    &:hover {
+        transform: none;
+        border-color: var(--card-separator-color);
+        box-shadow: none;
+    }
+
+    /* 二维码固定为正方形，避免被主题 .article-content img{height:auto} 拉变形
+       （变形会导致扫不出来，故用 !important 兜底） */
+    .gt-link-qr {
+        width: 132px !important;
+        height: 132px !important;
+        max-width: none !important;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+        margin-top: 8px;
+        padding: 6px;
+        border-radius: 6px;
+        background: #fff;
+        border: 1px solid var(--card-separator-color);
+    }
+}
+
+/* ============================================================
+   5. 顶部导航栏
+   Stack 原生只有左侧栏，没有顶栏。这里用站点层 baseof.html
+   把「站点名 + 主菜单 + 社交 + 明暗切换」提到顶部，
+   并去掉左侧栏，主体与右栏保持不变。
+   ============================================================ */
+.gt-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--card-separator-color);
+    transition: box-shadow 0.25s ease;
+
+    /* 滚下去给一点层次，避免和内容糊在一起 */
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.gt-topbar__inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    /* 与下方 .main-container 的 max-width 断点保持一致，左右边缘才能对齐 */
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+    min-height: 60px;
+
+    @include respond(lg) {
+        max-width: 1240px;
+    }
+
+    @include respond(xl) {
+        max-width: 1280px;
+    }
+}
+
+/* ---- 站点标识 ---- */
+.gt-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    text-decoration: none !important;
+
+    .gt-brand__avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--card-separator-color);
+    }
+
+    .gt-brand__text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+    }
+
+    .gt-brand__name {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--card-text-color-main);
+        letter-spacing: 0.02em;
+    }
+
+    .gt-brand__desc {
+        font-size: 1.1rem;
+        color: var(--card-text-color-tertiary);
+        font-weight: 400;
+    }
+
+    &:hover .gt-brand__name {
+        color: var(--accent-color);
+    }
+}
+
+/* ---- 主菜单：横排（覆盖主题的左栏竖排规则） ---- */
+.gt-topbar #main-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 0;
+    gap: 26px;
+    margin: 0 0 0 auto; /* 靠右，与右侧动作区相邻 */
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    font-size: 1.45rem;
+
+    li {
+        width: auto;
+        padding: 0;
+        margin: 0;
+
+        a {
+            position: relative;
+            display: inline-block;
+            padding: 6px 0;
+            color: var(--body-text-color);
+            font-weight: 400;
+            transition: color 0.2s ease;
+
+            /* 当前项的下划线指示 */
+            &::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 2px;
+                border-radius: 2px;
+                background: var(--accent-color);
+                transform: scaleX(0);
+                transform-origin: left center;
+                transition: transform 0.22s ease;
+            }
+
+            &:hover {
+                color: var(--accent-color);
+
+                &::after {
+                    transform: scaleX(0.55);
+                    opacity: 0.5;
+                }
+            }
+        }
+
+        &.current a {
+            color: var(--accent-color);
+            font-weight: 600;
+
+            &::after {
+                transform: scaleX(1);
+            }
+        }
+    }
+}
+
+/* ---- 右端动作区 ---- */
+.gt-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+    flex-shrink: 0;
+
+    .gt-topbar__social {
+        gap: 10px;
+
+        svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--card-text-color-tertiary);
+            transition: stroke 0.2s ease;
+        }
+
+        a:hover svg {
+            stroke: var(--accent-color);
+        }
+    }
+}
+
+.gt-topbar__scheme {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--card-text-color-tertiary);
+    cursor: pointer;
+    border-radius: 4px;
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover {
+        color: var(--accent-color);
+    }
+}
+
+/* ---- 汉堡按钮：仅移动端显示 ---- */
+.gt-topbar__burger {
+    display: none;
+    margin-left: auto;
+    padding: 6px 0;
+}
+
+/* ---- 顶栏占位后，主体顶部间距 ---- */
+.gt-has-topbar {
+    padding-top: 28px;
+
+    @include respond(md) {
+        padding-top: 32px;
+    }
+}
+
+/* 锚点跳转时不被 sticky 顶栏遮住 */
+html {
+    scroll-padding-top: 78px;
+}
+
+/* ============================================================
+   移动端：菜单收进汉堡下拉
+   ============================================================ */
+@media (max-width: 767px) {
+    .gt-topbar__inner {
+        flex-wrap: wrap;
+        gap: 0;
+    }
+
+    .gt-topbar__burger {
+        display: inline-block;
+    }
+
+    .gt-topbar__actions {
+        margin-left: 10px;
+    }
+
+    /* 下拉面板：脱离文档流铺满一行 */
+    .gt-topbar #main-menu {
+        display: none;
+        flex-basis: 100%;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin: 0 calc(var(--container-padding) * -1);
+        padding: 6px var(--container-padding) 14px;
+        background-color: var(--card-background);
+        border-top: 1px solid var(--card-separator-color);
+
+        &.show {
+            display: flex;
+        }
+
+        li {
+            width: 100%;
+
+            a {
+                display: block;
+                width: 100%;
+                padding: 11px 0;
+                font-size: 1.5rem;
+                border-bottom: 1px solid var(--card-separator-color);
+
+                &::after {
+                    display: none;
+                }
+            }
+
+            &:last-child a {
+                border-bottom: 0;
+            }
+
+            &.current a {
+                padding-left: 10px;
+                border-left: 3px solid var(--accent-color);
+            }
+        }
+    }
+}
+
+/* ============================================================
+   6. 去掉左侧栏后的宽度校正
+   原主题靠左栏占 15~20% 压住正文宽度；左栏移除后 main 会撑到
+   1400px（一行 80+ 字），需重新收敛。
+   ============================================================ */
+
+/* 整体容器略收，避免卡片横向拉得过长 */
+.gt-has-topbar.container.extended {
+    @include respond(md) {
+        max-width: 1180px;
+    }
+
+    @include respond(lg) {
+        max-width: 1240px;
+    }
+
+    @include respond(xl) {
+        max-width: 1280px;
+    }
+}
+
+/* 无右栏的页面（如没有目录的文章页）：正文限宽并居中 */
+.gt-has-topbar:not(:has(.right-sidebar)) main.main {
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ============================================================
+   7. 首页落地页
+   ============================================================ */
+/* 首页三卡片需要更宽，抵消无右栏时的 860px 限宽 */
+.gt-home .main-container main.main {
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ---- Hero ---- */
+.gt-hero {
+    position: relative;
+    padding: 52px 44px 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(52, 73, 94, 0.055) 0%, rgba(52, 73, 94, 0.015) 55%, transparent 100%);
+    border: 1px solid var(--card-separator-color);
+    overflow: hidden;
+
+    @include respond(md) {
+        padding: 64px 56px 52px;
+    }
+}
+
+.gt-hero__eyebrow {
+    margin: 0 0 14px;
+    font-size: 1.25rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--card-text-color-tertiary);
+}
+
+.gt-hero__title {
+    margin: 0 0 20px;
+    font-size: 4.2rem;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--card-text-color-main);
+
+    @include respond(md) {
+        font-size: 5.4rem;
+    }
+}
+
+.gt-hero__lead {
+    margin: 0 0 14px;
+    max-width: 44em;
+    font-size: 1.7rem;
+    line-height: 1.85;
+    color: var(--body-text-color);
+
+    strong {
+        color: var(--card-text-color-main);
+        font-weight: 600;
+    }
+}
+
+.gt-hero__sub {
+    margin: 0 0 34px;
+    max-width: 44em;
+    font-size: 1.5rem;
+    line-height: 1.8;
+    color: var(--card-text-color-tertiary);
+}
+
+/* ---- 数字条 ---- */
+.gt-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 12px;
+    padding-top: 26px;
+    border-top: 1px solid var(--card-separator-color);
+
+    @include respond(md) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.gt-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.gt-stat__num {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--card-text-color-main);
+    font-variant-numeric: tabular-nums;
+
+    @include respond(md) {
+        font-size: 2.7rem;
+    }
+}
+
+.gt-stat__label {
+    font-size: 1.2rem;
+    color: var(--card-text-color-tertiary);
+    letter-spacing: 0.04em;
+}
+
+/* ---- 三入口卡片 ---- */
+.gt-doors {
+    margin-top: 8px;
+}
+
+.gt-doors__title {
+    margin: 0 0 16px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--card-text-color-tertiary);
+}
+
+.gt-doors__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+
+    @include respond(md) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.gt-door {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px 22px 20px;
+    border-radius: 10px;
+    background: var(--card-background);
+    border: 1px solid var(--card-separator-color);
+    text-decoration: none !important;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+
+    .gt-door__icon {
+        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--gt-tag-bg);
+        color: var(--gt-tag-fg);
+        margin-bottom: 4px;
+
+        svg {
+            width: 19px;
+            height: 19px;
+            stroke-width: 1.6;
+        }
+    }
+
+    .gt-door__name {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--card-text-color-main);
+        line-height: 1.4;
+    }
+
+    .gt-door__desc {
+        font-size: 1.32rem;
+        line-height: 1.7;
+        color: var(--card-text-color-secondary);
+        flex-grow: 1;
+    }
+
+    .gt-door__go {
+        margin-top: 8px;
+        font-size: 1.28rem;
+        font-weight: 500;
+        color: var(--accent-color);
+        transition: transform 0.22s ease;
+    }
+
+    &:hover {
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-l1);
+        transform: translateY(-2px);
+
+        .gt-door__go {
+            transform: translateX(4px);
+        }
+    }
+}
+
+/* ---- GitHub 区 ---- */
+.gt-github {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 26px 28px;
+    border-radius: 10px;
+    background: var(--card-background);
+    border: 1px solid var(--card-separator-color);
+}
+
+.gt-github__left {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.gt-github__title {
+    margin: 0 0 6px;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--card-text-color-main);
+}
+
+.gt-github__desc {
+    margin: 0;
+    font-size: 1.32rem;
+    line-height: 1.7;
+    color: var(--card-text-color-secondary);
+    max-width: 46em;
+}
+
+.gt-github__card {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 9px;
+    border: 1px solid var(--card-separator-color);
+    background: var(--gt-tag-bg);
+    text-decoration: none !important;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    .gt-github__icon svg {
+        width: 26px;
+        height: 26px;
+        stroke: var(--card-text-color-main);
+    }
+
+    .gt-github__meta {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.35;
+    }
+
+    .gt-github__handle {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--card-text-color-main);
+    }
+
+    .gt-github__url {
+        font-size: 1.18rem;
+        color: var(--card-text-color-tertiary);
+        font-family: var(--code-font-family);
+    }
+
+    &:hover {
+        border-color: var(--accent-color);
+        background: var(--gt-tag-bg-hover);
+    }
+}
+
+/* ============================================================
+   8. 通用页头（博客 / 作品 / 归档）
+   ============================================================ */
+.gt-page-head {
+    padding-bottom: 2px;
+}
+
+.gt-page-title {
+    margin: 0 0 8px;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--card-text-color-main);
+    line-height: 1.2;
+}
+
+.gt-page-desc {
+    margin: 0 0 8px;
+    font-size: 1.42rem;
+    line-height: 1.7;
+    color: var(--card-text-color-secondary);
+}
+
+.gt-page-meta {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--card-text-color-tertiary);
+    font-variant-numeric: tabular-nums;
+
+    a {
+        color: var(--accent-color);
+    }
+
+    .gt-page-meta__sep {
+        margin: 0 6px;
+        opacity: 0.5;
+    }
+}
+
+/* ============================================================
+   9. 作品页
+   ============================================================ */
+.gt-works-section {
+    margin: 8px 0 4px;
+}
+
+.gt-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--card-separator-color);
+
+    .gt-section-title {
+        font-size: 1.9rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--card-text-color-main);
+    }
+
+    .gt-section-count {
+        font-size: 1.2rem;
+        color: var(--card-text-color-tertiary);
+    }
+}
+
+/* ---- 图书：按状态分组 ---- */
+.gt-book-group {
+    margin-bottom: 22px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.gt-book-group__label {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--card-text-color-tertiary);
+
+    /* 与状态对应的小色点 */
+    &::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 7px;
+        border-radius: 50%;
+        vertical-align: middle;
+        background: var(--card-text-color-tertiary);
+    }
+}
+
+.gt-book-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+
+    @include respond(md) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.gt-book-card {
+    padding: 16px 18px;
+    border-radius: 9px;
+    border: 1px solid var(--card-separator-color);
+    background: var(--card-background);
+    border-left: 3px solid var(--card-separator-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: var(--shadow-l1);
+    }
+
+    .gt-book-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.5;
+        color: var(--card-text-color-main);
+        margin-bottom: 6px;
+    }
+
+    .gt-book-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.2rem;
+        color: var(--card-text-color-tertiary);
+    }
+
+    .gt-book-role {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 3px;
+        background: var(--gt-tag-bg);
+        color: var(--gt-tag-fg);
+        font-weight: 500;
+    }
+}
+
+/* 已出版：左侧竖条用强调色；其余弱化 */
+.gt-book-group:nth-of-type(1) .gt-book-card {
+    border-left-color: var(--accent-color);
+}
+
+.gt-book-group:not(:nth-of-type(1)) .gt-book-card {
+    opacity: 0.82;
+}
+
+/* ---- 软件包卡片 ---- */
+.gt-pkg-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    @include respond(md) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.gt-pkg-card {
+    display: block;
+    padding: 18px 20px;
+    border-radius: 9px;
+    border: 1px solid var(--card-separator-color);
+    background: var(--card-background);
+    text-decoration: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+    .gt-pkg-head {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 7px;
+    }
+
+    .gt-pkg-name {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--card-text-color-main);
+        font-family: var(--code-font-family);
+    }
+
+    .gt-pkg-repo {
+        font-size: 1.18rem;
+        color: var(--card-text-color-tertiary);
+        font-family: var(--code-font-family);
+    }
+
+    .gt-pkg-desc {
+        margin: 0;
+        font-size: 1.32rem;
+        line-height: 1.7;
+        color: var(--card-text-color-secondary);
+    }
+
+    &:hover {
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-l1);
+        transform: translateY(-1px);
+    }
+}
+
+/* 作品页正文容器（复用 article-content 但去掉首尾多余间距） */
+.gt-works-content {
+    > :first-child {
+        margin-top: 0;
+    }
+}
+
+/* 作品页无右栏，给足宽度以便两列书卡舒展 */
+.gt-works-page .main-container main.main {
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 移动端：hero 内边距与标题收缩，避免 360px 下正文被挤成窄条 */
+@media (max-width: 767px) {
+    .gt-hero {
+        padding: 30px 22px 26px;
+        border-radius: 12px;
+    }
+
+    .gt-hero__title {
+        font-size: 3.4rem;
+        margin-bottom: 14px;
+    }
+
+    .gt-hero__lead {
+        font-size: 1.55rem;
+        line-height: 1.8;
+    }
+
+    .gt-hero__sub {
+        margin-bottom: 24px;
+        font-size: 1.38rem;
+    }
+
+    .gt-hero__stats {
+        padding-top: 20px;
+        gap: 16px 10px;
+    }
+
+    .gt-stat__num {
+        font-size: 2.1rem;
+    }
+
+    .gt-door {
+        padding: 20px 18px 17px;
+    }
+
+    .gt-github {
+        padding: 20px 18px;
+    }
+
+    .gt-page-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* ============================================================
+   10. 全局细节打磨（不改结构，只调排印与配色质感）
+   ============================================================ */
+
+/* ---- 选中文字：用主色的淡版本，而非系统默认高亮 ---- */
+::selection {
+    background: rgba(52, 73, 94, 0.16);
+    color: inherit;
+}
+
+:root[data-scheme="dark"] ::selection {
+    background: rgba(236, 240, 241, 0.22);
+}
+
+/* ---- 滚动条：细、淡、悬停才加深 ---- */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gt-rule) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gt-rule);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+
+    &:hover {
+        background: var(--gt-ink-soft);
+        background-clip: content-box;
+    }
+}
+
+/* ---- 链接：下划线离文字远一点，细一点 ---- */
+.article-content a,
+.gt-page-desc a,
+.gt-link-card .gt-link-name {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+}
+
+/* ---- 正文标题：层次靠字重与留白，不靠装饰 ---- */
+.article-content {
+    h2 {
+        margin-top: 2.2em;
+        padding-bottom: 0.35em;
+        border-bottom: 1px solid var(--gt-rule-soft);
+    }
+
+    h3 {
+        margin-top: 1.9em;
+    }
+
+    img {
+        border-radius: 6px;
+    }
+
+    /* 行内代码与代码块配色统一 */
+    code {
+        border-radius: 4px;
+    }
+
+    pre {
+        border-radius: 8px;
+    }
+}
+
+/* ---- 文章卡片：hover 用颜色而非透明度，过渡更柔 ---- */
+.article-list article .article-title a {
+    transition: color 0.2s ease;
+
+    &:hover {
+        opacity: 1;
+        color: var(--accent-color);
+    }
+}
+
+/* 卡片顶部与标题之间的呼吸感 */
+.article-list article .article-details {
+    gap: 10px;
+}
+
+/* ---- 目录：左侧细线，当前项用强调色 ---- */
+.widget--toc,
+.widget.toc {
+    .toc-content {
+        border-left: 1px solid var(--gt-rule-soft);
+
+        ul {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        a {
+            color: var(--gt-ink-soft);
+            font-size: 1.28rem;
+            line-height: 1.7;
+            transition: color 0.18s ease;
+
+            &:hover,
+            &.active {
+                color: var(--accent-color);
+            }
+        }
+    }
+}
+
+/* ---- 分页：更轻的按钮外观 ---- */
+.pagination .page-link {
+    border-radius: 6px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+
+    &:hover {
+        background: var(--gt-tag-bg);
+    }
+
+    &.current {
+        background: var(--accent-color);
+        color: #fff;
+    }
+}
+
+:root[data-scheme="dark"] .pagination .page-link.current {
+    color: #1a1a1a;
+}
+
+/* ---- 页脚：去掉粗黑短横，改细线，整体更轻 ---- */
+footer.site-footer {
+    &:before {
+        height: 1px;
+        width: 42px;
+        background: var(--gt-rule);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .copyright {
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .powerby {
+        opacity: 0.75;
+    }
+}
+
+/* ---- 友情链接卡片：与侧栏 chip 同一套色阶 ---- */
+.gt-link-card {
+    .gt-link-name {
+        transition: color 0.18s ease;
+    }
+
+    &:hover .gt-link-name {
+        color: var(--accent-color);
+    }
+}
+
+/* ---- 首页入口卡片：图标底色与侧栏统一 ---- */
+.gt-door .gt-door__icon {
+    background: var(--gt-tag-bg);
+    color: var(--gt-ink-soft);
+    transition: background-color 0.22s ease, color 0.22s ease;
+}
+
+.gt-door:hover .gt-door__icon {
+    background: var(--gt-tag-bg-hover);
+    color: var(--accent-color);
+}

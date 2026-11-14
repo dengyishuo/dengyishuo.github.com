@@ -1,0 +1,61 @@
+{{- /*
+    格物堂 · 作品页
+    数据来自 data/works.yaml：图书（已出版 / 撰写中 / 计划内）+ 开源软件包。
+*/ -}}
+{{- $works := hugo.Data.works -}}
+{{- $books := $works.books -}}
+{{- $packages := $works.packages -}}
+
+{{ if $books }}
+<section class="gt-works-section">
+    <h2 class="gt-section-head">
+        <span class="gt-section-title">图书</span>
+        <span class="gt-section-count">{{ len $books }} 本</span>
+    </h2>
+
+    {{- range $groups := slice
+        (dict "key" "published" "label" "已出版")
+        (dict "key" "writing" "label" "撰写中")
+        (dict "key" "planned" "label" "计划内")
+    }}
+        {{- $items := where $books "status" $groups.key -}}
+        {{- with $items }}
+        <div class="gt-book-group">
+            <h3 class="gt-book-group__label">{{ $groups.label }}</h3>
+            <div class="gt-book-list">
+                {{- range . }}
+                <div class="gt-book-card">
+                    <div class="gt-book-title">{{ .title }}</div>
+                    <div class="gt-book-meta">
+                        <span class="gt-book-role">{{ .role }}</span>
+                        {{- with .note }}<span class="gt-book-note">{{ . }}</span>{{ end }}
+                    </div>
+                </div>
+                {{- end }}
+            </div>
+        </div>
+        {{- end }}
+    {{- end }}
+</section>
+{{ end }}
+
+{{ if $packages }}
+<section class="gt-works-section">
+    <h2 class="gt-section-head">
+        <span class="gt-section-title">开源软件包</span>
+        <span class="gt-section-count">{{ len $packages }} 个</span>
+    </h2>
+
+    <div class="gt-pkg-list">
+        {{- range $packages }}
+        <a class="gt-pkg-card" href="{{ .url }}" target="_blank" rel="noopener">
+            <div class="gt-pkg-head">
+                <span class="gt-pkg-name">{{ .name }}</span>
+                <span class="gt-pkg-repo">{{ .repo }}</span>
+            </div>
+            <p class="gt-pkg-desc">{{ .desc }}</p>
+        </a>
+        {{- end }}
+    </div>
+</section>
+{{ end }}

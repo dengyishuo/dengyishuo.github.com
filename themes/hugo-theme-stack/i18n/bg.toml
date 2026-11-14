@@ -1,0 +1,82 @@
+toggleMenu = "Покажи Меню"
+darkMode   = "Тъмен Режим"
+
+[list]
+    section = "Секция"
+
+    [list.page]
+        one   = "{{ .Count }} страница"
+        other = "{{ .Count }} страници"
+
+    [list.subsection]
+        one   = "Подсекция"
+        other = "Подсекции"
+
+[article]
+    back            = "Назад"
+    tableOfContents = "Съдържание"
+    relatedContent  = "Свързано Съдържание"
+    lastUpdatedOn   = "Последна промяна на"
+
+    [article.readingTime]
+        one   = "{{ .Count }} minute read"
+        other = "{{ .Count }} minute read"
+
+    [article.alert]
+        note      = "Бележка"
+        tip       = "Съвет"
+        important = "Важно"
+        warning   = "Предупреждение"
+        caution   = "Внимание"
+
+    [article.codeblock]
+        copy   = "Копирай"
+        copied = "Копирано!"
+
+[notFound]
+    title    = "Не е намерено"
+    subtitle = "Страницата която търсите не е открита"
+
+[widget]
+    [widget.archives]
+        title = "Архиви"
+        more  = "Повече"
+
+    [widget.tagCloud]
+        title = "Тагове"
+
+    [widget.categoriesCloud]
+        title = "Категории"
+
+[search]
+    title       = "Търсене"
+    placeholder = "Напишете нещо..."
+    resultTitle = "#PAGES_COUNT страници (#TIME_SECONDS секунди)"
+
+[footer]
+    builtWith  = "Създадено с {{ .Generator }}"
+    designedBy = "Тема {{ .Theme }} създадена от {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Съгласие за бисквитки"
+    text              = "Използваме бисквитки, за да подобрим вашето изживяване и да анализираме трафика на сайта."
+    acceptAll         = "Приемане на всички"
+    deny              = "Откажи"
+    managePreferences = "Управление на предпочитанията"
+    settingsTitle     = "Предпочитания за бисквитки"
+    savePreferences   = "Запазване на предпочитанията"
+    cancel            = "Отказ"
+    footerLink        = "Настройки на бисквитките"
+    commentsDisabled  = "Коментарите са деактивирани, докато не приемете функционални бисквитки."
+
+    [cookies.necessary]
+        title = "Необходими"
+        text  = "Тези бисквитки са необходими за функционирането на уебсайта и не могат да бъдат деактивирани."
+
+    [cookies.analytics]
+        title = "Анализи"
+        text  = "Тези бисквитки ни помагат да разберем как посетителите взаимодействат с нашия уебсайт."
+
+    [cookies.functional]
+        title = "Функционални"
+        text  = "Тези бисквитки активират функции като коментари и вградено съдържание."

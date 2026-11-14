@@ -1,0 +1,31 @@
+{{- /*
+    格物堂 · 页面标题（站点层覆盖）
+    规则：
+      - 首页：仅站点名；首页分页：第 N 页 | 站点名
+      - 其他页：页面名 | 站点名
+    主题原版用 "Page %d" 且页面名后不接站名，中文场景下不合适。
+*/ -}}
+{{- $siteTitle := .Site.Title -}}
+{{- $paginator := partial "helper/paginator.html" . -}}
+
+{{- if .IsHome -}}
+    {{- if and $paginator $paginator.HasPrev -}}
+        {{- return (printf "第 %d 页 | %s" $paginator.PageNumber $siteTitle) -}}
+    {{- end -}}
+    {{- return $siteTitle -}}
+{{- end -}}
+
+{{- $parts := slice -}}
+
+{{- if and $paginator $paginator.HasPrev -}}
+    {{- $parts = $parts | append (printf "第 %d 页" $paginator.PageNumber) -}}
+{{- end -}}
+
+{{- $pageTitle := .Title | default "" -}}
+{{- if and $pageTitle (ne $pageTitle $siteTitle) -}}
+    {{- $parts = $parts | append $pageTitle -}}
+{{- end -}}
+
+{{- $parts = $parts | append $siteTitle -}}
+
+{{- return delimit $parts " | " -}}

@@ -1,0 +1,82 @@
+toggleMenu = "메뉴 여닫기"
+darkMode   = "다크 모드"
+
+[list]
+    section = "섹션"
+
+    [list.page]
+        one   = "{{ .Count }} 페이지"
+        other = "{{ .Count }} 페이지"
+
+    [list.subsection]
+        one   = "서브섹션"
+        other = "서브섹션"
+
+[article]
+    back            = "뒤로가기"
+    tableOfContents = "목차"
+    relatedContent  = "관련 글"
+    lastUpdatedOn   = "마지막 수정: "
+
+    [article.readingTime]
+        one   = "{{ .Count }} 분 정도"
+        other = "{{ .Count }} 분 정도"
+
+    [article.alert]
+        note      = "참고"
+        tip       = "팁"
+        important = "중요"
+        warning   = "경고"
+        caution   = "주의"
+
+    [article.codeblock]
+        copy   = "복사"
+        copied = "복사됨!"
+
+[notFound]
+    title    = "찾을 수 없음"
+    subtitle = "페이지를 찾을 수 없습니다."
+
+[widget]
+    [widget.archives]
+        title = "보관함"
+        more  = "더보기"
+
+    [widget.categoriesCloud]
+        title = "카테고리"
+
+    [widget.tagCloud]
+        title = "태그"
+
+[search]
+    title       = "검색"
+    placeholder = "검색어를 입력하세요..."
+    resultTitle = "#PAGES_COUNT 페이지 (#TIME_SECONDS 초)"
+
+[footer]
+    builtWith  = "{{ .Generator }}로 만듦"
+    designedBy = "{{ .DesignedBy }}의 {{ .Theme }} 테마 사용 중"
+
+[cookies]
+    title             = "쿠키 동의"
+    text              = "브라우징 경험을 향상시키고 사이트 트래픽을 분석하기 위해 쿠키를 사용합니다."
+    acceptAll         = "모두 허용"
+    deny              = "거부"
+    managePreferences = "설정 관리"
+    settingsTitle     = "쿠키 설정"
+    savePreferences   = "설정 저장"
+    cancel            = "취소"
+    footerLink        = "쿠키 설정"
+    commentsDisabled  = "기능적 쿠키를 수락할 때까지 댓글이 비활성화됩니다."
+
+    [cookies.necessary]
+        title = "필수"
+        text  = "이 쿠키는 웹사이트 기능에 필요하며 비활성화할 수 없습니다."
+
+    [cookies.analytics]
+        title = "분석"
+        text  = "이 쿠키는 방문자가 웹사이트와 상호작용하는 방식을 이해하는 데 도움이 됩니다."
+
+    [cookies.functional]
+        title = "기능적"
+        text  = "이 쿠키는 댓글 및 임베디드 콘텐츠와 같은 기능을 활성화합니다."

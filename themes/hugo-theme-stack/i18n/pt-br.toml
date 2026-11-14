@@ -1,0 +1,82 @@
+toggleMenu = "Alternar Menu"
+darkMode   = "Modo Escuro"
+
+[list]
+    section = "Seção"
+
+    [list.page]
+        one   = "{{ .Count }} página"
+        other = "{{ .Count }} páginas"
+
+    [list.subsection]
+        one   = "Subseção"
+        other = "Subseções"
+
+[article]
+    back            = "Voltar"
+    tableOfContents = "Índice"
+    relatedContent  = "Conteúdo relacionado"
+    lastUpdatedOn   = "Última atualização em"
+
+    [article.readingTime]
+        one   = "{{ .Count }} minuto de leitura"
+        other = "{{ .Count }} minutos de leitura"
+
+    [article.alert]
+        note      = "Nota"
+        tip       = "Dica"
+        important = "Importante"
+        warning   = "Aviso"
+        caution   = "Cuidado"
+
+    [article.codeblock]
+        copy   = "Copiar"
+        copied = "Copiado!"
+
+[notFound]
+    title    = "Não Encontrado"
+    subtitle = "Esta página não existe."
+
+[widget]
+    [widget.archives]
+        title = "Arquivos"
+        more  = "Mais"
+
+    [widget.tagCloud]
+        title = "Tags"
+
+    [widget.categoriesCloud]
+        title = "Categorias"
+
+[search]
+    title       = "Busca"
+    placeholder = "Digite algo..."
+    resultTitle = "#PAGES_COUNT páginas (#TIME_SECONDS segundos)"
+
+[footer]
+    builtWith  = "Criado com {{ .Generator }}"
+    designedBy = "Tema {{ .Theme }} desenvolvido por {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Consentimento de cookies"
+    text              = "Usamos cookies para melhorar sua experiência de navegação e analisar o tráfego do site."
+    acceptAll         = "Aceitar todos"
+    deny              = "Recusar"
+    managePreferences = "Gerenciar preferências"
+    settingsTitle     = "Preferências de cookies"
+    savePreferences   = "Salvar preferências"
+    cancel            = "Cancelar"
+    footerLink        = "Configurações de cookies"
+    commentsDisabled  = "Os comentários estão desativados até que você aceite os cookies funcionais."
+
+    [cookies.necessary]
+        title = "Necessários"
+        text  = "Estes cookies são necessários para o funcionamento do site e não podem ser desativados."
+
+    [cookies.analytics]
+        title = "Analíticos"
+        text  = "Estes cookies nos ajudam a entender como os visitantes interagem com nosso site."
+
+    [cookies.functional]
+        title = "Funcionais"
+        text  = "Estes cookies habilitam recursos como comentários e conteúdo incorporado."

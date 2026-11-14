@@ -1,0 +1,87 @@
+{{- /*
+    格物堂 · 文章块信息区（站点层覆盖）
+    与主题原版的差异：
+      1. 分类保留在标题上方；
+      2. 日期/阅读时长在左，标签移到底部右下角右对齐；
+      3. 标签采用轻量 chip 样式（见 assets/scss/custom.scss）。
+*/ -}}
+{{- $IsList := .IsList -}}
+{{- $Page := .Page -}}
+<div class="article-details">
+    {{ if $Page.Params.categories }}
+    <header class="article-category">
+        {{ range ($Page.GetTerms "categories") }}
+            {{ $color := partial "helper/color-from-str" .LinkTitle }}
+            {{ $BackgroundColor := default $color.BackgroundColor .Params.style.background }}
+            {{ $TextColor := default $color.TextColor .Params.style.color }}
+            <a href="{{ .RelPermalink }}" style="background-color: {{ $BackgroundColor | safeCSS }}; color: {{ $TextColor | safeCSS }};">
+                {{ .LinkTitle }}
+            </a>
+        {{ end }}
+    </header>
+    {{ end }}
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="{{ $Page.RelPermalink }}">
+                {{- $Page.Title -}}
+            </a>
+        </h2>
+
+        {{ with $Page.Description }}
+        <h3 class="article-subtitle">
+            {{ . }}
+        </h3>
+        {{ end }}
+    </div>
+
+    {{ $showReadingTime := $Page.Params.readingTime | default ($Page.Site.Params.article.readingTime) }}
+    {{ $showDate := not $Page.Date.IsZero }}
+    {{ $showTime := or $showDate $showReadingTime }}
+    {{ $showTranslations := $Page.IsTranslated }}
+    {{ $showTags := and $Page.Site.Params.Article.List.ShowTags ($Page.GetTerms "tags") $IsList }}
+
+    {{ if or $showTime $showTranslations $showTags }}
+    <footer class="article-meta{{ if and $IsList $showTags }} article-meta--split{{ end }}">
+        {{ if $showTime }}
+            <div class="inline-meta">
+                {{ if $showDate }}
+                    {{ partial "helper/icon" "date" }}
+                    <time class="article-time--published" datetime='{{ $Page.Date.Format "2006-01-02T15:04:05Z07:00" }}'>
+                        {{- $Page.Date | time.Format $Page.Site.Params.dateFormat.published -}}
+                    </time>
+                {{ end }}
+
+                {{ if $showReadingTime }}
+                    {{ partial "helper/icon" "clock" }}
+                    <time class="article-time--reading">
+                        {{ T "article.readingTime" $Page.ReadingTime }}
+                    </time>
+                {{ end }}
+            </div>
+        {{ end }}
+
+        {{ if $showTranslations }}
+            <div class="inline-meta">
+                {{ partial "helper/icon" "language" }}
+                {{ range $Page.Translations }}
+                    <a href="{{ .RelPermalink }}" class="link">{{ .Language.Label }}</a>
+                {{ end }}
+            </div>
+        {{ end }}
+
+        {{ if $showTags }}
+            {{- $tags := $Page.GetTerms "tags" -}}
+            {{- $maxTags := 5 -}}
+            <div class="article-tags article-tags--list">
+                {{ range first $maxTags $tags }}
+                    <a href="{{ .RelPermalink }}" class="link">{{ .LinkTitle }}</a>
+                {{ end }}
+                {{- if gt (len $tags) $maxTags }}
+                    <span class="gt-tag-more" title="共 {{ len $tags }} 个标签">+{{ sub (len $tags) $maxTags }}</span>
+                {{- end }}
+            </div>
+        {{ end }}
+    </footer>
+    {{ end }}
+</div>

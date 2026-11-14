@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="{{ or .Site.Language.Locale .Site.Language.Lang }}" dir="{{ default `ltr` .Language.Direction }}">
+    <head>
+        {{- partial "head/head.html" . -}}
+        {{- block "head" . -}}{{ end }}
+    </head>
+    <body class="{{ block `body-class` . }}{{ end }}">
+        {{- partial "head/colorScheme" . -}}
+
+        {{/* 顶部导航栏（站点层重写：原主题只有左侧栏，无顶栏） */}}
+        <header class="gt-topbar">
+            <div class="gt-topbar__inner">
+                <a class="gt-brand" href="{{ .Site.Home.RelPermalink }}">
+                    {{ with .Site.Params.sidebar.avatar }}
+                        <img class="gt-brand__avatar" src="{{ . | relURL }}" alt="{{ $.Site.Title }}" loading="lazy">
+                    {{ end }}
+                    <span class="gt-brand__text">
+                        <span class="gt-brand__name">{{ .Site.Title }}</span>
+                        {{ with .Site.Params.sidebar.subtitle }}
+                            <span class="gt-brand__desc">{{ . }}</span>
+                        {{ end }}
+                    </span>
+                </a>
+
+                <button class="hamburger hamburger--spin gt-topbar__burger" type="button" id="toggle-menu" aria-label="{{ T `toggleMenu` }}">
+                    <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+                </button>
+
+                {{- /* 与主题 sidebar/left.html 保持同一 id，复用 menu.ts 的折叠逻辑 */ -}}
+                <ol class="menu gt-topbar__menu" id="main-menu">
+                    {{ $currentPage := . }}
+                    {{ range .Site.Menus.main }}
+                        {{ $active := or (eq $currentPage.RelPermalink .URL) (or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .)) }}
+                        {{- /* 文章页与年度归档页都归到「博客」之下 */ -}}
+                        {{- if and (not $active) (eq .Identifier "blog") (or (eq $currentPage.Section "blog") (eq $currentPage.RelPermalink "/archives/")) -}}
+                            {{- $active = true -}}
+                        {{- end }}
+                        <li{{ if $active }} class="current"{{ end }}>
+                            <a href="{{ .URL }}"{{ if .Params.newTab }} target="_blank"{{ end }}>{{ .Name }}</a>
+                        </li>
+                    {{ end }}
+                </ol>
+
+                <div class="gt-topbar__actions">
+                    {{- with .Site.Menus.social }}
+                        <ol class="menu-social gt-topbar__social">
+                            {{ range . }}
+                                <li>
+                                    <a href="{{ .URL }}"{{ if .Params.newTab }} target="_blank" rel="me"{{ end }}{{ with .Name }} title="{{ . }}"{{ end }}>
+                                        {{ partial "helper/icon" (default "link" .Params.Icon) }}
+                                    </a>
+                                </li>
+                            {{ end }}
+                        </ol>
+                    {{- end }}
+
+                    {{ if .Site.Params.colorScheme.toggle }}
+                        <button class="gt-topbar__scheme" id="dark-mode-toggle" type="button" aria-label="{{ T `darkMode` }}">
+                            {{ partial "helper/icon" "toggle-left" }}
+                            {{ partial "helper/icon" "toggle-right" }}
+                        </button>
+                    {{ end }}
+                </div>
+            </div>
+        </header>
+
+        {{/* The container is wider when there's any activated widget */}}
+        {{- $hasWidget := false -}}
+        {{- range .Site.Params.widgets -}}
+            {{- if gt (len .) 0 -}}
+                {{- $hasWidget = true -}}
+            {{- end -}}
+        {{- end -}}
+        <div class="container main-container flex on-phone--column {{ if $hasWidget }}extended{{ else }}compact{{ end }} gt-has-topbar">
+            {{- block "right-sidebar" . -}}{{ end }}
+            <main class="main full-width">
+                {{- block "main" . }}{{- end }}
+            </main>
+        </div>
+        {{ partial "footer/include.html" . }}
+    </body>
+</html>

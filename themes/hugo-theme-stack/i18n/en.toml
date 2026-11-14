@@ -1,0 +1,87 @@
+toggleMenu = "Toggle Menu"
+darkMode   = "Dark Mode"
+
+[list]
+    section = "Section"
+
+    [list.page]
+        one   = "{{ .Count }} page"
+        other = "{{ .Count }} pages"
+
+    [list.subsection]
+        one   = "Subsection"
+        other = "Subsections"
+
+[article]
+    back            = "Back"
+    tableOfContents = "Table of contents"
+    relatedContent  = "Related content"
+    lastUpdatedOn   = "Last updated on"
+
+    [article.readingTime]
+        one   = "{{ .Count }} minute read"
+        other = "{{ .Count }} minutes read"
+
+    [article.alert]
+        note      = "Note"
+        tip       = "Tip"
+        important = "Important"
+        warning   = "Warning"
+        caution   = "Caution"
+
+    [article.codeblock]
+        copy   = "Copy"
+        copied = "Copied!"
+
+[notFound]
+    title    = "Not Found"
+    subtitle = "This page does not exist"
+
+[widget]
+    [widget.archives]
+        title = "Archives"
+        more  = "More"
+
+    [widget.tagCloud]
+        title = "Tags"
+
+    [widget.categoriesCloud]
+        title = "Categories"
+
+[search]
+    title       = "Search"
+    placeholder = "Type something..."
+    resultTitle = "#PAGES_COUNT pages (#TIME_SECONDS seconds)"
+
+[footer]
+    builtWith  = "Built with {{ .Generator }}"
+    designedBy = "Theme {{ .Theme }} designed by {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Cookie Consent"
+    text              = "We use cookies to enhance your browsing experience and analyze site traffic."
+    acceptAll         = "Accept All"
+    deny              = "Deny"
+    managePreferences = "Manage preferences"
+    settingsTitle     = "Cookie Preferences"
+    savePreferences   = "Save preferences"
+    cancel            = "Cancel"
+    footerLink        = "Cookie settings"
+    commentsDisabled  = "Comments are disabled until you accept functional cookies."
+
+    [cookies.necessary]
+        title = "Necessary"
+        text  = "These cookies are required for the website to function and cannot be disabled."
+
+    [cookies.analytics]
+        title = "Analytics"
+        text  = "These cookies help us understand how visitors interact with our website."
+
+    [cookies.functional]
+        title = "Functional"
+        text  = "These cookies enable features like comments and embedded content."
+
+[pagination]
+    jumpToPage = "Jump to page"
+    jump       = "Go"
+    pressEnter = "Press Enter to jump"

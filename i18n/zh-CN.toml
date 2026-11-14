@@ -1,0 +1,61 @@
+# 格物堂 · 简体中文语言包（zh-CN）
+# 为什么需要这个文件：本站 locale 为 zh-cn，Hugo 0.158+ 按 zh-CN 查找语言包，
+# 主题只提供 i18n/zh.toml，无法匹配，导致界面文案全部回退为空。
+# 另外 Hugo 新版 i18n 需要复数条目写成 one/other，故 readingTime 用 other。
+
+toggleMenu = "切换菜单"
+darkMode   = "暗色模式"
+
+[list]
+    page       = "{{ .Count }} 篇"
+    section    = "章节"
+    subsection = "子章节"
+
+[article]
+    back            = "返回"
+    tableOfContents = "目录"
+    relatedContent  = "相关文章"
+    lastUpdatedOn   = "最后更新于"
+
+    [article.readingTime]
+        other = "{{ .Count }} 分钟"
+
+    [article.alert]
+        note      = "备注"
+        tip       = "提示"
+        important = "重要"
+        warning   = "警告"
+        caution   = "注意"
+
+    [article.codeblock]
+        copy   = "复制"
+        copied = "已复制！"
+
+[notFound]
+    title    = "404 错误"
+    subtitle = "页面不存在"
+
+[widget]
+    [widget.archives]
+        title = "归档"
+        more  = "更多"
+
+    [widget.tagCloud]
+        title = "标签"
+
+    [widget.categoriesCloud]
+        title = "分类"
+
+[search]
+    title       = "搜索"
+    placeholder = "输入关键词..."
+    resultTitle = "#PAGES_COUNT 个结果（用时 #TIME_SECONDS 秒）"
+
+[footer]
+    builtWith  = "使用 {{ .Generator }} 构建"
+    designedBy = "主题 {{ .Theme }} 由 {{ .DesignedBy }} 设计"
+
+[pagination]
+    jumpToPage = "跳转到页码"
+    jump       = "跳转"
+    pressEnter = "按 Enter 键跳转"

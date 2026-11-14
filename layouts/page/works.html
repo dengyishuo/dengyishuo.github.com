@@ -1,0 +1,21 @@
+{{- /* 格物堂 · 作品页 */ -}}
+{{ define "body-class" }}gt-works-page{{ end }}
+
+{{ define "main" }}
+    <header class="gt-page-head">
+        <h1 class="gt-page-title">{{ .Title }}</h1>
+        {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
+    </header>
+
+    {{ .Content }}
+
+    <article class="article-page">
+        <div class="article-content">
+            {{ partial "works/list" . }}
+        </div>
+    </article>
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

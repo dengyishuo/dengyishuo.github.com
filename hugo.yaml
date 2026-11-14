@@ -1,0 +1,125 @@
+baseURL: "https://gewutang.cn/"
+title: 格物堂
+theme: hugo-theme-stack
+locale: zh-cn
+defaultContentLanguage: zh-cn
+hasCJKLanguage: true
+
+security:
+  allowContent:
+    - "text/html"
+    - "text/markdown"
+    - "text/org"
+
+pagination:
+  pagerSize: 12
+
+permalinks:
+  blog: /:year/:month/:day/:slug/
+  page: /:slug/
+
+taxonomies:
+  category: categories
+  tag: tags
+
+# 搜索页需要 json 输出（用于前端索引）；不在单页 front matter 里写 outputs，
+# 那会触发 Hugo 0.170 的 shiftToOutputFormat panic。
+outputs:
+  page:
+    - HTML
+    - JSON
+  section:
+    - HTML
+    - RSS
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    codeFences: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 4
+
+params:
+  mainSections:
+    - blog
+  rssFullContent: true
+  favicon: "images/favicon.ico"
+  dateFormat:
+    published: "2006-01-02"
+    lastUpdated: "2006-01-02"
+
+  sidebar:
+    subtitle: 让知识美好生活
+    avatar: "images/avatar.png"
+
+  article:
+    headingAnchor: true
+    math: true
+    toc: true
+    readingTime: true
+    list:
+      showTags: true
+    license:
+      enabled: false
+
+  footer:
+    since: 2010
+    customText: "格物堂 · 让知识美好生活"
+
+  widgets:
+    homepage:
+      - type: search
+      - type: archives
+        params:
+          limit: 8
+      - type: categories
+        params:
+          limit: 12
+      - type: tag-cloud
+        params:
+          limit: 20
+    page:
+      - type: toc
+
+menu:
+  main:
+    - identifier: home
+      name: 首页
+      url: /
+      weight: 1
+      params:
+        icon: home
+    - identifier: blog
+      name: 博客
+      url: /blog/
+      weight: 2
+      params:
+        icon: archives
+    - identifier: works
+      name: 作品
+      url: /works/
+      weight: 3
+      params:
+        icon: hash
+    - identifier: about
+      name: 关于我
+      url: /about/
+      weight: 4
+      params:
+        icon: user
+    - identifier: links
+      name: 友情链接
+      url: /links/
+      weight: 5
+      params:
+        icon: link
+
+  social:
+    - identifier: github
+      name: GitHub
+      url: "https://github.com/dengyishuo"
+      params:
+        icon: brand-github

@@ -1,0 +1,228 @@
+/*
+*   Global style
+*/
+:root {
+    --main-top-padding: 35px;
+
+    @include respond(xl) {
+        --main-top-padding: 50px;
+    }
+
+    --body-background: #f5f5fa;
+
+    --accent-color: #34495e;
+    --accent-color-darker: #2c3e50;
+    --accent-color-text: #fff;
+    --body-text-color: #707070;
+
+    --tag-border-radius: 4px;
+
+    --section-separation: 40px;
+
+    &[data-scheme="dark"] {
+        --body-background: #303030;
+        --accent-color: #ecf0f1;
+        --accent-color-darker: #bdc3c7;
+        --accent-color-text: #000;
+        --body-text-color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+/**
+*   Global font family
+*/
+:root {
+    --sys-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Droid Sans", "Helvetica Neue";
+    --base-font-family: "Lato", var(--sys-font-family), sans-serif;
+    --code-font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/*
+*   Card style
+*/
+:root {
+    --card-background: #fff;
+    --card-background-selected: #eaeaea;
+
+    --card-text-color-main: #000;
+    --card-text-color-secondary: #747474;
+    --card-text-color-tertiary: #767676;
+    --card-separator-color: rgba(218, 218, 218, 0.5);
+
+    --card-border-radius: 10px;
+
+    --card-padding: 20px;
+
+    @include respond(md) {
+        --card-padding: 25px;
+    }
+
+    @include respond(xl) {
+        --card-padding: 30px;
+    }
+
+    --small-card-padding: 25px 20px;
+
+    @include respond(md) {
+        --small-card-padding: 25px;
+    }
+
+    &[data-scheme="dark"] {
+        --card-background: #424242;
+        --card-background-selected: rgba(255, 255, 255, 0.16);
+        --card-text-color-main: rgba(255, 255, 255, 0.9);
+        --card-text-color-secondary: rgba(255, 255, 255, 0.7);
+        --card-text-color-tertiary: rgba(255, 255, 255, 0.5);
+        --card-separator-color: rgba(255, 255, 255, 0.12);
+    }
+}
+
+/**
+*   Article content font settings
+*/
+:root {
+    --article-font-family: var(--base-font-family);
+    --article-font-size: 1.6rem;
+
+    @include respond(md) {
+        --article-font-size: 1.7rem;
+    }
+
+    --article-line-height: 1.85;
+}
+
+/*
+*   Article content style
+*/
+:root {
+    --blockquote-border-size: 4px;
+    --blockquote-background-color: rgb(248 248 248);
+
+    --heading-border-size: 4px;
+
+    --alert-note-color: #4da3ff;
+    --alert-note-background: rgba(77, 163, 255, 0.08);
+    --alert-tip-color: #3fb950;
+    --alert-tip-background: rgba(63, 185, 80, 0.08);
+    --alert-important-color: #8457d9;
+    --alert-important-background: rgba(130, 80, 223, 0.08);
+    --alert-warning-color: #d29922;
+    --alert-warning-background: rgba(210, 153, 34, 0.1);
+    --alert-caution-color: #f85149;
+    --alert-caution-background: rgba(248, 81, 73, 0.1);
+
+    --link-background-color: 189, 195, 199;
+    --link-background-opacity: 0.5;
+    --link-background-opacity-hover: 0.7;
+
+    --code-background-color: rgba(0, 0, 0, 0.12);
+    --code-text-color: #808080;
+
+    --table-border-color: #dadada;
+    --tr-even-background-color: #efefee;
+
+    --kbd-border-color: #dadada;
+
+    &[data-scheme="dark"] {
+        --code-background-color: #272822;
+        --code-text-color: rgba(255, 255, 255, 0.9);
+
+        --table-border-color: #717171;
+        --tr-even-background-color: #545454;
+
+        --blockquote-background-color: rgb(75 75 75);
+    }
+}
+
+/*
+*   Shadow style
+*   Thanks to https://www.figma.com/community/plugin/744987207861965946/Shadow-picker
+*/
+:root {
+    --shadow-l1-y: 4px;
+    --shadow-l1-blur: 8px;
+    --shadow-l2-y: 10px;
+    --shadow-l2-blur: 20px;
+
+    --shadow-l1: 0px var(--shadow-l1-y) var(--shadow-l1-blur) rgba(0, 0, 0, 0.04), 0px 0px 2px rgba(0, 0, 0, 0.06), 0px 0px 1px rgba(0, 0, 0, 0.04);
+    --shadow-l2: 0px var(--shadow-l2-y) var(--shadow-l2-blur) rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);
+}
+
+[data-scheme="light"] {
+    --pre-text-color: #272822;
+    --pre-background-color: #fafafa;
+    @import "partials/highlight/light.scss";
+}
+
+[data-scheme="dark"] {
+    --pre-text-color: #f8f8f2;
+    --pre-background-color: #272822;
+    @import "partials/highlight/dark.scss";
+}
+
+:root {
+    --menu-icon-separation: 40px;
+    --container-padding: 15px;
+
+    @include respond(md) {
+        --container-padding: 20px;
+    }
+
+    --widget-separation: var(--section-separation);
+
+    /* Spacing tokens */
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 25px;
+    --spacing-2xl: 30px;
+    --spacing-3xl: 40px;
+
+    /* Article image height variables */
+    --article-image-height: 150px;
+
+    @include respond(md) {
+        --article-image-height: 200px;
+    }
+
+    @include respond(xl) {
+        --article-image-height: 250px;
+    }
+
+    /* Mermaid component variables */
+    --mermaid-toolbar-btn-bg: rgba(255, 255, 255, 0.95);
+    --mermaid-toolbar-btn-text: #333;
+    --mermaid-modal-bg: rgba(0, 0, 0, 0.95);
+    --mermaid-modal-content-bg: #fff;
+    --mermaid-modal-btn-bg: #fff;
+    --mermaid-modal-btn-hover: #ddd;
+
+    &[data-scheme="dark"] {
+        --mermaid-toolbar-btn-bg: rgba(0, 0, 0, 0.85);
+        --mermaid-toolbar-btn-text: #eee;
+        --mermaid-modal-content-bg: #1e1e1e;
+        --mermaid-modal-btn-bg: #333;
+        --mermaid-modal-btn-hover: #444;
+    }
+
+    /* Article compact image size */
+    --article-compact-image-size: 50px;
+
+    @include respond(md) {
+        --article-compact-image-size: 60px;
+    }
+
+    /* Widget icon size */
+    --widget-icon-size: 32px;
+
+    /* Article list tile variables */
+    --article-tile-width: 250px;
+    --article-tile-height: 150px;
+    --article-tile-overlay-bg: rgba(0, 0, 0, 0.25);
+    --article-tile-text-color: #fff;
+
+    &[data-scheme="dark"] {
+        --article-tile-overlay-bg: rgba(0, 0, 0, 0.45);
+    }
+}

@@ -1,0 +1,15 @@
+{{- $pages := partial "helper/pages.html" .Site.Home -}}
+{{- $result := slice -}}
+
+{{- range $pages -}}
+    {{- $data := dict "title" .Title "date" .Date "permalink" .RelPermalink "content" (.Plain) -}}
+
+    {{- $image := partial "helper/image" (dict "Image" .Params.image "Resources" .Resources "Context" .) -}}
+    {{- if $image -}}
+        {{- $data = merge $data (dict "image" $image.Permalink) -}}
+    {{- end -}}
+
+    {{- $result = $result | append $data -}}
+{{- end -}}
+
+{{ jsonify $result }}

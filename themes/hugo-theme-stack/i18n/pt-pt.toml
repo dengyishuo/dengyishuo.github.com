@@ -1,0 +1,82 @@
+toggleMenu = "Alternar Menu"
+darkMode   = "Modo Escuro"
+
+[list]
+    section = "Secção"
+
+    [list.page]
+        one   = "{{ .Count }} página"
+        other = "{{ .Count }} páginas"
+
+    [list.subsection]
+        one   = "Subsecção"
+        other = "Subsecções"
+
+[article]
+    back            = "Voltar"
+    tableOfContents = "Índice"
+    relatedContent  = "Conteúdo relacionado"
+    lastUpdatedOn   = "Última atualização a"
+
+    [article.readingTime]
+        one   = "{{ .Count }} minuto de leitura"
+        other = "{{ .Count }} minutos de leitura"
+
+    [article.alert]
+        note      = "Nota"
+        tip       = "Dica"
+        important = "Importante"
+        warning   = "Aviso"
+        caution   = "Cuidado"
+
+    [article.codeblock]
+        copy   = "Copiar"
+        copied = "Copiado!"
+
+[notFound]
+    title    = "Não Encontrado"
+    subtitle = "Esta página não existe."
+
+[widget]
+    [widget.archives]
+        title = "Arquivos"
+        more  = "Mais"
+
+    [widget.tagCloud]
+        title = "Tags"
+
+    [widget.categoriesCloud]
+        title = "Categorias"
+
+[search]
+    title       = "Pesquisa"
+    placeholder = "Escreva algo..."
+    resultTitle = "#PAGES_COUNT páginas (#TIME_SECONDS segundos)"
+
+[footer]
+    builtWith  = "Criado com {{ .Generator }}"
+    designedBy = "Tema {{ .Theme }} desenvolvido por {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Consentimento de cookies"
+    text              = "Utilizamos cookies para melhorar a sua experiência de navegação e analisar o tráfego do site."
+    acceptAll         = "Aceitar todos"
+    deny              = "Recusar"
+    managePreferences = "Gerir preferências"
+    settingsTitle     = "Preferências de cookies"
+    savePreferences   = "Guardar preferências"
+    cancel            = "Cancelar"
+    footerLink        = "Definições de cookies"
+    commentsDisabled  = "Os comentários estão desativados até que aceite os cookies funcionais."
+
+    [cookies.necessary]
+        title = "Necessários"
+        text  = "Estes cookies são necessários para o funcionamento do website e não podem ser desativados."
+
+    [cookies.analytics]
+        title = "Analíticos"
+        text  = "Estes cookies ajudam-nos a compreender como os visitantes interagem com o nosso website."
+
+    [cookies.functional]
+        title = "Funcionais"
+        text  = "Estes cookies permitem funcionalidades como comentários e conteúdo incorporado."

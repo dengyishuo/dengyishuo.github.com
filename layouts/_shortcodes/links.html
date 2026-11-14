@@ -1,0 +1,43 @@
+{{- /* 友情链接卡片：数据来自 data/links.yaml
+     三种形态：
+       1) 有 url          → 可点击卡片（整卡可点）
+       2) 有 qrcode       → 二维码卡片（不可点，便于扫码）
+       3) 都没有          → 纯信息卡片（不可点，弱化显示）
+*/ -}}
+{{- $links := hugo.Data.links -}}
+{{- with $links }}
+<div class="gt-links">
+    {{- range . }}
+        {{- $url := .url -}}
+        {{- $name := .name -}}
+        {{- $desc := .desc -}}
+        {{- $qrcode := .qrcode -}}
+        {{- $account := .account -}}
+
+        {{- if $url }}
+        <a class="gt-link-card" href="{{ $url }}" target="_blank" rel="noopener noreferrer nofollow">
+            <span class="gt-link-name">{{ $name }}</span>
+            {{- with $desc }}<span class="gt-link-desc">{{ . }}</span>{{ end }}
+            <span class="gt-link-host">{{ (urls.Parse $url).Host }}</span>
+        </a>
+
+        {{- else if $qrcode }}
+        <div class="gt-link-card gt-link-card--qr">
+            <span class="gt-link-name">{{ $name }}</span>
+            {{- with $desc }}<span class="gt-link-desc">{{ . }}</span>{{ end }}
+            <img class="gt-link-qr" src="{{ $qrcode | relURL }}" alt="{{ $name }} 二维码" loading="lazy">
+            {{- with $account }}<span class="gt-link-host">{{ . }}</span>{{ end }}
+        </div>
+
+        {{- else }}
+        <div class="gt-link-card gt-link-card--text">
+            <span class="gt-link-name">{{ $name }}</span>
+            {{- with $desc }}<span class="gt-link-desc">{{ . }}</span>{{ end }}
+            {{- with $account }}<span class="gt-link-host">{{ . }}</span>{{ end }}
+        </div>
+        {{- end }}
+    {{- end }}
+</div>
+{{- else }}
+<p>暂未添加友链。</p>
+{{- end }}

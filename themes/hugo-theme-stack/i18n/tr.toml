@@ -1,0 +1,82 @@
+toggleMenu = "Menüyü Gizle"
+darkMode   = "Koyu Mod"
+
+[list]
+    section = "Bölüm"
+
+    [list.page]
+        one   = "{{ .Count }} makale"
+        other = "{{ .Count }} makale"
+
+    [list.subsection]
+        one   = "Alt bölüm"
+        other = "Alt bölümler"
+
+[article]
+    back            = "Geri"
+    tableOfContents = "İçindekiler"
+    relatedContent  = "Benzer içerikler"
+    lastUpdatedOn   = "Son güncelleme"
+
+    [article.readingTime]
+        one   = "{{ .Count }} dakika okuma süresi"
+        other = "{{ .Count }} dakika okuma süresi"
+
+    [article.alert]
+        note      = "Not"
+        tip       = "İpucu"
+        important = "Önemli"
+        warning   = "Uyarı"
+        caution   = "Dikkat"
+
+    [article.codeblock]
+        copy   = "Kopyala"
+        copied = "Kopyalandı!"
+
+[notFound]
+    title    = "Bulunamadı"
+    subtitle = "Aradığınız sayfa mevcut değil."
+
+[widget]
+    [widget.archives]
+        title = "Arşiv"
+        more  = "Daha fazla"
+
+    [widget.tagCloud]
+        title = "Etiketler"
+
+    [widget.categoriesCloud]
+        title = "Kategoriler"
+
+[search]
+    title       = "Arama"
+    placeholder = "Birşeyler yazın..."
+    resultTitle = "#PAGES_COUNT sayfa (#TIME_SECONDS saniye)"
+
+[footer]
+    builtWith  = "{{ .Generator }} ile oluşturuldu."
+    designedBy = "{{ .Theme }} teması {{ .DesignedBy }} tarafından tasarlandı"
+
+[cookies]
+    title             = "Çerez Onayı"
+    text              = "Tarayıcı deneyiminizi iyileştirmek ve site trafiğini analiz etmek için çerezler kullanıyoruz."
+    acceptAll         = "Tümünü Kabul Et"
+    deny              = "Reddet"
+    managePreferences = "Tercihleri yönet"
+    settingsTitle     = "Çerez Tercihleri"
+    savePreferences   = "Tercihleri kaydet"
+    cancel            = "İptal"
+    footerLink        = "Çerez ayarları"
+    commentsDisabled  = "İşlevsel çerezleri kabul edene kadar yorumlar devre dışıdır."
+
+    [cookies.necessary]
+        title = "Gerekli"
+        text  = "Bu çerezler web sitesinin çalışması için gereklidir ve devre dışı bırakılamaz."
+
+    [cookies.analytics]
+        title = "Analitik"
+        text  = "Bu çerezler, ziyaretçilerin web sitemizle nasıl etkileşimde bulunduğunu anlamamıza yardımcı olur."
+
+    [cookies.functional]
+        title = "İşlevsel"
+        text  = "Bu çerezler, yorumlar ve gömülü içerik gibi özellikleri etkinleştirir."

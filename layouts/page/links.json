@@ -1,0 +1,2 @@
+{{- /* 友链页不需要 json 索引，占位以满足 outputs.page 配置 */ -}}
+{{- dict "title" .Title "url" .RelPermalink | jsonify -}}

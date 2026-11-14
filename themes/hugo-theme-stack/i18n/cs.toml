@@ -1,0 +1,82 @@
+toggleMenu = "Skrýt menu"
+darkMode   = "Tmavý režim"
+
+[list]
+    section = "Kategorie"
+
+    [list.page]
+        one   = "{{ .Count }} stránka"
+        other = "{{ .Count }} stránek"
+
+    [list.subsection]
+        one   = "Podkategorie"
+        other = "Podkategorie"
+
+[article]
+    back            = "Zpět"
+    tableOfContents = "Obsah"
+    relatedContent  = "Související"
+    lastUpdatedOn   = "Naposledy aktualizováno"
+
+    [article.readingTime]
+        one   = "{{ .Count }} minuta"
+        other = "{{ .Count }} minut"
+
+    [article.alert]
+        note      = "Poznámka"
+        tip       = "Tip"
+        important = "Důležité"
+        warning   = "Varování"
+        caution   = "Upozornění"
+
+    [article.codeblock]
+        copy   = "Kopírovat"
+        copied = "Zkopírováno!"
+
+[notFound]
+    title    = "Nenalezeno"
+    subtitle = "Tato stránka neexistuje"
+
+[widget]
+    [widget.archives]
+        title = "Archivy"
+        more  = "Více"
+
+    [widget.tagCloud]
+        title = "Štítky"
+
+    [widget.categoriesCloud]
+        title = "Kategorie"
+
+[search]
+    title       = "Hledat"
+    placeholder = "Zadejte něco..."
+    resultTitle = "#PAGES_COUNT stránek (#TIME_SECONDS sekund)"
+
+[footer]
+    builtWith  = "Vytvořeno pomocí {{ .Generator }}"
+    designedBy = "Šablona {{ .Theme }} od {{ .DesignedBy }}"
+
+[cookies]
+    title             = "Souhlas s cookies"
+    text              = "Používáme cookies ke zlepšení vašeho prohlížení a analýze návštěvnosti webu."
+    acceptAll         = "Přijmout vše"
+    deny              = "Odmítnout"
+    managePreferences = "Spravovat předvolby"
+    settingsTitle     = "Předvolby cookies"
+    savePreferences   = "Uložit předvolby"
+    cancel            = "Zrušit"
+    footerLink        = "Nastavení cookies"
+    commentsDisabled  = "Komentáře jsou zakázány, dokud nepřijmete funkční cookies."
+
+    [cookies.necessary]
+        title = "Nutné"
+        text  = "Tyto cookies jsou nutné pro fungování webu a nelze je zakázat."
+
+    [cookies.analytics]
+        title = "Analytické"
+        text  = "Tyto cookies nám pomáhají pochopit, jak návštěvníci interagují s naším webem."
+
+    [cookies.functional]
+        title = "Funkční"
+        text  = "Tyto cookies umožňují funkce jako komentáře a vložený obsah."

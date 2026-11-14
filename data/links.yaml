@@ -1,0 +1,27 @@
+# 友情链接
+# 每项字段：
+#   name    （必填）站点名称
+#   url     （可选）站点地址；留空则渲染为不可点的纯信息卡片
+#   desc    （可选）一句话简介
+#   qrcode  （可选）二维码图片路径，放在 static/images/ 下，如 images/wechat-xiangma.jpg
+#   account （可选）公众号/账号名，无二维码时作为说明文字显示
+# 改完重新构建即可，无需动模板。
+
+- name: XQuant
+  url: https://xquant-shop.com
+  desc: 用 AI 和数据读懂量化
+
+- name: R-Finance 中国
+  url: https://rfinance.org.cn
+  desc: R 语言在金融领域的应用社区
+
+- name: 统计之都
+  url: https://cosx.org
+  desc: 中国 R 语言与统计学社区
+
+# 公众号：目前无网站，二维码图片补上后在 qrcode 里填路径即可自动显示
+- name: 响马读书
+  url: ""
+  desc: 读书与投资随笔，不定期更新
+  account: i响马读书
+  qrcode: ""
