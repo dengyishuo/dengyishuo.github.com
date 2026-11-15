@@ -1,0 +1,65 @@
+{{- /*
+    格物堂 · 关于我（与作品页同一套版式）
+    数据来自 data/about.yaml：开场一段 + 分区列表（事项在左，时间在右）。
+    无右栏、限宽 920，与 /works/ 保持一致的阅读节奏。
+*/ -}}
+{{ define "body-class" }}gt-about-page{{ end }}
+
+{{ define "main" }}
+    {{- $about := hugo.Data.about -}}
+
+    <header class="gt-page-head">
+        <h1 class="gt-page-title">{{ .Title }}</h1>
+        {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
+    </header>
+
+    {{- with $about.lead }}
+    <section class="gt-wlist-section">
+        <p class="gt-about-lead">{{ . | markdownify }}</p>
+    </section>
+    {{- end }}
+
+    {{- range $about.sections }}
+    <section class="gt-wlist-section">
+        <h2 class="gt-wlist-head">{{ .title }}</h2>
+        <ul class="gt-wlist">
+            {{- range .items }}
+            <li class="gt-wlist-item">
+                <div class="gt-wlist-main">
+                    <div class="gt-wlist-title gt-wlist-title--plain">{{ .text | markdownify }}</div>
+                </div>
+                {{- with .period }}
+                <span class="gt-wlist-meta">
+                    <span class="gt-about-period">{{ . }}</span>
+                </span>
+                {{- end }}
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- /* 结尾：指向作品页，做成一行可点条目，与上方列表同构 */ -}}
+    <section class="gt-wlist-section">
+        <h2 class="gt-wlist-head">我的作品</h2>
+        <ul class="gt-wlist">
+            <li class="gt-wlist-item gt-about-cta">
+                <a href="{{ "/works/" | relLangURL }}">
+                    <div class="gt-wlist-main">
+                        <div class="gt-wlist-title">我翻译与撰写的图书，以及两个开源 R 包</div>
+                        <p class="gt-wlist-desc">已出版的译著、撰写中的新书，以及 eTTR、eTushare 两个包，都在作品页。</p>
+                    </div>
+                    <span class="gt-wlist-meta">
+                        <span class="gt-about-go">前往「作品」</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    {{ .Content }}
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

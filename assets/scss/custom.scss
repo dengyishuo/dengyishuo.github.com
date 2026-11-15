@@ -1437,3 +1437,131 @@ footer.site-footer {
     background: var(--gt-tag-bg-hover);
     color: var(--accent-color);
 }
+
+/* ============================================================
+   11. 关于我（沿用作品页的版式语言）
+   与 /works/ 共用 .gt-wlist-* 骨架，只补三处专属：
+   开场段、时间列、结尾跳转行。
+   ============================================================ */
+
+/* 与作品页同样的无右栏限宽，保证两页切换时列宽不跳 */
+.gt-about-page .main-container main.main {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 开场一段：比正文稍大、颜色稍淡，像作品页的导语 */
+.gt-about-lead {
+    margin: 0;
+    font-size: 1.42rem;
+    line-height: 1.9;
+    color: var(--card-text-color-secondary);
+    text-wrap: pretty;
+
+    p {
+        margin: 0;
+    }
+}
+
+/* 经历条目：文字是句子而非书名，取消加粗以免整段发黑 */
+.gt-wlist-title--plain {
+    font-weight: 400;
+    line-height: 1.75;
+
+    a {
+        color: inherit;
+        border-bottom: 1px solid var(--gt-rule);
+        text-decoration: none;
+        transition: color 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+    }
+}
+
+/* 时间列：等宽数字，右对齐，像一条时间轴 */
+.gt-about-period {
+    font-family: var(--code-font-family);
+    font-size: 1.16rem;
+    letter-spacing: -0.01em;
+    color: var(--card-text-color-tertiary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* 结尾跳转到作品页：整行可点 */
+.gt-about-cta {
+    padding: 0;
+
+    a {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px 20px;
+        padding: 14px 8px 14px 0;
+        text-decoration: none;
+    }
+
+    .gt-wlist-title {
+        display: inline;
+        font-weight: 600;
+    }
+
+    .gt-wlist-desc {
+        margin-top: 4px;
+    }
+
+    .gt-about-go {
+        display: inline-block;
+        padding: 2px 10px;
+        border: 1px solid var(--gt-rule);
+        border-radius: 4px;
+        font-size: 1.24rem;
+        font-weight: 500;
+        color: var(--accent-color);
+        white-space: nowrap;
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+        /* 暗色下 --accent-color 接近白色，靠描边与底色维持"可点"的观感 */
+        &::after {
+            content: " →";
+        }
+    }
+
+    &:hover .gt-about-go {
+        transform: translateX(4px);
+        border-color: var(--accent-color);
+        background-color: var(--gt-tag-bg);
+    }
+
+    /* 悬停底色由 a 承载，避免与外层 li 的 hover 重复 */
+    &:hover {
+        background-color: transparent;
+    }
+
+    a:hover {
+        background-color: var(--gt-tag-bg);
+    }
+}
+
+/* 窄屏：时间移到事项下方，右对齐取消 */
+@media (max-width: 767px) {
+    .gt-about-lead {
+        font-size: 1.34rem;
+        line-height: 1.85;
+    }
+
+    .gt-about-cta a {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 12px 0;
+    }
+
+    .gt-about-cta .gt-about-go {
+        font-size: 1.22rem;
+    }
+}

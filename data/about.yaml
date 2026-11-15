@@ -1,0 +1,29 @@
+# 关于页数据
+# 结构与作品页一致：分区标题 + 一行一条（事项在左，时间在右）
+# text 支持 Markdown（可用链接）；period 留空则不显示
+
+lead: 前金融业高管，现今游走于投资、读书和美食之间，偶尔写随笔。喜欢维修宇宙和抚慰人心；喜欢简单；喜欢活力和宁静之间的平衡。
+
+sections:
+  - title: 教育经历
+    items:
+      - period: 2006–2010
+        text: 求学于中央财经大学，数学与统计学院
+      - period: 2019–2021
+        text: 求学于北京大学，光华管理学院
+
+  - title: 工作经历
+    items:
+      - period: 2010–2017
+        text: 先后就职于首钢集团、Dawanjia Inc. 等
+      - period: 2017–
+        text: 先后就职于华睿创盈投资管理有限公司、润安国际保险经纪及字节跳动
+
+  - title: 社会经历
+    items:
+      - period: 2010–2020
+        text: R 语言专家，统计之都理事会成员，R 沙龙理事会成员
+      - period: 2015–
+        text: 创立响马读书（微信公众号：i响马读书）
+      - period: 2020–
+        text: R 语言 / 量化投资专家，创立 [R-Finance 中国](https://rfinance.org.cn) 和 [X-Quant](https://x-quant.com.cn)
