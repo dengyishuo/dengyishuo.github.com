@@ -1,7 +1,7 @@
 {{- /*
     格物堂 · 作品页（文本列表版）
     数据来自 data/works.yaml：图书（已出版 / 撰写中 / 计划内）+ 开源软件包。
-    刻意不用卡片：一行一条，书名在左、角色在右，便于快速扫读与打印。
+    每条：书名 + 主要内容 + 适合谁读，右侧保留"译/著"标签。无卡片。
 */ -}}
 {{- $works := hugo.Data.works -}}
 {{- $books := $works.books -}}
@@ -23,7 +23,13 @@
             <ul class="gt-wlist">
                 {{- range . }}
                 <li class="gt-wlist-item">
-                    <span class="gt-wlist-title">{{ .title }}</span>
+                    <div class="gt-wlist-main">
+                        <div class="gt-wlist-title">{{ .title }}</div>
+                        {{- with .desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+                        {{- with .suit }}
+                        <p class="gt-wlist-suit"><span class="gt-wlist-suit__k">适合</span><span class="gt-wlist-suit__v">{{ . }}</span></p>
+                        {{- end }}
+                    </div>
                     <span class="gt-wlist-meta">
                         <span class="gt-wlist-role">{{ .role }}</span>
                         {{- with .note }}<span class="gt-wlist-note">{{ . }}</span>{{ end }}
@@ -43,11 +49,13 @@
     <ul class="gt-wlist">
         {{- range $packages }}
         <li class="gt-wlist-item">
-            <span class="gt-wlist-title">
-                <a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a>
-            </span>
+            <div class="gt-wlist-main">
+                <div class="gt-wlist-title">
+                    <a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }}</a>
+                </div>
+                {{- with .desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+            </div>
             <span class="gt-wlist-meta">
-                {{- with .desc }}<span class="gt-wlist-note">{{ . }}</span>{{ end }}
                 <span class="gt-wlist-repo">{{ .repo }}</span>
             </span>
         </li>

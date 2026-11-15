@@ -1065,7 +1065,7 @@ html {
     align-items: baseline;
     justify-content: space-between;
     gap: 10px 20px;
-    padding: 8px 8px 8px 0;
+    padding: 14px 8px 14px 0;
     border-bottom: 1px solid var(--gt-rule-soft);
     transition: background-color 0.18s ease;
 
@@ -1079,11 +1079,20 @@ html {
     }
 }
 
-.gt-wlist-title {
+/* 左侧主体：书名 + 简介 + 适读人群，纵向排列 */
+.gt-wlist-main {
     flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.gt-wlist-title {
+    min-width: 0;
     font-size: 1.5rem;
-    line-height: 1.65;
+    font-weight: 600;
+    line-height: 1.6;
     color: var(--card-text-color-main);
 
     a {
@@ -1096,6 +1105,46 @@ html {
             color: var(--accent-color);
             border-bottom-color: var(--gt-rule);
         }
+    }
+}
+
+/* 主要内容 */
+.gt-wlist-desc {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1.82;
+    color: var(--card-text-color-secondary);
+    text-wrap: pretty;
+}
+
+/* 适合谁读：小一号，前面带一个淡标签 */
+.gt-wlist-suit {
+    margin: 1px 0 0;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: 1.2rem;
+    line-height: 1.78;
+    color: var(--card-text-color-tertiary);
+    text-wrap: pretty;
+
+    .gt-wlist-suit__k {
+        flex: 0 0 auto;
+        display: inline-block;
+        padding: 0 5px;
+        border: 1px solid var(--gt-rule);
+        border-radius: 3px;
+        font-size: 1.04rem;
+        line-height: 1.7;
+        letter-spacing: 0.06em;
+        color: var(--card-text-color-tertiary);
+        white-space: nowrap;
+    }
+
+    .gt-wlist-suit__v {
+        flex: 1 1 auto;
+        min-width: 0;
     }
 }
 
@@ -1141,13 +1190,22 @@ html {
     .gt-wlist-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 3px;
-        padding: 9px 0;
+        gap: 5px;
+        padding: 12px 0;
     }
 
     .gt-wlist-meta {
         text-align: left;
         white-space: normal;
+        font-size: 1.16rem;
+    }
+
+    .gt-wlist-desc {
+        font-size: 1.26rem;
+        line-height: 1.78;
+    }
+
+    .gt-wlist-suit {
         font-size: 1.16rem;
     }
 
