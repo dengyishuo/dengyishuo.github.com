@@ -37,7 +37,14 @@ markup:
     renderer:
       unsafe: true
   highlight:
-    codeFences: false
+    # 打开围栏代码块的语法高亮（原来 false，代码全无颜色）
+    # noClasses: false 表示输出 class 而非内联样式，
+    # 配色表在 assets/scss/_chroma.scss（由 custom.scss 引入）
+    codeFences: true
+    noClasses: false
+    style: friendly
+    lineNos: false
+    tabWidth: 4
   tableOfContents:
     startLevel: 2
     endLevel: 4

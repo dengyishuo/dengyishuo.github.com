@@ -1632,3 +1632,242 @@ footer.site-footer {
         font-size: 1.22rem;
     }
 }
+
+/* ============================================================
+   12. 代码块：米色底 + 语法着色
+   主题原样式是浅灰底（#fafafa）且全幅出血到卡片边缘。
+   这里改成米色、内缩成圆角面板，与下方引用框共用一套"面板"语言。
+   ============================================================ */
+:root {
+    --gt-code-bg: #f7f2e5;
+    --gt-code-edge: #e6dcc4;
+    --gt-code-fg: #3f3a30;
+
+    /* 引用框 */
+    --gt-quote-bg: #f8fafc;
+    --gt-quote-edge: #e2e8f0;
+    --gt-quote-bar: #3b82f6;
+}
+
+:root[data-scheme="dark"] {
+    --gt-code-bg: #262520;
+    --gt-code-edge: #3a382f;
+    --gt-code-fg: rgba(255, 255, 255, 0.88);
+
+    --gt-quote-bg: rgba(255, 255, 255, 0.045);
+    --gt-quote-edge: rgba(255, 255, 255, 0.12);
+    --gt-quote-bar: #60a5fa;
+}
+
+/* 覆盖主题变量，让 .highlight / pre 的底色统一到米色 */
+:root {
+    --pre-background-color: #f7f2e5;
+    --pre-text-color: #3f3a30;
+}
+
+:root[data-scheme="dark"] {
+    --pre-background-color: #262520;
+    --pre-text-color: rgba(255, 255, 255, 0.88);
+}
+
+/* ---- 代码块面板 ---- */
+.article-content {
+    .highlight,
+    pre {
+        /* 取消主题的全幅出血，改成内缩面板 */
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: auto !important;
+
+        background-color: var(--gt-code-bg);
+        border: 1px solid var(--gt-code-edge);
+        border-radius: 8px;
+        color: var(--gt-code-fg);
+
+        /* 主题原 padding 是卡片级 30px，内缩后显得空 */
+        padding: 14px 16px;
+        font-size: 1.32rem;
+        line-height: 1.72;
+        tab-size: 4;
+
+        /* 长行横向滚动，滚动条不要压内容 */
+        overflow-x: auto;
+    }
+
+    /* .highlight 是主题包在 pre 外面的壳，边框与内边距都由内层 pre 承担
+       （主题对 .highlight pre 单独设了 padding:0，权重高于 .article-content pre，
+        所以必须写到 .highlight pre 这一层才生效） */
+    .highlight {
+        padding: 0;
+        border: 0;
+        background: none;
+
+        pre {
+            padding: 14px 16px;
+            border: 1px solid var(--gt-code-edge);
+            background-color: var(--gt-code-bg);
+        }
+    }
+
+    /* chroma 自带背景色，压成米色 */
+    .chroma {
+        background-color: var(--gt-code-bg) !important;
+    }
+
+    /* pre 内部的 code 不要再有自己的底色 */
+    pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+        border: 0;
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    /* 行内代码：极淡米底，与块区分但不刺眼 */
+    :not(pre) > code {
+        background-color: var(--gt-code-bg);
+        color: var(--gt-code-fg);
+        border: 1px solid var(--gt-code-edge);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+}
+
+/* ============================================================
+   13. 引用块：带左蓝框线的方框
+   主题原样式只有左侧一条灰线 + 通栏浅灰底，没有完整边框。
+   这里改成完整方框（细边）+ 左侧 3px 蓝线，圆角，内缩。
+   ============================================================ */
+.article-content {
+    blockquote {
+        /* 取消主题的全幅出血 */
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: auto !important;
+        margin-top: 1.6em;
+        margin-bottom: 1.6em;
+
+        padding: 14px 18px 14px 16px;
+        background-color: var(--gt-quote-bg);
+        border: 1px solid var(--gt-quote-edge);
+        border-inline-start: 3px solid var(--gt-quote-bar);
+        border-radius: 6px;
+
+        /* 引用文字略弱于正文，避免整块太重 */
+        color: var(--card-text-color-secondary);
+        font-size: 0.97em;
+
+        /* 首尾段落不要撑出多余留白 */
+        > :first-child {
+            margin-top: 0;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+
+        /* 引用里的 cite 右对齐，保持主题行为 */
+        .cite {
+            display: block;
+            text-align: right;
+            font-size: 0.8em;
+            margin-top: 6px;
+            color: var(--card-text-color-tertiary);
+        }
+
+        /* 引用内嵌代码块时不要双层边框 */
+        pre,
+        .highlight {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    }
+
+    /* 主题的 alert 型引用（note/tip/warning 等）保留各自配色，
+       只继承方框与圆角，不改左线颜色 */
+    blockquote.alert {
+        border-inline-start-width: 3px;
+        border-radius: 6px;
+    }
+}
+
+/* 窄屏：内边距收紧 */
+@media (max-width: 767px) {
+    .article-content {
+        .highlight,
+        pre {
+            padding: 12px 13px;
+            font-size: 1.24rem;
+            border-radius: 6px;
+        }
+
+        /* 内层 pre 单独设，权重才够压过主题的 .highlight pre{padding:0} */
+        .highlight pre {
+            padding: 12px 13px;
+        }
+
+        blockquote {
+            padding: 12px 14px 12px 13px;
+            border-radius: 5px;
+        }
+    }
+}
+
+/* ============================================================
+   14. 语法配色微调（仅明色）
+   主题内置的是 Monokailight，青蓝 + 品红在米色底上偏杂。
+   这里换成一套为米色底挑的低噪暖色：关键字紫、函数名蓝、
+   字符串青、数字赭、运算符降饱和。暗色仍用主题自带那套。
+   选择器加 [data-scheme="light"] 前缀，权重才压得过主题的
+   [data-scheme=light] .chroma .xx（同为三元组，靠源码顺序取胜）。
+   ============================================================ */
+[data-scheme="light"] {
+    .chroma {
+        color: #3f3a30;
+
+        /* 注释：暖灰，不抢眼 */
+        .c, .ch, .cm, .c1, .cs, .cp, .cpf { color: #8a8478; font-style: italic; }
+
+        /* 关键字：柔和紫 */
+        .k, .kc, .kd, .kn, .kp, .kr, .kt, .kv { color: #6c71c4; font-weight: 600; }
+
+        /* 函数名：蓝 */
+        .nf, .fm { color: #268bd2; }
+
+        /* 类名 / 命名空间 */
+        .nc, .nn, .ne, .nl { color: #b5651d; }
+        .nx { color: #3f3a30; }
+
+        /* 字符串：青绿 */
+        .s, .sa, .sb, .sc, .dl, .sd, .s1, .s2, .se, .sh, .si, .sr, .ss, .sx { color: #2f8f6f; }
+
+        /* 数字与常量：赭石 */
+        .m, .mb, .mf, .mh, .mi, .il, .mo { color: #b5651d; }
+        .no, .kc.constant { color: #b5651d; }
+
+        /* 运算符：降饱和的品红，比原版克制 */
+        .o, .ow { color: #b0508b; }
+
+        /* 标点与括号：接近正文墨色，不另设颜色 */
+        .p { color: #6b6459; }
+
+        /* 内置名 / 属性 */
+        .nb, .bp { color: #5f7d8c; }
+
+        /* 泛型 / 装饰器 / 标签 */
+        .nd, .nt { color: #6c71c4; }
+
+        /* 出错片段 */
+        .err { color: #c0392b; }
+
+        /* 行号 */
+        .ln, .lnt { color: #b3ab99; }
+    }
+}
+
+/* 普通变量名：主题设为纯黑(#111)，在米色底上偏硬，收到正文墨色 */
+[data-scheme="light"] .chroma .n {
+    color: #3f3a30;
+}
