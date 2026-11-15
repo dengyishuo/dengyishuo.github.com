@@ -16,6 +16,9 @@
     --gt-card-bg-hover: rgba(255, 255, 255, 0.86);
     --gt-card-edge: rgba(52, 73, 94, 0.075);
     --gt-card-edge-hover: rgba(52, 73, 94, 0.18);
+
+    /* 列表项目符号：介于分隔线与正文之间，太淡会看不见 */
+    --gt-bullet: rgba(52, 73, 94, 0.42);
 }
 
 :root[data-scheme="dark"] {
@@ -27,6 +30,8 @@
     --gt-card-bg-hover: rgba(255, 255, 255, 0.075);
     --gt-card-edge: rgba(255, 255, 255, 0.075);
     --gt-card-edge-hover: rgba(255, 255, 255, 0.2);
+
+    --gt-bullet: rgba(255, 255, 255, 0.46);
 }
 
 /* ============================================================
@@ -1870,4 +1875,77 @@ footer.site-footer {
 /* 普通变量名：主题设为纯黑(#111)，在米色底上偏硬，收到正文墨色 */
 [data-scheme="light"] .chroma .n {
     color: #3f3a30;
+}
+
+/* ============================================================
+   15. 关于页经历列表：去分隔线，改无序列表
+   作品页靠条目间的 hairline 分隔"一本一本书"，
+   但关于页每条是一句经历，用项目符号更自然。
+
+   符号放在**文本流内**（不在 flex 层），用 padding-left + 负 text-indent
+   做悬挂缩进：首行从 0 开始（符号在行首），换行后的文字对齐到 padding
+   起点。这样无论窄屏怎么改 flex-direction 都不会错位。
+   ============================================================ */
+.gt-about-list {
+    padding-left: 0;
+
+    .gt-wlist-item {
+        border-bottom: 0;
+        padding: 5px 8px 5px 0;
+        gap: 8px 10px;
+        align-items: baseline;
+
+        /* 关于页没有可点行为，不需要整行 hover 底色 */
+        &:hover {
+            background-color: transparent;
+        }
+    }
+
+    /* 悬挂缩进：padding 右移整体，text-indent 负值把首行拉回 */
+    .gt-wlist-title--plain {
+        line-height: 1.7;
+        padding-left: 13px;
+        text-indent: -13px;
+    }
+
+    /* 符号占满首行的缩进量，后面紧跟正文 */
+    .gt-wlist-title--plain::before {
+        content: "•";
+        display: inline-block;
+        width: 13px;
+        text-indent: 0;
+        color: var(--gt-bullet);
+        transition: color 0.18s ease;
+    }
+
+    /* 悬停时符号略加深，给出微弱反馈 */
+    .gt-wlist-item:hover .gt-wlist-title--plain::before {
+        color: var(--card-text-color-main);
+    }
+}
+
+/* 首条与分区标题之间留一口气（原 border 版的 14px 节奏保留） */
+.gt-about-list .gt-wlist-item:first-child {
+    padding-top: 7px;
+}
+
+/* 窄屏：条目结构由 column 变回 row-wrap，符号仍在文字行内，
+   时间落到下一行左对齐，不会与符号抢同一行。 */
+@media (max-width: 767px) {
+    .gt-about-list .gt-wlist-item {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 4px 0;
+        gap: 2px 10px;
+    }
+
+    .gt-about-list .gt-wlist-main {
+        flex: 1 1 100%;
+    }
+
+    .gt-about-list .gt-wlist-meta {
+        flex: 1 1 100%;
+        padding-left: 13px;
+        text-align: left;
+    }
 }
