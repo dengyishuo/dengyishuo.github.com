@@ -75,7 +75,8 @@ params:
       - type: search
       - type: archives
         params:
-          limit: 8
+          # 默认只露前 3 年，其余收进「更多」
+          limit: 3
       - type: categories
         params:
           limit: 12
