@@ -41,24 +41,22 @@ HUGO_ENV = 'production'
 # 避免 404。文章本身的 permalink 未变，无需跳转。
 # ============================================================
 
+# ============================================================
+# 旧分类页 301 跳转
+# 2026-11 重构分类：23 个中英混杂分类合并为 6 个中文分类。
+# 注意：Netlify 匹配的是**已 URL 编码**的请求路径，所以中文 from
+# 必须写成 %XX 形式，写中文明文会匹配不到（实测 404）。
+# 文章 permalink 未变，无需跳转。
+# ============================================================
+
 [[redirects]]
-  from = "/categories/r/"
+  from = "/categories/R/"
   to = "/categories/r语言/"
   status = 301
 
 [[redirects]]
-  from = "/categories/economics/"
-  to = "/categories/经济学/"
-  status = 301
-
-[[redirects]]
-  from = "/categories/econometrics/"
-  to = "/categories/经济学/"
-  status = 301
-
-[[redirects]]
-  from = "/categories/计量经济学/"
-  to = "/categories/经济学/"
+  from = "/categories/r/"
+  to = "/categories/r语言/"
   status = 301
 
 [[redirects]]
@@ -72,13 +70,28 @@ HUGO_ENV = 'production'
   status = 301
 
 [[redirects]]
-  from = "/categories/投资/"
+  from = "/categories/%E6%8A%95%E8%B5%84/"
   to = "/categories/量化投资/"
   status = 301
 
 [[redirects]]
-  from = "/categories/财务/"
+  from = "/categories/%E8%B4%A2%E5%8A%A1/"
   to = "/categories/量化投资/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/economics/"
+  to = "/categories/经济学/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/econometrics/"
+  to = "/categories/经济学/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/%E8%AE%A1%E9%87%8F%E7%BB%8F%E6%B5%8E%E5%AD%A6/"
+  to = "/categories/经济学/"
   status = 301
 
 [[redirects]]
@@ -87,17 +100,17 @@ HUGO_ENV = 'production'
   status = 301
 
 [[redirects]]
-  from = "/categories/生活/"
+  from = "/categories/%E7%94%9F%E6%B4%BB/"
   to = "/categories/随笔/"
   status = 301
 
 [[redirects]]
-  from = "/categories/读书/"
+  from = "/categories/%E8%AF%BB%E4%B9%A6/"
   to = "/categories/随笔/"
   status = 301
 
 [[redirects]]
-  from = "/categories/reading-notes/"
+  from = "/categories/Reading-Notes/"
   to = "/categories/随笔/"
   status = 301
 
@@ -107,12 +120,12 @@ HUGO_ENV = 'production'
   status = 301
 
 [[redirects]]
-  from = "/categories/美食记/"
+  from = "/categories/%E7%BE%8E%E9%A3%9F%E8%AE%B0/"
   to = "/categories/随笔/"
   status = 301
 
 [[redirects]]
-  from = "/categories/商业/"
+  from = "/categories/%E5%95%86%E4%B8%9A/"
   to = "/categories/随笔/"
   status = 301
 
@@ -127,12 +140,11 @@ HUGO_ENV = 'production'
   status = 301
 
 [[redirects]]
-  from = "/categories/可视化/"
+  from = "/categories/%E5%8F%AF%E8%A7%86%E5%8C%96/"
   to = "/categories/r语言/"
   status = 301
 
 [[redirects]]
-  from = "/categories/时间序列/"
+  from = "/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/"
   to = "/categories/r语言/"
   status = 301
-
