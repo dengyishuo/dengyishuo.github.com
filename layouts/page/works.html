@@ -1,4 +1,4 @@
-{{- /* 格物堂 · 作品页 */ -}}
+{{- /* 格物堂 · 作品页（文本列表版，无卡片） */ -}}
 {{ define "body-class" }}gt-works-page{{ end }}
 
 {{ define "main" }}
@@ -9,11 +9,9 @@
 
     {{ .Content }}
 
-    <article class="article-page">
-        <div class="article-content">
-            {{ partial "works/list" . }}
-        </div>
-    </article>
+    <div class="gt-works-body">
+        {{ partial "works/list" . }}
+    </div>
 
     {{ partial "footer/footer" . }}
 {{ end }}

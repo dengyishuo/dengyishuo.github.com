@@ -1001,230 +1001,158 @@ html {
 }
 
 /* ============================================================
-   9. 作品页
+   9. 作品页（文本列表）
+   不用卡片：一行一条，书名在左、角色与出处靠右，
+   用细线分隔，读起来像目录而不是货架。
    ============================================================ */
-.gt-works-section {
-    margin: 8px 0 4px;
+.gt-works-body {
+    margin-top: 4px;
 }
 
-.gt-section-head {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin: 0 0 18px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--card-separator-color);
-
-    .gt-section-title {
-        font-size: 1.9rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        color: var(--card-text-color-main);
-    }
-
-    .gt-section-count {
-        font-size: 1.2rem;
-        color: var(--card-text-color-tertiary);
+.gt-wlist-section {
+    & + & {
+        margin-top: 34px;
     }
 }
 
-/* ---- 图书：按状态分组 ---- */
-.gt-book-group {
-    margin-bottom: 22px;
+/* 一级标题：图书 / 开源软件包 */
+.gt-wlist-head {
+    margin: 0 0 14px;
+    padding-bottom: 9px;
+    font-size: 1.34rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--card-text-color-tertiary);
+    border-bottom: 1px solid var(--gt-rule);
+}
 
-    &:last-child {
-        margin-bottom: 0;
+/* 二级分组：已出版 / 撰写中 / 计划内 */
+.gt-wlist-group {
+    & + & {
+        margin-top: 20px;
     }
 }
 
-.gt-book-group__label {
-    margin: 0 0 10px;
-    font-size: 1.2rem;
+.gt-wlist-label {
+    margin: 0 0 2px;
+    font-size: 1.14rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    color: var(--card-text-color-tertiary);
+    color: var(--gt-ink-soft);
 
-    /* 与状态对应的小色点 */
     &::before {
         content: "";
         display: inline-block;
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
         margin-right: 7px;
         border-radius: 50%;
-        vertical-align: middle;
-        background: var(--card-text-color-tertiary);
+        vertical-align: 2px;
+        background: var(--gt-rule);
     }
 }
 
-.gt-book-list {
-    display: grid;
-    grid-template-columns: 1fr;
+/* 列表本体 */
+.gt-wlist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.gt-wlist-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 20px;
+    padding: 8px 8px 8px 0;
+    border-bottom: 1px solid var(--gt-rule-soft);
+    transition: background-color 0.18s ease;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+
+    /* 悬停给一点点底色，替代卡片边界 */
+    &:hover {
+        background-color: var(--gt-tag-bg);
+    }
+}
+
+.gt-wlist-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 1.5rem;
+    line-height: 1.65;
+    color: var(--card-text-color-main);
+
+    a {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: color 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            color: var(--accent-color);
+            border-bottom-color: var(--gt-rule);
+        }
+    }
+}
+
+.gt-wlist-meta {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: baseline;
     gap: 10px;
-
-    @include respond(md) {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--card-text-color-tertiary);
+    text-align: right;
+    white-space: nowrap;
 }
 
-.gt-book-card {
-    padding: 16px 18px;
-    border-radius: 9px;
-    border: 1px solid var(--card-separator-color);
-    background: var(--card-background);
-    border-left: 3px solid var(--card-separator-color);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-        box-shadow: var(--shadow-l1);
-    }
-
-    .gt-book-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        line-height: 1.5;
-        color: var(--card-text-color-main);
-        margin-bottom: 6px;
-    }
-
-    .gt-book-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-        font-size: 1.2rem;
-        color: var(--card-text-color-tertiary);
-    }
-
-    .gt-book-role {
-        display: inline-block;
-        padding: 1px 7px;
-        border-radius: 3px;
-        background: var(--gt-tag-bg);
-        color: var(--gt-tag-fg);
-        font-weight: 500;
-    }
+.gt-wlist-role {
+    display: inline-block;
+    min-width: 24px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--gt-tag-bg);
+    color: var(--gt-ink-soft);
+    font-size: 1.1rem;
+    line-height: 1.55;
+    text-align: center;
 }
 
-/* 已出版：左侧竖条用强调色；其余弱化 */
-.gt-book-group:nth-of-type(1) .gt-book-card {
-    border-left-color: var(--accent-color);
+.gt-wlist-repo {
+    font-family: var(--code-font-family);
+    font-size: 1.1rem;
+    opacity: 0.72;
 }
 
-.gt-book-group:not(:nth-of-type(1)) .gt-book-card {
-    opacity: 0.82;
-}
-
-/* ---- 软件包卡片 ---- */
-.gt-pkg-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-
-    @include respond(md) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-.gt-pkg-card {
-    display: block;
-    padding: 18px 20px;
-    border-radius: 9px;
-    border: 1px solid var(--card-separator-color);
-    background: var(--card-background);
-    text-decoration: none !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-
-    .gt-pkg-head {
-        display: flex;
-        align-items: baseline;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 7px;
-    }
-
-    .gt-pkg-name {
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: var(--card-text-color-main);
-        font-family: var(--code-font-family);
-    }
-
-    .gt-pkg-repo {
-        font-size: 1.18rem;
-        color: var(--card-text-color-tertiary);
-        font-family: var(--code-font-family);
-    }
-
-    .gt-pkg-desc {
-        margin: 0;
-        font-size: 1.32rem;
-        line-height: 1.7;
-        color: var(--card-text-color-secondary);
-    }
-
-    &:hover {
-        border-color: var(--accent-color);
-        box-shadow: var(--shadow-l1);
-        transform: translateY(-1px);
-    }
-}
-
-/* 作品页正文容器（复用 article-content 但去掉首尾多余间距） */
-.gt-works-content {
-    > :first-child {
-        margin-top: 0;
-    }
-}
-
-/* 作品页无右栏，给足宽度以便两列书卡舒展 */
+/* 无右栏：作品页给到 920px，纯文本行过长会难读 */
 .gt-works-page .main-container main.main {
-    max-width: 1080px;
+    max-width: 920px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* 移动端：hero 内边距与标题收缩，避免 360px 下正文被挤成窄条 */
+/* 窄屏：书名换行时把角色推到下一行，避免挤压标题 */
 @media (max-width: 767px) {
-    .gt-hero {
-        padding: 30px 22px 26px;
-        border-radius: 12px;
+    .gt-wlist-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        padding: 9px 0;
     }
 
-    .gt-hero__title {
-        font-size: 3.4rem;
-        margin-bottom: 14px;
+    .gt-wlist-meta {
+        text-align: left;
+        white-space: normal;
+        font-size: 1.16rem;
     }
 
-    .gt-hero__lead {
-        font-size: 1.55rem;
-        line-height: 1.8;
-    }
-
-    .gt-hero__sub {
-        margin-bottom: 24px;
-        font-size: 1.38rem;
-    }
-
-    .gt-hero__stats {
-        padding-top: 20px;
-        gap: 16px 10px;
-    }
-
-    .gt-stat__num {
-        font-size: 2.1rem;
-    }
-
-    .gt-door {
-        padding: 20px 18px 17px;
-    }
-
-    .gt-github {
-        padding: 20px 18px;
-    }
-
-    .gt-page-title {
-        font-size: 2.5rem;
+    .gt-wlist-item:hover {
+        background-color: transparent;
     }
 }
 
