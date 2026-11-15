@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-08-03'
 slug: a-powerful-tool-to-draw-circle-with-r
 categories:
-- R
+- R语言
 tags:
 - 圆
 - 绘图

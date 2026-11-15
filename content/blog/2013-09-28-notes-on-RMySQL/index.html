@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-09-28'
 slug: notes-on-RMySQL
 categories:
-- R
+- 金融数据
 tags:
 - RMySQL
 - MySQL

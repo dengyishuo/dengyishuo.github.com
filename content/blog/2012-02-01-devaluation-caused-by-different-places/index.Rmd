@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-02-01'
 slug: devaluation-caused-by-different-places
 categories:
-- economics
+- 经济学
 tags:
 - 通胀
 ---

@@ -4,7 +4,7 @@ author: admin
 date: '2010-12-25'
 slug: solow-model
 categories:
-- economics
+- 经济学
 tags:
 - economics
 ---

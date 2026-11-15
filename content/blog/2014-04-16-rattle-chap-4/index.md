@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-04-16'
 slug: rattle-chap-4
 categories:
-- investment
+- R语言
 tags:
 - Rattle
 - 试读

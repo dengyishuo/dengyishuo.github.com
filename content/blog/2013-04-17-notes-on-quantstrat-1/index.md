@@ -3,7 +3,7 @@ title: R中的量化投资包：quantstrat
 author: MatrixSpk
 date: '2013-04-17'
 categories:
-- R
+- 量化投资
 tags:
 - R
 - 量化投资

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-04-18'
 slug: get-acount-data
 categories:
-- R
+- 金融数据
 tags:
 - 抓取数据
 - 股票开户数据

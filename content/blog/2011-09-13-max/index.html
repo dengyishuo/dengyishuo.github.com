@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-09-13'
 slug: max-likelyho
 categories:
-- R
+- 经济学
 tags:
 - r
 - 极大似然估计

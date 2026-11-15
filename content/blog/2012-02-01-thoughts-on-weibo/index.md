@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-02-01'
 slug: thoughts-on-weibo
 categories:
-- R
+- 金融数据
 tags:
 - 微博
 ---

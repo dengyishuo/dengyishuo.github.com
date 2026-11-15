@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-08-20'
 slug: large-scale-portfolio-optimization-with-R-and-DEoptim
 categories:
-- 量化投资
+- 风险与组合
 tags:
 - 投资组合
 - DEoptim

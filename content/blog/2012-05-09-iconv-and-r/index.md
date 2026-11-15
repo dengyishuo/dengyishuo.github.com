@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-05-09'
 slug: iconv-and-r
 categories:
-- R
+- R语言
 tags:
 - R
 - 乱码

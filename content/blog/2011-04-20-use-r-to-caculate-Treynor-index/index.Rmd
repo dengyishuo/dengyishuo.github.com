@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-04-20'
 slug: use-r-to-caculate-treynor-index
 categories:
-- 量化投资
+- 风险与组合
 tags:
 - Treynor指数
 - 基金

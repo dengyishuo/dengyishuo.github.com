@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-04-14'
 slug: use-r-to-get-trading-data
 categories:
-- R
+- 金融数据
 tags:
 - quantmod
 - yahoo

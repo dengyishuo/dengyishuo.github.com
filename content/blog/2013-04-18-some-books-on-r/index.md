@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-04-18'
 slug: some-books-on-r
 categories:
-- R
+- R语言
 tags:
 - R
 - 书籍

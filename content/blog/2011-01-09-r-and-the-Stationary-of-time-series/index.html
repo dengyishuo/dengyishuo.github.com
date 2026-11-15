@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-01-09'
 slug: r-and-the-stationary-of-time-series
 categories:
-- econometrics
+- 经济学
 tags:
 - R
 - 平稳性

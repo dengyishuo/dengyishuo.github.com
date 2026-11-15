@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-08-05'
 slug: lonely-investor-Carlo-Cannell
 categories:
-- investment
+- 经济学
 tags:
 - 卡洛·坎奈尔
 ---

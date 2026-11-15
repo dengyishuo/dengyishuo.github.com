@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-12-01'
 slug: the-most-importtant-plot-about-china
 categories:
-- investment
+- 经济学
 tags:
 - 外汇储备
 - 证券

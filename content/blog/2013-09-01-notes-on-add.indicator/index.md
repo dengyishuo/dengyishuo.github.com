@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-09-01'
 slug: notes-on-add.indicator
 categories:
-- r
+- 量化投资
 tags:
 - quantstrat
 - add.indicator

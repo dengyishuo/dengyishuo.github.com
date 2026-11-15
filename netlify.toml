@@ -33,3 +33,106 @@ command = 'curl -sSL https://github.com/sass/dart-sass/releases/download/1.77.8/
 
 [context.production.environment]
 HUGO_ENV = 'production'
+
+# ============================================================
+# 旧分类页 301 跳转
+# 2026-11 重构分类：23 个中英混杂的分类合并为 6 个中文分类。
+# 旧分类页 URL 已不再生成，这里把外链与搜索引擎的旧地址导到新分类，
+# 避免 404。文章本身的 permalink 未变，无需跳转。
+# ============================================================
+
+[[redirects]]
+  from = "/categories/r/"
+  to = "/categories/r语言/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/economics/"
+  to = "/categories/经济学/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/econometrics/"
+  to = "/categories/经济学/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/计量经济学/"
+  to = "/categories/经济学/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/investment/"
+  to = "/categories/量化投资/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/quant/"
+  to = "/categories/量化投资/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/投资/"
+  to = "/categories/量化投资/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/财务/"
+  to = "/categories/量化投资/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/life/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/生活/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/读书/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/reading-notes/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/art/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/美食记/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/商业/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/business/"
+  to = "/categories/随笔/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/datavis/"
+  to = "/categories/r语言/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/可视化/"
+  to = "/categories/r语言/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/时间序列/"
+  to = "/categories/r语言/"
+  status = 301
+

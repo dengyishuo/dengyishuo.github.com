@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2015-01-10'
 slug: luxor-sample-trade-graphs-sma
 categories:
-  - 量化投资
+- 量化投资
 tags:
   - 量化投资
   - r

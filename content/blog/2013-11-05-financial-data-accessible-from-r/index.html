@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-11-05'
 slug: financial-data-accessible-from-r
 categories:
-- R
+- 金融数据
 tags:
 - 金融数据
 - R语言

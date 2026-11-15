@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-09-15'
 slug: r-and-time-span-function
 categories:
-- R
+- R语言
 tags:
 - 差距
 - 应用

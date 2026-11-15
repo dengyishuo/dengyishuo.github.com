@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-01-14'
 slug: construct-pairty-risk-portfolio
 categories:
-- 量化投资
+- 风险与组合
 tags:
 - 风险均摊
 - 投资组合

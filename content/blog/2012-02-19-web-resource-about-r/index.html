@@ -4,7 +4,7 @@ author: admin
 date: '2012-02-19'
 slug: web-resource-about-r
 categories:
-- R
+- R语言
 tags:
 - r
 - 学习

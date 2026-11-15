@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-02-08'
 slug: r-is-a-kind-of-life-and-data-is-an-attitude
 categories:
-- R
+- R语言
 tags:
 - 演讲稿
 ---

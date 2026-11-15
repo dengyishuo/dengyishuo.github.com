@@ -4,7 +4,7 @@ author: DengYishuo
 date: '2025-08-23'
 slug: kalman-beta
 categories:
-  - investment
+- 量化投资
 tags:
   - beta
   - r

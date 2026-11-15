@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-03-08'
 slug: use-vectorisation-to-improve-computational-performance
 categories:
-- 量化投资
+- R语言
 tags:
 - 风险均摊
 - 投资组合

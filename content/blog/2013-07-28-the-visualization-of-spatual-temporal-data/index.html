@@ -3,8 +3,8 @@ title: 时空数据可视化
 author: MatrixSpk
 date: '2013-07-28'
 slug: the-visualization-of-spatual-temporal-data
-categories: 
-- R
+categories:
+- R语言
 tags: 
 - quantmod
 - R

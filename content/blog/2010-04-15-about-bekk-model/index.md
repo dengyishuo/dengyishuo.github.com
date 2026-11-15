@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-04-15'
 slug: about-bekk-model
 categories:
-- R
+- 经济学
 tags:
 - BEKK
 - mgarch

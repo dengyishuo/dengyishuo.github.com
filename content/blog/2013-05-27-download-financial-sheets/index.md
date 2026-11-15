@@ -4,7 +4,7 @@ author: MatriSpk
 date: '2013-05-27'
 slug: download-financial-sheets
 categories:
-- R
+- 金融数据
 tags:
 - 财务报表
 - R

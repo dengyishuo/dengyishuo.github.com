@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-05-18'
 slug: securities-margin-trading
 categories:
-- 财务
+- 量化投资
 tags:
 - 融资融券
 - 会计处理

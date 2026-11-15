@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-05-22'
 slug: plot-bbands-via-eTTR-and-tidyquant
 categories:
-  - datavis
+- R语言
 tags:
   - eTTR
   - tidyquant

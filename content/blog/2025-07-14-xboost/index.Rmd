@@ -3,7 +3,8 @@ title: 使用机器学习模型(xgboost）来预测纳斯达克 100 指数
 author: DengYishuo
 date: '2025-07-14'
 slug: xboost
-categories: [economics]
+categories:
+- 量化投资
 tags: [NASDAQ, R, xgboost]
 ---
 

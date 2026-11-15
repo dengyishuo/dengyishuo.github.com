@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-05-08'
 slug: use-r-to-do-unitroots-test
 categories:
-- 计量经济学
+- 经济学
 tags:
 - Augmented Dickey-Fuller test
 - unit root test

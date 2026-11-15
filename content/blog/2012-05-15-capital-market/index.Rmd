@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-05-15'
 slug: capital-market
 categories:
-- investment
+- 经济学
 tags:
 - 事件冲击
 - 资本市场

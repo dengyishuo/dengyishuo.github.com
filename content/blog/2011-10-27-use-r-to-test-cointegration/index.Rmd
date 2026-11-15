@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-10-27'
 slug: use-r-to-test-cointegration
 categories:
-- 计量经济学
+- 经济学
 tags:
 - 协整
 - 股票

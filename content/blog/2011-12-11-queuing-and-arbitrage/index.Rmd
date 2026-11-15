@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-11'
 slug: queuing-and-arbitrage
 categories:
-- economics
+- 经济学
 tags:
 - 排队
 - 套利

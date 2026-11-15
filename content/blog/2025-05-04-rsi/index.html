@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-05-04'
 slug: rsi
 categories:
-  - 量化投资
+- 量化投资
 tags:
   - 量化投资
   - 技术指标

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-05-05'
 slug: support-vector-machine
 categories:
-- R
+- 经济学
 tags:
 - 机器学习
 - Support Vector Machine

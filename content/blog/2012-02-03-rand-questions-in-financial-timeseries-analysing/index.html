@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-02-03'
 slug: r-and-questions-in-financial-timeseries-analysing
 categories:
-- investment
+- 经济学
 tags:
 - EVT
 - GARCH

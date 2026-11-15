@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-03-07'
 slug: What-Every-Man-Thinks-About-Apart-From-Sex
 categories:
-- 商业
+- 随笔
 tags:
 - 书
 - 思维

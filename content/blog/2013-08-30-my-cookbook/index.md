@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-08-30'
 slug: my-cookbook
 categories:
-- 美食记
+- 随笔
 tags:
 - 椰奶鸡蛋羹
 - 美食

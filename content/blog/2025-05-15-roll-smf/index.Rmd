@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-05-15'
 slug: roll-smf
 categories:
-  - quant
+- 量化投资
 tags:
   - 单因子
   - 投资

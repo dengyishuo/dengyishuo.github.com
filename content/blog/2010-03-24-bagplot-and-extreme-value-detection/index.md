@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-03-24'
 slug: bagplot-and-extreme-value-detection
 categories:
-  - 可视化
+- R语言
 tags:
   - data
   - vis

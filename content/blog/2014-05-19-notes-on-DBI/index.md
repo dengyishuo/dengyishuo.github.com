@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-05-19'
 slug: notes-on-DBI
 categories:
-- R
+- 金融数据
 tags:
 - R
 - DBI

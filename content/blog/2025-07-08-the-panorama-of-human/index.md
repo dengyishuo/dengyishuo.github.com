@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-07-08'
 slug: The-Panorama-of-human
 categories:
-  - 读书
+- 随笔
 tags:
   - 人的全景
   - 行为逻辑

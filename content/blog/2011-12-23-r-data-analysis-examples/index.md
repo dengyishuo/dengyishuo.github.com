@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-23'
 slug: r-data-analysis-examples
 categories:
-- R
+- R语言
 tags:
 - Logistic回归
 - 稳健回归

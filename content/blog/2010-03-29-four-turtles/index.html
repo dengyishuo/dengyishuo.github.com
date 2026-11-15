@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-03-29'
 slug: four-turtles
 categories:
-- R
+- R语言
 tags:
 - 四龟行走
 - 模拟

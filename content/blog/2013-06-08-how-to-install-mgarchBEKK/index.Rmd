@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-06-08'
 slug: how-to-install-mgarchBEKK
 categories:
-- R
+- R语言
 tags:
 - mgarchBEKK
 - R

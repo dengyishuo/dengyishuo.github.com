@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-03-24'
 slug: notes on CB
 categories:
-- investment
+- 量化投资
 tags:
 - 可转债
 - 转股

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-04-17'
 slug: use-r-to-fit-sparse-arma-model
 categories:
-- 计量经济学
+- 经济学
 tags:
 - ARIMA
 - ARMA

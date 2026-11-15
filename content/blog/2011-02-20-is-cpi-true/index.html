@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-02-20'
 slug: is-cpi-true
 categories:
-- 计量经济学
+- 经济学
 tags:
 - CPI
 - 意识形态

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-06-27'
 slug: financial-risk-forcasting
 categories:
-- life
+- 随笔
 tags:
 - Financial Risk Forecasting
 - 书评

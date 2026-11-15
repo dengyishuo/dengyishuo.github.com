@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-09-06'
 slug: demo-about-LPPL
 categories:
-- R
+- 量化投资
 tags:
 - LPPL
 - r

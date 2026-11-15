@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-12'
 slug: from-symbol-to-company-name
 categories:
-- R
+- 金融数据
 tags:
 - quantmod
 - yahoo

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-03-20'
 slug: chernoff
 categories:
-  - datavis
+- R语言
 tags:
   - data
   - vis

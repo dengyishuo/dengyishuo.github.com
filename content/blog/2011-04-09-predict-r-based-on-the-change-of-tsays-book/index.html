@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-04-09'
 slug: predict-r-based-on-the-change-of-tsays-book
 categories:
-- R
+- R语言
 tags:
 - Tasy
 - 书籍

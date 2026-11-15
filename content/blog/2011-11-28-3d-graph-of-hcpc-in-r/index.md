@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-11-28'
 slug: 3d-graph-of-hcpc-in-r
 categories:
-- R
+- R语言
 tags:
 - 3D
 - r

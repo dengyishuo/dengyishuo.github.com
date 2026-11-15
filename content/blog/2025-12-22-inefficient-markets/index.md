@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-12-22'
 slug: Inefficient-Markets
 categories:
-  - Reading-Notes
+- 随笔
 tags: []
 ---
 

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-05'
 slug: the-girls-we-loved-before
 categories:
-- life
+- 随笔
 tags:
 - 九把刀，那些年，我们一起追的女孩，读书
 ---

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-04-10'
 slug: use-r-to-fit-vasicek-model
 categories:
-- R
+- 经济学
 tags:
 - 利率模型
 - Vasicek

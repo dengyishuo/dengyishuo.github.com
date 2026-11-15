@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-06-23'
 slug: use-four-parameters-to-fit-an-elephant
 categories:
-- R
+- R语言
 tags:
 - 参数
 - 大象

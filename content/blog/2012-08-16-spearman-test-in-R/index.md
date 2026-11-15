@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-08-16'
 slug: spearman-test-in-R
 categories:
-- R
+- 经济学
 tags:
 - speraman
 - spearman-test

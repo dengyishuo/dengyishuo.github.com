@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-06-04'
 slug: notes-on-zoo
 categories:
-- 时间序列
+- R语言
 tags:
 - R
 - zoo

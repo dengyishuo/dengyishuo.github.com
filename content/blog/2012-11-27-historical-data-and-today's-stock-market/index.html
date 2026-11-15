@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-11-27'
 slug: historical-data-and-today's-stock-market
 categories:
-- investment
+- 经济学
 tags:
 - 潜在合理增长线
 - 投资

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-09-27'
 slug: notes-on-sets-caculations-in-r
 categories:
-- R
+- R语言
 tags:
 - 集合运算
 - R语言

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-01-14'
 slug: sas-anti-r
 categories:
-- 商业
+- 随笔
 tags:
 - anti
 - free

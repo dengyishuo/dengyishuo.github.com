@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-02-06'
 slug: notes-on-quantmod-2
 categories:
-- R
+- 金融数据
 tags:
 - quantmod
 - 分析

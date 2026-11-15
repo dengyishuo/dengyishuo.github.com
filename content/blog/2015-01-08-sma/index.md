@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2015-01-08'
 slug: A-simple-moving-average-strategy-for-evaluating-signal
 categories:
-  - 量化投资
+- 量化投资
 tags:
   - sma
   - r

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-09-09'
 slug: notes-on-wdi
 categories:
-- R
+- 金融数据
 tags:
 - WDI
 - 世界银行

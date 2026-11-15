@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-06-03'
 slug: useful-functions-in-R
 categories:
-- R
+- R语言
 tags:
 - file.choose
 - R

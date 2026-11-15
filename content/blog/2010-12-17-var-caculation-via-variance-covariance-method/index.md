@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-12-17'
 slug: VaR-Caculation-via-Variance-Covariance-Method
 categories:
-  - 量化投资
+- 风险与组合
 tags:
   - 量化投资
   - 风险度量

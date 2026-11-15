@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2018-07-27'
 slug: macross-stoptrailing
 categories:
-  - 量化投资
+- 量化投资
 tags:
   - 量化投资
   - quantstrat

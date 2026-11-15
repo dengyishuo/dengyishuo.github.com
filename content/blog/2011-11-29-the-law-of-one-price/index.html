@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-11-29'
 slug: the-law-of-one-price
 categories:
-- economics
+- 经济学
 tags:
 - 一价定律
 - 弗里德曼

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-09-13'
 slug: junk-code-again
 categories:
-- R
+- R语言
 tags:
 - R
 - 财务数据

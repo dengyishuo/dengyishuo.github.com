@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2013-08-09'
 slug: use-r-to-do-portfolio-optimization
 categories:
-- 量化投资
+- 风险与组合
 tags:
 - portfolio
 - frontier

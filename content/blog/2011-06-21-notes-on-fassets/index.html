@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-06-21'
 slug: notes-on-fassets
 categories:
-- 量化投资
+- 风险与组合
 tags:
 - fAssets
 - 包

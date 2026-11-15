@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-12-23'
 slug: all-weather-momentum
 categories:
-  - investment
+- 量化投资
 tags:
   - momentum
   - etf

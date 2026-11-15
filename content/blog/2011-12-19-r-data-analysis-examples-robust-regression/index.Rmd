@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-09'
 slug: r-data-analysis-examples-robust-regression
 categories:
-- R
+- R语言
 tags:
 - 数据分析
 - 实例

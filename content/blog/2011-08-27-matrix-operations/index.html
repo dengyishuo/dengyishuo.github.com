@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-08-27'
 slug: matrix-operations
 categories:
-- R
+- R语言
 tags:
 - 总结
 - 矩阵运算

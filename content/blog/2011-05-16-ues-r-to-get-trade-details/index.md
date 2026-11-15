@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-05-16'
 slug: use-r-to-get-trade-details
 categories:
-- R
+- 金融数据
 tags:
 - 交易明细数据
 ---

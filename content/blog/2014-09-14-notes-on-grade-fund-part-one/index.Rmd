@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-09-14'
 slug: notes-on-grade-fund-part-one
 categories:
-- 投资
+- 量化投资
 tags:
 - 分级基金
 - 长盛同庆

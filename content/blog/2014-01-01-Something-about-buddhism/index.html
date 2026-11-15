@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2014-01-01'
 slug: something about buddhism
 categories:
-- 生活
+- 随笔
 tags:
 - 佛教
 - 龙泉寺

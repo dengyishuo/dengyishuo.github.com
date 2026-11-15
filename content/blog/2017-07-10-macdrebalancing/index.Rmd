@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2017-07-10'
 slug: macdrebalancing
 categories:
-  - 量化投资
+- 量化投资
 tags:
   - 量化投资
   - macd

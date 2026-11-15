@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-11-22'
 slug: who-determines-your-taste-on-arts
 categories:
-- art
+- 随笔
 tags:
 - 品位
 - 教育

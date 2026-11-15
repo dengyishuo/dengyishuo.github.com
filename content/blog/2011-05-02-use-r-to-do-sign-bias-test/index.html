@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-05-02'
 slug: use-r-to-do-sign-bias-test
 categories:
-- econometrics
+- 经济学
 tags:
 - Joint Test
 - JT

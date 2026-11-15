@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-09-07'
 slug: get-financial-data-from-web
 categories:
-- R
+- 金融数据
 tags:
 - 抓数据
 - 财务指标

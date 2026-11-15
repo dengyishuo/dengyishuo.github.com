@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-12-18'
 slug: caculate-var-via-EWMA
 categories:
-  - 量化投资
+- 风险与组合
 tags:
   - VaR
   - r

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-07'
 slug: dignity-is-likes-fixed-costs
 categories:
-- economics
+- 经济学
 tags:
 - 尊严
 - economics

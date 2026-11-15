@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2025-06-06'
 slug: building-a-website-through-countless-twists-and-turns
 categories:
-  - 随笔
+- 随笔
 tags:
   - hugo
   - mainroad

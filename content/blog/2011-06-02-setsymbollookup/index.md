@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-06-02'
 slug: setsymbollookup
 categories:
-- investment
+- 金融数据
 tags:
 - quantmod
 - 指定名称

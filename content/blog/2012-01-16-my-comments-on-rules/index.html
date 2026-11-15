@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-01-16'
 slug: my-comments-on-rules
 categories:
-- life
+- 随笔
 tags:
 - 规则
 ---

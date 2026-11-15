@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2012-01-19'
 slug: how-to-learn-r-by-reading-books
 categories:
-- R
+- R语言
 tags:
 - ggobi
 - ggplot2

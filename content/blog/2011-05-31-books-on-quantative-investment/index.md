@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-05-31'
 slug: books-on-quantative-investment
 categories:
-- investment
+- 量化投资
 tags:
 - r
 - 书单

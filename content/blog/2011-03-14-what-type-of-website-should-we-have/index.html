@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-03-14'
 slug: what-type-of-website-should-we-have
 categories:
-- business
+- 随笔
 tags:
 - 建立
 - 民粹

@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-11-09'
 slug: apply-family
 categories:
-- R
+- R语言
 tags:
 - apply
 - r

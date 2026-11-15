@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2010-06-13'
 slug: scatterplot3d
 categories:
-- R
+- R语言
 tags:
 - R
 - scatterplot3d

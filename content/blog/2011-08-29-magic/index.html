@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-08-29'
 slug: magic
 categories:
-- R
+- R语言
 tags:
 - 魔方矩阵
 ---

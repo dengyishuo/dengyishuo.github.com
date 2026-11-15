@@ -4,7 +4,7 @@ author: MatrixSpk
 date: '2011-12-07'
 slug: cause-maturity-is-not-an-urgent-matter
 categories:
-- life
+- 随笔
 tags:
 - 情书
 - 成长
