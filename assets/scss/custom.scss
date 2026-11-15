@@ -1362,22 +1362,70 @@ html {
     color: #1a1a1a;
 }
 
-/* ---- 页脚：去掉粗黑短横，改细线，整体更轻 ---- */
+/* ---- 页脚：单行横排，项之间用中点分隔 ---- */
 footer.site-footer {
+    padding: var(--spacing-lg) 0 var(--spacing-xl) 0;
+
+    /* 分隔线改通栏hairline，与侧栏细线同一套 */
     &:before {
         height: 1px;
-        width: 42px;
-        background: var(--gt-rule);
-        margin-bottom: var(--spacing-md);
+        width: 100%;
+        background: var(--gt-rule-soft);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .gt-footer-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 0;
+        font-size: 1.22rem;
+        line-height: 1.6;
+        color: var(--card-text-color-tertiary);
     }
 
     .copyright {
+        color: var(--card-text-color-secondary);
         font-weight: 600;
         letter-spacing: 0.02em;
+        margin-bottom: 0;
     }
 
-    .powerby {
-        opacity: 0.75;
+    /* 除首项外，前面加一个淡中点做分隔 */
+    .gt-footer-item {
+        color: var(--card-text-color-tertiary);
+
+        &::before {
+            content: "·";
+            margin: 0 8px;
+            opacity: 0.45;
+        }
+    }
+
+    a {
+        color: var(--gt-ink-soft);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: color 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            color: var(--accent-color);
+            border-bottom-color: var(--gt-rule);
+        }
+    }
+}
+
+/* 窄屏：分隔中点收紧一点，避免折行后显得松散 */
+@media (max-width: 767px) {
+    footer.site-footer {
+        .gt-footer-row {
+            font-size: 1.18rem;
+            gap: 2px 0;
+        }
+
+        .gt-footer-item::before {
+            margin: 0 6px;
+        }
     }
 }
 

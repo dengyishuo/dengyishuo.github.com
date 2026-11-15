@@ -1,0 +1,32 @@
+{{- /*
+    格物堂 · 页脚（站点层覆盖）
+    与主题原版的差异：
+      1. 版权 / 标语 / 构建信息合并为**单行横排**，之间用中点分隔
+         （原版用 <br /> 强制换行，形成 4 行竖排）
+      2. 去掉 customText 后的强制换行
+    各项仍走 i18n，保持可翻译。
+*/ -}}
+{{- $ThemeVersion := "4.0.3" -}}
+
+{{- $Generator := `<a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a>` -}}
+{{- $Theme := printf `<a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="%s">Stack</a>` $ThemeVersion -}}
+{{- $DesignedBy := `<a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>` -}}
+
+<footer class="site-footer">
+    <div class="gt-footer-row">
+        <span class="copyright">&copy;
+            {{- if and (.Site.Params.footer.since) (ne .Site.Params.footer.since (int (now.Format "2006"))) -}}
+                {{- printf " %d&ndash;%s %s" .Site.Params.footer.since (now.Format "2006") (default .Site.Title .Site.Copyright) | safeHTML -}}
+            {{- else -}}
+                {{- printf " %s %s" (now.Format "2006") (default .Site.Title .Site.Copyright) | safeHTML -}}
+            {{- end -}}
+        </span>
+
+        {{- with .Site.Params.footer.customText }}
+            <span class="gt-footer-item">{{ . | safeHTML }}</span>
+        {{- end }}
+
+        <span class="gt-footer-item">{{ T "footer.builtWith" (dict "Generator" $Generator) | safeHTML }}</span>
+        <span class="gt-footer-item">{{ T "footer.designedBy" (dict "Theme" $Theme "DesignedBy" $DesignedBy) | safeHTML }}</span>
+    </div>
+</footer>

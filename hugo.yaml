@@ -67,7 +67,7 @@ params:
 
   footer:
     since: 2010
-    customText: "格物堂 · 让知识美好生活"
+    customText: "让知识美好生活"
 
   widgets:
     homepage:
