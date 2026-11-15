@@ -10,27 +10,56 @@
     --gt-tag-bg: rgba(52, 73, 94, 0.075);
     --gt-tag-fg: #3f5c76;
     --gt-tag-bg-hover: rgba(52, 73, 94, 0.15);
+
+    /* 文章卡片：半透明底色让 body 背景透上来，做"浮在纸上"而非"白卡叠纸" */
+    --gt-card-bg: rgba(255, 255, 255, 0.58);
+    --gt-card-bg-hover: rgba(255, 255, 255, 0.86);
+    --gt-card-edge: rgba(52, 73, 94, 0.075);
+    --gt-card-edge-hover: rgba(52, 73, 94, 0.18);
 }
 
 :root[data-scheme="dark"] {
     --gt-tag-bg: rgba(236, 240, 241, 0.12);
     --gt-tag-fg: rgba(236, 240, 241, 0.9);
     --gt-tag-bg-hover: rgba(236, 240, 241, 0.22);
+
+    --gt-card-bg: rgba(255, 255, 255, 0.042);
+    --gt-card-bg-hover: rgba(255, 255, 255, 0.075);
+    --gt-card-edge: rgba(255, 255, 255, 0.075);
+    --gt-card-edge-hover: rgba(255, 255, 255, 0.2);
 }
 
 /* ============================================================
    1. 文章块（首页 / 列表页）
    ============================================================ */
 
-/* 分类：标题上方的小 chip */
+/* ---- 卡片与背景融合 ----
+   主题原样式是纯白卡 + 双层投影，在灰紫背景上像一张张浮起的纸。
+   这里改成：半透明底（让背景色透上来）+ 一根细边 + 零投影；
+   悬停不加阴影，只把底色与边框提亮一档。 */
+.article-list article {
+    background-color: var(--gt-card-bg);
+    box-shadow: none;
+    border: 1px solid var(--gt-card-edge);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+
+    &:hover {
+        box-shadow: none;
+        background-color: var(--gt-card-bg-hover);
+        border-color: var(--gt-card-edge-hover);
+    }
+}
+
+/* 分类：标题上方的胶囊标签（无立体效果，纯底色 + 圆角） */
 .article-category a {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 2px 11px;
     font-size: 1.2rem;
-    line-height: 1.55;
+    line-height: 1.6;
     font-weight: 500;
     letter-spacing: 0.03em;
-    border-radius: 3px;
+    border-radius: 999px;
+    box-shadow: none;
     color: var(--gt-tag-fg);
     background-color: var(--gt-tag-bg);
     transition: background-color 0.25s ease;
@@ -38,12 +67,23 @@
     &:hover {
         color: var(--gt-tag-fg);
         background-color: var(--gt-tag-bg-hover);
+        box-shadow: none;
     }
 }
 
 .article-header .article-category {
     gap: 6px;
     margin-bottom: 0;
+}
+
+/* 分类底色是主题按名字哈希生成的粉彩色（内联 style），适合浅色背景；
+   暗色下这些 hsl(…,84%) 的亮块会刺眼，改回中性胶囊，与标签同一套色阶。
+   用 !important 是因为内联样式优先级高于任何选择器。 */
+:root[data-scheme="dark"] {
+    .article-category a {
+        background-color: var(--gt-tag-bg) !important;
+        color: var(--gt-tag-fg) !important;
+    }
 }
 
 /* 元信息行：日期在左，标签在右下角 */
@@ -95,15 +135,17 @@
 }
 
 /* ============================================================
-   2. 文章详情页标签
+   2. 文章详情页标签（胶囊，无立体效果）
    ============================================================ */
 .article-tags a {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 3px 12px;
     font-size: 1.25rem;
     line-height: 1.6;
     font-weight: 500;
-    border-radius: 3px;
+    border: 0;
+    border-radius: 999px;
+    box-shadow: none;
     color: var(--gt-tag-fg);
     background-color: var(--gt-tag-bg);
     transition: background-color 0.25s ease;
@@ -111,6 +153,7 @@
     &:hover {
         color: var(--gt-tag-fg);
         background-color: var(--gt-tag-bg-hover);
+        box-shadow: none;
     }
 }
 

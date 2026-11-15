@@ -61,7 +61,8 @@ params:
     toc: true
     readingTime: true
     list:
-      showTags: true
+      # 卡片流不显示标签，只在文章正文页显示
+      showTags: false
     license:
       enabled: false
 
