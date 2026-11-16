@@ -6,9 +6,9 @@ slug: construct-pairty-risk-portfolio
 categories:
 - 风险与组合
 tags:
-- 风险均摊
-- 投资组合
-- R
+  - R
+  - 投资组合
+  - 风险管理
 ---
 ### 引子
 

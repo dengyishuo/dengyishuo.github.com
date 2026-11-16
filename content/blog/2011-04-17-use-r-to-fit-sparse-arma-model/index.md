@@ -6,9 +6,7 @@ slug: use-r-to-fit-sparse-arma-model
 categories:
 - 经济学
 tags:
-- ARIMA
-- ARMA
-- 缺项
+  - 时间序列
 ---
 标准的ARMA（p,q）模型是这样的：
 

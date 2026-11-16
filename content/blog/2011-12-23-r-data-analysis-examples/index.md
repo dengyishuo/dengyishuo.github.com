@@ -6,8 +6,7 @@ slug: r-data-analysis-examples
 categories:
 - R语言
 tags:
-- Logistic回归
-- 稳健回归
+  - 回归
 ---
 
 ## 回归模型（Regression Models）

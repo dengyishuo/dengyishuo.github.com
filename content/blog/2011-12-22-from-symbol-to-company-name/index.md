@@ -4,14 +4,11 @@ author: MatrixSpk
 date: '2011-12-12'
 slug: from-symbol-to-company-name
 categories:
-- 金融数据
+- 数据获取
 tags:
-- quantmod
-- yahoo
-- yahooQF
-- 代码
-- 公司简称
-- 股票
+  - 数据获取
+  - 股票
+  - quantmod
 ---
 Ruser也有Ruser的恶习，经常弄的什么事情都想用R来完成：用R玩儿扫雷、用R玩汉诺塔、用R玩儿黑白棋、用R获取股票数据、用R获取财务数据。
 

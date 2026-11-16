@@ -6,9 +6,8 @@ slug: iconv-and-r
 categories:
 - R语言
 tags:
-- R
-- 乱码
-- icnov
+  - R
+  - 编码问题
 ---
 
 从网上抓数据（网页是`utf-8`编码）时，发现读入R的数据出现了乱码。代码和返回结果分别如下：

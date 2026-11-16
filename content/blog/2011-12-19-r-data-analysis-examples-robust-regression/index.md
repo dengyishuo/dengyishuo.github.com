@@ -6,10 +6,8 @@ slug: r-data-analysis-examples-robust-regression
 categories:
 - R语言
 tags:
-- 数据分析
-- 实例
-- 稳健回归
-- Robust Regression
+  - 数据获取
+  - 回归
 ---
 **按语：**当数据含有离群点（Outliar）或者强影响点（influential observation）时，稳健回归（Robust Regression）会比普通最小二乘法(OLS)的表现要更优异。稳健回归也可以用来检测数据中的强影响点。
 

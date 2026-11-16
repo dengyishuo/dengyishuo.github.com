@@ -6,9 +6,7 @@ slug: four-turtles
 categories:
 - R语言
 tags:
-- 四龟行走
-- 模拟
-- 追逐问题
+  - 统计检验
 ---
 
 四龟行走是一个很著名的论题，题目的大意是这样的：

@@ -5,9 +5,7 @@ date: '2011-06-23'
 slug: use-four-parameters-to-fit-an-elephant
 categories:
 - R语言
-tags:
-- 参数
-- 大象
+tags: []
 ---
 冯·诺依曼说过一句话，
 

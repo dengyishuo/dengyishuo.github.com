@@ -6,10 +6,10 @@ slug: A-simple-moving-average-strategy-for-evaluating-signal
 categories:
 - 量化投资
 tags:
-  - sma
-  - r
-  - quantstrat
+  - R
   - 量化投资
+  - quantstrat
+  - SMA
 ---
 
 ## 引言

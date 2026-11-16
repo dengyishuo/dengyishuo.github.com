@@ -5,9 +5,7 @@ date: '2014-01-01'
 slug: something about buddhism
 categories:
 - 随笔
-tags:
-- 佛教
-- 龙泉寺
+tags: []
 ---
 大概去年这个时候，小姨说她很多同事都相信佛教，很多是虔诚的佛教信徒。虽然没有出家，但严守佛门清规戒律，是通常所说的“居士”。
 

@@ -6,11 +6,10 @@ slug: demo-about-LPPL
 categories:
 - 量化投资
 tags:
-- LPPL
-- r
-- 示例
-- 股市拐点
-- 金融
+  - R
+  - 量化投资
+  - 股票
+  - LPPL
 ---
 
 ## LPPL模型是什么

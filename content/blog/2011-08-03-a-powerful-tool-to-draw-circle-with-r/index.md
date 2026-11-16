@@ -6,8 +6,7 @@ slug: a-powerful-tool-to-draw-circle-with-r
 categories:
 - R语言
 tags:
-- 圆
-- 绘图
+  - 绘图
 ---
 R用户经常要在图形中绘圆，如果你是其中的一员的话，你就不得不了解一下plotrix包中的draw.circle()函数。draw.circle()函数的优点有：
 	

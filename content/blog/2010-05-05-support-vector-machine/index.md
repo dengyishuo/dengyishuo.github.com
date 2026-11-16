@@ -6,10 +6,7 @@ slug: support-vector-machine
 categories:
 - 经济学
 tags:
-- 机器学习
-- Support Vector Machine
-- svm
-- 支持向量机
+  - 机器学习
 ---
 
 支持向量机(Support Vector Machine,SVM)是Corinna  Cortes和Vapnik等于1995年首先提出的一种机器学习方法，它在解决小样本、非线性及高维模式识别中表现出许多特有的优势，并能够推广应用到函数拟合等 其他机器学习问题中。

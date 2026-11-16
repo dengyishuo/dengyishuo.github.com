@@ -6,10 +6,8 @@ slug: the-history-of-china's-bloom-of-real-eastate
 categories:
 - 经济学
 tags:
-- 房价
-- 城镇化
-- 财税体制改革
-- 货币政策
+  - 宏观经济
+  - 房价
 ---
 一直想梳理一下中国房价上涨的逻辑，暂时思考了一下几个方面，记在这里：
 

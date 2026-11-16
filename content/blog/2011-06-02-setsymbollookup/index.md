@@ -4,11 +4,10 @@ author: MatrixSpk
 date: '2011-06-02'
 slug: setsymbollookup
 categories:
-- 金融数据
+- 数据获取
 tags:
-- quantmod
-- 指定名称
-- 股票数据
+  - 数据获取
+  - quantmod
 ---
 用quantmod获取OHLC数据时，如果不知道所有获取的股票的简称，在使用数据时可能会遇到一些麻烦，比如：
 

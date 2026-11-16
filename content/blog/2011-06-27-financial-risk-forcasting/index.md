@@ -6,11 +6,10 @@ slug: financial-risk-forcasting
 categories:
 - 随笔
 tags:
-- Financial Risk Forecasting
-- 书评
-- 金融
-- 预测
-- 风险
+  - 量化投资
+  - 读书
+  - 风险管理
+  - 时间序列
 ---
 Jon Danielsson撰写的一本金融风险预测的书籍。书的全称是：Financial Risk Forecasting: The Theory and Practice of Forecasting Market Risk with Implementation in R and Matlab (The Wiley Finance Series)。
 

@@ -6,10 +6,7 @@ slug: use-r-to-caculate-coskewness-and-cokurtosis
 categories:
 - 风险与组合
 tags:
-- cokurtosis
-- coskewness
-- 协偏度
-- 协峰度
+  - 投资组合
 ---
 在传统的金融理论中，均值方差分析假设正态分布，但现实中的数据往往偏离这一假设。当资产收益率不服从正态分布时，仅用协方差不足以解释风险，这时候协高阶矩，比如协偏度和协峰度）就变得重要了。协偏度和协峰度是用于衡量资产收益率分布的高阶协动特性。
 

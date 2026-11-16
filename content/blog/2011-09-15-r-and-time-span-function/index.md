@@ -5,11 +5,7 @@ date: '2011-09-15'
 slug: r-and-time-span-function
 categories:
 - R语言
-tags:
-- 差距
-- 应用
-- 月跨度函数
-- 理论
+tags: []
 ---
 R在处理数据方面的灵活性一直都被人们赞誉。当然，理论界的人的多些，应用界的人相对较少。
 

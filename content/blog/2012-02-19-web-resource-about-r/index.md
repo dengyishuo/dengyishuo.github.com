@@ -6,10 +6,7 @@ slug: web-resource-about-r
 categories:
 - R语言
 tags:
-- r
-- 学习
-- 网络
-- 资源
+  - R
 ---
 
 [http://alittleknowledge.wordpress.com/2009/09/11/r-for-pedestrians/](http://alittleknowledge.wordpress.com/2009/09/11/r-for-pedestrians/)

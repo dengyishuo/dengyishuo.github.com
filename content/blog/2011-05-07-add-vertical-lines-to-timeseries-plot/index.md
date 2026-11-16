@@ -6,10 +6,9 @@ slug: add-vertical-lines-to-timeseries-plot
 categories:
 - R语言
 tags:
-- r
-- 垂线
-- 时间序列
-- 绘图
+  - R
+  - 绘图
+  - 时间序列
 ---
 
 

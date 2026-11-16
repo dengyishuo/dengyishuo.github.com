@@ -6,9 +6,7 @@ slug: use-r-to-do-unitroots-test
 categories:
 - 经济学
 tags:
-- Augmented Dickey-Fuller test
-- unit root test
-- 单位根检验
+  - 统计检验
 ---
 R里面的fUnitRoots包可以轻松实现时间序列的单位根检验。两个主函数分别是adfTest和unitrootTest。对于以应用统计为主要目的的人而言，看懂单位根检验的结果可能比探讨单位根检验的原理更重要。
 

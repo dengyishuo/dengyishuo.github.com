@@ -6,9 +6,8 @@ slug: scatterplot3d
 categories:
 - R语言
 tags:
-- R
-- scatterplot3d
-- 三维作图
+  - R
+  - 3D 可视化
 ---
 scatterplot3d是一个力图在3D空间展示多维数据的R包，在这个包里只含有一个函数scatterplot3d()，这一点上可谓是特立独行。scatterplot3d()的用法如下：
 

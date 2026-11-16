@@ -5,9 +5,7 @@ date: '2011-12-07'
 slug: cause-maturity-is-not-an-urgent-matter
 categories:
 - 随笔
-tags:
-- 情书
-- 成长
+tags: []
 ---
 昨天跟姗姗聊天时说起“学生气”这种东西，然后一直都有一段话萦绕耳旁，晚上就敲下来了。
 

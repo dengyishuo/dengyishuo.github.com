@@ -4,11 +4,9 @@ author: MatrixSpk
 date: '2013-09-09'
 slug: notes-on-wdi
 categories:
-- 金融数据
+- 数据获取
 tags:
-- WDI
-- 世界银行
-- 世界发展指数
+  - 数据获取
 ---
 在网络上闲逛时偶然发现了WDI包，这个包可以帮助我们搜索、提取及格式化世界银行（World Bank）公布的世界发展指标（World Development Indicators）数据。
 

@@ -6,7 +6,7 @@ slug: the-girls-we-loved-before
 categories:
 - 随笔
 tags:
-- 九把刀，那些年，我们一起追的女孩，读书
+  - 读书
 ---
 
 每个时代，都有一个梦想让人们为之风靡。罗曼·罗兰

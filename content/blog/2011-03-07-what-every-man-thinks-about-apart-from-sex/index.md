@@ -6,9 +6,7 @@ slug: What-Every-Man-Thinks-About-Apart-From-Sex
 categories:
 - 随笔
 tags:
-- 书
-- 思维
-- 男人
+  - 读书
 ---
 英国最近出了一本书叫《What Every Man Thinks About Apart From Sex》。推出之后异常爆火，在Amazon一开卖就被抢购一空。购买者主要是女性以及想了解自己的部分男性。
 

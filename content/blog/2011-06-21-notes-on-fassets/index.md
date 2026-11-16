@@ -6,9 +6,8 @@ slug: notes-on-fassets
 categories:
 - 风险与组合
 tags:
-- fAssets
-- 包
-- 笔记
+  - R包
+  - 笔记
 ---
 [fAssets学习笔记](http://yishuo.org/wp-content/uploads/2011/06/fAssets学习笔记.pdf)
 

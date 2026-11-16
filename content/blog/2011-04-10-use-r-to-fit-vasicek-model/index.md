@@ -6,8 +6,7 @@ slug: use-r-to-fit-vasicek-model
 categories:
 - 经济学
 tags:
-- 利率模型
-- Vasicek
+  - 风险管理
 ---
 Vasicek模型几乎可以说是最常见的利率模型。在金融领域有着很大的用处，可以用R来做Vasicek模型的人显然不够多。
 

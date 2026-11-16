@@ -5,9 +5,9 @@ date: '2013-04-17'
 categories:
 - 量化投资
 tags:
-- R
-- 量化投资
-- quantstrat
+  - R
+  - 量化投资
+  - quantstrat
 ---
 
 ## quantstrat是什么东西？

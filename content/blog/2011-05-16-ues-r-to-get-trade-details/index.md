@@ -4,9 +4,9 @@ author: MatrixSpk
 date: '2011-05-16'
 slug: use-r-to-get-trade-details
 categories:
-- 金融数据
+- 数据获取
 tags:
-- 交易明细数据
+  - 数据获取
 ---
 或许是因为大学期间经常不吃早饭的原因，最终我的侥幸心理被无情的现实打破，不幸于上周罹患反流性食道炎。因为身体十分不适，所以也懒得写东西。
 

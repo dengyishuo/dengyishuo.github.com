@@ -6,9 +6,9 @@ slug: predict-r-based-on-the-change-of-tsays-book
 categories:
 - R语言
 tags:
-- Tasy
-- 书籍
-- 金融时间序列分析
+  - 读书
+  - R包
+  - 时间序列
 ---
 [Tsay](http://faculty.chicagobooth.edu/ruey.tsay/)写的最著名的书叫[《Analysis of Financial Time Series》](http://faculty.chicagobooth.edu/ruey.tsay/teaching/)，这本书目前已经到了第三版。可能很少有人注意到，第三版跟第二版比在书籍介绍里有一个微妙的变化：
 

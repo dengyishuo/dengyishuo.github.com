@@ -6,9 +6,7 @@ slug: notes-on-grade-fund-part-one
 categories:
 - 量化投资
 tags:
-- 分级基金
-- 长盛同庆
-- 国泰估值
+  - 基金
 ---
 ### 固定收益+剩余分成型
 

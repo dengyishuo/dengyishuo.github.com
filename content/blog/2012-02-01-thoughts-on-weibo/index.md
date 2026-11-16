@@ -4,9 +4,8 @@ author: MatrixSpk
 date: '2012-02-01'
 slug: thoughts-on-weibo
 categories:
-- 金融数据
-tags:
-- 微博
+- 数据获取
+tags: []
 ---
 weibo开放了API提供了众多的接口。只是这些接口对于非开发人员而言过于复杂，不利于weibo数据的开发和挖掘。
 

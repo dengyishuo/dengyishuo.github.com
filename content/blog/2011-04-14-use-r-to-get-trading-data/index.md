@@ -4,13 +4,11 @@ author: MatrixSpk
 date: '2011-04-14'
 slug: use-r-to-get-trading-data
 categories:
-- 金融数据
+- 数据获取
 tags:
-- quantmod
-- yahoo
-- 数据
-- 股票
-- 获取数据
+  - 数据获取
+  - 股票
+  - quantmod
 ---
 R中有多个包都提供了从线上数据库获取股票数据的方法。如果非得在其中找出一个最好的，quantmod当之无愧。譬如下载沪市大盘数据，代码可以是：
 

@@ -5,8 +5,7 @@ date: '2012-02-08'
 slug: r-is-a-kind-of-life-and-data-is-an-attitude
 categories:
 - R语言
-tags:
-- 演讲稿
+tags: []
 ---
 有多少人听说过R软件？有多少人用过R软件？你现在最常用的软件是什么？SAS？SPSS？EViews?如果你是一个经常和数据分析打交道的人，或者从事金融建模，数学建模的人员，还不用R，你就有点out了。如果现在不学R，五年后你没有任何优势可言；如果5年后，你还不学R，那你差不多就可以被淘汰了。
 

@@ -6,16 +6,9 @@ slug: junk-code-again
 categories:
 - R语言
 tags:
-- R
-- 财务数据
-- 财新网
-- 宏观数据
-- htmlParse
-- readHTMLTable
-- utf-8
-- XML
-- 乱码
-- 抓数据 
+  - R
+  - 数据获取
+  - 编码问题
 ---
 在Windows系统下，用readHTMLTable函数读取编码为unicod的网页时会出现乱码。这个时候的乱码是因为R是用本地码（通常是GBK）来解释了网页中的unicode，因此出现了符号不兼容。此时，只要用iconv(x,"utf-8","gbk")就可以了。然而，有时候会出现另外一种情况：
 

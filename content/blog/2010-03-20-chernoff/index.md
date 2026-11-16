@@ -6,8 +6,8 @@ slug: chernoff
 categories:
 - R语言
 tags:
-  - data
-  - vis
+  - 数据获取
+  - 绘图
 ---
 
 <link href="{{< blogdown/postref >}}index_files/htmltools-fill/fill.css" rel="stylesheet" />

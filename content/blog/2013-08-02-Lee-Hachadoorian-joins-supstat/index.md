@@ -6,7 +6,7 @@ slug: Lee-Hachadoorian-joins-supstat
 categories:
 - 随笔
 tags:
-- supstat
+  - R包
 ---
 
 上午收到 vivian 邮件发来的喜讯，她在邮件中说纽约城市大学研究生中心的 Lee Hachadoorian 已经答应加盟 Supstat 了。他是纽约城市大学研究生中心的 Ph.D，同时也担任该校的访问助理教授（Visiting Assistant Professor）。他的研究领域广泛，包括：

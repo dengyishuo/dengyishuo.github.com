@@ -6,8 +6,8 @@ slug: luxor-sample-trade-graphs-sma
 categories:
 - 量化投资
 tags:
+  - R
   - 量化投资
-  - r
   - quantstrat
 ---
 

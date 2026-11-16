@@ -4,9 +4,7 @@ author: "MatrixSpk"
 date: "2011-05-06"
 slug: use-r-to-do-jb-test
 tags:
-- jarque bera检验
-- jb检验
-- 正态性检验
+  - 统计检验
 categories:
 - 经济学
 ---

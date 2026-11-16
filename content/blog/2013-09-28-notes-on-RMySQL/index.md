@@ -4,12 +4,10 @@ author: MatrixSpk
 date: '2013-09-28'
 slug: notes-on-RMySQL
 categories:
-- 金融数据
+- 数据获取
 tags:
-- RMySQL
-- MySQL
-- R语言
-- R软件
+  - R
+  - 数据库
 ---
 
 处理金融市场数据的时候会用到MySQL数据库，R提供了一个RMySQL`包作为自身跟MySQL的接口。这个包本身很容易用，唯一不足的一点是在Windows下面安装RMySQL有点麻烦。安装RMySQL时,除了按部就班的安装MySQL、R、RTools、RMySQL等之外还要设置各种path变量以及把某些文件夹在各个路径里来回移动。

@@ -5,9 +5,9 @@ date: '2013-07-28'
 slug: the-visualization-of-spatual-temporal-data
 categories:
 - R语言
-tags: 
-- quantmod
-- R
+tags:
+  - R
+  - quantmod
 ---
 这几天北京有点热，穿着汗衫都觉得浑身冒烟儿，做啥都没有激情，只能赖在家里或者躲进图书馆和博物馆。没什么紧要的事情都懒得往外面走，但一月一次的“COS数据分析沙龙”是个例外。没有紧要的事儿，都得抽出时间去参加，偶尔还得客串一下主持人。
 

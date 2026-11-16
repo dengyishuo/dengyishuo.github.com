@@ -4,12 +4,10 @@ author: MatrixSpk
 date: '2014-05-19'
 slug: notes-on-DBI
 categories:
-- 金融数据
+- 数据获取
 tags:
-- R
-- DBI
-- RODBC
-- 数据库
+  - R
+  - 数据库
 ---
 DBI是DataBase Interface的简称，即数据库界面。这篇笔记的主要内容是讲一讲如何用R中的DBI包来与常见数据库进行交互。
 

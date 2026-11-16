@@ -6,9 +6,9 @@ slug: the-most-importtant-plot-about-china
 categories:
 - 经济学
 tags:
-- 外汇储备
-- 证券
-- 图表
+  - 宏观经济
+  - 绘图
+  - 股票
 ---
 几天前，华尔街日报采访了法国里昂证券的研究员Russel Napier。Russel Napier说，目前全球经济已进入早期复苏阶段的希望可能过于乐观了。他说，中国外汇储备增长将出现令人担忧的停滞，而中国外汇储备增长一直是全球经济增长的动力。
 

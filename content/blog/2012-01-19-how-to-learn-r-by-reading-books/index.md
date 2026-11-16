@@ -6,17 +6,13 @@ slug: how-to-learn-r-by-reading-books
 categories:
 - R语言
 tags:
-- ggobi
-- ggplot2
-- lattice
-- r
-- rattle
-- 协整
-- 可视化
-- 数据挖掘
-- 时间序列
-- 绘图
-- 金融
+  - R
+  - 量化投资
+  - 绘图
+  - 时间序列
+  - 机器学习
+  - 协整
+  - Rattle
 ---
 现在对R感兴趣的人越来越多，很多人都想快速地掌握R。然而，由于目前大部分高校都没有开设R课程，这就导致很多人不知道如何着手学习R。
 

@@ -6,8 +6,8 @@ slug: large-scale-portfolio-optimization-with-R-and-DEoptim
 categories:
 - 风险与组合
 tags:
-- 投资组合
-- DEoptim
+  - R包
+  - 投资组合
 ---
 
 ### 1.楔子

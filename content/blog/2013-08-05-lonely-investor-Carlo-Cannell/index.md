@@ -6,7 +6,7 @@ slug: lonely-investor-Carlo-Cannell
 categories:
 - 经济学
 tags:
-- 卡洛·坎奈尔
+  - 读书
 ---
 卡洛·坎奈尔(CarloCannell)是一位名副其实的价值投资者，因拥有一套独特的价值选股方法而闻名。1992年，他在旧金山创建专注于股票多空策略的坎奈尔资产管理公司(CannellCapitalLLC)，成立以来旗舰基金汤加基金(TongaFund)的年均收益率维持在20%左右的水平。
 

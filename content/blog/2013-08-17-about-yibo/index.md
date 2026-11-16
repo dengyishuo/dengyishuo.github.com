@@ -5,8 +5,7 @@ date: '2013-08-17'
 slug: about-yibo
 categories:
 - 随笔
-tags:
-- 怀旧
+tags: []
 ---
 待在家里梳理了一下跟逸波的相识历史，发现还是颇有意思。
 

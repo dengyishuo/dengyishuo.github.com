@@ -6,9 +6,9 @@ slug: apply-family
 categories:
 - R语言
 tags:
-- apply
-- r
-- 翻译
+  - R
+  - R包
+  - 出版
 ---
 
 在任何一个R语言问答网站或者论坛，你都能看见这样的问题：

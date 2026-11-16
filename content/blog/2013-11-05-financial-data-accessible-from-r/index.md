@@ -4,11 +4,10 @@ author: MatrixSpk
 date: '2013-11-05'
 slug: financial-data-accessible-from-r
 categories:
-- 金融数据
+- 数据获取
 tags:
-- 金融数据
-- R语言
-- R软件
+  - R
+  - 数据获取
 ---
 借助R软件，我们可以从网站上获取很多经济和金融数据。我整理了一下目前R可以使用的获取金融数据的包，供大家参考。
 

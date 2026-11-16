@@ -6,9 +6,8 @@ slug: notes-on-add.indicator
 categories:
 - 量化投资
 tags:
-- quantstrat
-- add.indicator
-- r
+  - R
+  - quantstrat
 ---
 add.indicator函数是quantstrat包中的主函数之一。它的主要功能是生成信号指示器。这种解释方法有点绕口。举个例子说起来更容易明白。假如说，我们想测试这样一个策略：即当某支股票的价格低于5日算术平均时，买入该股票；高于5日算术平均时卖出该股票。那么，在这个测试过程中，我们要用到 SMA(price,n=5) 这个序列（SMA函数的作用是计算算术平均），既然要用到这个序列，那么得首先生成这个序列， add.indicator函数就是干这个的，是用来生成序列的。
 

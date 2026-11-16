@@ -6,8 +6,8 @@ slug: useful-functions-in-R
 categories:
 - R语言
 tags:
-- file.choose
-- R
+  - R
+  - R包
 ---
 用R进行数据分析的时候，常常需要从外部载入数据或者函数。比如，我们有一个名为`example.txt`的数据位于E盘中的R文件夹中，我们可以用下面的命令把数据读取到R里：
 

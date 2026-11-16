@@ -6,7 +6,7 @@ slug: solow-model
 categories:
 - 经济学
 tags:
-- economics
+  - 经济学
 ---
 
 ## 索罗模型

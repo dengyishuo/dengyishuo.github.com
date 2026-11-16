@@ -6,9 +6,9 @@ slug: bagplot-and-extreme-value-detection
 categories:
 - R语言
 tags:
-  - data
-  - vis
-  - extreme value
+  - 数据获取
+  - 绘图
+  - 极值理论
 ---
 这两天在R软件中发现了一种趣味横生的检测异常值的可视化方法叫bagplot，我翻译为“布袋图”。它首先定义一个二维数据的中心,然后，将与中心较为疏离的点定义为野值。
 
