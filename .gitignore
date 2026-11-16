@@ -1,9 +1,21 @@
 .DS_Store
-_drafts/
-_site/
-.Rproj.user
 Thumbs.db
-.hugo_build.lock
+
+# Hugo
 /public/
 /resources/
+.hugo_build.lock
+
+# R / RStudio 会话与缓存（不该进版本库）
+.Rproj.user
+.Rhistory
+.Rapp.history
+.RData
 index_cache/
+*.Rmd.lock~
+*.lock~
+
+# blogdown / knit 在根目录误生成的产物
+/index.html
+_drafts/
+_site/
