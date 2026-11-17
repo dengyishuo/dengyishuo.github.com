@@ -2,7 +2,7 @@
 title: VaR和蒙特卡洛模拟法
 author: MatrixSpk
 date: '2010-12-16'
-slug: VaR-Calculation-via-MonteCarlo-Simulation
+slug: var-calculation-via-montecarlo-simulation
 categories:
 - 风险与组合
 tags:

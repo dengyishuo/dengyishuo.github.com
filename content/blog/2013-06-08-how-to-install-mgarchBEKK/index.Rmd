@@ -2,7 +2,7 @@
 title: 安装mgarchBEKK包
 author: MatrixSpk
 date: '2013-06-08'
-slug: how-to-install-mgarchBEKK
+slug: how-to-install-mgarchbekk
 categories:
 - R语言
 tags:

@@ -2,7 +2,7 @@
 title: NASDAQ有泡沫吗
 author: MatrixSpk
 date: '2011-09-06'
-slug: demo-about-LPPL
+slug: demo-about-lppl
 categories:
 - 量化投资
 tags:

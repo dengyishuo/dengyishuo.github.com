@@ -2,7 +2,7 @@
 title: 修改chartSeries绘图结果的x轴标签
 author: MatrixSpk
 date: '2013-06-26'
-slug: change-xlabels-in-chartSeries
+slug: change-xlabels-in-chartseries
 categories:
 - R语言
 tags:

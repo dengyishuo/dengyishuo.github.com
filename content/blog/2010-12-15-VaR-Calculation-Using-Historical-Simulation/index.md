@@ -2,7 +2,7 @@
 title: VaR和历史模拟法及R语言
 author: MatrixSpk
 date: '2010-12-15'
-slug: VaR-Calculation-Using-Historical-Simulation
+slug: var-calculation-using-historical-simulation
 categories:
 - 风险与组合
 tags:

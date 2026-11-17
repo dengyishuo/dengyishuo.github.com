@@ -2,7 +2,7 @@
 title: VaR和方差协方差方法及R语言
 author: MatrixSpk
 date: '2010-12-17'
-slug: VaR-Caculation-via-Variance-Covariance-Method
+slug: var-caculation-via-variance-covariance-method
 categories:
 - 风险与组合
 tags:

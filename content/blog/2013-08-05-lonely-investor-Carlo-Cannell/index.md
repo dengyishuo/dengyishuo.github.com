@@ -2,7 +2,7 @@
 title: 孤独的投资者卡洛·坎奈尔
 author: MatrixSpk
 date: '2013-08-05'
-slug: lonely-investor-Carlo-Cannell
+slug: lonely-investor-carlo-cannell
 categories:
 - 经济学
 tags:

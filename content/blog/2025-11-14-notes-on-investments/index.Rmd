@@ -2,7 +2,7 @@
 title: 投资笔记 1 ：先立认知，再选策略
 author: MatrixSpk
 date: '2025-11-14'
-slug: Notes-on-investments
+slug: notes-on-investments
 categories:
 - 量化投资
 tags: []

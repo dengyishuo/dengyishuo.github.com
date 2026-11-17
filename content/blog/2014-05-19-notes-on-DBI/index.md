@@ -2,7 +2,7 @@
 title: R数据库交互系列笔记：DBI包
 author: MatrixSpk
 date: '2014-05-19'
-slug: notes-on-DBI
+slug: notes-on-dbi
 categories:
 - 数据获取
 tags:

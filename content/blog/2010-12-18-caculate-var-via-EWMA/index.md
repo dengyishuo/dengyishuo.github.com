@@ -2,7 +2,7 @@
 title: 指数加权移动平均法计算VaR
 author: MatrixSpk
 date: '2010-12-18'
-slug: caculate-var-via-EWMA
+slug: caculate-var-via-ewma
 categories:
 - 风险与组合
 tags:

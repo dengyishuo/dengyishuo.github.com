@@ -2,7 +2,7 @@
 title: 使用R和DEoptim求解大规模投资组合
 author: MatrixSpk
 date: '2013-08-20'
-slug: large-scale-portfolio-optimization-with-R-and-DEoptim
+slug: large-scale-portfolio-optimization-with-r-and-deoptim
 categories:
 - 风险与组合
 tags:

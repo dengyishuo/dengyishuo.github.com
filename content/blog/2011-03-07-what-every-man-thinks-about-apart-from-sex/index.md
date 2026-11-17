@@ -2,7 +2,7 @@
 title: 男人通常在想什么
 author: MatrixSpk
 date: '2011-03-07'
-slug: What-Every-Man-Thinks-About-Apart-From-Sex
+slug: what-every-man-thinks-about-apart-from-sex
 categories:
 - 随笔
 tags:

@@ -15,8 +15,8 @@ security:
 # 不加这条 index.Rmd 会被复制到 public/ 下，任何人都能直接从站上下载。
 # 只影响构建产物，本地文件和 git 里的 Rmd 不受影响。
 ignoreFiles:
-  - '\.Rmd$'
-  - '\.Rmd\.lock~$'
+  - '(?i)\.rmd$'
+  - '(?i)\.rmd\.lock~$'
 
 pagination:
   pagerSize: 12

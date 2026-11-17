@@ -2,7 +2,7 @@
 title: Lee Hachadoorian 加入 Supstat
 author: MatrixSpk
 date: '2013-08-02'
-slug: Lee-Hachadoorian-joins-supstat
+slug: lee-hachadoorian-joins-supstat
 categories:
 - 随笔
 tags:

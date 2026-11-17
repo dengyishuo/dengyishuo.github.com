@@ -2,7 +2,7 @@
 title: 基于极值理论的 VaR 计算及实证分析
 author: MatrixSpk
 date: '2010-12-29'
-slug: var-caculation-and-EVT
+slug: var-caculation-and-evt
 categories:
 - 风险与组合
 tags:

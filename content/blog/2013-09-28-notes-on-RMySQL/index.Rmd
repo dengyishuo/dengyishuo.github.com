@@ -2,7 +2,7 @@
 title: 安装RMySQL
 author: MatrixSpk
 date: '2013-09-28'
-slug: notes-on-RMySQL
+slug: notes-on-rmysql
 categories:
 - 金融数据
 tags:

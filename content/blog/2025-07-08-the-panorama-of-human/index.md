@@ -2,7 +2,7 @@
 title: 《人的全景》读书笔记：洞察行为逻辑，突破认知牢笼
 author: MatrixSpk
 date: '2025-07-08'
-slug: The-Panorama-of-human
+slug: the-panorama-of-human
 categories:
 - 随笔
 tags:

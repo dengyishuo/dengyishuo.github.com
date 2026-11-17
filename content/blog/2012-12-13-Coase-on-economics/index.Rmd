@@ -2,7 +2,7 @@
 title: 科斯对现代经济学的批评
 author: MatrixSpk
 date: '2012-12-13'
-slug: Coase-on-economics
+slug: coase-on-economics
 categories:
 - 经济学
 tags:

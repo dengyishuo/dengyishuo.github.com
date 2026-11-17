@@ -2,7 +2,7 @@
 title: 基于混合正态分布的 VaR 计算
 author: DengYishuo
 date: '2010-12-21'
-slug: VaR-Mixture-of-Norms
+slug: var-mixture-of-norms
 categories:
 - 风险与组合
 tags:

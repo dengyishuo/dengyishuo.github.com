@@ -2,7 +2,7 @@
 title: 《并非有效的市场》笔记
 author: MatrixSpk
 date: '2025-12-22'
-slug: Inefficient-Markets
+slug: inefficient-markets
 categories:
 - 随笔
 tags:

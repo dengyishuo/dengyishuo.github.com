@@ -2,7 +2,7 @@
 title: A 股最近的表现怎么样
 author: DengYishuo
 date: '2025-08-23'
-slug: Performance-of-AShare
+slug: performance-of-ashare
 categories:
 - 经济学
 tags:

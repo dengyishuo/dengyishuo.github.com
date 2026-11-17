@@ -2,7 +2,7 @@
 title: 技术指标在量化投资中的应用：以RSI指标为例
 author: MatrixSpk
 date: '2015-02-09'
-slug: RSI-Cross-Strategy-with-Signal-Analysis
+slug: rsi-cross-strategy-with-signal-analysis
 categories:
 - 量化投资
 tags:
