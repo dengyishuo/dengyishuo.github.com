@@ -9,7 +9,6 @@ tags:
   - R
   - 量化投资
   - 套利
-markup: html
 ---
 
 
@@ -20,7 +19,9 @@ markup: html
 <h1>策略核心逻辑与代码框架</h1>
 <p>这段代码以 SPY 和 DIA 两只 ETF 为交易标的，通过构建价格比率的均值回归模型实现配对交易。策略的核心步骤包括：数据同步与准备、策略环境初始化、指标与信号构建、自定义订单规模控制、交易规则设置，以及回测与绩效分析。</p>
 <p>以下是完整代码实现：</p>
-<pre class="r"><code># Kindly contributed to quantstrat by Garrett See
+
+``` r
+# Kindly contributed to quantstrat by Garrett See
 # code borrowed heavily from existing quantstrat demos
 
 # 这是一个简单的配对交易示例，旨在展示如何扩展现有 quantstrat 功能。
@@ -35,93 +36,180 @@ markup: html
 # 股票 A 的买入（卖出）数量 = MaxPos / lvls
 # 股票 B 的卖出（买入）数量 = MaxPos * 比率 / lvls  
 
-require(quantstrat)</code></pre>
-<pre><code>## Loading required package: quantstrat</code></pre>
-<pre><code>## Loading required package: quantmod</code></pre>
-<pre><code>## Loading required package: xts</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
+require(quantstrat)
+```
+
+```
+## Loading required package: quantstrat
+```
+
+```
+## Loading required package: quantmod
+```
+
+```
+## Loading required package: xts
+```
+
+```
+## Loading required package: zoo
+```
+
+```
 ## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## Loading required package: TTR</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+## Attaching package: 'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## Loading required package: TTR
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
 ##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<pre><code>## Loading required package: blotter</code></pre>
-<pre><code>## Loading required package: FinancialInstrument</code></pre>
-<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
-<pre><code>## 
-## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+##   as.zoo.data.frame zoo
+```
+
+```
+## Loading required package: blotter
+```
+
+```
+## Loading required package: FinancialInstrument
+```
+
+```
+## Loading required package: PerformanceAnalytics
+```
+
+```
 ## 
-##     legend</code></pre>
-<pre><code>## Loading required package: foreach</code></pre>
-<pre class="r"><code>suppressWarnings(rm(&quot;order_book.pair1&quot;,pos=.strategy))
-suppressWarnings(rm(&quot;account.pairs&quot;, &quot;portfolio.pair1&quot;, pos=.blotter))
-suppressWarnings(rm(&quot;startDate&quot;, &quot;endDate&quot;, &quot;startDate&quot;, &quot;initEq&quot;, &quot;SD&quot;, &quot;N&quot;, 
-                    &quot;symb1&quot;, &quot;symb2&quot;, &quot;portfolio1.st&quot;, &quot;account.st&quot;, 
-                    &quot;pairStrat&quot;, &quot;out1&quot;))
+## Attaching package: 'PerformanceAnalytics'
+```
 
-initDate &lt;- &#39;2013-12-31&#39;    
-startDate &lt;- &#39;2014-01-01&#39;
-endDate &lt;- &#39;2015-05-01&#39;
-initEq &lt;- 100000
-SD &lt;- 2  # 标准差倍数
-N &lt;- 20  # 移动平均线周期
+```
+## The following object is masked from 'package:graphics':
+## 
+##     legend
+```
 
-MaxPos &lt;- 1500  # 股票 A 的最大头寸；
+```
+## Loading required package: foreach
+```
+
+``` r
+suppressWarnings(rm("order_book.pair1",pos=.strategy))
+suppressWarnings(rm("account.pairs", "portfolio.pair1", pos=.blotter))
+suppressWarnings(rm("startDate", "endDate", "startDate", "initEq", "SD", "N", 
+                    "symb1", "symb2", "portfolio1.st", "account.st", 
+                    "pairStrat", "out1"))
+
+initDate <- '2013-12-31'    
+startDate <- '2014-01-01'
+endDate <- '2015-05-01'
+initEq <- 100000
+SD <- 2  # 标准差倍数
+N <- 20  # 移动平均线周期
+
+MaxPos <- 1500  # 股票 A 的最大头寸；
 # 股票 B 的最大头寸将是 max * 比率，即对股票 B 没有硬性头寸限制
-lvls &lt;- 3  # 分几步建仓；每笔订单数量 = MaxPos/lvls
+lvls <- 3  # 分几步建仓；每笔订单数量 = MaxPos/lvls
 
-symb1 &lt;- &#39;SPY&#39;  # 可更改这些标的以尝试其他配对
-symb2 &lt;- &#39;DIA&#39;  # 如果更改，需确保头寸限制仍然合理
+symb1 <- 'SPY'  # 可更改这些标的以尝试其他配对
+symb2 <- 'DIA'  # 如果更改，需确保头寸限制仍然合理
 
-portfolio1.st &lt;- &#39;pair1&#39;
-account.st &lt;- &#39;pairs&#39;
+portfolio1.st <- 'pair1'
+account.st <- 'pairs'
 
 # 获取历史数据
-getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE) </code></pre>
-<pre><code>## [1] &quot;SPY&quot; &quot;DIA&quot;</code></pre>
-<pre class="r"><code># 以下函数用于确保所有标的的时间戳相同，删除其中一只股票数据缺失的行
-alignSymbols &lt;- function(symbols, env=.GlobalEnv) {
+getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE) 
+```
+
+```
+## [1] "SPY" "DIA"
+```
+
+``` r
+# 以下函数用于确保所有标的的时间戳相同，删除其中一只股票数据缺失的行
+alignSymbols <- function(symbols, env=.GlobalEnv) {
   # 这是 qmao::alignSymbols() 的简化版本
-  if (length(symbols) &lt; 2) 
-    stop(&quot;必须提供至少 2 个标的&quot;)
+  if (length(symbols) < 2) 
+    stop("必须提供至少 2 个标的")
   if (any(!is.character(symbols))) 
-    stop(&quot;标的必须是字符向量。&quot;)
-  ff &lt;- get(symbols[1],env=env)
+    stop("标的必须是字符向量。")
+  ff <- get(symbols[1],env=env)
   for (sym in symbols[-1]) {
-    tmp.sym &lt;- get(sym,env=env)
-    ff &lt;- merge(ff, tmp.sym, all=FALSE)  # 只保留双方都有数据的行
+    tmp.sym <- get(sym,env=env)
+    ff <- merge(ff, tmp.sym, all=FALSE)  # 只保留双方都有数据的行
   }
   for (sym in symbols) {
     assign(sym,ff[,grep(sym, colnames(ff))], env=env)  # 更新标的数据
   }
   symbols
 }
-alignSymbols(c(symb1, symb2))  # 对齐两只股票的时间戳</code></pre>
-<pre><code>## [1] &quot;SPY&quot; &quot;DIA&quot;</code></pre>
-<pre class="r"><code># 定义金融工具
-currency(&quot;USD&quot;)  # 基础货币为美元</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code>stock(symb1, currency=&quot;USD&quot;, multiplier=1)  # 定义股票 1 的属性</code></pre>
-<pre><code>## [1] &quot;SPY&quot;</code></pre>
-<pre class="r"><code>stock(symb2, currency=&quot;USD&quot;, multiplier=1)  # 定义股票 2 的属性</code></pre>
-<pre><code>## [1] &quot;DIA&quot;</code></pre>
-<pre class="r"><code># 初始化投资组合、账户和订单
-initPortf(name=portfolio1.st, c(symb1,symb2))  # 创建包含两只股票的组合</code></pre>
-<pre><code>## [1] &quot;pair1&quot;</code></pre>
-<pre class="r"><code>initAcct(account.st, portfolios=portfolio1.st, initEq=initEq)  # 初始化账户，初始资金 10 万美元</code></pre>
-<pre><code>## [1] &quot;pairs&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio=portfolio1.st)  # 初始化订单簿
+alignSymbols(c(symb1, symb2))  # 对齐两只股票的时间戳
+```
+
+```
+## [1] "SPY" "DIA"
+```
+
+``` r
+# 定义金融工具
+currency("USD")  # 基础货币为美元
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+stock(symb1, currency="USD", multiplier=1)  # 定义股票 1 的属性
+```
+
+```
+## [1] "SPY"
+```
+
+``` r
+stock(symb2, currency="USD", multiplier=1)  # 定义股票 2 的属性
+```
+
+```
+## [1] "DIA"
+```
+
+``` r
+# 初始化投资组合、账户和订单
+initPortf(name=portfolio1.st, c(symb1,symb2))  # 创建包含两只股票的组合
+```
+
+```
+## [1] "pair1"
+```
+
+``` r
+initAcct(account.st, portfolios=portfolio1.st, initEq=initEq)  # 初始化账户，初始资金 10 万美元
+```
+
+```
+## [1] "pairs"
+```
+
+``` r
+initOrders(portfolio=portfolio1.st)  # 初始化订单簿
 
 # osFUN 需要知道哪个标的是第一腿、哪个是第二腿，以及 MaxPos 和 lvls 的值。
 # 因此，在投资组合中创建一个插槽来存储这些信息。
-pair &lt;- c(1, 2, MaxPos, lvls)
-names(pair) &lt;- c(symb1, symb2, &quot;MaxPos&quot;, &quot;lvls&quot;)
-.blotter[[paste(&#39;portfolio&#39;, portfolio1.st, sep=&#39;.&#39;)]]$pair &lt;- pair  # 存储到组合属性中
+pair <- c(1, 2, MaxPos, lvls)
+names(pair) <- c(symb1, symb2, "MaxPos", "lvls")
+.blotter[[paste('portfolio', portfolio1.st, sep='.')]]$pair <- pair  # 存储到组合属性中
 
 # 按标的创建初始头寸限制和水平
 # 如果 lvls=3，则允许多空各 3 次建仓。
@@ -131,103 +219,103 @@ addPosLimit(portfolio=portfolio1.st, timestamp=startDate, symbol=symb2,
             maxpos=MaxPos, longlevels=lvls, minpos=-MaxPos, shortlevels=lvls)
 
 # 创建策略对象
-pairStrat &lt;- strategy(&#39;pairStrat&#39;)
+pairStrat <- strategy('pairStrat')
 
 # 指标函数：计算两只股票的价格比率
-calcRatio &lt;- function(x) { 
+calcRatio <- function(x) { 
   # 返回两只股票的名义收盘价比率
-  x1 &lt;- get(x[1])
-  x2 &lt;- get(x[2])
-  mult1 &lt;- getInstrument(x[1])$multiplier  # 合约乘数
-  mult2 &lt;- getInstrument(x[2])$multiplier
-  rat &lt;- (mult1 * Cl(x1)) / (mult2 * Cl(x2))  # 收盘价比率
-  colnames(rat) &lt;- &#39;Ratio&#39;
+  x1 <- get(x[1])
+  x2 <- get(x[2])
+  mult1 <- getInstrument(x[1])$multiplier  # 合约乘数
+  mult2 <- getInstrument(x[2])$multiplier
+  rat <- (mult1 * Cl(x1)) / (mult2 * Cl(x2))  # 收盘价比率
+  colnames(rat) <- 'Ratio'
   rat
 }
 # 用于确定入场/出场的指标：比率及其布林带
-Ratio &lt;- calcRatio(c(symb1[1], symb2[1]))  
+Ratio <- calcRatio(c(symb1[1], symb2[1]))  
 
 # 将对冲比率存储在投资组合中，以便订单规模函数使用。
 # 在本示例中，对冲比率与 Ratio 指标相同。
-.blotter[[paste(&#39;portfolio&#39;,portfolio1.st,sep=&#39;.&#39;)]]$HedgeRatio &lt;- Ratio
+.blotter[[paste('portfolio',portfolio1.st,sep='.')]]$HedgeRatio <- Ratio
 # 创建获取最新对冲比率的函数
-getHedgeRatio &lt;- function(portfolio, timestamp) {
-  portf &lt;- getPortfolio(portfolio)
-  timestamp &lt;- format(timestamp,&quot;%Y-%m-%d %H:%M:%S&quot;)  # 格式化时间戳
+getHedgeRatio <- function(portfolio, timestamp) {
+  portf <- getPortfolio(portfolio)
+  timestamp <- format(timestamp,"%Y-%m-%d %H:%M:%S")  # 格式化时间戳
   # 上述行确保在使用日内数据且时间戳为午夜时，不会获取次日的最后一个值
-  toDate &lt;- paste(&quot;::&quot;, timestamp, sep=&quot;&quot;)
-  Ratio &lt;- last(portf$HedgeRatio[toDate])  # 获取该时间点的最新比率
+  toDate <- paste("::", timestamp, sep="")
+  Ratio <- last(portf$HedgeRatio[toDate])  # 获取该时间点的最新比率
   as.numeric(Ratio)
 }
 
 # 添加指标：比率的布林带
-pairStrat &lt;- add.indicator(strategy=pairStrat, name = &quot;calcRatio&quot;, 
+pairStrat <- add.indicator(strategy=pairStrat, name = "calcRatio", 
                            arguments=list(x=c(symb1,symb2)))
-pairStrat &lt;- add.indicator(strategy=pairStrat, name = &quot;BBands&quot;, 
+pairStrat <- add.indicator(strategy=pairStrat, name = "BBands", 
                            arguments=list(HLC=quote(Ratio), sd=SD, n=N, 
-                                          maType=&#39;SMA&#39;))  # 基于 20 日 SMA 计算布林带
+                                          maType='SMA'))  # 基于 20 日 SMA 计算布林带
 
 # 生成信号：当比率从下方穿过下轨时买入，从上方穿过上轨时卖出，穿过中轨时平仓
-pairStrat &lt;- add.signal(strategy=pairStrat, name=&quot;sigCrossover&quot;, 
-                        arguments=list(columns=c(&quot;Ratio&quot;,&quot;up&quot;), 
-                                        relationship=&quot;lt&quot;),  # 比率 &lt; 上轨（从上方穿过）
-                        label=&quot;cross.up&quot;)
-pairStrat &lt;- add.signal(strategy=pairStrat, name=&quot;sigCrossover&quot;, 
-                        arguments=list(columns=c(&quot;Ratio&quot;,&quot;dn&quot;), 
-                                        relationship=&quot;gt&quot;),  # 比率 &gt; 下轨（从下方穿过）
-                        label=&quot;cross.dn&quot;)
-pairStrat &lt;- add.signal(strategy=pairStrat, name=&quot;sigCrossover&quot;, 
-                        arguments=list(columns=c(&quot;Ratio&quot;,&quot;mavg&quot;), 
-                                  relationship=&quot;lt&quot;),  # 比率 &lt; 中轨（从上方穿过）
-                        label=&quot;cross.mid.fa&quot;)
-pairStrat &lt;- add.signal(strategy=pairStrat, name=&quot;sigCrossover&quot;, 
-                        arguments=list(columns=c(&quot;Ratio&quot;,&quot;mavg&quot;), 
-                                       relationship=&quot;gt&quot;),  # 比率 &gt; 中轨（从下方穿过）
-                        label=&quot;cross.mid.fb&quot;)
+pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
+                        arguments=list(columns=c("Ratio","up"), 
+                                        relationship="lt"),  # 比率 < 上轨（从上方穿过）
+                        label="cross.up")
+pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
+                        arguments=list(columns=c("Ratio","dn"), 
+                                        relationship="gt"),  # 比率 > 下轨（从下方穿过）
+                        label="cross.dn")
+pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
+                        arguments=list(columns=c("Ratio","mavg"), 
+                                  relationship="lt"),  # 比率 < 中轨（从上方穿过）
+                        label="cross.mid.fa")
+pairStrat <- add.signal(strategy=pairStrat, name="sigCrossover", 
+                        arguments=list(columns=c("Ratio","mavg"), 
+                                       relationship="gt"),  # 比率 > 中轨（从下方穿过）
+                        label="cross.mid.fb")
 
 # 自定义订单规模函数
 #######################_ORDER SIZING FUNCTION_##################################
-osSpreadMaxPos &lt;- function (data, timestamp, orderqty, ordertype, orderside, 
+osSpreadMaxPos <- function (data, timestamp, orderqty, ordertype, orderside, 
                             portfolio, symbol, ruletype, ..., orderprice) {
-  portf &lt;- getPortfolio(portfolio)
+  portf <- getPortfolio(portfolio)
   # 检查 pair 插槽是否包含该函数所需的内容
-  if (!any(portf$pair == 1) &amp;&amp; !(any(portf$pair == 2))) 
-    stop(&#39;pair 必须包含值 1 和 2&#39;)
-  if (!any(names(portf$pair) == &quot;MaxPos&quot;) || !any(names(portf$pair) == &quot;lvls&quot;)) 
-    stop(&#39;pair 必须包含 MaxPos 和 lvls&#39;)  
+  if (!any(portf$pair == 1) && !(any(portf$pair == 2))) 
+    stop('pair 必须包含值 1 和 2')
+  if (!any(names(portf$pair) == "MaxPos") || !any(names(portf$pair) == "lvls")) 
+    stop('pair 必须包含 MaxPos 和 lvls')  
   
-  if (portf$pair[symbol] == 1) legside &lt;- &quot;long&quot;  # 第一腿
-  if (portf$pair[symbol] == 2) legside &lt;- &quot;short&quot;  # 第二腿（与第一腿方向相反）
-  MaxPos &lt;- portf$pair[&quot;MaxPos&quot;]
-  lvls &lt;- portf$pair[&quot;lvls&quot;]
-  ratio &lt;- getHedgeRatio(portfolio, timestamp)  # 获取当前对冲比率
-  pos &lt;- getPosQty(portfolio, symbol, timestamp)  # 当前头寸
-  PosLimit &lt;- getPosLimit(portfolio, symbol, timestamp)  # 头寸限制
-  qty &lt;- orderqty
-  if (legside == &quot;short&quot;) {# 标的是第二腿
+  if (portf$pair[symbol] == 1) legside <- "long"  # 第一腿
+  if (portf$pair[symbol] == 2) legside <- "short"  # 第二腿（与第一腿方向相反）
+  MaxPos <- portf$pair["MaxPos"]
+  lvls <- portf$pair["lvls"]
+  ratio <- getHedgeRatio(portfolio, timestamp)  # 获取当前对冲比率
+  pos <- getPosQty(portfolio, symbol, timestamp)  # 当前头寸
+  PosLimit <- getPosLimit(portfolio, symbol, timestamp)  # 头寸限制
+  qty <- orderqty
+  if (legside == "short") {# 标的是第二腿
     ## 注释掉下一行可使每只股票的订单规模相等。
     addPosLimit(portfolio=portfolio, timestamp=timestamp, symbol=symbol, 
                 maxpos=round(MaxPos*ratio,0), longlevels=lvls, 
                 minpos=round(-MaxPos*ratio,0), shortlevels=lvls)  # 调整第二腿的头寸限制
     ## 
-    qty &lt;- -orderqty  # 反转股票 B 的订单数量（多空相反）
+    qty <- -orderqty  # 反转股票 B 的订单数量（多空相反）
   }
   
-  if (qty &gt; 0) orderside = &#39;long&#39;  # 确定订单方向
-  if (qty &lt; 0) orderside = &#39;short&#39;
+  if (qty > 0) orderside = 'long'  # 确定订单方向
+  if (qty < 0) orderside = 'short'
  
   # 调用 osMaxPos 计算符合头寸限制的订单数量
-  orderqty &lt;- osMaxPos(data=data,timestamp=timestamp, orderqty=qty,
+  orderqty <- osMaxPos(data=data,timestamp=timestamp, orderqty=qty,
                        ordertype=ordertype, orderside=orderside,
                        portfolio=portfolio, symbol=symbol, ruletype=ruletype, 
                        ...)
           
   # 在规则信号函数中添加订单
-  if (!is.null(orderqty) &amp; !orderqty == 0 &amp; !is.null(orderprice)) {
+  if (!is.null(orderqty) & !orderqty == 0 & !is.null(orderprice)) {
     addOrder(portfolio=portfolio, symbol=symbol, 
              timestamp=timestamp, qty=orderqty, price=as.numeric(orderprice), 
              ordertype=ordertype, side=orderside, replace=FALSE,
-             status=&quot;open&quot;, ...=...)
+             status="open", ...=...)
   }
   return(0)  # 使 ruleSignal 函数不会尝试下单
 }
@@ -237,123 +325,170 @@ osSpreadMaxPos &lt;- function (data, timestamp, orderqty, ordertype, orderside,
 # 但 osMaxPos 会为第二个标的反转这些信号。
 # orderqty 大于头寸限制允许的值。osMaxPos 会将订单数量调整为最大允许值的 1/3。
 # （1/3 是因为我们在 PosLimit 中使用了 3 个水平）
-pairStrat &lt;- add.rule(strategy=pairStrat, name=&#39;ruleSignal&#39;, 
-                      arguments=list(sigcol=&quot;cross.dn&quot;, sigval=TRUE, 
-                                     orderqty=1e6, ordertype=&#39;market&#39;, 
-                                     orderside=NULL, osFUN=&#39;osSpreadMaxPos&#39;), 
-                      type=&#39;enter&#39;)  # cross.dn 信号触发入场
-pairStrat &lt;- add.rule(strategy=pairStrat, name=&#39;ruleSignal&#39;, 
-                      arguments=list(sigcol=&quot;cross.up&quot;, sigval=TRUE, 
-                                     orderqty=-1e6, ordertype=&#39;market&#39;, 
-                                     orderside=NULL, osFUN=&#39;osSpreadMaxPos&#39;), 
-                      type=&#39;enter&#39;)  # cross.up 信号触发入场
-pairStrat &lt;- add.rule(strategy=pairStrat, name=&#39;ruleSignal&#39;, 
-                      arguments=list(sigcol=&quot;cross.mid.fb&quot;, sigval=TRUE, 
-                                     orderqty=&#39;all&#39;, ordertype=&#39;market&#39;, 
+pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
+                      arguments=list(sigcol="cross.dn", sigval=TRUE, 
+                                     orderqty=1e6, ordertype='market', 
+                                     orderside=NULL, osFUN='osSpreadMaxPos'), 
+                      type='enter')  # cross.dn 信号触发入场
+pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
+                      arguments=list(sigcol="cross.up", sigval=TRUE, 
+                                     orderqty=-1e6, ordertype='market', 
+                                     orderside=NULL, osFUN='osSpreadMaxPos'), 
+                      type='enter')  # cross.up 信号触发入场
+pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
+                      arguments=list(sigcol="cross.mid.fb", sigval=TRUE, 
+                                     orderqty='all', ordertype='market', 
                                      orderside=NULL), 
-                      type=&#39;exit&#39;)  # cross.mid.fb 信号触发出场
-pairStrat &lt;- add.rule(strategy=pairStrat, name=&#39;ruleSignal&#39;, 
-                      arguments=list(sigcol=&quot;cross.mid.fa&quot;, sigval=TRUE, 
-                                     orderqty=&#39;all&#39;, ordertype=&#39;market&#39;, 
+                      type='exit')  # cross.mid.fb 信号触发出场
+pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
+                      arguments=list(sigcol="cross.mid.fa", sigval=TRUE, 
+                                     orderqty='all', ordertype='market', 
                                      orderside=NULL), 
-                      type=&#39;exit&#39;)  # cross.mid.fa 信号触发出场
+                      type='exit')  # cross.mid.fa 信号触发出场
 
 
 # 执行策略回测
-out1&lt;-applyStrategy(strategy=pairStrat, portfolios=portfolio1.st)</code></pre>
-<pre><code>## [1] &quot;2014-02-04 00:00:00 DIA 500 @ 150.182621296714&quot;
-## [1] &quot;2014-03-07 00:00:00 DIA 568 @ 160.616223229789&quot;
-## [1] &quot;2014-03-17 00:00:00 DIA 573 @ 158.690860184405&quot;
-## [1] &quot;2014-03-25 00:00:00 DIA -1641 @ 159.963991320726&quot;
-## [1] &quot;2014-03-31 00:00:00 DIA -574 @ 160.796174254035&quot;
-## [1] &quot;2014-04-22 00:00:00 DIA 574 @ 161.4743809578&quot;
-## [1] &quot;2014-05-22 00:00:00 DIA 571 @ 162.261848260392&quot;
-## [1] &quot;2014-06-02 00:00:00 DIA 572 @ 164.246166224292&quot;
-## [1] &quot;2014-06-27 00:00:00 DIA 576 @ 165.51814455118&quot;
-## [1] &quot;2014-07-02 00:00:00 DIA 27 @ 166.728744615667&quot;
-## [1] &quot;2014-07-15 00:00:00 DIA -1746 @ 167.69330191996&quot;
-## [1] &quot;2014-07-21 00:00:00 DIA -583 @ 167.676368799237&quot;
-## [1] &quot;2014-07-24 00:00:00 DIA 583 @ 167.932553399241&quot;
-## [1] &quot;2014-09-17 00:00:00 DIA -580 @ 169.355777408222&quot;
-## [1] &quot;2014-09-24 00:00:00 DIA -584 @ 169.969729387294&quot;
-## [1] &quot;2014-10-15 00:00:00 DIA -582 @ 159.57109738308&quot;
-## [1] &quot;2014-10-21 00:00:00 DIA 1746 @ 164.043208292008&quot;
-## [1] &quot;2014-10-27 00:00:00 DIA 576 @ 166.101170700567&quot;
-## [1] &quot;2014-11-05 00:00:00 DIA -576 @ 172.700494456876&quot;
-## [1] &quot;2014-12-03 00:00:00 DIA -586 @ 177.512433609148&quot;
-## [1] &quot;2014-12-10 00:00:00 DIA -579 @ 173.872106214788&quot;
-## [1] &quot;2014-12-18 00:00:00 DIA 1165 @ 176.351884195197&quot;
-## [1] &quot;2015-01-15 00:00:00 DIA -579 @ 172.030741759151&quot;
-## [1] &quot;2015-01-21 00:00:00 DIA 579 @ 174.456324855292&quot;
-## [1] &quot;2015-01-29 00:00:00 DIA 578 @ 173.013702717688&quot;
-## [1] &quot;2015-02-05 00:00:00 DIA -578 @ 177.640012837652&quot;
-## [1] &quot;2015-04-21 00:00:00 DIA 583 @ 179.259994506836&quot;
-## [1] &quot;2015-04-28 00:00:00 DIA 583 @ 180.839996337891&quot;
-## [1] &quot;2014-02-04 00:00:00 SPY -500 @ 171.264049909226&quot;
-## [1] &quot;2014-03-07 00:00:00 SPY -500 @ 183.831285747939&quot;
-## [1] &quot;2014-03-17 00:00:00 SPY -500 @ 181.946695046646&quot;
-## [1] &quot;2014-03-25 00:00:00 SPY 1500 @ 182.730103228311&quot;
-## [1] &quot;2014-03-31 00:00:00 SPY 500 @ 183.416649931591&quot;
-## [1] &quot;2014-04-22 00:00:00 SPY -500 @ 184.279745767482&quot;
-## [1] &quot;2014-05-22 00:00:00 SPY -500 @ 185.94707775133&quot;
-## [1] &quot;2014-06-02 00:00:00 SPY -500 @ 189.193474635518&quot;
-## [1] &quot;2014-06-27 00:00:00 SPY -500 @ 192.977678507185&quot;
-## [1] &quot;2014-07-15 00:00:00 SPY 1500 @ 194.367200918673&quot;
-## [1] &quot;2014-07-21 00:00:00 SPY 500 @ 194.475604869373&quot;
-## [1] &quot;2014-07-24 00:00:00 SPY -500 @ 195.766587803966&quot;
-## [1] &quot;2014-09-17 00:00:00 SPY 500 @ 197.83611230376&quot;
-## [1] &quot;2014-09-24 00:00:00 SPY 500 @ 197.582667853886&quot;
-## [1] &quot;2014-10-15 00:00:00 SPY 500 @ 184.582760931563&quot;
-## [1] &quot;2014-10-21 00:00:00 SPY -1500 @ 192.147074898032&quot;
-## [1] &quot;2014-10-27 00:00:00 SPY -500 @ 194.216362617501&quot;
-## [1] &quot;2014-11-05 00:00:00 SPY 500 @ 200.335121161983&quot;
-## [1] &quot;2014-12-03 00:00:00 SPY 500 @ 205.830132301385&quot;
-## [1] &quot;2014-12-10 00:00:00 SPY 500 @ 201.147003486903&quot;
-## [1] &quot;2014-12-18 00:00:00 SPY -1000 @ 204.731130073504&quot;
-## [1] &quot;2015-01-15 00:00:00 SPY 500 @ 198.135576473045&quot;
-## [1] &quot;2015-01-21 00:00:00 SPY -500 @ 202.177531751319&quot;
-## [1] &quot;2015-01-29 00:00:00 SPY -500 @ 201.092379263502&quot;
-## [1] &quot;2015-02-05 00:00:00 SPY 500 @ 205.204015568481&quot;
-## [1] &quot;2015-04-21 00:00:00 SPY -500 @ 209.600006103516&quot;
-## [1] &quot;2015-04-28 00:00:00 SPY -500 @ 211.440002441406&quot;</code></pre>
-<pre class="r"><code># 更新组合和账户数据
+out1<-applyStrategy(strategy=pairStrat, portfolios=portfolio1.st)
+```
+
+```
+## [1] "2014-02-04 00:00:00 DIA 500 @ 150.182621296714"
+## [1] "2014-03-07 00:00:00 DIA 568 @ 160.616223229789"
+## [1] "2014-03-17 00:00:00 DIA 573 @ 158.690860184405"
+## [1] "2014-03-25 00:00:00 DIA -1641 @ 159.963991320726"
+## [1] "2014-03-31 00:00:00 DIA -574 @ 160.796174254035"
+## [1] "2014-04-22 00:00:00 DIA 574 @ 161.4743809578"
+## [1] "2014-05-22 00:00:00 DIA 571 @ 162.261848260392"
+## [1] "2014-06-02 00:00:00 DIA 572 @ 164.246166224292"
+## [1] "2014-06-27 00:00:00 DIA 576 @ 165.51814455118"
+## [1] "2014-07-02 00:00:00 DIA 27 @ 166.728744615667"
+## [1] "2014-07-15 00:00:00 DIA -1746 @ 167.69330191996"
+## [1] "2014-07-21 00:00:00 DIA -583 @ 167.676368799237"
+## [1] "2014-07-24 00:00:00 DIA 583 @ 167.932553399241"
+## [1] "2014-09-17 00:00:00 DIA -580 @ 169.355777408222"
+## [1] "2014-09-24 00:00:00 DIA -584 @ 169.969729387294"
+## [1] "2014-10-15 00:00:00 DIA -582 @ 159.57109738308"
+## [1] "2014-10-21 00:00:00 DIA 1746 @ 164.043208292008"
+## [1] "2014-10-27 00:00:00 DIA 576 @ 166.101170700567"
+## [1] "2014-11-05 00:00:00 DIA -576 @ 172.700494456876"
+## [1] "2014-12-03 00:00:00 DIA -586 @ 177.512433609148"
+## [1] "2014-12-10 00:00:00 DIA -579 @ 173.872106214788"
+## [1] "2014-12-18 00:00:00 DIA 1165 @ 176.351884195197"
+## [1] "2015-01-15 00:00:00 DIA -579 @ 172.030741759151"
+## [1] "2015-01-21 00:00:00 DIA 579 @ 174.456324855292"
+## [1] "2015-01-29 00:00:00 DIA 578 @ 173.013702717688"
+## [1] "2015-02-05 00:00:00 DIA -578 @ 177.640012837652"
+## [1] "2015-04-21 00:00:00 DIA 583 @ 179.259994506836"
+## [1] "2015-04-28 00:00:00 DIA 583 @ 180.839996337891"
+## [1] "2014-02-04 00:00:00 SPY -500 @ 171.264049909226"
+## [1] "2014-03-07 00:00:00 SPY -500 @ 183.831285747939"
+## [1] "2014-03-17 00:00:00 SPY -500 @ 181.946695046646"
+## [1] "2014-03-25 00:00:00 SPY 1500 @ 182.730103228311"
+## [1] "2014-03-31 00:00:00 SPY 500 @ 183.416649931591"
+## [1] "2014-04-22 00:00:00 SPY -500 @ 184.279745767482"
+## [1] "2014-05-22 00:00:00 SPY -500 @ 185.94707775133"
+## [1] "2014-06-02 00:00:00 SPY -500 @ 189.193474635518"
+## [1] "2014-06-27 00:00:00 SPY -500 @ 192.977678507185"
+## [1] "2014-07-15 00:00:00 SPY 1500 @ 194.367200918673"
+## [1] "2014-07-21 00:00:00 SPY 500 @ 194.475604869373"
+## [1] "2014-07-24 00:00:00 SPY -500 @ 195.766587803966"
+## [1] "2014-09-17 00:00:00 SPY 500 @ 197.83611230376"
+## [1] "2014-09-24 00:00:00 SPY 500 @ 197.582667853886"
+## [1] "2014-10-15 00:00:00 SPY 500 @ 184.582760931563"
+## [1] "2014-10-21 00:00:00 SPY -1500 @ 192.147074898032"
+## [1] "2014-10-27 00:00:00 SPY -500 @ 194.216362617501"
+## [1] "2014-11-05 00:00:00 SPY 500 @ 200.335121161983"
+## [1] "2014-12-03 00:00:00 SPY 500 @ 205.830132301385"
+## [1] "2014-12-10 00:00:00 SPY 500 @ 201.147003486903"
+## [1] "2014-12-18 00:00:00 SPY -1000 @ 204.731130073504"
+## [1] "2015-01-15 00:00:00 SPY 500 @ 198.135576473045"
+## [1] "2015-01-21 00:00:00 SPY -500 @ 202.177531751319"
+## [1] "2015-01-29 00:00:00 SPY -500 @ 201.092379263502"
+## [1] "2015-02-05 00:00:00 SPY 500 @ 205.204015568481"
+## [1] "2015-04-21 00:00:00 SPY -500 @ 209.600006103516"
+## [1] "2015-04-28 00:00:00 SPY -500 @ 211.440002441406"
+```
+
+``` r
+# 更新组合和账户数据
 updatePortf(Portfolio=portfolio1.st,
-            Dates=paste(&quot;::&quot;, as.Date(Sys.time()), sep=&#39;&#39;))</code></pre>
-<pre><code>## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
+            Dates=paste("::", as.Date(Sys.time()), sep=''))
+```
+
+```
+## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
 ## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
 ## were outside the available prices: 2014-01-02/2015-04-30. Using all data
 ## instead.
 ## Warning in .updatePosPL(Portfolio = pname, Symbol = as.character(symbol), :
 ## Could not parse ::2025-07-13 as ISO8601 string, or one/bothends of the range
 ## were outside the available prices: 2014-01-02/2015-04-30. Using all data
-## instead.</code></pre>
-<pre><code>## [1] &quot;pair1&quot;</code></pre>
-<pre class="r"><code>updateAcct(account.st, Dates=paste(startDate, endDate, sep=&quot;::&quot;)) </code></pre>
-<pre><code>## [1] &quot;pairs&quot;</code></pre>
-<pre class="r"><code>updateEndEq(account.st, Dates=paste(startDate, endDate, sep=&quot;::&quot;))</code></pre>
-<pre><code>## [1] &quot;pairs&quot;</code></pre>
-<pre class="r"><code>getEndEq(account.st, Sys.time())  # 查看最终权益</code></pre>
-<pre><code>## [1] 103576.8</code></pre>
-<pre class="r"><code># 绘制持仓图表
+## instead.
+```
+
+```
+## [1] "pair1"
+```
+
+``` r
+updateAcct(account.st, Dates=paste(startDate, endDate, sep="::")) 
+```
+
+```
+## [1] "pairs"
+```
+
+``` r
+updateEndEq(account.st, Dates=paste(startDate, endDate, sep="::"))
+```
+
+```
+## [1] "pairs"
+```
+
+``` r
+getEndEq(account.st, Sys.time())  # 查看最终权益
+```
+
+```
+## [1] 103576.8
+```
+
+``` r
+# 绘制持仓图表
 # dev.new()
-chart.Posn(Portfolio=portfolio1.st, Symbol=symb1)  # 股票 1 的持仓图</code></pre>
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb1)  # 股票 1 的持仓图
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/pairTrade-1.png" width="672" /></p>
-<pre class="r"><code># dev.new()
-chart.Posn(Portfolio=portfolio1.st, Symbol=symb2)  # 股票 2 的持仓图</code></pre>
+
+``` r
+# dev.new()
+chart.Posn(Portfolio=portfolio1.st, Symbol=symb2)  # 股票 2 的持仓图
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/pairTrade-2.png" width="672" /></p>
-<pre class="r"><code># dev.new()
-chartSeries(Cl(get(symb1))/Cl(get(symb2)), TA=&quot;addBBands(n=N,sd=SD)&quot;)  # 比率与布林带图</code></pre>
+
+``` r
+# dev.new()
+chartSeries(Cl(get(symb1))/Cl(get(symb2)), TA="addBBands(n=N,sd=SD)")  # 比率与布林带图
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/pairTrade-3.png" width="672" /></p>
-<pre class="r"><code># 绩效分析
-ret1 &lt;- PortfReturns(account.st)  # 组合收益
-ret1$total &lt;- rowSums(ret1)  # 总收益
+
+``` r
+# 绩效分析
+ret1 <- PortfReturns(account.st)  # 组合收益
+ret1$total <- rowSums(ret1)  # 总收益
 
 # 绘制绩效摘要
-if(&quot;package:PerformanceAnalytics&quot; %in% search() || 
-   require(&quot;PerformanceAnalytics&quot;,quietly=TRUE)) {
+if("package:PerformanceAnalytics" %in% search() || 
+   require("PerformanceAnalytics",quietly=TRUE)) {
   # dev.new()
   charts.PerformanceSummary(ret1$total, geometric=FALSE, wealth.index=TRUE)  # 收益摘要图
-}</code></pre>
+}
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/pairTrade-4.png" width="672" /></p>
 </div>
 <div id="策略实现的核心思路" class="section level1">

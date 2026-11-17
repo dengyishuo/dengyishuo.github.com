@@ -9,7 +9,6 @@ tags:
   - R
   - 量化投资
   - quantstrat
-markup: html
 ---
 
 
@@ -17,24 +16,40 @@ markup: html
 <p>在交易过程中，MAE（最大不利偏移）是衡量风险的关键指标，它反映了从开仓到平仓期间账户价值相对于初始水平的最大回撤幅度。这一指标对于交易者而言具有重要意义：首先，它能直观呈现单笔交易可能面临的极端亏损风险，帮助交易者提前做好风险预判；其次，在止损策略优化方面，可将 MAE 的统计数据作为重要参考，例如将止损位设定在历史 MAE 均值的合理倍数之上，既能避免过早止损，又能有效控制亏损；最后，通过观察 MAE 的波动情况，还能评估交易系统的稳定性 —— 通常而言，MAE 曲线越平滑，说明系统在不同市场环境下的表现越稳定，抗风险能力越强。</p>
 <p>Jaekle 和 Tamasini 在《A new approach to system development and portfolio optimisation》一书中，通过 Luxor 系统的实证分析进一步印证了 MAE 的应用价值。书中，作者通过绘制该系统的 MAE 图表，清晰展示了策略在不同市场周期中的风险暴露特征，为读者提供了一个将理论指标转化为实践分析的典型案例，这种可视化的呈现方式有助于交易者更直观地理解风险分布规律，进而优化自身的交易决策体系。</p>
 <p><code>R</code> 可以便捷绘制 MAE 图：</p>
-<pre class="r"><code># 加载 blotter 包 - 用于交易系统分析和绩效评估
-require(&#39;blotter&#39;)
 
-# 加载 quantstrat 包中的示例数据 &#39;luxor-p066&#39;（这是一个交易策略的历史回测结果）
-data(&#39;luxor-p066&#39;, package=&#39;quantstrat&#39;, envir=.blotter)
+``` r
+# 加载 blotter 包 - 用于交易系统分析和绩效评估
+require('blotter')
+
+# 加载 quantstrat 包中的示例数据 'luxor-p066'（这是一个交易策略的历史回测结果）
+data('luxor-p066', package='quantstrat', envir=.blotter)
 
 # 设置货币和汇率信息（GBP 代表英镑，USD 代表美元）
-currency(c(&#39;GBP&#39;, &#39;USD&#39;))</code></pre>
-<pre><code>## [1] &quot;GBP&quot; &quot;USD&quot;</code></pre>
-<pre class="r"><code>exchange_rate(c(&#39;GBPUSD&#39;), tick_size=0.0001)  # 设定 GBP/USD 汇率的最小变动单位</code></pre>
-<pre><code>## [1] &quot;GBPUSD&quot;</code></pre>
-<pre class="r"><code># 绘制最大不利偏移（MAE）图表
+currency(c('GBP', 'USD'))
+```
+
+```
+## [1] "GBP" "USD"
+```
+
+``` r
+exchange_rate(c('GBPUSD'), tick_size=0.0001)  # 设定 GBP/USD 汇率的最小变动单位
+```
+
+```
+## [1] "GBPUSD"
+```
+
+``` r
+# 绘制最大不利偏移（MAE）图表
 chart.ME(
-  Portfolio=&#39;luxor&#39;,  # 指定要分析的投资组合名称为 &#39;luxor&#39;
-  Symbol=&#39;GBPUSD&#39;,    # 指定要分析的交易品种为 GBP/USD
-  type=&#39;MAE&#39;,         # 选择绘制 MAE（Maximum Adverse Excursion）图表
-  scale=&#39;cash&#39;        # 以货币金额（现金）为单位显示结果
-)</code></pre>
+  Portfolio='luxor',  # 指定要分析的投资组合名称为 'luxor'
+  Symbol='GBPUSD',    # 指定要分析的交易品种为 GBP/USD
+  type='MAE',         # 选择绘制 MAE（Maximum Adverse Excursion）图表
+  scale='cash'        # 以货币金额（现金）为单位显示结果
+)
+```
+
 <div class="figure"><span style="display:block;" id="fig:MAE"></span>
 <img src="{{< blogdown/postref >}}index_files/figure-html/MAE-1.png" alt="luxor 系统的 MAE 图" width="672" />
 <p class="caption">

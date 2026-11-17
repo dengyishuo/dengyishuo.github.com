@@ -8,7 +8,6 @@ categories:
 tags:
   - 统计之都
   - 建站
-markup: html
 ---
 
 
@@ -24,9 +23,15 @@ markup: html
 <p>Rstudio -&gt;&gt; tools -&gt;&gt; Terminal -&gt;&gt; New Terminal</p>
 </blockquote>
 <p>输入以下命令将r-finance库克隆到本地。</p>
-<pre><code>git clone https://github.com/dengyishuo/r-finance.git</code></pre>
+
+```
+git clone https://github.com/dengyishuo/r-finance.git
+```
+
 <p>进入r-finance目录，设置.gitignore文件。这个文件作用极大，可以帮助我们忽略一些不必要的文件，避免提交到github上。以下是我设置的.gitignore文件内容：</p>
-<pre><code>public/
+
+```
+public/
 resources/
 .hugo_build.lock
 # History files
@@ -47,13 +52,25 @@ resources/
 *_cache/
 /cache/
 # R Environment Variables
-.Renviron</code></pre>
+.Renviron
+```
+
 <p>如果未安装blogdown包的话，先在Rstudio中安装blogdown包，命令如下：</p>
-<pre class="r"><code>install.packages(&quot;blogdown&quot;)</code></pre>
+
+``` r
+install.packages("blogdown")
+```
+
 <p>接下来在Rstudio中，将r-finance文件夹设定为当前工作目录，再使用blogdown包创建一个网站。命令如下：</p>
-<pre class="r"><code>blogdown::new_site()</code></pre>
+
+``` r
+blogdown::new_site()
+```
+
 <p>在bash中使用以下命令更新主题为mainroad：</p>
-<pre><code>cd r-finance
+
+```
+cd r-finance
 # 更新主题为子模块
 git submodule add https://github.com/vimux/mainroad.git themes/mainroad
 # 查看子模块状态
@@ -69,78 +86,96 @@ rm -rf themes/mainroad/.git
 # 将主题添加到git中
 git add themes/mainroad
 # commit 更改
-git commit -m &quot;fix:include theme direct&quot;
+git commit -m "fix:include theme direct"
 # 将更改推送到github
-git push origin master</code></pre>
+git push origin master
+```
+
 </div>
 <div id="配置config.toml" class="section level1">
 <h1>配置config.toml</h1>
 <p>在r-finance目录下创建一个config.toml文件，内容如下：</p>
-<pre><code>baseurl = &quot;https://rfinance.org.cn&quot;
-title = &quot;R-Finance中国&quot;
-languageCode = &quot;zh-CN&quot;
-theme = &quot;mainroad&quot;
-disqusShortname = &quot;&quot; # Enable comments by entering your Disqus shortname
-googleAnalytics = &quot;&quot; # Enable Google Analytics by entering your tracking id
+
+```
+baseurl = "https://rfinance.org.cn"
+title = "R-Finance中国"
+languageCode = "zh-CN"
+theme = "mainroad"
+disqusShortname = "" # Enable comments by entering your Disqus shortname
+googleAnalytics = "" # Enable Google Analytics by entering your tracking id
 
 [pagination]
   pagerSize = 10 # Number of posts per page
 
 [params]
-  description = &quot;rfinance&#39;s Personal blog about everything&quot; # Description of your site
+  description = "rfinance's Personal blog about everything" # Description of your site
   opengraph = true
   twitter_cards = false
-  readmore = false # Show &quot;Read more&quot; button in list if true
+  readmore = false # Show "Read more" button in list if true
   authorbox = true
   pager = true
-  post_meta = [&quot;date&quot;, &quot;categories&quot;] # Order of post meta information
-  mainSections = [&quot;post&quot;, &quot;docs&quot;]
-  ignoreLogs = [&quot;warning-goldmark-raw-html&quot;] 
+  post_meta = ["date", "categories"] # Order of post meta information
+  mainSections = ["post", "docs"]
+  ignoreLogs = ["warning-goldmark-raw-html"] 
 
 [params.logo]
-  subtitle = &quot;Just another site&quot; # Logo subtitle
+  subtitle = "Just another site" # Logo subtitle
 
 [params.sidebar]
-  home = &quot;right&quot;   # Configure layout for home page
-  list = &quot;right&quot;   # Configure layout for list pages
-  single = &quot;right&quot; # Configure layout for single pages
+  home = "right"   # Configure layout for home page
+  list = "right"   # Configure layout for list pages
+  single = "right" # Configure layout for single pages
   # Enable widgets in given order
-  widgets = [&quot;search&quot;, &quot;recent&quot;, &quot;categories&quot;, &quot;taglist&quot;]
+  widgets = ["search", "recent", "categories", "taglist"]
 
 [params.widgets]
-  recent_num = 5 # Set the number of articles in the &quot;Recent articles&quot; widget
-  tags_counter = false # Enable counter for each tag in &quot;Tags&quot; widget (disabled by default)
+  recent_num = 5 # Set the number of articles in the "Recent articles" widget
+  tags_counter = false # Enable counter for each tag in "Tags" widget (disabled by default)
 
 [params.author]
-  name = &quot;rfinance&quot;
-  bio = &quot;rfinnace&#39;s true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it.&quot;
-  avatar = &quot;img/avatar.png&quot;</code></pre>
+  name = "rfinance"
+  bio = "rfinnace's true identity is unknown. Maybe he is a successful blogger or writer. Nobody knows it."
+  avatar = "img/avatar.png"
+```
+
 </div>
 <div id="验证网站" class="section level1">
 <h1>验证网站</h1>
 <p>下面来验证hugo是否可以正确生成网站，命令如下：</p>
-<pre><code>rm -rf public
+
+```
+rm -rf public
 git submodule update --init --recursive
-hugo --gc --minify</code></pre>
+hugo --gc --minify
+```
+
 <p>如果一切顺利，就可以将文件推送至github了。</p>
 </div>
 <div id="推送到github" class="section level1">
 <h1>推送到github</h1>
 <p>推送至github之前，先将r-finance目录下的所有文件添加到git中，命令如下：</p>
-<pre><code>git add .
-git commit -m &quot;build website&quot;
-git push origin master</code></pre>
+
+```
+git add .
+git commit -m "build website"
+git push origin master
+```
+
 </div>
 <div id="配置netlify" class="section level1">
 <h1>配置netlify</h1>
 <p>在r-finance目录下配置netlify.toml，内容如下：</p>
-<pre><code>[build]
-command = &#39;git submodule update --init --recursive &amp;&amp; hugo --gc --minify&#39;
-publish = &#39;public&#39;
+
+```
+[build]
+command = 'git submodule update --init --recursive && hugo --gc --minify'
+publish = 'public'
 
 [build.environment]
-HUGO_VERSION = &#39;0.147.7&#39;
-HUGO_ENV = &#39;production&#39;</code></pre>
+HUGO_VERSION = '0.147.7'
+HUGO_ENV = 'production'
+```
+
 <p>接下来在netlify上创建一个新的站点。具体步骤：</p>
 <ol style="list-style-type: decimal">
 <li>登陆自己的账号</li>
@@ -152,10 +187,18 @@ HUGO_ENV = &#39;production&#39;</code></pre>
 <li>选择master分支。发布目录为<code>public</code>。</li>
 </ol>
 <p>接下来在netlify上配置构建命令和发布目录，构建命令为：</p>
-<pre><code>git submodule update --init --recursive &amp;&amp; hugo --gc --minify</code></pre>
+
+```
+git submodule update --init --recursive && hugo --gc --minify
+```
+
 <p>配置环境变量，添加变量：</p>
-<pre><code>HUGO_VERSION = &#39;0.147.7&#39;
-HUGO_ENV = &#39;production&#39;</code></pre>
+
+```
+HUGO_VERSION = '0.147.7'
+HUGO_ENV = 'production'
+```
+
 <p>选择 <code>deploy</code> 即可。此时已经可以用<a href="https://r-finance.netlify.app">https://r-finance.netlify.app</a> 访问网站了。</p>
 </div>
 <div id="设置个性化域名" class="section level1">

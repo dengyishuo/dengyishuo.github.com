@@ -9,16 +9,27 @@ tags:
   - R
   - VaR
   - 风险管理
-markup: html
 ---
 
 
 
-<pre class="r"><code>library(showtext)</code></pre>
-<pre><code>## Loading required package: sysfonts</code></pre>
-<pre><code>## Loading required package: showtextdb</code></pre>
-<pre class="r"><code>font_add(&quot;SimHei&quot;, &quot;SimHei.ttf&quot;)
-showtext_auto()</code></pre>
+``` r
+library(showtext)
+```
+
+```
+## Loading required package: sysfonts
+```
+
+```
+## Loading required package: showtextdb
+```
+
+``` r
+font_add("SimHei", "SimHei.ttf")
+showtext_auto()
+```
+
 <div id="引言" class="section level2">
 <h2>引言</h2>
 <p>现代金融领域的计量工作分为两大块，即资产定价和风险度量。而资产定价又是以度量风险并为风险定价为基础，由此可见，风险度量工作实际上是现代金融计量领域的核心。金融领域度量风险的方法有很多，其中应用最多的是方差、最大回撤和 VaR 等。</p>
@@ -57,176 +68,278 @@ VaR_{\alpha}=-P_{0}r_{\alpha}^*
 <div id="单资产-var-的计算及其r实现" class="section level2">
 <h2>单资产 VaR 的计算及其R实现</h2>
 <p>下面以计算单个资产的VaR为例：</p>
-<pre class="r"><code># 加载必要包
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
+
+``` r
+# 加载必要包
+if (!require("quantmod")) install.packages("quantmod")
 library(quantmod)
 
 # 获取苹果公司股票数据
-getSymbols(&quot;AAPL&quot;, src = &quot;yahoo&quot;, from = Sys.Date() - 365, to = Sys.Date())</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 计算对数收益率
-returns &lt;- na.omit(periodReturn(AAPL, period = &#39;daily&#39;, type = &#39;log&#39;))
+getSymbols("AAPL", src = "yahoo", from = Sys.Date() - 365, to = Sys.Date())
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 计算对数收益率
+returns <- na.omit(periodReturn(AAPL, period = 'daily', type = 'log'))
 
 # 设置置信水平 (95%)
-confidence_level &lt;- 0.95
+confidence_level <- 0.95
 
 # 历史模拟法计算VaR
-historical_var &lt;- -quantile(returns, probs = 1 - confidence_level)
+historical_var <- -quantile(returns, probs = 1 - confidence_level)
 
 # 打印结果
-cat(&quot;历史模拟法计算的每日VaR（95%置信水平）:&quot;, round(historical_var*100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## 历史模拟法计算的每日VaR（95%置信水平）: 3.22 %</code></pre>
-<pre class="r"><code># 可视化结果
-hist(returns, breaks = 50, main = &quot;日收益率分布与VaR（95%）&quot;,
-     xlab = &quot;日收益率&quot;, col = &quot;lightblue&quot;, border = &quot;white&quot;)
-abline(v = -historical_var, col = &quot;red&quot;, lwd = 2)
-text(x = -historical_var, y = par(&quot;usr&quot;)[4]*0.9, 
-     labels = paste(&quot;VaR =&quot;, round(historical_var*100, 2), &quot;%&quot;), 
-     pos = 2, col = &quot;red&quot;)</code></pre>
+cat("历史模拟法计算的每日VaR（95%置信水平）:", round(historical_var*100, 2), "%\n")
+```
+
+```
+## 历史模拟法计算的每日VaR（95%置信水平）: 3.22 %
+```
+
+``` r
+# 可视化结果
+hist(returns, breaks = 50, main = "日收益率分布与VaR（95%）",
+     xlab = "日收益率", col = "lightblue", border = "white")
+abline(v = -historical_var, col = "red", lwd = 2)
+text(x = -historical_var, y = par("usr")[4]*0.9, 
+     labels = paste("VaR =", round(historical_var*100, 2), "%"), 
+     pos = 2, col = "red")
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <p>也可以直接用PerformanceAnalytics包中的VaR函数计算历史模拟法下的VaR值：</p>
-<pre class="r"><code># 加载必要包
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
-if (!require(&quot;PerformanceAnalytics&quot;)) install.packages(&quot;PerformanceAnalytics&quot;)</code></pre>
-<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
-<pre><code>## 
-## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+
+``` r
+# 加载必要包
+if (!require("quantmod")) install.packages("quantmod")
+if (!require("PerformanceAnalytics")) install.packages("PerformanceAnalytics")
+```
+
+```
+## Loading required package: PerformanceAnalytics
+```
+
+```
 ## 
-##     legend</code></pre>
-<pre class="r"><code>library(quantmod)
+## Attaching package: 'PerformanceAnalytics'
+```
+
+```
+## The following object is masked from 'package:graphics':
+## 
+##     legend
+```
+
+``` r
+library(quantmod)
 library(PerformanceAnalytics)
 
 # 获取苹果公司股票数据（过去250个交易日）
-getSymbols(&quot;AAPL&quot;, src = &quot;yahoo&quot;, from = Sys.Date() - 365, to = Sys.Date())</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 计算对数收益率
-returns &lt;- na.omit(ROC(Cl(AAPL)))  # 等效于 log(Cl(AAPL)/lag(Cl(AAPL)))
+getSymbols("AAPL", src = "yahoo", from = Sys.Date() - 365, to = Sys.Date())
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 计算对数收益率
+returns <- na.omit(ROC(Cl(AAPL)))  # 等效于 log(Cl(AAPL)/lag(Cl(AAPL)))
 
 # 使用PerformanceAnalytics包计算历史模拟法VaR（95%置信水平）
-var_result &lt;- VaR(
+var_result <- VaR(
   R = returns,
   p = 0.95,
-  method = &quot;historical&quot;,
-  portfolio_method = &quot;single&quot;
+  method = "historical",
+  portfolio_method = "single"
 )
 
 # 提取并格式化结果
-historical_var &lt;- abs(var_result[1,])  # VaR值通常取正数表示损失
-confidence_level &lt;- attr(var_result, &quot;cl&quot;)
+historical_var <- abs(var_result[1,])  # VaR值通常取正数表示损失
+confidence_level <- attr(var_result, "cl")
 
 # 输出结果
-cat(&quot;PerformanceAnalytics计算的每日VaR（&quot;, confidence_level*100, &quot;%置信水平）:&quot;,
-    round(historical_var*100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## PerformanceAnalytics计算的每日VaR（  %置信水平）: 3.22 %</code></pre>
-<pre class="r"><code># 可视化收益率分布及VaR
-hist(returns, breaks = 50, main = &quot;日收益率分布与VaR（历史模拟法）&quot;,
-     xlab = &quot;日收益率&quot;, col = &quot;lightblue&quot;, border = &quot;white&quot;)
-abline(v = -historical_var, col = &quot;red&quot;, lwd = 2)
-text(x = -historical_var, y = par(&quot;usr&quot;)[4]*0.9,
-     labels = paste(&quot;VaR =&quot;, round(historical_var*100, 2), &quot;%&quot;),
-     pos = 2, col = &quot;red&quot;)</code></pre>
+cat("PerformanceAnalytics计算的每日VaR（", confidence_level*100, "%置信水平）:",
+    round(historical_var*100, 2), "%\n")
+```
+
+```
+## PerformanceAnalytics计算的每日VaR（  %置信水平）: 3.22 %
+```
+
+``` r
+# 可视化收益率分布及VaR
+hist(returns, breaks = 50, main = "日收益率分布与VaR（历史模拟法）",
+     xlab = "日收益率", col = "lightblue", border = "white")
+abline(v = -historical_var, col = "red", lwd = 2)
+text(x = -historical_var, y = par("usr")[4]*0.9,
+     labels = paste("VaR =", round(historical_var*100, 2), "%"),
+     pos = 2, col = "red")
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="多资产投资组合的-var-计算及其-r-实现" class="section level2">
 <h2>多资产投资组合的 VaR 计算及其 R 实现</h2>
 <p>用历史模拟法计算多资产投资组合的 VaR 与单资产思路类似，唯一不同的是要按照当前投资组合中各资产的权重计算投资组合的历史收益率。</p>
 <p>具体R代码如下:</p>
-<pre class="r"><code># 加载必要包
+
+``` r
+# 加载必要包
 library(quantmod)  # 金融数据获取
-library(dplyr)     # 数据处理</code></pre>
-<pre><code>## 
-## ######################### Warning from &#39;xts&#39; package ##########################
+library(dplyr)     # 数据处理
+```
+
+```
+## 
+## ######################### Warning from 'xts' package ##########################
 ## #                                                                             #
-## # The dplyr lag() function breaks how base R&#39;s lag() function is supposed to  #
+## # The dplyr lag() function breaks how base R's lag() function is supposed to  #
 ## # work, which breaks lag(my_xts). Calls to lag(my_xts) that you type or       #
-## # source() into this session won&#39;t work correctly.                            #
+## # source() into this session won't work correctly.                            #
 ## #                                                                             #
-## # Use stats::lag() to make sure you&#39;re not using dplyr::lag(), or you can add #
-## # conflictRules(&#39;dplyr&#39;, exclude = &#39;lag&#39;) to your .Rprofile to stop           #
-## # dplyr from breaking base R&#39;s lag() function.                                #
+## # Use stats::lag() to make sure you're not using dplyr::lag(), or you can add #
+## # conflictRules('dplyr', exclude = 'lag') to your .Rprofile to stop           #
+## # dplyr from breaking base R's lag() function.                                #
 ## #                                                                             #
-## # Code in packages is not affected. It&#39;s protected by R&#39;s namespace mechanism #
+## # Code in packages is not affected. It's protected by R's namespace mechanism #
 ## # Set `options(xts.warn_dplyr_breaks_lag = FALSE)` to suppress this warning.  #
 ## #                                                                             #
-## ###############################################################################</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:xts&#39;:
+## ###############################################################################
+```
+
+```
 ## 
-##     first, last</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:xts':
 ## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
+##     first, last
+```
+
+```
+## The following objects are masked from 'package:stats':
 ## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(ggplot2)   # 可视化
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+``` r
+library(ggplot2)   # 可视化
 
 # ========== 参数设置 ==========
-symbols &lt;- c(&quot;AAPL&quot;, &quot;GOOG&quot;, &quot;MSFT&quot;)  # 资产代码（苹果、谷歌、微软）
-weights &lt;- c(0.5, 0.3, 0.2)          # 资产权重（总和为1）
-portfolio_value &lt;- 1e7               # 投资组合当前价值（假设1千万元）
-confidence_level &lt;- 0.95             # 置信水平
-start_date &lt;- &quot;2020-01-01&quot;           # 数据开始日期
-end_date &lt;- &quot;2023-12-31&quot;             # 数据结束日期
+symbols <- c("AAPL", "GOOG", "MSFT")  # 资产代码（苹果、谷歌、微软）
+weights <- c(0.5, 0.3, 0.2)          # 资产权重（总和为1）
+portfolio_value <- 1e7               # 投资组合当前价值（假设1千万元）
+confidence_level <- 0.95             # 置信水平
+start_date <- "2020-01-01"           # 数据开始日期
+end_date <- "2023-12-31"             # 数据结束日期
 
 # ========== 1. 获取历史价格数据 ==========
-getSymbols(symbols, src = &quot;yahoo&quot;, from = start_date, to = end_date)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot; &quot;GOOG&quot; &quot;MSFT&quot;</code></pre>
-<pre class="r"><code># 提取收盘价并合并
-prices &lt;- merge(Cl(get(symbols[1])), Cl(get(symbols[2])), Cl(get(symbols[3])))
-colnames(prices) &lt;- symbols
+getSymbols(symbols, src = "yahoo", from = start_date, to = end_date)
+```
+
+```
+## [1] "AAPL" "GOOG" "MSFT"
+```
+
+``` r
+# 提取收盘价并合并
+prices <- merge(Cl(get(symbols[1])), Cl(get(symbols[2])), Cl(get(symbols[3])))
+colnames(prices) <- symbols
 
 # 清理缺失值（确保日期对齐）
-prices_clean &lt;- na.omit(prices)
+prices_clean <- na.omit(prices)
 
 # ========== 2. 计算各资产对数收益率 ==========
-returns &lt;- data.frame(
+returns <- data.frame(
   AAPL = as.numeric(Delt(prices_clean$AAPL)),
   GOOG = as.numeric(Delt(prices_clean$GOOG)),
   MSFT = as.numeric(Delt(prices_clean$MSFT))
-) %&gt;% na.omit()  # 去除首行NA
+) %>% na.omit()  # 去除首行NA
 
 # ========== 3. 计算投资组合每日收益率 ==========
 # 将收益率转换为矩阵进行加权计算
-returns_matrix &lt;- as.matrix(returns)
-portfolio_returns &lt;- returns_matrix %*% weights
+returns_matrix <- as.matrix(returns)
+portfolio_returns <- returns_matrix %*% weights
 
 # ========== 4. 历史模拟法计算VaR ==========
 # 按升序排列组合收益率（损失为负值）
-sorted_returns &lt;- sort(portfolio_returns)
+sorted_returns <- sort(portfolio_returns)
 
 # 确定分位数位置
-n &lt;- length(sorted_returns)
-var_index &lt;- floor((1 - confidence_level) * n)
-var_quantile &lt;- sorted_returns[var_index]
+n <- length(sorted_returns)
+var_index <- floor((1 - confidence_level) * n)
+var_quantile <- sorted_returns[var_index]
 
 # 计算VaR绝对值
-VaR &lt;- abs(var_quantile) * portfolio_value
+VaR <- abs(var_quantile) * portfolio_value
 
 # ========== 5. 输出结果 ==========
-cat(&quot;========== 计算结果 ==========\n&quot;)</code></pre>
-<pre><code>## ========== 计算结果 ==========</code></pre>
-<pre class="r"><code>cat(&quot;置信水平:&quot;, confidence_level * 100, &quot;%\n&quot;)</code></pre>
-<pre><code>## 置信水平: 95 %</code></pre>
-<pre class="r"><code>cat(&quot;历史数据天数:&quot;, n, &quot;\n&quot;)</code></pre>
-<pre><code>## 历史数据天数: 1005</code></pre>
-<pre class="r"><code>cat(&quot;VaR分位数对应收益率:&quot;, round(var_quantile * 100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## VaR分位数对应收益率: -2.94 %</code></pre>
-<pre class="r"><code>cat(&quot;组合VaR值:&quot;, round(VaR, 2), &quot;元\n&quot;)</code></pre>
-<pre><code>## 组合VaR值: 294069.7 元</code></pre>
-<pre class="r"><code># ========== 6. 可视化== ==========
+cat("========== 计算结果 ==========\n")
+```
+
+```
+## ========== 计算结果 ==========
+```
+
+``` r
+cat("置信水平:", confidence_level * 100, "%\n")
+```
+
+```
+## 置信水平: 95 %
+```
+
+``` r
+cat("历史数据天数:", n, "\n")
+```
+
+```
+## 历史数据天数: 1005
+```
+
+``` r
+cat("VaR分位数对应收益率:", round(var_quantile * 100, 2), "%\n")
+```
+
+```
+## VaR分位数对应收益率: -2.94 %
+```
+
+``` r
+cat("组合VaR值:", round(VaR, 2), "元\n")
+```
+
+```
+## 组合VaR值: 294069.7 元
+```
+
+``` r
+# ========== 6. 可视化== ==========
 # 绘制组合收益率分布直方图
 ggplot(data.frame(Return = portfolio_returns), aes(x = Return)) +
-  geom_histogram(bins = 50, fill = &quot;lightblue&quot;, color = &quot;black&quot;) +
-  geom_vline(xintercept = var_quantile, color = &quot;red&quot;, linewidth = 1) +
-  labs(title = &quot;投资组合历史收益率分布与VaR&quot;,
-       x = &quot;收益率&quot;, y = &quot;频数&quot;) +
-  annotate(&quot;text&quot;, x = var_quantile, y = Inf, 
-           label = paste0(confidence_level * 100, &quot;% VaR: &quot;, round(VaR, 2), &quot;元&quot;),
-           color = &quot;red&quot;, vjust = 1.5, hjust = -0.1) +
-  theme_minimal()</code></pre>
+  geom_histogram(bins = 50, fill = "lightblue", color = "black") +
+  geom_vline(xintercept = var_quantile, color = "red", linewidth = 1) +
+  labs(title = "投资组合历史收益率分布与VaR",
+       x = "收益率", y = "频数") +
+  annotate("text", x = var_quantile, y = Inf, 
+           label = paste0(confidence_level * 100, "% VaR: ", round(VaR, 2), "元"),
+           color = "red", vjust = 1.5, hjust = -0.1) +
+  theme_minimal()
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 </div>

@@ -7,297 +7,348 @@ categories:
 - 经济学
 tags:
   - 股票
-markup: html
 ---
 
 
 
 <p>本轮A股行情从2024年9月份启动到现在，上证指数已累计上涨了9.4%，深成指累计上涨12.9%，创业板指数累计上涨了33.7%。可谓汹涌上涨、波澜壮阔。</p>
 <p>抓住了这波行情的投资者不用说自然是喜不胜收，那些错失前期行情的投资者，也开始抵挡不住赚钱的诱惑准备上车了。不过，千万不要太过性急！</p>
-<pre class="r"><code># 安装必要包（若未安装）
-# install.packages(c(&quot;quantmod&quot;, &quot;ggplot2&quot;, &quot;TTR&quot;, &quot;scales&quot;, &quot;gridExtra&quot;, &quot;cowplot&quot;, &quot;showtext&quot;))
 
-library(quantmod)</code></pre>
-<pre><code>## Loading required package: xts</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
+``` r
+# 安装必要包（若未安装）
+# install.packages(c("quantmod", "ggplot2", "TTR", "scales", "gridExtra", "cowplot", "showtext"))
+
+library(quantmod)
+```
+
+```
+## Loading required package: xts
+```
+
+```
+## Loading required package: zoo
+```
+
+```
 ## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## Loading required package: TTR</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+## Attaching package: 'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## Loading required package: TTR
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
 ##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<pre class="r"><code>library(ggplot2)
+##   as.zoo.data.frame zoo
+```
+
+``` r
+library(ggplot2)
 library(TTR)
 library(scales)
 library(gridExtra)
 library(cowplot)
-library(showtext)</code></pre>
-<pre><code>## Loading required package: sysfonts</code></pre>
-<pre><code>## Loading required package: showtextdb</code></pre>
-<pre class="r"><code># 设置中文字体
-font_add(&quot;SimHei&quot;, &quot;SimHei.ttf&quot;)  # 请确保系统中有SimHei字体，或指定正确路径
+library(showtext)
+```
+
+```
+## Loading required package: sysfonts
+```
+
+```
+## Loading required package: showtextdb
+```
+
+``` r
+# 设置中文字体
+font_add("SimHei", "SimHei.ttf")  # 请确保系统中有SimHei字体，或指定正确路径
 showtext_auto()
 
 # 设置指数代码和名称
-indices &lt;- list(
-  &quot;上证指数&quot; = &quot;000001.SS&quot;,
-  &quot;沪深300&quot; = &quot;000300.SS&quot;,
-  &quot;深证成指&quot; = &quot;399001.SZ&quot;
+indices <- list(
+  "上证指数" = "000001.SS",
+  "沪深300" = "000300.SS",
+  "深证成指" = "399001.SZ"
 )
 
 # 获取数据（最近365天）
-get_stock_data &lt;- function(symbol) {
-  data &lt;- tryCatch({
-    getSymbols(symbol, src = &quot;yahoo&quot;, from = Sys.Date() - 365, auto.assign = FALSE)
+get_stock_data <- function(symbol) {
+  data <- tryCatch({
+    getSymbols(symbol, src = "yahoo", from = Sys.Date() - 365, auto.assign = FALSE)
   }, error = function(e) {
-    message(paste(&quot;获取数据失败:&quot;, symbol, &quot;-&quot;, e$message))
+    message(paste("获取数据失败:", symbol, "-", e$message))
     return(NULL)
   })
   return(data)
 }
 
 # 计算技术指标并准备数据
-prepare_data &lt;- function(data, index_name) {
-  if (is.null(data) || nrow(data) &lt; 30) {
-    message(paste(&quot;数据不足或为空:&quot;, index_name))
+prepare_data <- function(data, index_name) {
+  if (is.null(data) || nrow(data) < 30) {
+    message(paste("数据不足或为空:", index_name))
     return(NULL)
   }
   
-  df &lt;- data.frame(Date = index(data), coredata(data))
-  colnames(df) &lt;- c(&quot;Date&quot;, &quot;Open&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;Close&quot;, &quot;Volume&quot;, &quot;Adjusted&quot;)
+  df <- data.frame(Date = index(data), coredata(data))
+  colnames(df) <- c("Date", "Open", "High", "Low", "Close", "Volume", "Adjusted")
   
   # 计算收益率
-  df$Return &lt;- c(NA, diff(log(df$Close)))
+  df$Return <- c(NA, diff(log(df$Close)))
   
   # 计算移动平均线
-  df$SMA5 &lt;- SMA(df$Close, n = 5)
-  df$SMA20 &lt;- SMA(df$Close, n = 20)
-  df$SMA60 &lt;- SMA(df$Close, n = 60)
+  df$SMA5 <- SMA(df$Close, n = 5)
+  df$SMA20 <- SMA(df$Close, n = 20)
+  df$SMA60 <- SMA(df$Close, n = 60)
   
   # 确保有足够的数据计算指标
-  if (nrow(df) &gt; 26) {
+  if (nrow(df) > 26) {
     # 计算MACD
-    macd_data &lt;- tryCatch({
+    macd_data <- tryCatch({
       MACD(df$Close, nFast = 12, nSlow = 26, nSig = 9)
     }, error = function(e) {
-      message(paste(&quot;计算MACD失败:&quot;, index_name, &quot;-&quot;, e$message))
+      message(paste("计算MACD失败:", index_name, "-", e$message))
       return(NULL)
     })
     
     if (!is.null(macd_data)) {
-      df$MACD &lt;- macd_data[, &quot;macd&quot;]
-      df$Signal &lt;- macd_data[, &quot;signal&quot;]
-      df$Histogram &lt;- df$MACD - df$Signal
+      df$MACD <- macd_data[, "macd"]
+      df$Signal <- macd_data[, "signal"]
+      df$Histogram <- df$MACD - df$Signal
     }
   }
   
-  if (nrow(df) &gt; 14) {
+  if (nrow(df) > 14) {
     # 计算KDJ指标
-    kdj &lt;- tryCatch({
-      stoch(df[, c(&quot;High&quot;, &quot;Low&quot;, &quot;Close&quot;)], nFastK = 14, nFastD = 3, nSlowD = 3)
+    kdj <- tryCatch({
+      stoch(df[, c("High", "Low", "Close")], nFastK = 14, nFastD = 3, nSlowD = 3)
     }, error = function(e) {
-      message(paste(&quot;计算KDJ失败:&quot;, index_name, &quot;-&quot;, e$message))
+      message(paste("计算KDJ失败:", index_name, "-", e$message))
       return(NULL)
     })
     
     if (!is.null(kdj)) {
-      df$K &lt;- kdj[, &quot;fastK&quot;] * 100  # 转换为百分比
-      df$D &lt;- kdj[, &quot;fastD&quot;] * 100  # 转换为百分比
-      df$J &lt;- 3 * df$K - 2 * df$D   # J线计算
+      df$K <- kdj[, "fastK"] * 100  # 转换为百分比
+      df$D <- kdj[, "fastD"] * 100  # 转换为百分比
+      df$J <- 3 * df$K - 2 * df$D   # J线计算
     }
     
     # 计算RSI
-    df$RSI &lt;- tryCatch({
+    df$RSI <- tryCatch({
       RSI(df$Close, n = 14)
     }, error = function(e) {
-      message(paste(&quot;计算RSI失败:&quot;, index_name, &quot;-&quot;, e$message))
+      message(paste("计算RSI失败:", index_name, "-", e$message))
       return(rep(NA, nrow(df)))
     })
   }
   
-  df$Index &lt;- index_name
+  df$Index <- index_name
   return(df)
 }
 
 # 获取所有指数数据
-all_data &lt;- list()
+all_data <- list()
 for (index_name in names(indices)) {
-  symbol &lt;- indices[[index_name]]
-  data &lt;- get_stock_data(symbol)
+  symbol <- indices[[index_name]]
+  data <- get_stock_data(symbol)
   if (!is.null(data)) {
-    prepared_data &lt;- prepare_data(data, index_name)
+    prepared_data <- prepare_data(data, index_name)
     if (!is.null(prepared_data)) {
-      all_data[[index_name]] &lt;- prepared_data
+      all_data[[index_name]] <- prepared_data
     }
   }
 }
 
 # 如果没有获取到任何数据，则停止执行
 if (length(all_data) == 0) {
-  stop(&quot;未能获取到任何指数数据，请检查网络连接和代码设置&quot;)
+  stop("未能获取到任何指数数据，请检查网络连接和代码设置")
 }
 
 # 合并所有数据
-combined_data &lt;- do.call(rbind, all_data)
+combined_data <- do.call(rbind, all_data)
 
 # 1. 单独绘制价格走势图
-price_plot &lt;- ggplot(combined_data, aes(x = Date, y = Close, color = Index)) +
+price_plot <- ggplot(combined_data, aes(x = Date, y = Close, color = Index)) +
   geom_line(size = 0.8) +
   theme_bw() +
   theme(
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
-    legend.position = &quot;bottom&quot;,
-    text = element_text(family = &quot;SimHei&quot;)
+    legend.position = "bottom",
+    text = element_text(family = "SimHei")
   ) +
-  scale_color_brewer(palette = &quot;Set1&quot;) +
+  scale_color_brewer(palette = "Set1") +
   scale_y_continuous(labels = comma) +
   # 为深证成指添加右侧Y轴
   scale_y_continuous(
     sec.axis = sec_axis(
-      ~./max(combined_data$Close[combined_data$Index == &quot;深证成指&quot;], na.rm = TRUE) * 
-        max(combined_data$Close[combined_data$Index != &quot;深证成指&quot;], na.rm = TRUE),
-      name = &quot;深证成指&quot;
+      ~./max(combined_data$Close[combined_data$Index == "深证成指"], na.rm = TRUE) * 
+        max(combined_data$Close[combined_data$Index != "深证成指"], na.rm = TRUE),
+      name = "深证成指"
     )
-  )</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+  )
+```
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<pre><code>## Scale for y is already present.
-## Adding another scale for y, which will replace the existing scale.</code></pre>
-<pre class="r"><code>print(price_plot)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<pre class="r"><code># 2. 单独绘制收益率走势图
-return_range &lt;- range(combined_data$Return, na.rm = TRUE)
+## generated.
+```
 
-return_plot &lt;- ggplot(combined_data, aes(x = Date, y = Return, color = Index)) +
+```
+## Scale for y is already present.
+## Adding another scale for y, which will replace the existing scale.
+```
+
+``` r
+print(price_plot)
+```
+
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+
+``` r
+# 2. 单独绘制收益率走势图
+return_range <- range(combined_data$Return, na.rm = TRUE)
+
+return_plot <- ggplot(combined_data, aes(x = Date, y = Return, color = Index)) +
   geom_line(size = 0.8) +
   theme_bw() +
   theme(
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
-    legend.position = &quot;bottom&quot;,
-    text = element_text(family = &quot;SimHei&quot;)
+    legend.position = "bottom",
+    text = element_text(family = "SimHei")
   ) +
-  scale_color_brewer(palette = &quot;Set1&quot;) +
+  scale_color_brewer(palette = "Set1") +
   scale_y_continuous(labels = percent, limits = return_range)
 
-print(return_plot)</code></pre>
-<pre><code>## Warning: Removed 3 rows containing missing values or values outside the scale range
-## (`geom_line()`).</code></pre>
+print(return_plot)
+```
+
+```
+## Warning: Removed 3 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
-<pre class="r"><code># 为每个指数单独绘制技术分析图
+
+``` r
+# 为每个指数单独绘制技术分析图
 for (index_name in names(all_data)) {
-  index_data &lt;- all_data[[index_name]]
+  index_data <- all_data[[index_name]]
   
   # 筛选最近三个月的数据
-  three_months_ago &lt;- Sys.Date() - 90
-  recent_data &lt;- index_data[index_data$Date &gt;= three_months_ago, ]
+  three_months_ago <- Sys.Date() - 90
+  recent_data <- index_data[index_data$Date >= three_months_ago, ]
   
   # 创建蜡烛图
-  candle_plot &lt;- ggplot(recent_data, aes(x = Date)) +
-    geom_linerange(aes(ymin = Low, ymax = High), color = &quot;black&quot;, size = 0.3) +
+  candle_plot <- ggplot(recent_data, aes(x = Date)) +
+    geom_linerange(aes(ymin = Low, ymax = High), color = "black", size = 0.3) +
     geom_rect(aes(xmin = Date - 0.4, xmax = Date + 0.4, 
                   ymin = pmin(Open, Close), ymax = pmax(Open, Close),
-                  fill = Close &gt; Open), color = &quot;black&quot;) +
-    geom_line(aes(y = SMA5, color = &quot;SMA5&quot;), size = 0.8) +
-    geom_line(aes(y = SMA20, color = &quot;SMA20&quot;), size = 0.8) +
-    geom_line(aes(y = SMA60, color = &quot;SMA60&quot;), size = 0.8) +
-    scale_fill_manual(values = c(&quot;TRUE&quot; = &quot;red&quot;, &quot;FALSE&quot; = &quot;green&quot;), guide = FALSE) +
-    scale_color_manual(values = c(&quot;SMA5&quot; = &quot;blue&quot;, &quot;SMA20&quot; = &quot;orange&quot;, &quot;SMA60&quot; = &quot;purple&quot;)) +
+                  fill = Close > Open), color = "black") +
+    geom_line(aes(y = SMA5, color = "SMA5"), size = 0.8) +
+    geom_line(aes(y = SMA20, color = "SMA20"), size = 0.8) +
+    geom_line(aes(y = SMA60, color = "SMA60"), size = 0.8) +
+    scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "green"), guide = FALSE) +
+    scale_color_manual(values = c("SMA5" = "blue", "SMA20" = "orange", "SMA60" = "purple")) +
     theme_bw() +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_blank(),
-      legend.position = &quot;top&quot;,
+      legend.position = "top",
       legend.title = element_blank(),
-      plot.margin = unit(c(5.5, 5.5, 0, 5.5), &quot;points&quot;),
-      text = element_text(family = &quot;SimHei&quot;)
+      plot.margin = unit(c(5.5, 5.5, 0, 5.5), "points"),
+      text = element_text(family = "SimHei")
     )
   
   # 成交量图
-  volume_plot &lt;- ggplot(recent_data, aes(x = Date, y = Volume)) +
-    geom_col(fill = &quot;orange&quot;, alpha = 0.7) +
+  volume_plot <- ggplot(recent_data, aes(x = Date, y = Volume)) +
+    geom_col(fill = "orange", alpha = 0.7) +
     theme_bw() +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_blank(),
-      plot.margin = unit(c(0, 5.5, 0, 5.5), &quot;points&quot;),
-      text = element_text(family = &quot;SimHei&quot;)
+      plot.margin = unit(c(0, 5.5, 0, 5.5), "points"),
+      text = element_text(family = "SimHei")
     ) +
     scale_y_continuous(labels = comma)
   
   # MACD图
-  macd_plot &lt;- ggplot(recent_data, aes(x = Date)) +
-    geom_line(aes(y = MACD, color = &quot;MACD&quot;), size = 0.8) +
-    geom_line(aes(y = Signal, color = &quot;Signal&quot;), size = 0.8) +
-    geom_col(aes(y = Histogram, fill = &quot;Histogram&quot;), alpha = 0.5) +
-    geom_hline(yintercept = 0, linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
-    scale_color_manual(values = c(&quot;MACD&quot; = &quot;blue&quot;, &quot;Signal&quot; = &quot;red&quot;)) +
-    scale_fill_manual(values = c(&quot;Histogram&quot; = &quot;gray&quot;)) +
+  macd_plot <- ggplot(recent_data, aes(x = Date)) +
+    geom_line(aes(y = MACD, color = "MACD"), size = 0.8) +
+    geom_line(aes(y = Signal, color = "Signal"), size = 0.8) +
+    geom_col(aes(y = Histogram, fill = "Histogram"), alpha = 0.5) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+    scale_color_manual(values = c("MACD" = "blue", "Signal" = "red")) +
+    scale_fill_manual(values = c("Histogram" = "gray")) +
     theme_bw() +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_blank(),
-      legend.position = &quot;none&quot;,
-      plot.margin = unit(c(0, 5.5, 0, 5.5), &quot;points&quot;),
-      text = element_text(family = &quot;SimHei&quot;)
+      legend.position = "none",
+      plot.margin = unit(c(0, 5.5, 0, 5.5), "points"),
+      text = element_text(family = "SimHei")
     )
   
   # RSI图
-  rsi_plot &lt;- ggplot(recent_data, aes(x = Date, y = RSI)) +
-    geom_line(color = &quot;purple&quot;, size = 0.8) +
-    geom_hline(yintercept = c(30, 70), linetype = &quot;dashed&quot;, color = &quot;red&quot;) +
-    geom_hline(yintercept = 50, linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
+  rsi_plot <- ggplot(recent_data, aes(x = Date, y = RSI)) +
+    geom_line(color = "purple", size = 0.8) +
+    geom_hline(yintercept = c(30, 70), linetype = "dashed", color = "red") +
+    geom_hline(yintercept = 50, linetype = "dashed", color = "gray") +
     theme_bw() +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
       axis.text.x = element_blank(),
-      plot.margin = unit(c(0, 5.5, 0, 5.5), &quot;points&quot;),
-      text = element_text(family = &quot;SimHei&quot;)
+      plot.margin = unit(c(0, 5.5, 0, 5.5), "points"),
+      text = element_text(family = "SimHei")
     ) +
     ylim(0, 100)
   
   # KDJ图（保留日期标签）
-  kdj_plot &lt;- ggplot(recent_data, aes(x = Date)) +
-    geom_line(aes(y = K, color = &quot;K&quot;), size = 0.8) +
-    geom_line(aes(y = D, color = &quot;D&quot;), size = 0.8) +
-    geom_line(aes(y = J, color = &quot;J&quot;), size = 0.8) +
-    geom_hline(yintercept = c(20, 80), linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
-    scale_color_manual(values = c(&quot;K&quot; = &quot;blue&quot;, &quot;D&quot; = &quot;red&quot;, &quot;J&quot; = &quot;green&quot;)) +
+  kdj_plot <- ggplot(recent_data, aes(x = Date)) +
+    geom_line(aes(y = K, color = "K"), size = 0.8) +
+    geom_line(aes(y = D, color = "D"), size = 0.8) +
+    geom_line(aes(y = J, color = "J"), size = 0.8) +
+    geom_hline(yintercept = c(20, 80), linetype = "dashed", color = "gray") +
+    scale_color_manual(values = c("K" = "blue", "D" = "red", "J" = "green")) +
     theme_bw() +
     theme(
       axis.title.x = element_blank(),
       axis.title.y = element_blank(),
-      legend.position = &quot;top&quot;,
+      legend.position = "top",
       legend.title = element_blank(),
-      plot.margin = unit(c(0, 5.5, 5.5, 5.5), &quot;points&quot;),
-      text = element_text(family = &quot;SimHei&quot;)
+      plot.margin = unit(c(0, 5.5, 5.5, 5.5), "points"),
+      text = element_text(family = "SimHei")
     ) +
     ylim(0, 100)
   
   # 组合图表
-  index_plot &lt;- plot_grid(
+  index_plot <- plot_grid(
     candle_plot,
     volume_plot,
     macd_plot,
     rsi_plot,
     kdj_plot,
     ncol = 1,
-    align = &quot;v&quot;,
+    align = "v",
     rel_heights = c(2, 1, 1, 1, 1.2)
   )
   
-  final_plot &lt;- plot_grid(
+  final_plot <- plot_grid(
     title, index_plot,
     ncol = 1,
     rel_heights = c(0.05, 1)
@@ -305,286 +356,329 @@ for (index_name in names(all_data)) {
   
   # 显示图表
   print(final_plot)
-}</code></pre>
-<pre><code>## Warning: The `guide` argument in `scale_*()` cannot be `FALSE`. This was deprecated in
+}
+```
+
+```
+## Warning: The `guide` argument in `scale_*()` cannot be `FALSE`. This was deprecated in
 ## ggplot2 3.3.4.
-## ℹ Please use &quot;none&quot; instead.
+## ℹ Please use "none" instead.
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<pre><code>## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## generated.
+```
+
+```
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
-## &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
+## 'SimHei' not found in PostScript font database
+```
+
+```
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<pre><code>## Warning: Removed 3 rows containing missing values or values outside the scale range
-## (`geom_line()`).</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
+```
+
+```
+## Warning: Removed 3 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+```
+
+```
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<pre><code>## Warning: Package `gridGraphics` is required to handle base-R plots.
-## Substituting empty plot.</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<pre><code>## Warning: Removed 3 rows containing missing values or values outside the scale range
-## (`geom_line()`).</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
-## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
-<pre><code>## Warning: Package `gridGraphics` is required to handle base-R plots.
+## family 'SimHei' not found in PostScript font database
+```
+
+```
+## Warning: Package `gridGraphics` is required to handle base-R plots.
 ## Substituting empty plot.
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database
-## Warning: font family &#39;SimHei&#39; not found in PostScript font database</code></pre>
-<pre><code>## Warning: Removed 3 rows containing missing values or values outside the scale range
-## (`geom_line()`).</code></pre>
-<pre><code>## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+```
+
+```
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database
+## family 'SimHei' not found in PostScript font database
 ## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
-## family &#39;SimHei&#39; not found in PostScript font database</code></pre>
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+```
+
+```
+## Warning: Removed 3 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+```
+
+```
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+```
+
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+
+```
+## Warning: Package `gridGraphics` is required to handle base-R plots.
+## Substituting empty plot.
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+## Warning: font family 'SimHei' not found in PostScript font database
+```
+
+```
+## Warning: Removed 3 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+```
+
+```
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family 'SimHei' not found in PostScript font database
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-4.png" width="672" /></p>
-<pre><code>## Warning: Package `gridGraphics` is required to handle base-R plots.
-## Substituting empty plot.</code></pre>
+
+```
+## Warning: Package `gridGraphics` is required to handle base-R plots.
+## Substituting empty plot.
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>

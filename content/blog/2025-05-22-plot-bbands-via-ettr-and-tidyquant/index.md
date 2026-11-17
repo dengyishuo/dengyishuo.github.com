@@ -10,7 +10,6 @@ tags:
   - 量化投资
   - R包
   - 技术指标
-markup: html
 ---
 
 
@@ -18,19 +17,21 @@ markup: html
 <div id="引言" class="section level1">
 <h1>引言</h1>
 <p>俗话说，巧妇难为无米之炊。绘图的前提是得有数据在手。下面是获取数据的代码：</p>
-<pre class="r"><code># 定义股票代码
-tickers &lt;- c(&quot;TSLA&quot;, &quot;AAPL&quot;, &quot;NVDA&quot;)
+
+``` r
+# 定义股票代码
+tickers <- c("TSLA", "AAPL", "NVDA")
 
 # 批量下载股票数据并进行预处理
-stock_list &lt;- map(tickers, function(ticker) {
+stock_list <- map(tickers, function(ticker) {
   # 下载数据
-  stock_data &lt;- getSymbols(ticker, auto.assign = FALSE)
+  stock_data <- getSymbols(ticker, auto.assign = FALSE)
   # 重命名列
-  colnames(stock_data) &lt;- c(&quot;Open&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;Close&quot;, &quot;Volume&quot;, &quot;Adjusted&quot;)
+  colnames(stock_data) <- c("Open", "High", "Low", "Close", "Volume", "Adjusted")
   # 转化为tibble
-  tibble_data &lt;- as_tibble(fortify.zoo(stock_data))
+  tibble_data <- as_tibble(fortify.zoo(stock_data))
   # 标准化列命名
-  renamed_data &lt;- tibble_data %&gt;%
+  renamed_data <- tibble_data %>%
     rename(
       Date = Index,
       open = Open,
@@ -41,79 +42,97 @@ stock_list &lt;- map(tickers, function(ticker) {
       adjusted = Adjusted
     )
   # 动态命名
-  dyn_name &lt;- paste0(ticker, &quot;_data&quot;)
+  dyn_name <- paste0(ticker, "_data")
   assign(dyn_name, renamed_data, envir = globalenv())
   return(get(dyn_name))
 })
 # 重新命名列表
-names(stock_list) &lt;- tickers</code></pre>
+names(stock_list) <- tickers
+```
+
 <p>有了基础数据之后，接下来是根据布林带定义计算布林带值，并将布林带数据整合进原始数据备用。</p>
-<pre class="r"><code># 使用dplyr生成包含high, low, close的tibble对象并计算布林带
-stock_list_with_bbands &lt;- map(stock_list, function(data) {
+
+``` r
+# 使用dplyr生成包含high, low, close的tibble对象并计算布林带
+stock_list_with_bbands <- map(stock_list, function(data) {
   # 确认输入参数为tibble对象
-  if (is.list(data) &amp;&amp; length(data) == 1) {
-    data &lt;- data[[1]]
+  if (is.list(data) && length(data) == 1) {
+    data <- data[[1]]
   }
   # 提取eTTR::BBands所需参数
-  hlc_tibble &lt;- data %&gt;% select(high, low, close)
+  hlc_tibble <- data %>% select(high, low, close)
   # 计算布林带
-  bbands &lt;- BBands(hlc_tibble, n = 20, sd = 2)
+  bbands <- BBands(hlc_tibble, n = 20, sd = 2)
   # 整合进原始数据
-  data %&gt;%
+  data %>%
     mutate(
-      middle = bbands[, &quot;mavg&quot;],
-      upper = bbands[, &quot;up&quot;],
-      lower = bbands[, &quot;dn&quot;]
+      middle = bbands[, "mavg"],
+      upper = bbands[, "up"],
+      lower = bbands[, "dn"]
     )
 })
 
 # 将列表中的tibble行合并，并增加公司名作为列
-combined_data &lt;- bind_rows(stock_list_with_bbands,.id = &quot;company_name&quot;)
+combined_data <- bind_rows(stock_list_with_bbands,.id = "company_name")
 
 # 确保相关列是数值型
-num_cols &lt;- c(&quot;open&quot;, &quot;high&quot;, &quot;low&quot;, &quot;close&quot;, &quot;middle&quot;, &quot;upper&quot;, &quot;lower&quot;)
-combined_data &lt;- combined_data %&gt;% 
-  mutate(across(all_of(num_cols), as.numeric))</code></pre>
+num_cols <- c("open", "high", "low", "close", "middle", "upper", "lower")
+combined_data <- combined_data %>% 
+  mutate(across(all_of(num_cols), as.numeric))
+```
+
 <p>数据准备好之后，用<code>ggplot2</code>包几行命令就可以打造一个叠加布林带的蜡烛图，代码如下：</p>
-<pre class="r"><code># 利用分面功能绘制多支股票的蜡烛图和布林带
+
+``` r
+# 利用分面功能绘制多支股票的蜡烛图和布林带
 ggplot(combined_data, aes(x = Date)) +
   geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
-  geom_line(aes(y = middle), color = &quot;blue&quot;) +
-  geom_line(aes(y = upper), color = &quot;red&quot;) +
-  geom_line(aes(y = lower), color = &quot;green&quot;) +
-  facet_wrap(~ company_name, scales = &quot;free_y&quot;) +
-  labs(title = &quot;多股票布林带对比&quot;, x = &quot;日期&quot;, y = &quot;价格&quot;) +
-  theme_minimal()</code></pre>
+  geom_line(aes(y = middle), color = "blue") +
+  geom_line(aes(y = upper), color = "red") +
+  geom_line(aes(y = lower), color = "green") +
+  facet_wrap(~ company_name, scales = "free_y") +
+  labs(title = "多股票布林带对比", x = "日期", y = "价格") +
+  theme_minimal()
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>当然，还可以单独绘制每支股票的蜡烛图叠加布林带。这里我们使用<code>purrr</code>包中的<code>walk2</code>函数来遍历列表中每一个对象。代码如下：</p>
-<pre class="r"><code># 单独绘制每支股票的蜡烛图叠加布林带
+
+``` r
+# 单独绘制每支股票的蜡烛图叠加布林带
 walk2(stock_list_with_bbands, names(stock_list_with_bbands), function(data, name) {
-   if (is.list(data) &amp;&amp; length(data) == 1) {
-    data &lt;- data[[1]]
+   if (is.list(data) && length(data) == 1) {
+    data <- data[[1]]
    }
-  p &lt;- ggplot(data, aes(x = Date)) +
+  p <- ggplot(data, aes(x = Date)) +
     geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
-    geom_line(aes(y = middle), color = &quot;blue&quot;) +
-    geom_line(aes(y = upper), color = &quot;red&quot;) +
-    geom_line(aes(y = lower), color = &quot;green&quot;) +
-    labs(title = paste0(&quot;布林带 - &quot;, name), x = &quot;日期&quot;, y = &quot;价格&quot;) +
+    geom_line(aes(y = middle), color = "blue") +
+    geom_line(aes(y = upper), color = "red") +
+    geom_line(aes(y = lower), color = "green") +
+    labs(title = paste0("布林带 - ", name), x = "日期", y = "价格") +
     theme_minimal()
   print(p)
-})</code></pre>
+})
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
 <p>其实，tidyquant包中提供了一个直接绘制布林带的函数叫 <code>tidyquant::geom_bbands</code>，可以在绘图时直接基于<code>HLC</code>数据计算布林带。这样一来，可以免去单独计算布林带数据的过程。</p>
-<pre class="r"><code># 基于geom_bbands 单独绘制每个对象的蜡烛图叠加布林带
+
+``` r
+# 基于geom_bbands 单独绘制每个对象的蜡烛图叠加布林带
 walk2(stock_list, names(stock_list), function(data, name) {
-   if (is.list(data) &amp;&amp; length(data) == 1) {
-    data &lt;- data[[1]]
+   if (is.list(data) && length(data) == 1) {
+    data <- data[[1]]
    }
-  p &lt;- ggplot(data, aes(x = Date)) +
+  p <- ggplot(data, aes(x = Date)) +
     geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
     geom_bbands(aes(high = high, low = low, close = close),ma_fun = SMA, n = 20) +
-    labs(title = paste0(&quot;布林带 - &quot;, name), x = &quot;日期&quot;, y = &quot;价格&quot;) +
+    labs(title = paste0("布林带 - ", name), x = "日期", y = "价格") +
     theme_minimal()
   print(p)
-})</code></pre>
+})
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
 <p>呐，有了R语言，尤其是eTTR包和ggplot2包之后，计算技术指标并进行可视化就是这么简单。欢迎收藏本网站，关注微信公众号<strong>ruijiao007</strong>。</p>
 </div>

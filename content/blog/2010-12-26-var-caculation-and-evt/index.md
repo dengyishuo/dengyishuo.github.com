@@ -10,7 +10,6 @@ tags:
   - VaR
   - 风险管理
   - 极值理论
-markup: html
 ---
 
 
@@ -107,56 +106,79 @@ VaR_{1-\alpha} = u + \frac{\sigma}{\xi} \left[ \left( \frac{n}{N_u} (1 - \alpha)
 <div id="数据准备与预处理" class="section level2">
 <h2>1. 数据准备与预处理</h2>
 <p>使用<code>quantmod</code>获取数据并计算对数收益率（保留损失数据，即负收益率的绝对值）：</p>
-<pre class="r"><code># 安装并加载包
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
-if (!require(&quot;fExtremes&quot;)) install.packages(&quot;fExtremes&quot;)
-if (!require(&quot;evd&quot;)) install.packages(&quot;evd&quot;)
+
+``` r
+# 安装并加载包
+if (!require("quantmod")) install.packages("quantmod")
+if (!require("fExtremes")) install.packages("fExtremes")
+if (!require("evd")) install.packages("evd")
 library(quantmod)
 library(fExtremes)
 library(evd)
 library(ggplot2)
 library(showtext)
-font_add(&quot;SimHei&quot;,&quot;SimHei.ttf&quot;)
+font_add("SimHei","SimHei.ttf")
 showtext_auto()
 # 获取TSLA数据（2018-2023年）
-getSymbols(&quot;TSLA&quot;, from = &quot;2018-01-01&quot;, to = &quot;2023-12-31&quot;)</code></pre>
-<pre><code>## [1] &quot;TSLA&quot;</code></pre>
-<pre class="r"><code>tsla_close &lt;- TSLA$TSLA.Close
-ret &lt;- diff(log(tsla_close))  # 对数收益率
-loss &lt;- -ret  # 损失序列（负收益为损失）
-loss &lt;- na.omit(loss)
-colnames(loss) &lt;- &quot;TSLA_Loss&quot;</code></pre>
+getSymbols("TSLA", from = "2018-01-01", to = "2023-12-31")
+```
+
+```
+## [1] "TSLA"
+```
+
+``` r
+tsla_close <- TSLA$TSLA.Close
+ret <- diff(log(tsla_close))  # 对数收益率
+loss <- -ret  # 损失序列（负收益为损失）
+loss <- na.omit(loss)
+colnames(loss) <- "TSLA_Loss"
+```
+
 </div>
 <div id="阈值选择mean-excess-plot" class="section level2">
 <h2>2. 阈值选择（Mean Excess Plot）</h2>
 <p>通过平均超出量函数确定阈值 <span class="math inline">\(u\)</span> ：</p>
-<pre class="r"><code># 计算平均超出量
-u_candidate &lt;- seq(quantile(loss, 0.7), quantile(loss, 0.95), length.out = 20)  # 候选阈值
-mean_excess &lt;- sapply(u_candidate, function(u) {
-excess &lt;- loss[loss &gt; u] - u  # 超出量
+
+``` r
+# 计算平均超出量
+u_candidate <- seq(quantile(loss, 0.7), quantile(loss, 0.95), length.out = 20)  # 候选阈值
+mean_excess <- sapply(u_candidate, function(u) {
+excess <- loss[loss > u] - u  # 超出量
 mean(excess, na.rm = TRUE)
 })
 # 可视化平均超出量
-me_df &lt;- data.frame(u = u_candidate, mean_excess = mean_excess)
+me_df <- data.frame(u = u_candidate, mean_excess = mean_excess)
 ggplot(me_df, aes(x = u, y = mean_excess)) +
-geom_line(color = &quot;blue&quot;) +
+geom_line(color = "blue") +
 geom_point() +
-labs(title = &quot;平均超出量函数（确定阈值u）&quot;, x = &quot;阈值u&quot;, y = &quot;平均超出量&quot;) +
-theme_minimal()</code></pre>
+labs(title = "平均超出量函数（确定阈值u）", x = "阈值u", y = "平均超出量") +
+theme_minimal()
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code># 选择阈值（如u=0.03，对应约80%分位数）
-u &lt;- 0.03
-excess &lt;- as.numeric(loss[loss &gt; u] - u)  # 超出量序列</code></pre>
+
+``` r
+# 选择阈值（如u=0.03，对应约80%分位数）
+u <- 0.03
+excess <- as.numeric(loss[loss > u] - u)  # 超出量序列
+```
+
 </div>
 <div id="gpd-参数估计" class="section level2">
 <h2>3. GPD 参数估计
 </h2>
 <p>使用<code>evd</code>包的<code>fpot</code>函数估计 GPD 的形状参数 <span class="math inline">\(\xi\)</span> 和尺度参数 <span class="math inline">\(\sigma\)</span> ：</p>
-<pre class="r"><code># 拟合GPD模型
-gpd_fit &lt;- fpot(as.numeric(loss), threshold = u)
 
-summary(gpd_fit)  # 输出参数估计结果</code></pre>
-<pre><code>##             Length Class  Mode     
+``` r
+# 拟合GPD模型
+gpd_fit <- fpot(as.numeric(loss), threshold = u)
+
+summary(gpd_fit)  # 输出参数估计结果
+```
+
+```
+##             Length Class  Mode     
 ## estimate       2   -none- numeric  
 ## std.err        2   -none- numeric  
 ## fixed          0   -none- NULL     
@@ -181,64 +203,92 @@ summary(gpd_fit)  # 输出参数估计结果</code></pre>
 ## exceedances  244   -none- numeric  
 ## mper           0   -none- NULL     
 ## scale          1   -none- numeric  
-## call           3   -none- call</code></pre>
-<pre class="r"><code># 提取参数
+## call           3   -none- call
+```
 
-xi &lt;- gpd_fit$estimate[&quot;shape&quot;]  # 形状参数ξ
+``` r
+# 提取参数
 
-sigma &lt;- gpd_fit$estimate[&quot;scale&quot;]  # 尺度参数σ
+xi <- gpd_fit$estimate["shape"]  # 形状参数ξ
 
-N &lt;- length(loss)  # 总样本量
+sigma <- gpd_fit$estimate["scale"]  # 尺度参数σ
 
-Nu &lt;- length(excess)  # 超限值数量</code></pre>
+N <- length(loss)  # 总样本量
+
+Nu <- length(excess)  # 超限值数量
+```
+
 </div>
 <div id="计算-var-与回测" class="section level2">
 <h2>4. 计算 VaR 与回测</h2>
 <p>基于 GPD 参数计算高置信水平（如 99%、99.5%）的 VaR：</p>
-<pre class="r"><code># 定义VaR计算函数（GPD）
 
-calc_evt_var &lt;- function(conf_level, u, xi, sigma, N, Nu) {
-alpha &lt;- 1 - conf_level
-term &lt;- (N / Nu * alpha)^(-xi)
+``` r
+# 定义VaR计算函数（GPD）
 
-var &lt;- u + (sigma / xi) * (term - 1)
+calc_evt_var <- function(conf_level, u, xi, sigma, N, Nu) {
+alpha <- 1 - conf_level
+term <- (N / Nu * alpha)^(-xi)
+
+var <- u + (sigma / xi) * (term - 1)
 return(var)
 
 }
 # 计算99%和99.5%置信水平的VaR
-var_99 &lt;- calc_evt_var(0.99, u, xi, sigma, N, Nu)
-var_995 &lt;- calc_evt_var(0.995, u, xi, sigma, N, Nu)
-cat(&quot;99% VaR（EVT-GPD）：&quot;, round(var_99, 4), &quot;\n&quot;)</code></pre>
-<pre><code>## 99% VaR（EVT-GPD）： 0.1115</code></pre>
-<pre class="r"><code>cat(&quot;99.5% VaR（EVT-GPD）：&quot;, round(var_995, 4), &quot;\n&quot;)</code></pre>
-<pre><code>## 99.5% VaR（EVT-GPD）： 0.1367</code></pre>
-<pre class="r"><code># 回测：极端损失超过VaR的比例
-extreme_loss &lt;- as.numeric(loss)[loss &gt; u]  # 极端损失序列
-fail_99 &lt;- mean(extreme_loss &gt; var_99)
-cat(&quot;99% VaR失败率：&quot;, round(fail_99 * 100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## 99% VaR失败率： 6.15 %</code></pre>
+var_99 <- calc_evt_var(0.99, u, xi, sigma, N, Nu)
+var_995 <- calc_evt_var(0.995, u, xi, sigma, N, Nu)
+cat("99% VaR（EVT-GPD）：", round(var_99, 4), "\n")
+```
+
+```
+## 99% VaR（EVT-GPD）： 0.1115
+```
+
+``` r
+cat("99.5% VaR（EVT-GPD）：", round(var_995, 4), "\n")
+```
+
+```
+## 99.5% VaR（EVT-GPD）： 0.1367
+```
+
+``` r
+# 回测：极端损失超过VaR的比例
+extreme_loss <- as.numeric(loss)[loss > u]  # 极端损失序列
+fail_99 <- mean(extreme_loss > var_99)
+cat("99% VaR失败率：", round(fail_99 * 100, 2), "%\n")
+```
+
+```
+## 99% VaR失败率： 6.15 %
+```
+
 </div>
 <div id="结果可视化" class="section level2">
 <h2>5. 结果可视化</h2>
 <p>对比实际极端损失与 VaR 阈值：</p>
-<pre class="r"><code># 可视化极端损失与VaR
-extreme_df &lt;- data.frame(
-Date = index(loss)[loss &gt; u],
+
+``` r
+# 可视化极端损失与VaR
+extreme_df <- data.frame(
+Date = index(loss)[loss > u],
 Extreme_Loss = as.numeric(extreme_loss)
 )
 
 ggplot(extreme_df, aes(x = Date, y = Extreme_Loss)) +
-geom_point(color = &quot;red&quot;) +
+geom_point(color = "red") +
 geom_hline(yintercept = var_99, 
-           color = &quot;blue&quot;, 
-           linetype = &quot;dashed&quot;) +
+           color = "blue", 
+           linetype = "dashed") +
 geom_hline(yintercept = var_995, 
-           color = &quot;black&quot;, 
-           linetype = &quot;dashed&quot;) +
+           color = "black", 
+           linetype = "dashed") +
 
 
-labs(title = &quot;TSLA极端损失与EVT-GPD VaR&quot;,x = &quot;日期&quot;, y = &quot;极端损失（绝对值）&quot;) +
-theme_minimal()</code></pre>
+labs(title = "TSLA极端损失与EVT-GPD VaR",x = "日期", y = "极端损失（绝对值）") +
+theme_minimal()
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 </div>

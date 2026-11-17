@@ -8,7 +8,6 @@ categories:
 tags:
   - R
   - 投资组合
-markup: html
 ---
 
 
@@ -72,11 +71,13 @@ markup: html
 </div>
 <div id="r代码实例" class="section level1">
 <h1>R代码实例</h1>
-<pre class="r"><code># 安装必要的包（如果尚未安装）
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)  # 用于获取数据
-if (!require(&quot;dlm&quot;)) install.packages(&quot;dlm&quot;)            # 用于卡尔曼滤波
-if (!require(&quot;ggplot2&quot;)) install.packages(&quot;ggplot2&quot;)    # 用于绘图
-if (!require(&quot;reshape2&quot;)) install.packages(&quot;reshape2&quot;)  # 用于数据重塑
+
+``` r
+# 安装必要的包（如果尚未安装）
+if (!require("quantmod")) install.packages("quantmod")  # 用于获取数据
+if (!require("dlm")) install.packages("dlm")            # 用于卡尔曼滤波
+if (!require("ggplot2")) install.packages("ggplot2")    # 用于绘图
+if (!require("reshape2")) install.packages("reshape2")  # 用于数据重塑
 
 # 加载包
 library(quantmod)
@@ -85,30 +86,42 @@ library(ggplot2)
 library(reshape2)
 
 # 设置时间范围
-start_date &lt;- as.Date(&quot;2020-01-01&quot;)
-end_date &lt;- Sys.Date() # 使用当前日期
+start_date <- as.Date("2020-01-01")
+end_date <- Sys.Date() # 使用当前日期
 
 # 下载AAPL和SPY的日收盘价数据
-getSymbols(&quot;AAPL&quot;, src = &quot;yahoo&quot;, from = start_date, to = end_date)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code>getSymbols(&quot;SPY&quot;, src = &quot;yahoo&quot;, from = start_date, to = end_date)</code></pre>
-<pre><code>## [1] &quot;SPY&quot;</code></pre>
-<pre class="r"><code># 提取收盘价并合并数据
-aapl_close &lt;- Cl(AAPL)
-spy_close &lt;- Cl(SPY)
-merged_data &lt;- merge(aapl_close, spy_close)
-colnames(merged_data) &lt;- c(&quot;AAPL&quot;, &quot;SPY&quot;)
+getSymbols("AAPL", src = "yahoo", from = start_date, to = end_date)
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+getSymbols("SPY", src = "yahoo", from = start_date, to = end_date)
+```
+
+```
+## [1] "SPY"
+```
+
+``` r
+# 提取收盘价并合并数据
+aapl_close <- Cl(AAPL)
+spy_close <- Cl(SPY)
+merged_data <- merge(aapl_close, spy_close)
+colnames(merged_data) <- c("AAPL", "SPY")
 
 # 计算日对数收益率
-returns &lt;- na.omit(data.frame(
+returns <- na.omit(data.frame(
   Date = index(merged_data),
   AAPL_Return = as.numeric(ROC(merged_data$AAPL)),
   SPY_Return = as.numeric(ROC(merged_data$SPY))
 ))
 
 # 使用dlm构建卡尔曼滤波模型
-buildCapm &lt;- function(parm) {
-  dlmMod &lt;- dlm(
+buildCapm <- function(parm) {
+  dlmMod <- dlm(
     FF = matrix(c(1, 0), nrow=1),
     V = exp(parm[1]),
     GG = diag(2),
@@ -116,16 +129,16 @@ buildCapm &lt;- function(parm) {
     m0 = c(0, 1),
     C0 = diag(2)
   )
-  dlmMod$JFF &lt;- matrix(c(0, 1), nrow=1)
-  dlmMod$X &lt;- returns$SPY_Return
+  dlmMod$JFF <- matrix(c(0, 1), nrow=1)
+  dlmMod$X <- returns$SPY_Return
   return(dlmMod)
 }
 
 # 初始参数猜测（取对数后的方差）
-init_parm &lt;- c(log(0.01), log(0.0001), log(0.0001))
+init_parm <- c(log(0.01), log(0.0001), log(0.0001))
 
 # 使用dlmMLE优化参数
-mle_result &lt;- dlmMLE(
+mle_result <- dlmMLE(
   y = returns$AAPL_Return,
   parm = init_parm,
   build = buildCapm
@@ -133,51 +146,57 @@ mle_result &lt;- dlmMLE(
 
 # 检查优化是否成功
 if (mle_result$convergence != 0) {
-  warning(&quot;参数优化可能未完全收敛。&quot;)
+  warning("参数优化可能未完全收敛。")
 }
 
 # 用优化后的参数构建最终的dlm模型
-final_model &lt;- buildCapm(mle_result$par)
+final_model <- buildCapm(mle_result$par)
 
 # 运行卡尔曼滤波和平滑
-filtered_result &lt;- dlmFilter(returns$AAPL_Return, final_model)
-smoothed_result &lt;- dlmSmooth(filtered_result)
+filtered_result <- dlmFilter(returns$AAPL_Return, final_model)
+smoothed_result <- dlmSmooth(filtered_result)
 
 # 提取平滑后的状态估计
-alpha_smoothed &lt;- smoothed_result$s[-1, 1]
-beta_smoothed &lt;- smoothed_result$s[-1, 2]
+alpha_smoothed <- smoothed_result$s[-1, 1]
+beta_smoothed <- smoothed_result$s[-1, 2]
 
 # 提取滤波后的状态估计
-alpha_filtered &lt;- filtered_result$m[-1, 1]
-beta_filtered &lt;- filtered_result$m[-1, 2]
+alpha_filtered <- filtered_result$m[-1, 1]
+beta_filtered <- filtered_result$m[-1, 2]
 
 # 将结果添加到数据框中
-returns$Alpha_Smoothed &lt;- alpha_smoothed
-returns$Beta_Smoothed &lt;- beta_smoothed
-returns$Alpha_Filtered &lt;- alpha_filtered
-returns$Beta_Filtered &lt;- beta_filtered
+returns$Alpha_Smoothed <- alpha_smoothed
+returns$Beta_Smoothed <- beta_smoothed
+returns$Alpha_Filtered <- alpha_filtered
+returns$Beta_Filtered <- beta_filtered
 
 # 绘制时变贝塔系数
 ggplot(returns, aes(x = Date)) +
-  geom_line(aes(y = Beta_Smoothed, color = &quot;Smoothed β&quot;), linewidth = 0.8) +
-  geom_line(aes(y = Beta_Filtered, color = &quot;Filtered β&quot;), linewidth = 0.5, linetype = &quot;dashed&quot;, alpha = 0.7) +
-  geom_hline(yintercept = 1, linetype = &quot;dotted&quot;, color = &quot;black&quot;) +
-  labs(title = &quot;AAPL vs SPY: Dynamic Beta Coefficient (Kalman Filter)&quot;,
-       x = &quot;Date&quot;,
-       y = &quot;Beta Value&quot;,
-       color = &quot;Estimation Type&quot;) +
+  geom_line(aes(y = Beta_Smoothed, color = "Smoothed β"), linewidth = 0.8) +
+  geom_line(aes(y = Beta_Filtered, color = "Filtered β"), linewidth = 0.5, linetype = "dashed", alpha = 0.7) +
+  geom_hline(yintercept = 1, linetype = "dotted", color = "black") +
+  labs(title = "AAPL vs SPY: Dynamic Beta Coefficient (Kalman Filter)",
+       x = "Date",
+       y = "Beta Value",
+       color = "Estimation Type") +
   theme_bw() +
-  scale_color_manual(values = c(&quot;Smoothed β&quot; = &quot;darkgreen&quot;, &quot;Filtered β&quot; = &quot;darkred&quot;))</code></pre>
+  scale_color_manual(values = c("Smoothed β" = "darkgreen", "Filtered β" = "darkred"))
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<pre class="r"><code># 绘制时变阿尔法系数
+
+``` r
+# 绘制时变阿尔法系数
 ggplot(returns, aes(x = Date)) +
-  geom_line(aes(y = Alpha_Smoothed, color = &quot;Smoothed α&quot;), linewidth = 0.8) +
-  geom_hline(yintercept = 0, linetype = &quot;dotted&quot;, color = &quot;black&quot;) +
-  labs(title = &quot;AAPL vs SPY: Dynamic Alpha Coefficient (Kalman Filter)&quot;,
-       x = &quot;Date&quot;,
-       y = &quot;Alpha Value&quot;,
-       color = &quot;Estimation Type&quot;) +
+  geom_line(aes(y = Alpha_Smoothed, color = "Smoothed α"), linewidth = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "black") +
+  labs(title = "AAPL vs SPY: Dynamic Alpha Coefficient (Kalman Filter)",
+       x = "Date",
+       y = "Alpha Value",
+       color = "Estimation Type") +
   theme_bw() +
-  scale_color_manual(values = c(&quot;Smoothed α&quot; = &quot;darkgreen&quot;))</code></pre>
+  scale_color_manual(values = c("Smoothed α" = "darkgreen"))
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 </div>

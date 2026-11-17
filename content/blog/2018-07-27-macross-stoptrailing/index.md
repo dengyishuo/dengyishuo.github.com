@@ -9,7 +9,6 @@ tags:
   - R
   - 量化投资
   - quantstrat
-markup: html
 ---
 
 
@@ -27,7 +26,9 @@ markup: html
 <div id="策略代码" class="section level1">
 <h1>策略代码</h1>
 <p>以下是完整的策略代码，包含逐段注释以解释各环节功能：</p>
-<pre class="r"><code>###############################################################################
+
+``` r
+###############################################################################
 # 一个使用简单均线交叉策略的演示脚本，包含追踪止损，用于测试
 ###############################################################################
 
@@ -35,28 +36,40 @@ markup: html
 library(quantstrat)
 
 # 策略参数设置
-init_date &lt;- &quot;2017-01-01&quot;  # 初始化日期
-start_date &lt;- &quot;2017-01-01&quot;  # 回测开始日期
-end_date &lt;- &quot;2018-12-31&quot;    # 回测结束日期
-init_equity &lt;- 1e4          # 初始资金1万美元
-.orderqty &lt;- 100            # 订单数量（后续规则中实际使用1000）
-Sys.setenv(TZ = &quot;UTC&quot;)      # 设置时区为UTC，避免日期处理问题
-fast &lt;- 5                   # 快速SMA周期（5日）
-slow &lt;- 75                  # 慢速SMA周期（75日）
-symbols &lt;- symbol &lt;- &quot;AAPL&quot; # 交易标的为AAPL
+init_date <- "2017-01-01"  # 初始化日期
+start_date <- "2017-01-01"  # 回测开始日期
+end_date <- "2018-12-31"    # 回测结束日期
+init_equity <- 1e4          # 初始资金1万美元
+.orderqty <- 100            # 订单数量（后续规则中实际使用1000）
+Sys.setenv(TZ = "UTC")      # 设置时区为UTC，避免日期处理问题
+fast <- 5                   # 快速SMA周期（5日）
+slow <- 75                  # 慢速SMA周期（75日）
+symbols <- symbol <- "AAPL" # 交易标的为AAPL
 tradesize = 1e4             # 交易规模（1万美元）
 
 # 定义货币与标的属性：AAPL以美元计价，合约乘数为1
-currency(&#39;USD&#39;)</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code># 加载AAPL历史数据（此处使用内置数据，也可从雅虎财经下载）
+currency('USD')
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+# 加载AAPL历史数据（此处使用内置数据，也可从雅虎财经下载）
 data(AAPL)
-stock(symbols, currency = &quot;USD&quot;, multiplier = 1)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 初始化组合、账户与订单簿
-portfolio.st &lt;- &quot;Port.Luxor&quot;  # 组合名称
-account.st &lt;- &quot;Acct.Luxor&quot;    # 账户名称
-strategy.st &lt;- &quot;Strat.Luxor&quot;  # 策略名称
+stock(symbols, currency = "USD", multiplier = 1)
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 初始化组合、账户与订单簿
+portfolio.st <- "Port.Luxor"  # 组合名称
+account.st <- "Acct.Luxor"    # 账户名称
+strategy.st <- "Strat.Luxor"  # 策略名称
 
 # 清理旧策略数据，确保回测环境纯净
 rm.strat(strategy.st)
@@ -68,17 +81,29 @@ initPortf(
   name = portfolio.st,
   symbols = symbols,
   initDate = init_date
-)</code></pre>
-<pre><code>## [1] &quot;Port.Luxor&quot;</code></pre>
-<pre class="r"><code># 初始化账户：关联组合，设置初始资金
+)
+```
+
+```
+## [1] "Port.Luxor"
+```
+
+``` r
+# 初始化账户：关联组合，设置初始资金
 initAcct(
   name = account.st,
   portfolios = portfolio.st,
   initDate = init_date,
   initEq = init_equity
-)</code></pre>
-<pre><code>## [1] &quot;Acct.Luxor&quot;</code></pre>
-<pre class="r"><code># 初始化订单簿：记录交易订单
+)
+```
+
+```
+## [1] "Acct.Luxor"
+```
+
+``` r
+# 初始化订单簿：记录交易订单
 initOrders(
   portfolio = portfolio.st,
   symbols = symbols,
@@ -91,139 +116,211 @@ strategy(strategy.st, store = TRUE)
 # 添加技术指标：快速SMA与慢速SMA
 add.indicator(
   strategy = strategy.st,
-  name = &quot;SMA&quot;,  # 使用SMA函数计算移动平均线
+  name = "SMA",  # 使用SMA函数计算移动平均线
   arguments = list(x = quote(Cl(mktdata)), n = fast),  # 输入为收盘价，周期5日
-  label = &quot;nFast&quot;  # 指标标签：快速SMA
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code>add.indicator(
+  label = "nFast"  # 指标标签：快速SMA
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+add.indicator(
   strategy = strategy.st,
-  name = &quot;SMA&quot;,
+  name = "SMA",
   arguments = list(x = quote(Cl(mktdata)), n = slow),  # 周期75日
-  label = &quot;nSlow&quot;  # 指标标签：慢速SMA
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 生成交易信号：基于双均线交叉
+  label = "nSlow"  # 指标标签：慢速SMA
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 生成交易信号：基于双均线交叉
 # 信号1：快速SMA上穿慢速SMA（大于关系），视为多头信号（LONG）
 add.signal(
   strategy.st,
-  name = &quot;sigCrossover&quot;,  # 交叉信号函数
+  name = "sigCrossover",  # 交叉信号函数
   arguments = list(
-    column = c(&quot;nFast&quot;, &quot;nSlow&quot;),  # 对比快速与慢速SMA
-    relationship = &quot;gt&quot;  # 大于（上穿）
+    column = c("nFast", "nSlow"),  # 对比快速与慢速SMA
+    relationship = "gt"  # 大于（上穿）
   ),
-  label = &quot;LONG&quot;  # 信号标签：买入
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 信号2：快速SMA下穿慢速SMA（小于关系），视为空头信号（SHORT）
+  label = "LONG"  # 信号标签：买入
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 信号2：快速SMA下穿慢速SMA（小于关系），视为空头信号（SHORT）
 add.signal(
   strategy.st,
-  name = &quot;sigCrossover&quot;,
+  name = "sigCrossover",
   arguments = list(
-    column = c(&quot;nFast&quot;, &quot;nSlow&quot;),
-    relationship = &quot;lt&quot;  # 小于（下穿）
+    column = c("nFast", "nSlow"),
+    relationship = "lt"  # 小于（下穿）
   ),
-  label = &quot;SHORT&quot;  # 信号标签：卖出
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 入场规则：当LONG信号触发时，以限价单买入
+  label = "SHORT"  # 信号标签：卖出
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 入场规则：当LONG信号触发时，以限价单买入
 add.rule(
   strategy.st,
-  name = &quot;ruleSignal&quot;,  # 基于信号的规则
+  name = "ruleSignal",  # 基于信号的规则
   arguments = list(
-    sigcol = &quot;LONG&quot;,  # 触发信号列：LONG
+    sigcol = "LONG",  # 触发信号列：LONG
     sigval = TRUE,  # 信号值为TRUE时执行
-    orderside = &quot;long&quot;,  # 做多方向
-    ordertype = &quot;limit&quot;,  # 限价单
+    orderside = "long",  # 做多方向
+    ordertype = "limit",  # 限价单
     threshold = 1/100,  # 阈值（相对于参考价格的比例）
     tmult = T,  # 阈值为比例（而非固定值）
     orderqty = 1000,  # 订单数量：1000股
-    prefer = &quot;Open&quot;,  # 参考价格为开盘价
+    prefer = "Open",  # 参考价格为开盘价
     TxnFees = -10,  # 交易费用：-10美元（每次交易成本）
-    orderset = &quot;ocolong&quot;,  # 订单集标签，用于管理相关订单
+    orderset = "ocolong",  # 订单集标签，用于管理相关订单
     replace = F  # 不替换未成交订单
   ),
-  type = &quot;enter&quot;,  # 入场规则
+  type = "enter",  # 入场规则
   enabled = T,  # 启用规则
-  label = &quot;EnterLONG&quot;  # 规则标签
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 出场规则：当SHORT信号触发时，平掉所有多头持仓
+  label = "EnterLONG"  # 规则标签
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 出场规则：当SHORT信号触发时，平掉所有多头持仓
 add.rule(
   strategy = strategy.st,
-  name = &quot;ruleSignal&quot;,
+  name = "ruleSignal",
   arguments = list(
-    sigcol = &quot;SHORT&quot;,  # 触发信号列：SHORT
+    sigcol = "SHORT",  # 触发信号列：SHORT
     sigval = TRUE,
-    orderqty = &#39;all&#39;,  # 平仓全部持仓
-    orderside = &#39;long&#39;,  # 针对多头持仓
-    ordertype = &quot;market&quot;,  # 市价单（确保快速平仓）
-    prefer = &quot;Open&quot;,  # 参考价格为开盘价
+    orderqty = 'all',  # 平仓全部持仓
+    orderside = 'long',  # 针对多头持仓
+    ordertype = "market",  # 市价单（确保快速平仓）
+    prefer = "Open",  # 参考价格为开盘价
     TxnFees = -10,  # 交易费用
-    orderset = &quot;ocolong&quot;,
+    orderset = "ocolong",
     replace = F
   ),
-  type = &quot;exit&quot;,  # 出场规则
+  type = "exit",  # 出场规则
   enabled = T,
-  parent = &quot;EnterLONG&quot;,  # 关联入场规则，确保对应持仓平仓
-  label = &quot;Exit2SHORT&quot;
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 止损规则：追踪止损，控制单边趋势反转风险
+  parent = "EnterLONG",  # 关联入场规则，确保对应持仓平仓
+  label = "Exit2SHORT"
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 止损规则：追踪止损，控制单边趋势反转风险
 add.rule(
   strategy.st,
-  name = &quot;ruleSignal&quot;,
+  name = "ruleSignal",
   arguments = list(
-    sigcol = &quot;LONG&quot;,  # 与入场信号关联
+    sigcol = "LONG",  # 与入场信号关联
     sigval = TRUE,
-    orderside = &quot;long&quot;,
-    ordertype = &quot;stoptrailing&quot;,  # 追踪止损单
-    orderqty = &quot;all&quot;,  # 平仓全部持仓
-    prefer = &quot;Close&quot;,  # 参考价格为收盘价
+    orderside = "long",
+    ordertype = "stoptrailing",  # 追踪止损单
+    orderqty = "all",  # 平仓全部持仓
+    prefer = "Close",  # 参考价格为收盘价
     threshold = 2/100,  # 追踪止损比例：2%（从高点回落2%平仓）
     tmult = T,  # 阈值为比例
     TxnFees = -10,
-    orderset = &quot;ocolong&quot;,
+    orderset = "ocolong",
     replace = F
   ),
-  type = &quot;chain&quot;,  # 链式规则（跟随入场规则触发）
-  parent = &quot;EnterLONG&quot;,  # 基于EnterLONG规则触发的持仓
+  type = "chain",  # 链式规则（跟随入场规则触发）
+  parent = "EnterLONG",  # 基于EnterLONG规则触发的持仓
   enabled = T,
-  label = &quot;StopTrailingLONG&quot;  # 规则标签：多头追踪止损
-)</code></pre>
-<pre><code>## [1] &quot;Strat.Luxor&quot;</code></pre>
-<pre class="r"><code># 执行策略回测
-applyStrategy(strategy = strategy.st, portfolios = portfolio.st)</code></pre>
-<pre><code>## [1] &quot;2017-07-27 00:00:00 AAPL 1000 @ 141.598281619503&quot;
-## [1] &quot;2017-08-03 00:00:00 AAPL -1000 @ 150.70126151877&quot;
-## [1] &quot;2017-10-04 00:00:00 AAPL 1000 @ 147.350684699421&quot;
-## [1] &quot;2017-10-19 00:00:00 AAPL -1000 @ 151.241571914452&quot;
-## [1] &quot;2018-03-22 00:00:00 AAPL 1000 @ 166.357919238892&quot;
-## [1] &quot;2018-03-23 00:00:00 AAPL -1000 @ 163.030760854114&quot;
-## [1] &quot;2018-04-19 00:00:00 AAPL 1000 @ 168.23487944963&quot;
-## [1] &quot;2018-04-20 00:00:00 AAPL -1000 @ 164.870181860637&quot;
-## [1] &quot;2018-11-23 00:00:00 AAPL 1000 @ 171.574945095388&quot;
-## [1] &quot;2018-11-26 00:00:00 AAPL -1000 @ 168.14344619348&quot;</code></pre>
-<pre class="r"><code># 更新组合与账户数据
-updatePortf(portfolio.st)</code></pre>
-<pre><code>## [1] &quot;Port.Luxor&quot;</code></pre>
-<pre class="r"><code>daterange &lt;- time(getPortfolio(portfolio.st)$summary)[-1]  # 获取交易日期范围
-updateAcct(account.st, daterange)  # 更新账户数据至指定日期</code></pre>
-<pre><code>## [1] &quot;Acct.Luxor&quot;</code></pre>
-<pre class="r"><code>updateEndEq(account.st)  # 更新账户最终权益</code></pre>
-<pre><code>## [1] &quot;Acct.Luxor&quot;</code></pre>
-<pre class="r"><code># 提取交易统计数据
-tstats &lt;- t(tradeStats(Portfolios = portfolio.st))
+  label = "StopTrailingLONG"  # 规则标签：多头追踪止损
+)
+```
+
+```
+## [1] "Strat.Luxor"
+```
+
+``` r
+# 执行策略回测
+applyStrategy(strategy = strategy.st, portfolios = portfolio.st)
+```
+
+```
+## [1] "2017-07-27 00:00:00 AAPL 1000 @ 141.598281619503"
+## [1] "2017-08-03 00:00:00 AAPL -1000 @ 150.70126151877"
+## [1] "2017-10-04 00:00:00 AAPL 1000 @ 147.350684699421"
+## [1] "2017-10-19 00:00:00 AAPL -1000 @ 151.241571914452"
+## [1] "2018-03-22 00:00:00 AAPL 1000 @ 166.357919238892"
+## [1] "2018-03-23 00:00:00 AAPL -1000 @ 163.030760854114"
+## [1] "2018-04-19 00:00:00 AAPL 1000 @ 168.23487944963"
+## [1] "2018-04-20 00:00:00 AAPL -1000 @ 164.870181860637"
+## [1] "2018-11-23 00:00:00 AAPL 1000 @ 171.574945095388"
+## [1] "2018-11-26 00:00:00 AAPL -1000 @ 168.14344619348"
+```
+
+``` r
+# 更新组合与账户数据
+updatePortf(portfolio.st)
+```
+
+```
+## [1] "Port.Luxor"
+```
+
+``` r
+daterange <- time(getPortfolio(portfolio.st)$summary)[-1]  # 获取交易日期范围
+updateAcct(account.st, daterange)  # 更新账户数据至指定日期
+```
+
+```
+## [1] "Acct.Luxor"
+```
+
+``` r
+updateEndEq(account.st)  # 更新账户最终权益
+```
+
+```
+## [1] "Acct.Luxor"
+```
+
+``` r
+# 提取交易统计数据
+tstats <- t(tradeStats(Portfolios = portfolio.st))
 
 # 可视化回测结果：展示持仓变化与双均线
 chart.Posn(
   Portfolio = portfolio.st, 
-  Symbol = &quot;AAPL&quot;, 
-  TA = c(&quot;add_SMA(n=fast, col=&#39;blue&#39;)&quot;, &quot;add_SMA(n=slow, col=&#39;red&#39;)&quot;)  # 叠加5日（蓝）与75日（红）均线
-)</code></pre>
+  Symbol = "AAPL", 
+  TA = c("add_SMA(n=fast, col='blue')", "add_SMA(n=slow, col='red')")  # 叠加5日（蓝）与75日（红）均线
+)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/simpleSMA-1.png" width="672" /></p>
-<pre class="r"><code># 查看订单簿（用于调试与详细分析）
-obook &lt;- getOrderBook(&#39;Port.Luxor&#39;)</code></pre>
+
+``` r
+# 查看订单簿（用于调试与详细分析）
+obook <- getOrderBook('Port.Luxor')
+```
+
 </div>
 <div id="策略核心思路解析" class="section level1">
 <h1>策略核心思路解析</h1>

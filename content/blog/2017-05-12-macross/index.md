@@ -9,7 +9,6 @@ tags:
   - R
   - 量化投资
   - quantstrat
-markup: html
 ---
 
 
@@ -25,137 +24,213 @@ markup: html
 <div id="策略实现的关键步骤" class="section level1">
 <h1>策略实现的关键步骤</h1>
 <p>下面是代码的关键实现部分及解析：</p>
-<pre class="r"><code># 加载必要的包
+
+``` r
+# 加载必要的包
 require(quantstrat)
 
 # 环境初始化
-ttz&lt;-Sys.getenv(&#39;TZ&#39;)
-Sys.setenv(TZ=&#39;UTC&#39;)  # 时区设置，避免日期处理问题
+ttz<-Sys.getenv('TZ')
+Sys.setenv(TZ='UTC')  # 时区设置，避免日期处理问题
 
 # 清理旧策略数据
-suppressWarnings(rm(&quot;order_book.macross&quot;,pos=.strategy))
-suppressWarnings(rm(&quot;account.macross&quot;,&quot;portfolio.macross&quot;,pos=.blotter))
-suppressWarnings(rm(&quot;account.st&quot;,&quot;portfolio.st&quot;,&quot;stock.str&quot;,&quot;stratMACROSS&quot;,&#39;start_t&#39;,&#39;end_t&#39;))
+suppressWarnings(rm("order_book.macross",pos=.strategy))
+suppressWarnings(rm("account.macross","portfolio.macross",pos=.blotter))
+suppressWarnings(rm("account.st","portfolio.st","stock.str","stratMACROSS",'start_t','end_t'))
 
 # 设置交易标的和货币
-stock.str=&#39;AAPL&#39;  # 以苹果公司股票为例
-currency(&#39;USD&#39;)</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code>stock(stock.str,currency=&#39;USD&#39;,multiplier=1)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 初始化回测参数
-startDate=&quot;1999-12-31&quot;  # 回测起始日期
+stock.str='AAPL'  # 以苹果公司股票为例
+currency('USD')
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+stock(stock.str,currency='USD',multiplier=1)
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 初始化回测参数
+startDate="1999-12-31"  # 回测起始日期
 initEq=1000000          # 初始资金100万美元
-portfolio.st=&#39;macross&#39;  # 投资组合名称
-account.st=&#39;macross&#39;    # 账户名称
+portfolio.st='macross'  # 投资组合名称
+account.st='macross'    # 账户名称
 
 # 初始化投资组合、账户和订单簿
-initPortf(portfolio.st,symbols=stock.str)</code></pre>
-<pre><code>## [1] &quot;macross&quot;</code></pre>
-<pre class="r"><code>initAcct(account.st,portfolios=portfolio.st, initEq=initEq)</code></pre>
-<pre><code>## [1] &quot;macross&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio=portfolio.st)
+initPortf(portfolio.st,symbols=stock.str)
+```
+
+```
+## [1] "macross"
+```
+
+``` r
+initAcct(account.st,portfolios=portfolio.st, initEq=initEq)
+```
+
+```
+## [1] "macross"
+```
+
+``` r
+initOrders(portfolio=portfolio.st)
 
 # 创建策略对象
-stratMACROSS&lt;- strategy(portfolio.st)
+stratMACROSS<- strategy(portfolio.st)
 
 # 添加技术指标：50日和200日简单移动平均线
-stratMACROSS &lt;- add.indicator(strategy = stratMACROSS, name = &quot;SMA&quot;, 
+stratMACROSS <- add.indicator(strategy = stratMACROSS, name = "SMA", 
                               arguments = list(x=quote(Cl(mktdata)), n=50),
-                              label= &quot;ma50&quot; )
-stratMACROSS &lt;- add.indicator(strategy = stratMACROSS, name = &quot;SMA&quot;, 
+                              label= "ma50" )
+stratMACROSS <- add.indicator(strategy = stratMACROSS, name = "SMA", 
                               arguments = list(x=quote(Cl(mktdata)[,1]), n=200),
-                              label= &quot;ma200&quot;)
+                              label= "ma200")
 
 # 添加交易信号：均线交叉信号
-stratMACROSS &lt;- add.signal(strategy = stratMACROSS, name=&quot;sigCrossover&quot;,
-                          arguments = list(columns=c(&quot;ma50&quot;,&quot;ma200&quot;), relationship=&quot;gte&quot;),
-                          label=&quot;ma50.gt.ma200&quot;)  # 短期均线上穿长期均线
-stratMACROSS &lt;- add.signal(strategy = stratMACROSS, name=&quot;sigCrossover&quot;,
-                          arguments = list(columns=c(&quot;ma50&quot;,&quot;ma200&quot;), relationship=&quot;lt&quot;),
-                          label=&quot;ma50.lt.ma200&quot;)  # 短期均线下穿长期均线
+stratMACROSS <- add.signal(strategy = stratMACROSS, name="sigCrossover",
+                          arguments = list(columns=c("ma50","ma200"), relationship="gte"),
+                          label="ma50.gt.ma200")  # 短期均线上穿长期均线
+stratMACROSS <- add.signal(strategy = stratMACROSS, name="sigCrossover",
+                          arguments = list(columns=c("ma50","ma200"), relationship="lt"),
+                          label="ma50.lt.ma200")  # 短期均线下穿长期均线
 
 # 添加交易规则：基于信号的交易执行
-stratMACROSS &lt;- add.rule(strategy = stratMACROSS, name=&#39;ruleSignal&#39;, 
-                        arguments = list(sigcol=&quot;ma50.gt.ma200&quot;, sigval=TRUE, 
-                                        orderqty=100, ordertype=&#39;market&#39;, orderside=&#39;long&#39;),
-                        type=&#39;enter&#39;)  # 买入规则
-stratMACROSS &lt;- add.rule(strategy = stratMACROSS, name=&#39;ruleSignal&#39;, 
-                        arguments = list(sigcol=&quot;ma50.lt.ma200&quot;, sigval=TRUE, 
-                                        orderqty=&#39;all&#39;, ordertype=&#39;market&#39;, orderside=&#39;long&#39;),
-                        type=&#39;exit&#39;)   # 卖出规则
+stratMACROSS <- add.rule(strategy = stratMACROSS, name='ruleSignal', 
+                        arguments = list(sigcol="ma50.gt.ma200", sigval=TRUE, 
+                                        orderqty=100, ordertype='market', orderside='long'),
+                        type='enter')  # 买入规则
+stratMACROSS <- add.rule(strategy = stratMACROSS, name='ruleSignal', 
+                        arguments = list(sigcol="ma50.lt.ma200", sigval=TRUE, 
+                                        orderqty='all', ordertype='market', orderside='long'),
+                        type='exit')   # 卖出规则
 
 # 预留的做空策略代码（默认未启用）
-# stratMACROSS &lt;- add.rule(strategy = stratMACROSS, name=&#39;ruleSignal&#39;, 
-#                         arguments = list(sigcol=&quot;ma50.lt.ma200&quot;, sigval=TRUE, 
-#                                         orderqty=-100, ordertype=&#39;market&#39;, orderside=&#39;short&#39;),
-#                         type=&#39;enter&#39;)
-# stratMACROSS &lt;- add.rule(strategy = stratMACROSS, name=&#39;ruleSignal&#39;, 
-#                         arguments = list(sigcol=&quot;ma50.gt.ma200&quot;, sigval=TRUE, 
-#                                         orderqty=100, ordertype=&#39;market&#39;, orderside=&#39;short&#39;),
-#                         type=&#39;exit&#39;)
+# stratMACROSS <- add.rule(strategy = stratMACROSS, name='ruleSignal', 
+#                         arguments = list(sigcol="ma50.lt.ma200", sigval=TRUE, 
+#                                         orderqty=-100, ordertype='market', orderside='short'),
+#                         type='enter')
+# stratMACROSS <- add.rule(strategy = stratMACROSS, name='ruleSignal', 
+#                         arguments = list(sigcol="ma50.gt.ma200", sigval=TRUE, 
+#                                         orderqty=100, ordertype='market', orderside='short'),
+#                         type='exit')
 
 # 获取历史数据并进行复权处理
-getSymbols(stock.str, from=startDate, src=&#39;yahoo&#39;)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code>for(i in stock.str)
+getSymbols(stock.str, from=startDate, src='yahoo')
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+for(i in stock.str)
   assign(i, adjustOHLC(get(i), use.Adjusted=TRUE))
 
 # 执行策略回测
-start_t&lt;-Sys.time()
-out&lt;-applyStrategy(strategy=stratMACROSS, portfolios=portfolio.st)</code></pre>
-<pre><code>## [1] &quot;2001-06-27 00:00:00 AAPL 100 @ 0.350732564926147&quot;
-## [1] &quot;2001-09-07 00:00:00 AAPL -100 @ 0.259667813777924&quot;
-## [1] &quot;2002-01-07 00:00:00 AAPL 100 @ 0.344120860099792&quot;
-## [1] &quot;2002-07-10 00:00:00 AAPL -100 @ 0.260269552469254&quot;
-## [1] &quot;2003-05-16 00:00:00 AAPL 100 @ 0.28250914812088&quot;
-## [1] &quot;2006-06-22 00:00:00 AAPL -100 @ 1.79062843322754&quot;
-## [1] &quot;2006-09-26 00:00:00 AAPL 100 @ 2.33250570297241&quot;
-## [1] &quot;2008-03-07 00:00:00 AAPL -100 @ 3.67412352561951&quot;
-## [1] &quot;2008-05-19 00:00:00 AAPL 100 @ 5.51794862747192&quot;
-## [1] &quot;2008-09-24 00:00:00 AAPL -100 @ 3.8682746887207&quot;
-## [1] &quot;2009-05-14 00:00:00 AAPL 100 @ 3.69516229629517&quot;
-## [1] &quot;2012-12-11 00:00:00 AAPL -100 @ 16.41552734375&quot;
-## [1] &quot;2013-09-11 00:00:00 AAPL 100 @ 14.4533443450928&quot;
-## [1] &quot;2015-08-31 00:00:00 AAPL -100 @ 25.3688125610352&quot;
-## [1] &quot;2016-08-31 00:00:00 AAPL 100 @ 24.3808135986328&quot;
-## [1] &quot;2018-12-24 00:00:00 AAPL -100 @ 34.9761238098145&quot;
-## [1] &quot;2019-05-07 00:00:00 AAPL 100 @ 48.5301742553711&quot;
-## [1] &quot;2022-06-06 00:00:00 AAPL -100 @ 143.832458496094&quot;
-## [1] &quot;2022-09-27 00:00:00 AAPL 100 @ 149.571166992188&quot;
-## [1] &quot;2022-10-10 00:00:00 AAPL -100 @ 138.394744873047&quot;
-## [1] &quot;2023-03-23 00:00:00 AAPL 100 @ 157.137161254883&quot;
-## [1] &quot;2024-03-15 00:00:00 AAPL -100 @ 171.583724975586&quot;
-## [1] &quot;2024-06-14 00:00:00 AAPL 100 @ 211.500885009766&quot;
-## [1] &quot;2025-04-08 00:00:00 AAPL -100 @ 172.194198608398&quot;</code></pre>
-<pre class="r"><code>end_t&lt;-Sys.time()
-print(end_t-start_t)  # 输出回测执行时间</code></pre>
-<pre><code>## Time difference of 0.2876902 secs</code></pre>
-<pre class="r"><code># 更新投资组合数据
-start_t&lt;-Sys.time()
-updatePortf(Portfolio=&#39;macross&#39;, Dates=paste(&#39;::&#39;, as.Date(Sys.time()), sep=&#39;&#39;))</code></pre>
-<pre><code>## [1] &quot;macross&quot;</code></pre>
-<pre class="r"><code>end_t&lt;-Sys.time()
-print(&quot;trade blotter portfolio update:&quot;)</code></pre>
-<pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
-<pre class="r"><code>print(end_t-start_t)</code></pre>
-<pre><code>## Time difference of 0.04611683 secs</code></pre>
-<pre class="r"><code># 可视化回测结果
-chart.Posn(Portfolio=&#39;macross&#39;, Symbol=stock.str)</code></pre>
+start_t<-Sys.time()
+out<-applyStrategy(strategy=stratMACROSS, portfolios=portfolio.st)
+```
+
+```
+## [1] "2001-06-27 00:00:00 AAPL 100 @ 0.350732564926147"
+## [1] "2001-09-07 00:00:00 AAPL -100 @ 0.259667813777924"
+## [1] "2002-01-07 00:00:00 AAPL 100 @ 0.344120860099792"
+## [1] "2002-07-10 00:00:00 AAPL -100 @ 0.260269552469254"
+## [1] "2003-05-16 00:00:00 AAPL 100 @ 0.28250914812088"
+## [1] "2006-06-22 00:00:00 AAPL -100 @ 1.79062843322754"
+## [1] "2006-09-26 00:00:00 AAPL 100 @ 2.33250570297241"
+## [1] "2008-03-07 00:00:00 AAPL -100 @ 3.67412352561951"
+## [1] "2008-05-19 00:00:00 AAPL 100 @ 5.51794862747192"
+## [1] "2008-09-24 00:00:00 AAPL -100 @ 3.8682746887207"
+## [1] "2009-05-14 00:00:00 AAPL 100 @ 3.69516229629517"
+## [1] "2012-12-11 00:00:00 AAPL -100 @ 16.41552734375"
+## [1] "2013-09-11 00:00:00 AAPL 100 @ 14.4533443450928"
+## [1] "2015-08-31 00:00:00 AAPL -100 @ 25.3688125610352"
+## [1] "2016-08-31 00:00:00 AAPL 100 @ 24.3808135986328"
+## [1] "2018-12-24 00:00:00 AAPL -100 @ 34.9761238098145"
+## [1] "2019-05-07 00:00:00 AAPL 100 @ 48.5301742553711"
+## [1] "2022-06-06 00:00:00 AAPL -100 @ 143.832458496094"
+## [1] "2022-09-27 00:00:00 AAPL 100 @ 149.571166992188"
+## [1] "2022-10-10 00:00:00 AAPL -100 @ 138.394744873047"
+## [1] "2023-03-23 00:00:00 AAPL 100 @ 157.137161254883"
+## [1] "2024-03-15 00:00:00 AAPL -100 @ 171.583724975586"
+## [1] "2024-06-14 00:00:00 AAPL 100 @ 211.500885009766"
+## [1] "2025-04-08 00:00:00 AAPL -100 @ 172.194198608398"
+```
+
+``` r
+end_t<-Sys.time()
+print(end_t-start_t)  # 输出回测执行时间
+```
+
+```
+## Time difference of 0.2876902 secs
+```
+
+``` r
+# 更新投资组合数据
+start_t<-Sys.time()
+updatePortf(Portfolio='macross', Dates=paste('::', as.Date(Sys.time()), sep=''))
+```
+
+```
+## [1] "macross"
+```
+
+``` r
+end_t<-Sys.time()
+print("trade blotter portfolio update:")
+```
+
+```
+## [1] "trade blotter portfolio update:"
+```
+
+``` r
+print(end_t-start_t)
+```
+
+```
+## Time difference of 0.04611683 secs
+```
+
+``` r
+# 可视化回测结果
+chart.Posn(Portfolio='macross', Symbol=stock.str)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/DualSMA-1.png" width="672" /></p>
-<pre class="r"><code>add_SMA(n=50, on=1, col=&#39;blue&#39;)  # 叠加50日均线（蓝色）</code></pre>
+
+``` r
+add_SMA(n=50, on=1, col='blue')  # 叠加50日均线（蓝色）
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/DualSMA-2.png" width="672" /></p>
-<pre class="r"><code>add_SMA(n=200, on=1)             # 叠加200日均线（默认红色）</code></pre>
+
+``` r
+add_SMA(n=200, on=1)             # 叠加200日均线（默认红色）
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/DualSMA-3.png" width="672" /></p>
-<pre class="r"><code># 获取交易统计数据
-book    = getOrderBook(&#39;macross&#39;)      # 订单簿
-stats   = tradeStats(&#39;macross&#39;)        # 交易统计
-ptstats = perTradeStats(&#39;macross&#39;)     # 每笔交易统计
-rets    = PortfReturns(&#39;macross&#39;)      # 组合收益
-txns    = getTxns(&#39;macross&#39;, stock.str)  # 交易记录
+
+``` r
+# 获取交易统计数据
+book    = getOrderBook('macross')      # 订单簿
+stats   = tradeStats('macross')        # 交易统计
+ptstats = perTradeStats('macross')     # 每笔交易统计
+rets    = PortfReturns('macross')      # 组合收益
+txns    = getTxns('macross', stock.str)  # 交易记录
 
 # 恢复时区设置
-Sys.setenv(TZ=ttz) </code></pre>
+Sys.setenv(TZ=ttz) 
+```
+
 <p>策略的核心组件涵盖了从环境搭建到结果分析的完整流程。在
 环境初始化阶段，首先通过设置时区避免日期处理过程中可能出现的问题，同时清理旧有的策略数据，确保回测环境的纯净性，为后续分析排除干扰。在
 此基础上，明确交易标的为 AAPL，并设定货币单位为 USD，为策略运行奠定基础。</p>

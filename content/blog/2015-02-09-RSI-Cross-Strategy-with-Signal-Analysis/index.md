@@ -9,98 +9,218 @@ tags:
   - R
   - quantstrat
   - RSI
-markup: html
 ---
 
 
 
-<pre class="r"><code># ===================== 工作流程说明 =====================
-# 本代码演示如何使用Quantstrat进行信号有效性分析，通过扫描RSI参数评估超卖信号（RSI&lt;30）的未来收益表现
+``` r
+# ===================== 工作流程说明 =====================
+# 本代码演示如何使用Quantstrat进行信号有效性分析，通过扫描RSI参数评估超卖信号（RSI<30）的未来收益表现
 
 # ===================== 包加载与初始化 =====================
 # 加载所需R包
-require(iterators)       # 迭代器工具（用于参数扫描循环）</code></pre>
-<pre><code>## Loading required package: iterators</code></pre>
-<pre class="r"><code>require(quantstrat)      # 量化策略框架核心包</code></pre>
-<pre><code>## Loading required package: quantstrat</code></pre>
-<pre><code>## Loading required package: quantmod</code></pre>
-<pre><code>## Loading required package: xts</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
+require(iterators)       # 迭代器工具（用于参数扫描循环）
+```
+
+```
+## Loading required package: iterators
+```
+
+``` r
+require(quantstrat)      # 量化策略框架核心包
+```
+
+```
+## Loading required package: quantstrat
+```
+
+```
+## Loading required package: quantmod
+```
+
+```
+## Loading required package: xts
+```
+
+```
+## Loading required package: zoo
+```
+
+```
 ## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## Loading required package: TTR</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+## Attaching package: 'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## Loading required package: TTR
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
 ##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<pre><code>## Loading required package: blotter</code></pre>
-<pre><code>## Loading required package: FinancialInstrument</code></pre>
-<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
-<pre><code>## 
-## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+##   as.zoo.data.frame zoo
+```
+
+```
+## Loading required package: blotter
+```
+
+```
+## Loading required package: FinancialInstrument
+```
+
+```
+## Loading required package: PerformanceAnalytics
+```
+
+```
 ## 
-##     legend</code></pre>
-<pre><code>## Loading required package: foreach</code></pre>
-<pre class="r"><code>require(gamlss.util)     # 统计分布可视化工具（用于箱线图）</code></pre>
-<pre><code>## Loading required package: gamlss.util</code></pre>
-<pre><code>## Loading required package: gamlss.dist</code></pre>
-<pre><code>## 
-## Attaching package: &#39;gamlss.dist&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:TTR&#39;:
+## Attaching package: 'PerformanceAnalytics'
+```
+
+```
+## The following object is masked from 'package:graphics':
 ## 
-##     DPO</code></pre>
-<pre><code>## Loading required package: gamlss</code></pre>
-<pre><code>## Loading required package: splines</code></pre>
-<pre><code>## Loading required package: gamlss.data</code></pre>
-<pre><code>## 
-## Attaching package: &#39;gamlss.data&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:datasets&#39;:
+##     legend
+```
+
+```
+## Loading required package: foreach
+```
+
+``` r
+require(gamlss.util)     # 统计分布可视化工具（用于箱线图）
+```
+
+```
+## Loading required package: gamlss.util
+```
+
+```
+## Loading required package: gamlss.dist
+```
+
+```
 ## 
-##     sleep</code></pre>
-<pre><code>## Loading required package: nlme</code></pre>
-<pre><code>## Loading required package: parallel</code></pre>
-<pre><code>##  **********   GAMLSS Version 5.4-22  **********</code></pre>
-<pre><code>## For more on GAMLSS look at https://www.gamlss.com/</code></pre>
-<pre><code>## Type gamlssNews() to see new features/changes/bug fixes.</code></pre>
-<pre class="r"><code># 清理策略环境残留数据（防止旧数据干扰）
-suppressWarnings(rm(&quot;order_book.RSI&quot;, pos = .strategy))    # 删除策略订单记录
-suppressWarnings(rm(&quot;account.RSI&quot;, &quot;portfolio.RSI&quot;, pos = .blotter)) # 删除账户组合记录
-suppressWarnings(rm(&quot;account.st&quot;, &quot;portfolio.st&quot;, &quot;stock.str&quot;, &quot;stratRSI&quot;, &quot;startDate&quot;, &quot;initEq&quot;, &#39;start_t&#39;, &#39;end_t&#39;)) # 清除临时变量
+## Attaching package: 'gamlss.dist'
+```
+
+```
+## The following object is masked from 'package:TTR':
+## 
+##     DPO
+```
+
+```
+## Loading required package: gamlss
+```
+
+```
+## Loading required package: splines
+```
+
+```
+## Loading required package: gamlss.data
+```
+
+```
+## 
+## Attaching package: 'gamlss.data'
+```
+
+```
+## The following object is masked from 'package:datasets':
+## 
+##     sleep
+```
+
+```
+## Loading required package: nlme
+```
+
+```
+## Loading required package: parallel
+```
+
+```
+##  **********   GAMLSS Version 5.4-22  **********
+```
+
+```
+## For more on GAMLSS look at https://www.gamlss.com/
+```
+
+```
+## Type gamlssNews() to see new features/changes/bug fixes.
+```
+
+``` r
+# 清理策略环境残留数据（防止旧数据干扰）
+suppressWarnings(rm("order_book.RSI", pos = .strategy))    # 删除策略订单记录
+suppressWarnings(rm("account.RSI", "portfolio.RSI", pos = .blotter)) # 删除账户组合记录
+suppressWarnings(rm("account.st", "portfolio.st", "stock.str", "stratRSI", "startDate", "initEq", 'start_t', 'end_t')) # 清除临时变量
 
 # ===================== 参数设置 =====================
 n = 2  # RSI指标的默认计算周期（日）
 
 # ===================== 数据准备阶段 =====================
 # 设置货币类型和交易标的
-currency(&quot;USD&quot;)  # 设置基础货币为美元</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code>currency(&quot;EUR&quot;)  # 其他货币类型（示例用）</code></pre>
-<pre><code>## [1] &quot;EUR&quot;</code></pre>
-<pre class="r"><code>symbols = c(&quot;SPY&quot;)  # 交易标的为标普500 ETF
+currency("USD")  # 设置基础货币为美元
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+currency("EUR")  # 其他货币类型（示例用）
+```
+
+```
+## [1] "EUR"
+```
+
+``` r
+symbols = c("SPY")  # 交易标的为标普500 ETF
 
 # 初始化金融工具并下载历史数据
 for(symbol in symbols){
-  stock(symbol, currency = &quot;USD&quot;, multiplier = 1)  # 定义标的属性（货币/乘数）
-  getSymbols(symbol, src = &#39;yahoo&#39;)  # 从雅虎财经下载OHLC数据
+  stock(symbol, currency = "USD", multiplier = 1)  # 定义标的属性（货币/乘数）
+  getSymbols(symbol, src = 'yahoo')  # 从雅虎财经下载OHLC数据
 }
 
 # ===================== 账户/组合/策略初始化 =====================
-stratRSI &lt;- strategy(&quot;RSI&quot;)  # 创建策略对象
+stratRSI <- strategy("RSI")  # 创建策略对象
 
 # 回测参数设置
-startDate = &#39;1997-12-31&#39;  # 回测起始日期
+startDate = '1997-12-31'  # 回测起始日期
 initEq = 100000           # 初始资金10万美元
-port.st &lt;- &#39;RSI&#39;          # 组合命名（便于参数调整后重复运行）
+port.st <- 'RSI'          # 组合命名（便于参数调整后重复运行）
 
 # 初始化组合、账户和订单系统
-initPortf(port.st, symbols = symbols)  # 创建投资组合对象</code></pre>
-<pre><code>## [1] &quot;RSI&quot;</code></pre>
-<pre class="r"><code>initAcct(port.st, portfolios = port.st, initEq = initEq)  # 创建账户对象</code></pre>
-<pre><code>## [1] &quot;RSI&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio = port.st)        # 初始化订单簿
+initPortf(port.st, symbols = symbols)  # 创建投资组合对象
+```
+
+```
+## [1] "RSI"
+```
+
+``` r
+initAcct(port.st, portfolios = port.st, initEq = initEq)  # 创建账户对象
+```
+
+```
+## [1] "RSI"
+```
+
+``` r
+initOrders(portfolio = port.st)        # 初始化订单簿
 
 # 设置头寸限制规则（风险控制）
 for(symbol in symbols){
@@ -110,62 +230,62 @@ for(symbol in symbols){
 
 # ===================== 技术指标配置 =====================
 # 添加RSI指标到策略中
-stratRSI &lt;- add.indicator(
+stratRSI <- add.indicator(
   strategy = stratRSI, 
-  name = &quot;RSI&quot;,  # 使用TTR包的RSI函数
+  name = "RSI",  # 使用TTR包的RSI函数
   arguments = list(
     price = quote(getPrice(mktdata)),  # 使用收盘价计算
     n = n                              # RSI计算周期
   ), 
-  label = &quot;RSI&quot;  # 指标标签（用于后续信号引用）
+  label = "RSI"  # 指标标签（用于后续信号引用）
 )
 
 # ===================== 交易信号定义 =====================
 # 信号1：RSI上穿70（超买信号）
-stratRSI &lt;- add.signal(
+stratRSI <- add.signal(
   strategy = stratRSI, 
-  name = &quot;sigThreshold&quot;,    # 阈值型信号生成器
+  name = "sigThreshold",    # 阈值型信号生成器
   arguments = list(
     threshold = 70,         # 阈值水平
-    column = &quot;RSI&quot;,         # 作用于RSI指标列
-    relationship = &quot;gt&quot;,    # 大于关系（greater than）
+    column = "RSI",         # 作用于RSI指标列
+    relationship = "gt",    # 大于关系（greater than）
     cross = TRUE            # 需要穿越阈值（避免持续触发）
   ),
-  label = &quot;RSI.gt.70&quot;      # 信号标签
+  label = "RSI.gt.70"      # 信号标签
 )
 
 # 信号2：RSI下穿30（超卖信号）
-stratRSI &lt;- add.signal(
+stratRSI <- add.signal(
   strategy = stratRSI, 
-  name = &quot;sigThreshold&quot;,
+  name = "sigThreshold",
   arguments = list(
     threshold = 30,         # 阈值水平  
-    column = &quot;RSI&quot;,
-    relationship = &quot;lt&quot;,    # 小于关系（less than）
+    column = "RSI",
+    relationship = "lt",    # 小于关系（less than）
     cross = TRUE
   ),
-  label = &quot;RSI.lt.30&quot;      # 信号标签
+  label = "RSI.lt.30"      # 信号标签
 )
 
 # ===================== 信号分析模块 =====================
-signal.label = &#39;RSI.lt.30&#39;  # 选择分析的信号（此处分析超卖信号）
+signal.label = 'RSI.lt.30'  # 选择分析的信号（此处分析超卖信号）
 
 .n = seq(2, 10, 1)  # 创建RSI参数的扫描范围（2到10日，步长1）
 
 # 将参数扫描配置添加到策略对象
-strategy.st &lt;- add.distribution(
+strategy.st <- add.distribution(
   stratRSI,
-  paramset.label = &#39;RSI&#39;,        # 参数集名称
-  component.type = &#39;indicator&#39;,  # 组件类型（指标）
-  component.label = &#39;RSI&#39;,       # 对应指标标签
+  paramset.label = 'RSI',        # 参数集名称
+  component.type = 'indicator',  # 组件类型（指标）
+  component.label = 'RSI',       # 对应指标标签
   variable = list(n = .n),       # 要扫描的参数变量（n值）
-  label = &#39;nRSI&#39;                 # 参数集标签
+  label = 'nRSI'                 # 参数集标签
 )
 
 # ===================== 执行参数研究 =====================
-results &lt;- apply.paramset.signal.analysis(
+results <- apply.paramset.signal.analysis(
   strategy.st,                # 策略对象
-  paramset.label = &#39;RSI&#39;,     # 参数集标签
+  paramset.label = 'RSI',     # 参数集标签
   port.st,                    # 组合名称
   sigcol = signal.label,      # 分析的目标信号列
   sigval = 1,                 # 信号触发值（1=激活状态）
@@ -177,8 +297,11 @@ results &lt;- apply.paramset.signal.analysis(
   decreasing = T,             # 结果降序排列
   mktdata = NULL,             # 使用默认市场数据
   verbose = TRUE              # 显示详细运行信息
-)</code></pre>
-<pre><code>## Applying Parameter Set:  2 
+)
+```
+
+```
+## Applying Parameter Set:  2 
 ## Applying Parameter Set:  3 
 ## Applying Parameter Set:  4 
 ## Applying Parameter Set:  5 
@@ -186,8 +309,11 @@ results &lt;- apply.paramset.signal.analysis(
 ## Applying Parameter Set:  7 
 ## Applying Parameter Set:  8 
 ## Applying Parameter Set:  9 
-## Applying Parameter Set:  10</code></pre>
-<pre class="r"><code># ===================== 可视化分析结果 =====================
+## Applying Parameter Set:  10
+```
+
+``` r
+# ===================== 可视化分析结果 =====================
 # 绘制不同参数收益柱状图
 signal.plot(
   results$sigret.by.asset$SPY,  # 选择SPY的信号收益数据
@@ -198,12 +324,20 @@ signal.plot(
 # 绘制参数集2的收益分布箱线图
 distributional.boxplot(
   results$sigret.by.asset$SPY$paramset.2  # 指定参数集数据
-)</code></pre>
-<pre><code>## GAMLSS-RS iteration 1: Global Deviance = 41038.77 
-## GAMLSS-RS iteration 2: Global Deviance = 41038.77</code></pre>
-<pre><code>## gamlss package currently doesnt 
+)
+```
+
+```
+## GAMLSS-RS iteration 1: Global Deviance = 41038.77 
+## GAMLSS-RS iteration 2: Global Deviance = 41038.77
+```
+
+```
+## gamlss package currently doesnt 
 ##                             support encapsulation of their 
-##                             plotting function. Pending Patch.</code></pre>
+##                             plotting function. Pending Patch.
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <div id="核心逻辑流程图解" class="section level2">
 <h2>核心逻辑流程图解</h2>

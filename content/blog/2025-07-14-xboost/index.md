@@ -9,7 +9,6 @@ tags:
   - R
   - 股票
   - 机器学习
-markup: html
 ---
 
 <script src="{{< blogdown/postref >}}index_files/core-js/shim.min.js"></script>
@@ -73,12 +72,20 @@ markup: html
 <div id="三如何使用" class="section level1">
 <h1>三、如何使用</h1>
 <p>我们将用联邦基金有效利率和失业率为输入参数，按照 xgboost 模型对纳斯达克 100 指数月度数据进行建模。</p>
-<pre class="r"><code># 加载必要的R包
-library(tidyquant)      # 获取数据</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+
+``` r
+# 加载必要的R包
+library(tidyquant)      # 获取数据
+```
+
+```
+## Registered S3 method overwritten by 'quantmod':
 ##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<pre><code>## ── Attaching core tidyquant packages ────────────────── tidyquant 1.0.11.9000 ──
+##   as.zoo.data.frame zoo
+```
+
+```
+## ── Attaching core tidyquant packages ────────────────── tidyquant 1.0.11.9000 ──
 ## ✔ PerformanceAnalytics 2.0.8      ✔ TTR                  0.24.4
 ## ✔ quantmod             0.4.28     ✔ xts                  0.14.1
 ## ── Conflicts ────────────────────────────────────────── tidyquant_conflicts() ──
@@ -86,9 +93,15 @@ library(tidyquant)      # 获取数据</code></pre>
 ## ✖ zoo::as.Date.numeric()         masks base::as.Date.numeric()
 ## ✖ PerformanceAnalytics::legend() masks graphics::legend()
 ## ✖ quantmod::summary()            masks base::summary()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(tidyverse)      # 数据处理与可视化的核心包集合</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
+library(tidyverse)      # 数据处理与可视化的核心包集合
+```
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
 ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
@@ -99,9 +112,15 @@ library(tidyquant)      # 获取数据</code></pre>
 ## ✖ dplyr::first()  masks xts::first()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ✖ dplyr::last()   masks xts::last()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(tidymodels)     # 机器学习建模框架</code></pre>
-<pre><code>## ── Attaching packages ────────────────────────────────────── tidymodels 1.3.0 ──
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
+library(tidymodels)     # 机器学习建模框架
+```
+
+```
+## ── Attaching packages ────────────────────────────────────── tidymodels 1.3.0 ──
 ## ✔ broom        1.0.8     ✔ rsample      1.3.0
 ## ✔ dials        1.4.0     ✔ tune         1.3.0
 ## ✔ infer        1.0.9     ✔ workflows    1.2.0
@@ -117,97 +136,124 @@ library(tidyquant)      # 获取数据</code></pre>
 ## ✖ dplyr::last()     masks xts::last()
 ## ✖ dials::momentum() masks TTR::momentum()
 ## ✖ yardstick::spec() masks readr::spec()
-## ✖ recipes::step()   masks stats::step()</code></pre>
-<pre class="r"><code>library(modeltime)      # 时间序列建模与预测</code></pre>
-<pre><code>## 
-## Attaching package: &#39;modeltime&#39;
+## ✖ recipes::step()   masks stats::step()
+```
+
+``` r
+library(modeltime)      # 时间序列建模与预测
+```
+
+```
 ## 
-## The following object is masked from &#39;package:TTR&#39;:
+## Attaching package: 'modeltime'
 ## 
-##     growth</code></pre>
-<pre class="r"><code>library(timetk)         # 时间序列数据处理工具</code></pre>
-<pre><code>## 
-## Attaching package: &#39;timetk&#39;
+## The following object is masked from 'package:TTR':
 ## 
-## The following object is masked from &#39;package:tidyquant&#39;:
+##     growth
+```
+
+``` r
+library(timetk)         # 时间序列数据处理工具
+```
+
+```
 ## 
-##     FANG</code></pre>
-<pre class="r"><code># 获取失业率数据 (UNRATE)
-df_unrate &lt;- 
-  tq_get(&quot;UNRATE&quot;, get = &quot;economic.data&quot;) %&gt;% 
+## Attaching package: 'timetk'
+## 
+## The following object is masked from 'package:tidyquant':
+## 
+##     FANG
+```
+
+``` r
+# 获取失业率数据 (UNRATE)
+df_unrate <- 
+  tq_get("UNRATE", get = "economic.data") %>% 
   select(date, unrate = price)  # 重命名价格列为unrate
 
 # 获取联邦基金有效利率数据 (FEDFUNDS)
-df_fedfunds &lt;- 
-  tq_get(&quot;FEDFUNDS&quot;, get = &quot;economic.data&quot;) %&gt;% 
+df_fedfunds <- 
+  tq_get("FEDFUNDS", get = "economic.data") %>% 
   select(date, fedfunds = price)  # 重命名价格列为fedfunds
 
 # 获取纳斯达克100指数数据
-df_nasdaq &lt;- 
-  tq_get(&quot;^NDX&quot;) %&gt;% 
+df_nasdaq <- 
+  tq_get("^NDX") %>% 
   tq_transmute(select = close,         # 选择收盘价
                mutate_fun = to.monthly, # 转换为月度数据
-               col_rename = &quot;nasdaq&quot;) %&gt;%  # 重命名列
+               col_rename = "nasdaq") %>%  # 重命名列
   mutate(date = as.Date(date))         # 确保日期格式正确
 
 # 合并三个数据集
-df_merged &lt;- 
-  df_unrate %&gt;% 
-  left_join(df_fedfunds) %&gt;% 
-  left_join(df_nasdaq) %&gt;% 
-  drop_na()  # 删除包含缺失值的行</code></pre>
-<pre><code>## Joining with `by = join_by(date)`
-## Joining with `by = join_by(date)`</code></pre>
-<pre class="r"><code># 时间序列数据分割
-splits &lt;- 
+df_merged <- 
+  df_unrate %>% 
+  left_join(df_fedfunds) %>% 
+  left_join(df_nasdaq) %>% 
+  drop_na()  # 删除包含缺失值的行
+```
+
+```
+## Joining with `by = join_by(date)`
+## Joining with `by = join_by(date)`
+```
+
+``` r
+# 时间序列数据分割
+splits <- 
   time_series_split(
     df_merged,
-    assess     = &quot;1 year&quot;,  # 测试集为1年数据
+    assess     = "1 year",  # 测试集为1年数据
     cumulative = TRUE      # 训练集包含所有历史数据
-  )</code></pre>
-<pre><code>## Using date_var: date</code></pre>
-<pre class="r"><code>df_train &lt;- training(splits)  # 提取训练集
-df_test &lt;- testing(splits)    # 提取测试集
+  )
+```
+
+```
+## Using date_var: date
+```
+
+``` r
+df_train <- training(splits)  # 提取训练集
+df_test <- testing(splits)    # 提取测试集
 
 # 创建机器学习预处理配方
-recipe_ml &lt;- 
-  recipe(nasdaq ~ ., df_train) %&gt;%  # 以nasdaq为目标变量
-  step_date(date, features = &quot;month&quot;, ordinal = FALSE) %&gt;%  # 从日期提取月份特征
-  step_dummy(all_nominal_predictors(), one_hot = TRUE) %&gt;%  # 将分类变量转为虚拟变量
-  step_mutate(date_num = as.numeric(date)) %&gt;%  # 将日期转换为数值型
-  step_normalize(all_numeric_predictors()) %&gt;%  # 标准化数值预测变量
+recipe_ml <- 
+  recipe(nasdaq ~ ., df_train) %>%  # 以nasdaq为目标变量
+  step_date(date, features = "month", ordinal = FALSE) %>%  # 从日期提取月份特征
+  step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%  # 将分类变量转为虚拟变量
+  step_mutate(date_num = as.numeric(date)) %>%  # 将日期转换为数值型
+  step_normalize(all_numeric_predictors()) %>%  # 标准化数值预测变量
   step_rm(date)  # 移除原始日期列
 
 # 定义XGBoost提升树模型规格，设置超参数为待调优
-mod_spec &lt;- 
+mod_spec <- 
   boost_tree(trees = tune(),         # 树的数量
              min_n = tune(),         # 节点最小样本量
              tree_depth = tune(),    # 树的最大深度
-             learn_rate = tune()) %&gt;%  # 学习率
-  set_engine(&quot;xgboost&quot;) %&gt;%          # 使用xgboost引擎
-  set_mode(&quot;regression&quot;)             # 设置为回归模式
+             learn_rate = tune()) %>%  # 学习率
+  set_engine("xgboost") %>%          # 使用xgboost引擎
+  set_mode("regression")             # 设置为回归模式
 
 # 提取模型的超参数集
-mod_param &lt;- extract_parameter_set_dials(mod_spec)
+mod_param <- extract_parameter_set_dials(mod_spec)
 
 # 设置随机种子确保结果可复现
 set.seed(1234)
 
 # 创建随机超参数网格（50种组合）
-model_tbl &lt;- 
-  mod_param %&gt;% 
-  grid_random(size = 50) %&gt;%
+model_tbl <- 
+  mod_param %>% 
+  grid_random(size = 50) %>%
   create_model_grid(
     f_model_spec = boost_tree,
-    engine_name  = &quot;xgboost&quot;,
-    mode         = &quot;regression&quot;
+    engine_name  = "xgboost",
+    mode         = "regression"
   )
 
 # 从网格中提取模型列表
-model_list &lt;- model_tbl$.models
+model_list <- model_tbl$.models
 
 # 创建工作流集，将预处理配方与不同模型规格组合
-model_wfset &lt;- 
+model_wfset <- 
   workflow_set(
     preproc = list(recipe_ml),  # 使用之前定义的预处理配方
     models = model_list,        # 使用超参数网格生成的模型列表
@@ -215,16 +261,19 @@ model_wfset &lt;-
   )
 
 # 使用并行计算加速模型训练
-model_parallel_tbl &lt;- 
-  model_wfset %&gt;%
+model_parallel_tbl <- 
+  model_wfset %>%
   modeltime_fit_workflowset(
     data    = df_train,  # 使用训练集数据
     control = control_fit_workflowset(
       verbose   = TRUE,      # 显示训练进度
       allow_par = TRUE       # 允许并行计算
     )
-  )</code></pre>
-<pre><code>## ℹ Fitting Model: 1
+  )
+```
+
+```
+## ℹ Fitting Model: 1
 ## ✔ Model Successfully Fitted: 1
 ## ℹ Fitting Model: 2
 ## ✔ Model Successfully Fitted: 2
@@ -324,62 +373,77 @@ model_parallel_tbl &lt;-
 ## ✔ Model Successfully Fitted: 49
 ## ℹ Fitting Model: 50
 ## ✔ Model Successfully Fitted: 50
-## Total time | 22.065 seconds</code></pre>
-<pre class="r"><code># 评估模型在测试集上的准确性
-model_parallel_tbl %&gt;% 
-  modeltime_calibrate(new_data = df_test) %&gt;%  # 校准模型
-  modeltime_accuracy() %&gt;%                     # 计算准确性指标
-  table_modeltime_accuracy()                   # 以表格形式展示结果</code></pre>
-<pre><code>## Warning: There were 12 warnings in `dplyr::mutate()`.
+## Total time | 22.065 seconds
+```
+
+``` r
+# 评估模型在测试集上的准确性
+model_parallel_tbl %>% 
+  modeltime_calibrate(new_data = df_test) %>%  # 校准模型
+  modeltime_accuracy() %>%                     # 计算准确性指标
+  table_modeltime_accuracy()                   # 以表格形式展示结果
+```
+
+```
+## Warning: There were 12 warnings in `dplyr::mutate()`.
 ## The first warning was:
 ## ℹ In argument: `.nested.col = purrr::map(...)`.
 ## Caused by warning:
 ## ! A correlation computation is required, but `estimate` is constant and has 0
 ## standard deviation, resulting in a divide by 0 error. `NA` will be returned.
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 11 remaining warnings.</code></pre>
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 11 remaining warnings.
+```
+
 <div class="reactable html-widget html-fill-item" id="htmlwidget-1" style="width:auto;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-1">{"x":{"tag":{"name":"Reactable","attribs":{"data":{".model_id":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50],".model_desc":["RECIPE_BOOST_TREE_1","RECIPE_BOOST_TREE_2","RECIPE_BOOST_TREE_3","RECIPE_BOOST_TREE_4","RECIPE_BOOST_TREE_5","RECIPE_BOOST_TREE_6","RECIPE_BOOST_TREE_7","RECIPE_BOOST_TREE_8","RECIPE_BOOST_TREE_9","RECIPE_BOOST_TREE_10","RECIPE_BOOST_TREE_11","RECIPE_BOOST_TREE_12","RECIPE_BOOST_TREE_13","RECIPE_BOOST_TREE_14","RECIPE_BOOST_TREE_15","RECIPE_BOOST_TREE_16","RECIPE_BOOST_TREE_17","RECIPE_BOOST_TREE_18","RECIPE_BOOST_TREE_19","RECIPE_BOOST_TREE_20","RECIPE_BOOST_TREE_21","RECIPE_BOOST_TREE_22","RECIPE_BOOST_TREE_23","RECIPE_BOOST_TREE_24","RECIPE_BOOST_TREE_25","RECIPE_BOOST_TREE_26","RECIPE_BOOST_TREE_27","RECIPE_BOOST_TREE_28","RECIPE_BOOST_TREE_29","RECIPE_BOOST_TREE_30","RECIPE_BOOST_TREE_31","RECIPE_BOOST_TREE_32","RECIPE_BOOST_TREE_33","RECIPE_BOOST_TREE_34","RECIPE_BOOST_TREE_35","RECIPE_BOOST_TREE_36","RECIPE_BOOST_TREE_37","RECIPE_BOOST_TREE_38","RECIPE_BOOST_TREE_39","RECIPE_BOOST_TREE_40","RECIPE_BOOST_TREE_41","RECIPE_BOOST_TREE_42","RECIPE_BOOST_TREE_43","RECIPE_BOOST_TREE_44","RECIPE_BOOST_TREE_45","RECIPE_BOOST_TREE_46","RECIPE_BOOST_TREE_47","RECIPE_BOOST_TREE_48","RECIPE_BOOST_TREE_49","RECIPE_BOOST_TREE_50"],".type":["Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test","Test"],"mae":[3427.41,3693.7,4332.08,5324.17,3338.1,3204.96,3078.92,3418.09,3493.16,1435.28,2400.65,3591.03,7976.25,4047.48,3561.98,2942.64,2727.6,4147.96,4218.05,6301.8,1883.95,2620.27,11907.92,9158.61,16641.88,2622.77,1123.06,3291.36,3731.53,3267.55,3298.09,3999.73,7986.47,7091.48,2850.35,9948.4,3882.81,1403.43,4618.44,3618.64,1903.92,3483.62,1946.15,6692.92,3249.41,2129.04,6187.97,3329.09,3447.82,3949.36],"mape":[16.38,17.81,20.81,25.67,16.07,15.32,14.81,16.46,16.7,6.75,11.5,17.16,38.76,19.55,17.16,14.04,13.1,20.04,20.22,30.57,8.94,12.58,57.97,44.54,81.12,12.51,5.26,15.77,18,15.67,15.88,19.32,38.74,34.37,13.63,48.4,18.75,6.61,22.21,17.45,9.06,16.78,9.27,32.43,15.65,10.16,30.01,15.87,16.62,18.92],"mase":[4.68,5.04,5.91,7.27,4.56,4.38,4.2,4.67,4.77,1.96,3.28,4.9,10.89,5.53,4.86,4.02,3.72,5.66,5.76,8.6,2.57,3.58,16.26,12.51,22.72,3.58,1.53,4.49,5.09,4.46,4.5,5.46,10.9,9.68,3.89,13.58,5.3,1.92,6.31,4.94,2.6,4.76,2.66,9.14,4.44,2.91,8.45,4.55,4.71,5.39],"smape":[18.33,19.67,23.89,29.94,17.6,17.01,16.11,18.06,18.7,7.15,12.31,19.3,48.15,21.77,18.9,15.55,14.17,22.38,23.06,36.18,9.53,13.57,81.7,57.37,136.48,13.62,5.52,17.42,19.89,17.26,17.37,21.48,48.27,41.72,14.88,63.92,20.79,6.97,25.45,19.23,9.61,18.44,9.84,38.89,17.08,10.83,35.41,17.82,18.23,21.48],"rmse":[3924.06,3839.53,4835.9,5645.15,3501.61,3680.14,3244.57,3580.67,3989.87,1859.11,2604.44,4107.19,8039.09,4169.95,3720.66,3484.57,2954.76,4267.55,4687.98,6381.15,2236.95,2843.35,11950.1,9213.39,16672.09,3017.81,1530.27,3645.34,3875.05,3574.1,3467.13,4123.62,8099.8,7216.69,3197.56,9998.86,4010.32,1782.33,4981.11,3757.13,2169.9,3640.02,2221.36,6810.63,3402.37,2380.42,6268.77,3943.18,3590.8,4460.67],"rsq":[0.22,0.09,0.11,0.21,0.06,0.19,0.01,0.09,0.25,0.09,0.09,0.27,"NA","NA",0.09,0.15,0,"NA",0.28,"NA",0.09,0.01,"NA","NA","NA",0.14,0.08,0.19,0.09,0.14,0.06,"NA",0.24,0.23,0.18,"NA","NA",0.09,0.25,0.09,0.09,0.09,0.09,0.23,0.09,0.09,"NA",0.28,"NA",0.21]},"columns":[{"id":".model_id","name":".model_id","type":"numeric"},{"id":".model_desc","name":".model_desc","type":"character"},{"id":".type","name":".type","type":"character"},{"id":"mae","name":"mae","type":"numeric"},{"id":"mape","name":"mape","type":"numeric"},{"id":"mase","name":"mase","type":"numeric"},{"id":"smape","name":"smape","type":"numeric"},{"id":"rmse","name":"rmse","type":"numeric"},{"id":"rsq","name":"rsq","type":"numeric"}],"searchable":true,"defaultExpanded":true,"showSortable":true,"dataKey":"719a9363636e9045a4bf916efdc2e3a3"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
-<pre class="r"><code># 选择表现最好的模型（这里假设是RECIPE_BOOST_TREE_27）
+
+``` r
+# 选择表现最好的模型（这里假设是RECIPE_BOOST_TREE_27）
 # 并在测试集上进行校准
-calibration_tbl &lt;- 
-  model_parallel_tbl %&gt;%
-  filter(.model_desc == &quot;RECIPE_BOOST_TREE_27&quot;) %&gt;% 
+calibration_tbl <- 
+  model_parallel_tbl %>%
+  filter(.model_desc == "RECIPE_BOOST_TREE_27") %>% 
   modeltime_calibrate(df_test)
 
 # 生成预测并绘制预测区间
-calibration_tbl %&gt;% 
+calibration_tbl %>% 
   modeltime_forecast(
     new_data = df_test,  # 在测试集上进行预测
-    actual_data = df_merged %&gt;%
-      filter(date &gt;= as.Date(&quot;2024-07-01&quot;))  # 实际数据从2024-07-01开始
-  ) %&gt;%
+    actual_data = df_merged %>%
+      filter(date >= as.Date("2024-07-01"))  # 实际数据从2024-07-01开始
+  ) %>%
   plot_modeltime_forecast(
     .interactive = FALSE,     # 生成静态图表
     .legend_show = FALSE,     # 不显示图例
     .line_size = 1.5,         # 设置线条粗细
-    .color_lab = &quot;&quot;,          # 设置颜色标签
-    .title = &quot;NASDAQ 100&quot;     # 设置图表标题
+    .color_lab = "",          # 设置颜色标签
+    .title = "NASDAQ 100"     # 设置图表标题
   ) +
   # 添加副标题（使用markdown格式）
-  labs(subtitle = &quot;&lt;span style = &#39;color:dimgrey;&#39;&gt;预测区间&lt;/span&gt;&lt;br&gt;&lt;span style = &#39;color:red;&#39;&gt;机器学习模型&lt;/span&gt;&quot;) + 
+  labs(subtitle = "<span style = 'color:dimgrey;'>预测区间</span><br><span style = 'color:red;'>机器学习模型</span>") + 
   # 设置x轴（日期）格式
   scale_x_date(
     expand = expansion(mult = c(.1, .15)),  # 设置x轴扩展
-    labels = scales::label_date(format = &quot;%b&#39;%y&quot;)  # 设置日期标签格式
+    labels = scales::label_date(format = "%b'%y")  # 设置日期标签格式
   ) +
   # 设置y轴（纳斯达克指数）格式为货币格式
   scale_y_continuous(labels = scales::label_currency()) +
   # 设置图表主题
-  theme_minimal(base_family = &quot;Roboto Slab&quot;, base_size = 20) +
+  theme_minimal(base_family = "Roboto Slab", base_size = 20) +
   theme(
-    legend.position = &quot;none&quot;,  # 不显示图例
-    plot.background = element_rect(fill = &quot;azure&quot;, color = &quot;azure&quot;),  # 设置背景颜色
-    plot.title = element_text(face = &quot;bold&quot;),  # 设置标题字体为粗体
-    axis.text = element_text(face = &quot;bold&quot;),  # 设置坐标轴标签字体为粗体
-    plot.subtitle = ggtext::element_markdown(face = &quot;bold&quot;)  # 设置副标题为markdown格式并加粗
-  )</code></pre>
-<pre><code>## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
-## -Inf</code></pre>
+    legend.position = "none",  # 不显示图例
+    plot.background = element_rect(fill = "azure", color = "azure"),  # 设置背景颜色
+    plot.title = element_text(face = "bold"),  # 设置标题字体为粗体
+    axis.text = element_text(face = "bold"),  # 设置坐标轴标签字体为粗体
+    plot.subtitle = ggtext::element_markdown(face = "bold")  # 设置副标题为markdown格式并加粗
+  )
+```
+
+```
+## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 </div>
 <div id="四竞争算法" class="section level1">

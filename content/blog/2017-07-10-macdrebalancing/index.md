@@ -10,7 +10,6 @@ tags:
   - 量化投资
   - 技术指标
   - MACD
-markup: html
 ---
 
 
@@ -30,7 +29,9 @@ markup: html
 <p>本策略的核心逻辑是：当信号线从下方穿越零轴（上穿）时，认为多头趋势确立，触发买入信号；当信号线从上方穿越零轴（下穿）时，认为空头趋势显现，触发卖出信号，通过这种方式跟踪中长期趋势。
 策略代码与详细注释</p>
 <p>以下是完整的策略代码，包含逐段注释以解释各环节的功能：</p>
-<pre class="r"><code># Simple MACD strategy
+
+``` r
+# Simple MACD strategy
 #
 # MACD可通过多种方式使用，本策略展示其作为趋势指标的应用。
 # 
@@ -46,259 +47,618 @@ markup: html
 require(quantstrat)
 
 # 清理旧策略数据，确保回测环境纯净（避免残留数据干扰结果）
-suppressWarnings(rm(&quot;order_book.macd&quot;, pos=.strategy))
-suppressWarnings(rm(&quot;account.macd&quot;, &quot;portfolio.macd&quot;, pos=.blotter))
-suppressWarnings(rm(&quot;account.st&quot;, &quot;portfolio.st&quot;, &quot;stock.str&quot;, &quot;stratMACD&quot;, &quot;startDate&quot;, &quot;initEq&quot;, &#39;start_t&#39;, &#39;end_t&#39;))
+suppressWarnings(rm("order_book.macd", pos=.strategy))
+suppressWarnings(rm("account.macd", "portfolio.macd", pos=.blotter))
+suppressWarnings(rm("account.st", "portfolio.st", "stock.str", "stratMACD", "startDate", "initEq", 'start_t', 'end_t'))
 
 # 设定交易标的为苹果公司股票（AAPL）
-stock.str &lt;- &#39;AAPL&#39;
+stock.str <- 'AAPL'
 
 # MACD指标参数：快速EMA周期、慢速EMA周期、信号线周期，均采用指数移动平均线（EMA）
 fastMA = 12  # 快速EMA周期（传统参数为12日）
 slowMA = 26  # 慢速EMA周期（传统参数为26日）
 signalMA = 9  # 信号线周期（传统参数为9日）
-maType = &quot;EMA&quot;  # 移动平均线类型为指数移动平均（EMA）
+maType = "EMA"  # 移动平均线类型为指数移动平均（EMA）
 
 # 定义货币单位为美元，并初始化标的属性（AAPL以美元计价，合约乘数为1）
-currency(&#39;USD&#39;)</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code>stock(stock.str, currency=&#39;USD&#39;, multiplier=1)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 回测参数设置：回测起始日期、初始资金、组合与账户名称
-startDate = &#39;2006-12-31&#39;  # 数据起始日期
+currency('USD')
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+stock(stock.str, currency='USD', multiplier=1)
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 回测参数设置：回测起始日期、初始资金、组合与账户名称
+startDate = '2006-12-31'  # 数据起始日期
 initEq = 1000000  # 初始资金100万美元
-portfolio.st = &#39;macd&#39;  # 投资组合名称
-account.st = &#39;macd&#39;  # 账户名称
+portfolio.st = 'macd'  # 投资组合名称
+account.st = 'macd'  # 账户名称
 
 # 初始化回测环境：创建组合、账户与订单簿
-initPortf(portfolio.st, symbols=stock.str)  # 初始化组合，包含AAPL</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>initAcct(account.st, portfolios=portfolio.st)  # 初始化账户，关联组合</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio=portfolio.st)  # 初始化订单簿，记录交易订单
+initPortf(portfolio.st, symbols=stock.str)  # 初始化组合，包含AAPL
+```
 
-# 创建策略对象，命名为&#39;macd&#39;并存储到环境中
-strat.st &lt;- portfolio.st
+```
+## [1] "macd"
+```
+
+``` r
+initAcct(account.st, portfolios=portfolio.st)  # 初始化账户，关联组合
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+initOrders(portfolio=portfolio.st)  # 初始化订单簿，记录交易订单
+
+# 创建策略对象，命名为'macd'并存储到环境中
+strat.st <- portfolio.st
 strategy(strat.st, store=TRUE)
 
 # 添加MACD指标：基于收盘价计算MACD线、信号线
 add.indicator(
   strat.st, 
-  name = &quot;MACD&quot;,  # 使用TTR包中的MACD函数
+  name = "MACD",  # 使用TTR包中的MACD函数
   arguments = list(x=quote(Cl(mktdata)))  # 输入为收盘价（Cl(mktdata)）
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 生成交易信号：基于信号线与零轴的交叉
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 生成交易信号：基于信号线与零轴的交叉
 # 信号1：信号线上穿零轴（大于零且交叉），视为买入信号
 add.signal(
   strat.st,
-  name = &quot;sigThreshold&quot;,  # 阈值型信号函数
+  name = "sigThreshold",  # 阈值型信号函数
   arguments = list(
-    column = &quot;signal.MACD.ind&quot;,  # 作用于MACD指标的信号线列
-    relationship = &quot;gt&quot;,  # 大于（greater than）
+    column = "signal.MACD.ind",  # 作用于MACD指标的信号线列
+    relationship = "gt",  # 大于（greater than）
     threshold = 0,  # 阈值为0（零轴）
     cross = TRUE  # 必须穿越阈值（避免持续触发）
   ),
-  label = &quot;signal.gt.zero&quot;  # 信号标签：上穿零轴
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 信号2：信号线下穿零轴（小于零且交叉），视为卖出信号
+  label = "signal.gt.zero"  # 信号标签：上穿零轴
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 信号2：信号线下穿零轴（小于零且交叉），视为卖出信号
 add.signal(
   strat.st,
-  name = &quot;sigThreshold&quot;,
+  name = "sigThreshold",
   arguments = list(
-    column = &quot;signal.MACD.ind&quot;,
-    relationship = &quot;lt&quot;,  # 小于（less than）
+    column = "signal.MACD.ind",
+    relationship = "lt",  # 小于（less than）
     threshold = 0,
     cross = TRUE
   ),
-  label = &quot;signal.lt.zero&quot;  # 信号标签：下穿零轴
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 定义交易规则：将信号转化为具体交易动作
+  label = "signal.lt.zero"  # 信号标签：下穿零轴
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 定义交易规则：将信号转化为具体交易动作
 # 入场规则：当出现上穿零轴信号时，买入（做多）
 add.rule(
   strat.st,
-  name = &#39;ruleSignal&#39;,  # 基于信号的规则函数
+  name = 'ruleSignal',  # 基于信号的规则函数
   arguments = list(
-    sigcol = &quot;signal.gt.zero&quot;,  # 触发信号列：上穿零轴
+    sigcol = "signal.gt.zero",  # 触发信号列：上穿零轴
     sigval = TRUE,  # 信号值为TRUE时触发
     orderqty = 1000000,  # 订单数量（此处为大额，实际会由osMaxPos限制）
-    ordertype = &#39;market&#39;,  # 市价单
-    orderside = &#39;long&#39;,  # 做多方向
+    ordertype = 'market',  # 市价单
+    orderside = 'long',  # 做多方向
     threshold = NULL,
-    osFUN = &#39;osMaxPos&#39;  # 使用最大仓位限制函数，避免超仓
+    osFUN = 'osMaxPos'  # 使用最大仓位限制函数，避免超仓
   ),
-  type = &#39;enter&#39;,  # 入场规则
-  label = &#39;enter&#39;
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 出场规则：当出现下穿零轴信号时，平仓（卖出所有持仓）
+  type = 'enter',  # 入场规则
+  label = 'enter'
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 出场规则：当出现下穿零轴信号时，平仓（卖出所有持仓）
 add.rule(
   strat.st,
-  name = &#39;ruleSignal&#39;,
+  name = 'ruleSignal',
   arguments = list(
-    sigcol = &quot;signal.lt.zero&quot;,  # 触发信号列：下穿零轴
+    sigcol = "signal.lt.zero",  # 触发信号列：下穿零轴
     sigval = TRUE,
-    orderqty = &#39;all&#39;,  # 平仓全部持仓
-    ordertype = &#39;market&#39;,
-    orderside = &#39;long&#39;,
+    orderqty = 'all',  # 平仓全部持仓
+    ordertype = 'market',
+    orderside = 'long',
     threshold = NULL,
-    orderset = &#39;exit2&#39;  # 订单集标签，用于管理出场订单
+    orderset = 'exit2'  # 订单集标签，用于管理出场订单
   ),
-  type = &#39;exit&#39;,  # 出场规则
-  label = &#39;exit&#39;
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 再平衡规则：按月调整仓位，控制单只标的的资金占比
+  type = 'exit',  # 出场规则
+  label = 'exit'
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 再平衡规则：按月调整仓位，控制单只标的的资金占比
 add.rule(
   strat.st,
-  &#39;rulePctEquity&#39;,  # 基于权益比例的再平衡函数
+  'rulePctEquity',  # 基于权益比例的再平衡函数
   arguments = list(
-    rebalance_on = &#39;months&#39;,  # 再平衡周期：每月
+    rebalance_on = 'months',  # 再平衡周期：每月
     trade.percent = .02,  # 单只标的持仓占总权益的比例（2%）
-    refprice = quote(last(getPrice(mktdata)[paste(&#39;::&#39;, curIndex, sep=&#39;&#39;)])),  # 参考价格为最新价格
+    refprice = quote(last(getPrice(mktdata)[paste('::', curIndex, sep='')])),  # 参考价格为最新价格
     digits = 0  # 订单数量取整
   ),
-  type = &#39;rebalance&#39;,  # 再平衡规则
-  label = &#39;rebalance&#39;
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 获取历史数据：从雅虎财经下载AAPL的历史数据（起始日期为startDate）
-getSymbols(stock.str, from=startDate, src=&#39;yahoo&#39;)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 执行策略回测：应用再平衡策略
-start_t &lt;- Sys.time()  # 记录回测开始时间
-out &lt;- applyStrategy.rebalancing(
+  type = 'rebalance',  # 再平衡规则
+  label = 'rebalance'
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 获取历史数据：从雅虎财经下载AAPL的历史数据（起始日期为startDate）
+getSymbols(stock.str, from=startDate, src='yahoo')
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 执行策略回测：应用再平衡策略
+start_t <- Sys.time()  # 记录回测开始时间
+out <- applyStrategy.rebalancing(
   strat.st, 
   portfolios = portfolio.st,
   parameters = list(nFast=fastMA, nSlow=slowMA, nSig=signalMA, maType=maType),  # 传递MACD参数
   verbose = TRUE  # 输出详细过程
-)</code></pre>
-<pre><code>## [1] &quot;2007-03-16 00:00:00 AAPL 6619 @ 3.19964289665222&quot;</code></pre>
-<pre><code>## [1] &quot;2007-08-17 00:00:00 AAPL -6619 @ 4.35928583145142&quot;</code></pre>
-<pre><code>## [1] &quot;2007-09-05 00:00:00 AAPL 4075 @ 4.88428592681885&quot;</code></pre>
-<pre><code>## [1] &quot;2008-01-16 00:00:00 AAPL -4075 @ 5.70142889022827&quot;</code></pre>
-<pre><code>## [1] &quot;2008-03-31 00:00:00 AAPL 4529 @ 5.125&quot;</code></pre>
-<pre><code>## [1] &quot;2008-06-26 00:00:00 AAPL -4529 @ 6.00928592681885&quot;</code></pre>
-<pre><code>## [1] &quot;2008-08-20 00:00:00 AAPL 3576 @ 6.28000020980835&quot;</code></pre>
-<pre><code>## [1] &quot;2008-09-09 00:00:00 AAPL -3576 @ 5.41714286804199&quot;</code></pre>
-<pre><code>## [1] &quot;2009-02-06 00:00:00 AAPL 6287 @ 3.56142902374268&quot;</code></pre>
-<pre><code>## [1] &quot;2009-03-04 00:00:00 AAPL -6287 @ 3.25607109069824&quot;
-## [1] &quot;2009-03-19 00:00:00 AAPL 6330 @ 3.62928605079651&quot;</code></pre>
-<pre><code>## [1] &quot;2009-12-15 00:00:00 AAPL -6330 @ 6.93464279174805&quot;
-## [1] &quot;2009-12-29 00:00:00 AAPL 2892 @ 7.46785688400269&quot;</code></pre>
-<pre><code>## [1] &quot;2010-02-03 00:00:00 AAPL -2892 @ 7.11535692214966&quot;</code></pre>
-<pre><code>## [1] &quot;2010-03-04 00:00:00 AAPL 2819 @ 7.52535676956177&quot;</code></pre>
-<pre><code>## [1] &quot;2010-07-16 00:00:00 AAPL -2819 @ 8.92500019073486&quot;</code></pre>
-<pre><code>## [1] &quot;2010-08-03 00:00:00 AAPL 2251 @ 9.35464286804199&quot;
-## [1] &quot;2010-08-17 00:00:00 AAPL -2251 @ 8.99892902374268&quot;</code></pre>
-<pre><code>## [1] &quot;2010-09-15 00:00:00 AAPL 2380 @ 9.65071392059326&quot;</code></pre>
-<pre><code>## [1] &quot;2011-03-22 00:00:00 AAPL -2380 @ 12.1857137680054&quot;</code></pre>
-<pre><code>## [1] &quot;2011-05-03 00:00:00 AAPL 1662 @ 12.4357137680054&quot;
-## [1] &quot;2011-05-23 00:00:00 AAPL -1662 @ 11.9428567886353&quot;</code></pre>
-<pre><code>## [1] &quot;2011-07-11 00:00:00 AAPL 1732 @ 12.6428565979004&quot;</code></pre>
-<pre><code>## [1] &quot;2011-11-16 00:00:00 AAPL -1732 @ 13.7417860031128&quot;</code></pre>
-<pre><code>## [1] &quot;2011-12-27 00:00:00 AAPL 1524 @ 14.518928527832&quot;</code></pre>
-<pre><code>## [1] &quot;2012-05-09 00:00:00 AAPL -1524 @ 20.3278560638428&quot;</code></pre>
-<pre><code>## [1] &quot;2012-06-20 00:00:00 AAPL 1017 @ 20.9192867279053&quot;</code></pre>
-<pre><code>## [1] &quot;2012-10-12 00:00:00 AAPL -1017 @ 22.4896430969238&quot;</code></pre>
-<pre><code>## [1] &quot;2013-05-09 00:00:00 AAPL 1329 @ 16.3132133483887&quot;</code></pre>
-<pre><code>## [1] &quot;2013-06-19 00:00:00 AAPL -1329 @ 15.1071434020996&quot;</code></pre>
-<pre><code>## [1] &quot;2013-07-26 00:00:00 AAPL 1481 @ 15.7496433258057&quot;</code></pre>
-<pre><code>## [1] &quot;2014-01-22 00:00:00 AAPL -1481 @ 19.6967868804932&quot;
-## [1] &quot;2014-01-24 00:00:00 AAPL 1053 @ 19.5025005340576&quot;
-## [1] &quot;2014-01-29 00:00:00 AAPL -1053 @ 17.8839282989502&quot;</code></pre>
-<pre><code>## [1] &quot;2014-03-26 00:00:00 AAPL 1121 @ 19.2778568267822&quot;</code></pre>
-<pre><code>## [1] &quot;2014-04-15 00:00:00 AAPL -1121 @ 18.498571395874&quot;
-## [1] &quot;2014-04-29 00:00:00 AAPL 1099 @ 21.1546421051025&quot;</code></pre>
-<pre><code>## [1] &quot;2014-10-17 00:00:00 AAPL -1099 @ 24.4174995422363&quot;
-## [1] &quot;2014-10-27 00:00:00 AAPL 839 @ 26.2775001525879&quot;</code></pre>
-<pre><code>## [1] &quot;2015-01-06 00:00:00 AAPL -839 @ 26.5650005340576&quot;</code></pre>
-<pre><code>## [1] &quot;2015-02-02 00:00:00 AAPL 721 @ 29.6574993133545&quot;</code></pre>
-<pre><code>## [1] &quot;2015-06-19 00:00:00 AAPL -721 @ 31.6499996185303&quot;</code></pre>
-<pre><code>## [1] &quot;2015-10-27 00:00:00 AAPL 767 @ 28.6375007629395&quot;</code></pre>
-<pre><code>## [1] &quot;2015-12-16 00:00:00 AAPL -767 @ 27.8349990844727&quot;</code></pre>
-<pre><code>## [1] &quot;2016-03-09 00:00:00 AAPL 874 @ 25.2800006866455&quot;</code></pre>
-<pre><code>## [1] &quot;2016-05-02 00:00:00 AAPL -874 @ 23.4099998474121&quot;</code></pre>
-<pre><code>## [1] &quot;2016-07-20 00:00:00 AAPL 883 @ 24.9899997711182&quot;</code></pre>
-<pre><code>## [1] &quot;2016-11-09 00:00:00 AAPL -883 @ 27.7199993133545&quot;</code></pre>
-<pre><code>## [1] &quot;2016-12-15 00:00:00 AAPL 766 @ 28.9549999237061&quot;</code></pre>
-<pre><code>## [1] &quot;2017-06-20 00:00:00 AAPL -766 @ 36.252498626709&quot;</code></pre>
-<pre><code>## [1] &quot;2017-07-25 00:00:00 AAPL 591 @ 38.185001373291&quot;</code></pre>
-<pre><code>## [1] &quot;2017-09-27 00:00:00 AAPL -591 @ 38.5574989318848&quot;</code></pre>
-<pre><code>## [1] &quot;2017-10-24 00:00:00 AAPL 552 @ 39.2750015258789&quot;</code></pre>
-<pre><code>## [1] &quot;2018-02-02 00:00:00 AAPL -552 @ 40.125&quot;</code></pre>
-<pre><code>## [1] &quot;2018-03-01 00:00:00 AAPL 478 @ 43.75&quot;</code></pre>
-<pre><code>## [1] &quot;2018-04-02 00:00:00 AAPL -478 @ 41.6699981689453&quot;
-## [1] &quot;2018-04-19 00:00:00 AAPL 507 @ 43.2000007629395&quot;
-## [1] &quot;2018-04-25 00:00:00 AAPL -507 @ 40.9124984741211&quot;</code></pre>
-<pre><code>## [1] &quot;2018-05-09 00:00:00 AAPL 514 @ 46.8400001525879&quot;</code></pre>
-<pre><code>## [1] &quot;2018-07-06 00:00:00 AAPL -514 @ 46.9925003051758&quot;
-## [1] &quot;2018-07-11 00:00:00 AAPL 459 @ 46.9700012207031&quot;</code></pre>
-<pre><code>## [1] &quot;2018-10-29 00:00:00 AAPL -459 @ 53.060001373291&quot;</code></pre>
-<pre><code>## [1] &quot;2019-02-08 00:00:00 AAPL 512 @ 42.6025009155273&quot;</code></pre>
-<pre><code>## [1] &quot;2019-05-21 00:00:00 AAPL -512 @ 46.6500015258789&quot;</code></pre>
-<pre><code>## [1] &quot;2019-06-21 00:00:00 AAPL 487 @ 49.6949996948242&quot;</code></pre>
-<pre><code>## [1] &quot;2020-03-02 00:00:00 AAPL -487 @ 74.7024993896484&quot;</code></pre>
-<pre><code>## [1] &quot;2020-04-23 00:00:00 AAPL 339 @ 68.7574996948242&quot;</code></pre>
-<pre><code>## [1] &quot;2020-09-25 00:00:00 AAPL -339 @ 112.279998779297&quot;</code></pre>
-<pre><code>## [1] &quot;2020-10-13 00:00:00 AAPL 189 @ 121.099998474121&quot;</code></pre>
-<pre><code>## [1] &quot;2020-11-03 00:00:00 AAPL -189 @ 110.440002441406&quot;
-## [1] &quot;2020-11-16 00:00:00 AAPL 201 @ 120.300003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2021-02-25 00:00:00 AAPL -201 @ 120.98999786377&quot;</code></pre>
-<pre><code>## [1] &quot;2021-04-14 00:00:00 AAPL 179 @ 132.029998779297&quot;</code></pre>
-<pre><code>## [1] &quot;2021-05-18 00:00:00 AAPL -179 @ 124.849998474121&quot;</code></pre>
-<pre><code>## [1] &quot;2021-06-21 00:00:00 AAPL 175 @ 132.300003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2021-09-27 00:00:00 AAPL -175 @ 145.369995117188&quot;</code></pre>
-<pre><code>## [1] &quot;2021-10-27 00:00:00 AAPL 154 @ 148.850006103516&quot;</code></pre>
-<pre><code>## [1] &quot;2022-01-26 00:00:00 AAPL -154 @ 159.690002441406&quot;</code></pre>
-<pre><code>## [1] &quot;2022-02-10 00:00:00 AAPL 125 @ 172.119995117188&quot;
-## [1] &quot;2022-02-24 00:00:00 AAPL -125 @ 162.740005493164&quot;</code></pre>
-<pre><code>## [1] &quot;2022-03-30 00:00:00 AAPL 132 @ 177.770004272461&quot;</code></pre>
-<pre><code>## [1] &quot;2022-04-26 00:00:00 AAPL -132 @ 156.800003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2022-07-19 00:00:00 AAPL 160 @ 151&quot;</code></pre>
-<pre><code>## [1] &quot;2022-09-13 00:00:00 AAPL -160 @ 153.839996337891&quot;</code></pre>
-<pre><code>## [1] &quot;2022-11-23 00:00:00 AAPL 142 @ 151.070007324219&quot;</code></pre>
-<pre><code>## [1] &quot;2022-12-08 00:00:00 AAPL -142 @ 142.649993896484&quot;</code></pre>
-<pre><code>## [1] &quot;2023-01-30 00:00:00 AAPL 168 @ 143&quot;</code></pre>
-<pre><code>## [1] &quot;2023-08-14 00:00:00 AAPL -168 @ 179.460006713867&quot;</code></pre>
-<pre><code>## [1] &quot;2023-11-13 00:00:00 AAPL 128 @ 184.800003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2024-01-10 00:00:00 AAPL -128 @ 186.190002441406&quot;
-## [1] &quot;2024-01-30 00:00:00 AAPL 114 @ 188.039993286133&quot;</code></pre>
-<pre><code>## [1] &quot;2024-02-06 00:00:00 AAPL -114 @ 189.300003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2024-05-08 00:00:00 AAPL 129 @ 182.740005493164&quot;</code></pre>
-<pre><code>## [1] &quot;2024-08-14 00:00:00 AAPL -129 @ 221.720001220703&quot;
-## [1] &quot;2024-08-16 00:00:00 AAPL 99 @ 226.050003051758&quot;</code></pre>
-<pre><code>## [1] &quot;2024-11-11 00:00:00 AAPL -99 @ 224.229995727539&quot;
-## [1] &quot;2024-11-27 00:00:00 AAPL 97 @ 234.929992675781&quot;</code></pre>
-<pre><code>## [1] &quot;2025-01-21 00:00:00 AAPL -97 @ 222.639999389648&quot;</code></pre>
-<pre><code>## [1] &quot;2025-02-24 00:00:00 AAPL 93 @ 247.100006103516&quot;</code></pre>
-<pre><code>## [1] &quot;2025-03-13 00:00:00 AAPL -93 @ 209.679992675781&quot;</code></pre>
-<pre><code>## [1] &quot;2025-07-07 00:00:00 AAPL 107 @ 209.949996948242&quot;</code></pre>
-<pre class="r"><code>end_t &lt;- Sys.time()  # 记录回测结束时间
-print(end_t - start_t)  # 打印回测耗时</code></pre>
-<pre><code>## Time difference of 8.527371 secs</code></pre>
-<pre class="r"><code># 更新组合数据：将交易记录同步到组合与账户
-start_t &lt;- Sys.time()
+)
+```
+
+```
+## [1] "2007-03-16 00:00:00 AAPL 6619 @ 3.19964289665222"
+```
+
+```
+## [1] "2007-08-17 00:00:00 AAPL -6619 @ 4.35928583145142"
+```
+
+```
+## [1] "2007-09-05 00:00:00 AAPL 4075 @ 4.88428592681885"
+```
+
+```
+## [1] "2008-01-16 00:00:00 AAPL -4075 @ 5.70142889022827"
+```
+
+```
+## [1] "2008-03-31 00:00:00 AAPL 4529 @ 5.125"
+```
+
+```
+## [1] "2008-06-26 00:00:00 AAPL -4529 @ 6.00928592681885"
+```
+
+```
+## [1] "2008-08-20 00:00:00 AAPL 3576 @ 6.28000020980835"
+```
+
+```
+## [1] "2008-09-09 00:00:00 AAPL -3576 @ 5.41714286804199"
+```
+
+```
+## [1] "2009-02-06 00:00:00 AAPL 6287 @ 3.56142902374268"
+```
+
+```
+## [1] "2009-03-04 00:00:00 AAPL -6287 @ 3.25607109069824"
+## [1] "2009-03-19 00:00:00 AAPL 6330 @ 3.62928605079651"
+```
+
+```
+## [1] "2009-12-15 00:00:00 AAPL -6330 @ 6.93464279174805"
+## [1] "2009-12-29 00:00:00 AAPL 2892 @ 7.46785688400269"
+```
+
+```
+## [1] "2010-02-03 00:00:00 AAPL -2892 @ 7.11535692214966"
+```
+
+```
+## [1] "2010-03-04 00:00:00 AAPL 2819 @ 7.52535676956177"
+```
+
+```
+## [1] "2010-07-16 00:00:00 AAPL -2819 @ 8.92500019073486"
+```
+
+```
+## [1] "2010-08-03 00:00:00 AAPL 2251 @ 9.35464286804199"
+## [1] "2010-08-17 00:00:00 AAPL -2251 @ 8.99892902374268"
+```
+
+```
+## [1] "2010-09-15 00:00:00 AAPL 2380 @ 9.65071392059326"
+```
+
+```
+## [1] "2011-03-22 00:00:00 AAPL -2380 @ 12.1857137680054"
+```
+
+```
+## [1] "2011-05-03 00:00:00 AAPL 1662 @ 12.4357137680054"
+## [1] "2011-05-23 00:00:00 AAPL -1662 @ 11.9428567886353"
+```
+
+```
+## [1] "2011-07-11 00:00:00 AAPL 1732 @ 12.6428565979004"
+```
+
+```
+## [1] "2011-11-16 00:00:00 AAPL -1732 @ 13.7417860031128"
+```
+
+```
+## [1] "2011-12-27 00:00:00 AAPL 1524 @ 14.518928527832"
+```
+
+```
+## [1] "2012-05-09 00:00:00 AAPL -1524 @ 20.3278560638428"
+```
+
+```
+## [1] "2012-06-20 00:00:00 AAPL 1017 @ 20.9192867279053"
+```
+
+```
+## [1] "2012-10-12 00:00:00 AAPL -1017 @ 22.4896430969238"
+```
+
+```
+## [1] "2013-05-09 00:00:00 AAPL 1329 @ 16.3132133483887"
+```
+
+```
+## [1] "2013-06-19 00:00:00 AAPL -1329 @ 15.1071434020996"
+```
+
+```
+## [1] "2013-07-26 00:00:00 AAPL 1481 @ 15.7496433258057"
+```
+
+```
+## [1] "2014-01-22 00:00:00 AAPL -1481 @ 19.6967868804932"
+## [1] "2014-01-24 00:00:00 AAPL 1053 @ 19.5025005340576"
+## [1] "2014-01-29 00:00:00 AAPL -1053 @ 17.8839282989502"
+```
+
+```
+## [1] "2014-03-26 00:00:00 AAPL 1121 @ 19.2778568267822"
+```
+
+```
+## [1] "2014-04-15 00:00:00 AAPL -1121 @ 18.498571395874"
+## [1] "2014-04-29 00:00:00 AAPL 1099 @ 21.1546421051025"
+```
+
+```
+## [1] "2014-10-17 00:00:00 AAPL -1099 @ 24.4174995422363"
+## [1] "2014-10-27 00:00:00 AAPL 839 @ 26.2775001525879"
+```
+
+```
+## [1] "2015-01-06 00:00:00 AAPL -839 @ 26.5650005340576"
+```
+
+```
+## [1] "2015-02-02 00:00:00 AAPL 721 @ 29.6574993133545"
+```
+
+```
+## [1] "2015-06-19 00:00:00 AAPL -721 @ 31.6499996185303"
+```
+
+```
+## [1] "2015-10-27 00:00:00 AAPL 767 @ 28.6375007629395"
+```
+
+```
+## [1] "2015-12-16 00:00:00 AAPL -767 @ 27.8349990844727"
+```
+
+```
+## [1] "2016-03-09 00:00:00 AAPL 874 @ 25.2800006866455"
+```
+
+```
+## [1] "2016-05-02 00:00:00 AAPL -874 @ 23.4099998474121"
+```
+
+```
+## [1] "2016-07-20 00:00:00 AAPL 883 @ 24.9899997711182"
+```
+
+```
+## [1] "2016-11-09 00:00:00 AAPL -883 @ 27.7199993133545"
+```
+
+```
+## [1] "2016-12-15 00:00:00 AAPL 766 @ 28.9549999237061"
+```
+
+```
+## [1] "2017-06-20 00:00:00 AAPL -766 @ 36.252498626709"
+```
+
+```
+## [1] "2017-07-25 00:00:00 AAPL 591 @ 38.185001373291"
+```
+
+```
+## [1] "2017-09-27 00:00:00 AAPL -591 @ 38.5574989318848"
+```
+
+```
+## [1] "2017-10-24 00:00:00 AAPL 552 @ 39.2750015258789"
+```
+
+```
+## [1] "2018-02-02 00:00:00 AAPL -552 @ 40.125"
+```
+
+```
+## [1] "2018-03-01 00:00:00 AAPL 478 @ 43.75"
+```
+
+```
+## [1] "2018-04-02 00:00:00 AAPL -478 @ 41.6699981689453"
+## [1] "2018-04-19 00:00:00 AAPL 507 @ 43.2000007629395"
+## [1] "2018-04-25 00:00:00 AAPL -507 @ 40.9124984741211"
+```
+
+```
+## [1] "2018-05-09 00:00:00 AAPL 514 @ 46.8400001525879"
+```
+
+```
+## [1] "2018-07-06 00:00:00 AAPL -514 @ 46.9925003051758"
+## [1] "2018-07-11 00:00:00 AAPL 459 @ 46.9700012207031"
+```
+
+```
+## [1] "2018-10-29 00:00:00 AAPL -459 @ 53.060001373291"
+```
+
+```
+## [1] "2019-02-08 00:00:00 AAPL 512 @ 42.6025009155273"
+```
+
+```
+## [1] "2019-05-21 00:00:00 AAPL -512 @ 46.6500015258789"
+```
+
+```
+## [1] "2019-06-21 00:00:00 AAPL 487 @ 49.6949996948242"
+```
+
+```
+## [1] "2020-03-02 00:00:00 AAPL -487 @ 74.7024993896484"
+```
+
+```
+## [1] "2020-04-23 00:00:00 AAPL 339 @ 68.7574996948242"
+```
+
+```
+## [1] "2020-09-25 00:00:00 AAPL -339 @ 112.279998779297"
+```
+
+```
+## [1] "2020-10-13 00:00:00 AAPL 189 @ 121.099998474121"
+```
+
+```
+## [1] "2020-11-03 00:00:00 AAPL -189 @ 110.440002441406"
+## [1] "2020-11-16 00:00:00 AAPL 201 @ 120.300003051758"
+```
+
+```
+## [1] "2021-02-25 00:00:00 AAPL -201 @ 120.98999786377"
+```
+
+```
+## [1] "2021-04-14 00:00:00 AAPL 179 @ 132.029998779297"
+```
+
+```
+## [1] "2021-05-18 00:00:00 AAPL -179 @ 124.849998474121"
+```
+
+```
+## [1] "2021-06-21 00:00:00 AAPL 175 @ 132.300003051758"
+```
+
+```
+## [1] "2021-09-27 00:00:00 AAPL -175 @ 145.369995117188"
+```
+
+```
+## [1] "2021-10-27 00:00:00 AAPL 154 @ 148.850006103516"
+```
+
+```
+## [1] "2022-01-26 00:00:00 AAPL -154 @ 159.690002441406"
+```
+
+```
+## [1] "2022-02-10 00:00:00 AAPL 125 @ 172.119995117188"
+## [1] "2022-02-24 00:00:00 AAPL -125 @ 162.740005493164"
+```
+
+```
+## [1] "2022-03-30 00:00:00 AAPL 132 @ 177.770004272461"
+```
+
+```
+## [1] "2022-04-26 00:00:00 AAPL -132 @ 156.800003051758"
+```
+
+```
+## [1] "2022-07-19 00:00:00 AAPL 160 @ 151"
+```
+
+```
+## [1] "2022-09-13 00:00:00 AAPL -160 @ 153.839996337891"
+```
+
+```
+## [1] "2022-11-23 00:00:00 AAPL 142 @ 151.070007324219"
+```
+
+```
+## [1] "2022-12-08 00:00:00 AAPL -142 @ 142.649993896484"
+```
+
+```
+## [1] "2023-01-30 00:00:00 AAPL 168 @ 143"
+```
+
+```
+## [1] "2023-08-14 00:00:00 AAPL -168 @ 179.460006713867"
+```
+
+```
+## [1] "2023-11-13 00:00:00 AAPL 128 @ 184.800003051758"
+```
+
+```
+## [1] "2024-01-10 00:00:00 AAPL -128 @ 186.190002441406"
+## [1] "2024-01-30 00:00:00 AAPL 114 @ 188.039993286133"
+```
+
+```
+## [1] "2024-02-06 00:00:00 AAPL -114 @ 189.300003051758"
+```
+
+```
+## [1] "2024-05-08 00:00:00 AAPL 129 @ 182.740005493164"
+```
+
+```
+## [1] "2024-08-14 00:00:00 AAPL -129 @ 221.720001220703"
+## [1] "2024-08-16 00:00:00 AAPL 99 @ 226.050003051758"
+```
+
+```
+## [1] "2024-11-11 00:00:00 AAPL -99 @ 224.229995727539"
+## [1] "2024-11-27 00:00:00 AAPL 97 @ 234.929992675781"
+```
+
+```
+## [1] "2025-01-21 00:00:00 AAPL -97 @ 222.639999389648"
+```
+
+```
+## [1] "2025-02-24 00:00:00 AAPL 93 @ 247.100006103516"
+```
+
+```
+## [1] "2025-03-13 00:00:00 AAPL -93 @ 209.679992675781"
+```
+
+```
+## [1] "2025-07-07 00:00:00 AAPL 107 @ 209.949996948242"
+```
+
+``` r
+end_t <- Sys.time()  # 记录回测结束时间
+print(end_t - start_t)  # 打印回测耗时
+```
+
+```
+## Time difference of 8.527371 secs
+```
+
+``` r
+# 更新组合数据：将交易记录同步到组合与账户
+start_t <- Sys.time()
 updatePortf(
   Portfolio = portfolio.st,
-  Dates = paste(&#39;::&#39;, as.Date(Sys.time()), sep=&#39;&#39;)  # 更新至当前日期
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>end_t &lt;- Sys.time()
-print(&quot;trade blotter portfolio update:&quot;)</code></pre>
-<pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
-<pre class="r"><code>print(end_t - start_t)  # 打印更新耗时</code></pre>
-<pre><code>## Time difference of 0.03819585 secs</code></pre>
-<pre class="r"><code># 可视化回测结果：绘制持仓变化与MACD指标
-chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 展示AAPL的持仓变化</code></pre>
+  Dates = paste('::', as.Date(Sys.time()), sep='')  # 更新至当前日期
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+end_t <- Sys.time()
+print("trade blotter portfolio update:")
+```
+
+```
+## [1] "trade blotter portfolio update:"
+```
+
+``` r
+print(end_t - start_t)  # 打印更新耗时
+```
+
+```
+## Time difference of 0.03819585 secs
+```
+
+``` r
+# 可视化回测结果：绘制持仓变化与MACD指标
+chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 展示AAPL的持仓变化
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-1.png" width="672" /></p>
-<pre class="r"><code>plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA, maType=&quot;EMA&quot;))  # 叠加MACD指标（快速EMA=12，慢速EMA=26，信号线=9）</code></pre>
+
+``` r
+plot(add_MACD(fast=fastMA, slow=slowMA, signal=signalMA, maType="EMA"))  # 叠加MACD指标（快速EMA=12，慢速EMA=26，信号线=9）
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-2.png" width="672" /></p>
-<pre class="r"><code># 查看订单簿：获取所有订单的详细记录（用于调试与分析）
-getOrderBook(&#39;macd&#39;)</code></pre>
-<pre><code>## $macd
+
+``` r
+# 查看订单簿：获取所有订单的详细记录（用于调试与分析）
+getOrderBook('macd')
+```
+
+```
+## $macd
 ## $macd$AAPL
 ##            Order.Qty      Order.Price Order.Type Order.Side Order.Threshold
 ## 2007-03-15      6619 3.19892907142639     market       long              NA
@@ -368,8 +728,10 @@ getOrderBook(&#39;macd&#39;)</code></pre>
 ## 2025-07-03              
 ## 
 ## 
-## attr(,&quot;class&quot;)
-## [1] &quot;order_book&quot;</code></pre>
+## attr(,"class")
+## [1] "order_book"
+```
+
 </div>
 <div id="策略核心思路" class="section level1">
 <h1>策略核心思路</h1>

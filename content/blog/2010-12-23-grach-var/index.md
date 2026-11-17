@@ -8,7 +8,6 @@ categories:
 tags:
   - VaR
   - GARCH
-markup: html
 ---
 
 
@@ -70,35 +69,50 @@ VaR_t = \mu_t + \sigma_t \cdot z_\alpha \tag{5}
 <ol style="list-style-type: decimal">
 <li>数据准备与预处理使用 quantmod 获取 TSLA 股票数据并计算对数收益率：</li>
 </ol>
-<pre class="r"><code># 安装并加载包
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
-if (!require(&quot;rugarch&quot;)) install.packages(&quot;rugarch&quot;)
-if (!require(&quot;ggplot2&quot;)) install.packages(&quot;ggplot2&quot;)
+
+``` r
+# 安装并加载包
+if (!require("quantmod")) install.packages("quantmod")
+if (!require("rugarch")) install.packages("rugarch")
+if (!require("ggplot2")) install.packages("ggplot2")
 library(quantmod)
 library(rugarch)
 library(ggplot2)
 
 # 获取TSLA数据（2018-2023年）
-getSymbols(&quot;TSLA&quot;, from = &quot;2018-01-01&quot;, to = &quot;2023-12-31&quot;)</code></pre>
-<pre><code>## [1] &quot;TSLA&quot;</code></pre>
-<pre class="r"><code>tsla_close &lt;- TSLA$TSLA.Close  # 提取收盘价
-ret &lt;- diff(log(tsla_close))  # 计算对数收益率
-ret &lt;- na.omit(ret)  # 去除缺失值
-colnames(ret) &lt;- &quot;TSLA_Return&quot;</code></pre>
+getSymbols("TSLA", from = "2018-01-01", to = "2023-12-31")
+```
+
+```
+## [1] "TSLA"
+```
+
+``` r
+tsla_close <- TSLA$TSLA.Close  # 提取收盘价
+ret <- diff(log(tsla_close))  # 计算对数收益率
+ret <- na.omit(ret)  # 去除缺失值
+colnames(ret) <- "TSLA_Return"
+```
+
 <ol start="2" style="list-style-type: decimal">
 <li>拟合 GARCH 模型以 GARCH (1,1) 为例，分别假设正态分布、t 分布和 GED 分布：</li>
 </ol>
-<pre class="r"><code># 定义模型规范（正态分布）
-garch_spec_norm &lt;- ugarchspec(
-  variance.model = list(model = &quot;sGARCH&quot;, garchOrder = c(1,1)),  # 标准GARCH(1,1)
+
+``` r
+# 定义模型规范（正态分布）
+garch_spec_norm <- ugarchspec(
+  variance.model = list(model = "sGARCH", garchOrder = c(1,1)),  # 标准GARCH(1,1)
   mean.model = list(armaOrder = c(0,0)),  # 均值模型为常数（无ARMA项）
-  distribution.model = &quot;norm&quot;  # 正态分布
+  distribution.model = "norm"  # 正态分布
 )
 
 # 拟合模型
-garch_fit_norm &lt;- ugarchfit(spec = garch_spec_norm, data = ret)
-print(garch_fit_norm)  # 输出参数估计结果</code></pre>
-<pre><code>## 
+garch_fit_norm <- ugarchfit(spec = garch_spec_norm, data = ret)
+print(garch_fit_norm)  # 输出参数估计结果
+```
+
+```
+## 
 ## *---------------------------------*
 ## *          GARCH Model Fit        *
 ## *---------------------------------*
@@ -111,14 +125,14 @@ print(garch_fit_norm)  # 输出参数估计结果</code></pre>
 ## 
 ## Optimal Parameters
 ## ------------------------------------
-##         Estimate  Std. Error  t value Pr(&gt;|t|)
+##         Estimate  Std. Error  t value Pr(>|t|)
 ## mu      0.001551    0.000945   1.6407 0.100852
 ## omega   0.000080    0.000025   3.1932 0.001407
 ## alpha1  0.066008    0.013489   4.8936 0.000001
 ## beta1   0.883325    0.026129  33.8057 0.000000
 ## 
 ## Robust Standard Errors:
-##         Estimate  Std. Error  t value Pr(&gt;|t|)
+##         Estimate  Std. Error  t value Pr(>|t|)
 ## mu      0.001551    0.001042   1.4883 0.136684
 ## omega   0.000080    0.000041   1.9324 0.053305
 ## alpha1  0.066008    0.020564   3.2098 0.001328
@@ -189,17 +203,22 @@ print(garch_fit_norm)  # 输出参数估计结果</code></pre>
 ## 4    50    129.67    3.238e-09
 ## 
 ## 
-## Elapsed time : 0.1193922</code></pre>
-<pre class="r"><code># 扩展：拟合GARCH-t和GARCH-GED
-garch_spec_t &lt;- ugarchspec(variance.model = list(model = &quot;sGARCH&quot;, garchOrder = c(1,1)),
-                           mean.model = list(armaOrder = c(0,0)),
-                           distribution.model = &quot;std&quot;)  # 学生t分布
-garch_fit_t &lt;- ugarchfit(spec = garch_spec_t, data = ret)
+## Elapsed time : 0.1193922
+```
 
-garch_spec_ged &lt;- ugarchspec(variance.model = list(model = &quot;sGARCH&quot;, garchOrder = c(1,1)),
+``` r
+# 扩展：拟合GARCH-t和GARCH-GED
+garch_spec_t <- ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
+                           mean.model = list(armaOrder = c(0,0)),
+                           distribution.model = "std")  # 学生t分布
+garch_fit_t <- ugarchfit(spec = garch_spec_t, data = ret)
+
+garch_spec_ged <- ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1,1)),
                              mean.model = list(armaOrder = c(0,0)),
-                             distribution.model = &quot;ged&quot;)  # GED分布
-garch_fit_ged &lt;- ugarchfit(spec = garch_spec_ged, data = ret)</code></pre>
+                             distribution.model = "ged")  # GED分布
+garch_fit_ged <- ugarchfit(spec = garch_spec_ged, data = ret)
+```
+
 <ol start="3" style="list-style-type: decimal">
 <li>模型参数解读</li>
 </ol>
@@ -211,65 +230,90 @@ garch_fit_ged &lt;- ugarchfit(spec = garch_spec_ged, data = ret)</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>计算 VaR基于拟合模型预测条件波动率，并计算不同置信水平的 VaR：</li>
 </ol>
-<pre class="r"><code># 提取条件标准差（在样内预测）
-sigma_norm &lt;- sigma(garch_fit_norm)  # 正态分布GARCH的条件标准差
+
+``` r
+# 提取条件标准差（在样内预测）
+sigma_norm <- sigma(garch_fit_norm)  # 正态分布GARCH的条件标准差
 
 # 定义分位数函数（计算z_alpha）
-quantile_fun &lt;- function(conf_level, dist) {
-  alpha &lt;- 1 - conf_level
-  if (dist == &quot;norm&quot;) {
+quantile_fun <- function(conf_level, dist) {
+  alpha <- 1 - conf_level
+  if (dist == "norm") {
     return(qnorm(alpha))  # 正态分布分位数
-  } else if (dist == &quot;std&quot;) {
-    nu &lt;- coef(garch_fit_t)[&quot;shape&quot;]  # 学生t分布自由度
+  } else if (dist == "std") {
+    nu <- coef(garch_fit_t)["shape"]  # 学生t分布自由度
     return(qt(alpha, df = nu))
-  } else if (dist == &quot;ged&quot;) {
-    nu &lt;- coef(garch_fit_ged)[&quot;shape&quot;]  # GED分布形状参数
+  } else if (dist == "ged") {
+    nu <- coef(garch_fit_ged)["shape"]  # GED分布形状参数
     return(qged(alpha, shape = nu))
   }
 }
 
 # 计算95%和99%置信水平的VaR（以正态分布为例）
-conf_levels &lt;- c(0.95, 0.99)
-z_95 &lt;- quantile_fun(0.95, &quot;norm&quot;)
-z_99 &lt;- quantile_fun(0.99, &quot;norm&quot;)
+conf_levels <- c(0.95, 0.99)
+z_95 <- quantile_fun(0.95, "norm")
+z_99 <- quantile_fun(0.99, "norm")
 
-vaR_95_norm &lt;- 0 + sigma_norm * z_95  # 假设条件均值为0
-vaR_99_norm &lt;- 0 + sigma_norm * z_99
+vaR_95_norm <- 0 + sigma_norm * z_95  # 假设条件均值为0
+vaR_99_norm <- 0 + sigma_norm * z_99
 
 # 整理结果（取绝对值，损失为正）
-vaR_df &lt;- data.frame(
+vaR_df <- data.frame(
   Date = index(ret),
   Return = as.numeric(ret),
   VaR_95 = abs(vaR_95_norm),
   VaR_99 = abs(vaR_99_norm)
-)</code></pre>
+)
+```
+
 <ol start="5" style="list-style-type: decimal">
 <li>结果可视化与回测</li>
 </ol>
-<pre class="r"><code># 可视化收益率与VaR
+
+``` r
+# 可视化收益率与VaR
 ggplot(vaR_df, aes(x = Date)) +
-  geom_line(aes(y = Return, color = &quot;收益率&quot;), alpha = 0.7) +
-  geom_line(aes(y = VaR_95, color = &quot;95% VaR&quot;), linetype = &quot;dashed&quot;) +
-  geom_line(aes(y = VaR_99, color = &quot;99% VaR&quot;), linetype = &quot;dashed&quot;) +
-  labs(title = &quot;TSLA收益率与GARCH模型VaR&quot;,
-       y = &quot;收益率/损失&quot;, x = &quot;日期&quot;, color = &quot;指标&quot;) +
-  theme_minimal()</code></pre>
+  geom_line(aes(y = Return, color = "收益率"), alpha = 0.7) +
+  geom_line(aes(y = VaR_95, color = "95% VaR"), linetype = "dashed") +
+  geom_line(aes(y = VaR_99, color = "99% VaR"), linetype = "dashed") +
+  labs(title = "TSLA收益率与GARCH模型VaR",
+       y = "收益率/损失", x = "日期", color = "指标") +
+  theme_minimal()
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<pre class="r"><code># 回测：计算失败率（实际损失超过VaR的比例）
-fail_95 &lt;- mean(vaR_df$Return &lt; -vaR_df$VaR_95, na.rm = TRUE)
-fail_99 &lt;- mean(vaR_df$Return &lt; -vaR_df$VaR_99, na.rm = TRUE)
-cat(&quot;95% VaR失败率：&quot;, round(fail_95 * 100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## 95% VaR失败率： 4.64 %</code></pre>
-<pre class="r"><code>cat(&quot;99% VaR失败率：&quot;, round(fail_99 * 100, 2), &quot;%\n&quot;)</code></pre>
-<pre><code>## 99% VaR失败率： 1.59 %</code></pre>
+
+``` r
+# 回测：计算失败率（实际损失超过VaR的比例）
+fail_95 <- mean(vaR_df$Return < -vaR_df$VaR_95, na.rm = TRUE)
+fail_99 <- mean(vaR_df$Return < -vaR_df$VaR_99, na.rm = TRUE)
+cat("95% VaR失败率：", round(fail_95 * 100, 2), "%\n")
+```
+
+```
+## 95% VaR失败率： 4.64 %
+```
+
+``` r
+cat("99% VaR失败率：", round(fail_99 * 100, 2), "%\n")
+```
+
+```
+## 99% VaR失败率： 1.59 %
+```
+
 <ol start="6" style="list-style-type: decimal">
 <li>不同模型的 VaR 对比</li>
 </ol>
 <p>可对比 GARCH-t、GARCH-GED 与正态 GARCH 的 VaR 结果，通常非正态分布假设下的 VaR 更大，更保守：</p>
-<pre class="r"><code># 计算GARCH-t的VaR（95%置信水平）
-sigma_t &lt;- sigma(garch_fit_t)
-z_95_t &lt;- quantile_fun(0.95, &quot;std&quot;)
-vaR_95_t &lt;- abs(sigma_t * z_95_t)</code></pre>
+
+``` r
+# 计算GARCH-t的VaR（95%置信水平）
+sigma_t <- sigma(garch_fit_t)
+z_95_t <- quantile_fun(0.95, "std")
+vaR_95_t <- abs(sigma_t * z_95_t)
+```
+
 <p>四、结论</p>
 <p>GARCH 模型通过捕捉波动率的动态变化，显著提升了 VaR 估计的准确性，尤其在市场波动剧烈时期（如 TSLA 股价大幅波动阶段）。</p>
 <p>实证显示：TSLA 收益率存在明显的波动聚类特性，GARCH (1,1) 能有效拟合；基于 t 分布或 GED 分布的 GARCH 模型计算的 VaR 更能反映尾部风险，失败率更接近理论置信水平；实际应用中可根据资产特性选择模型变种（如 EGARCH 捕捉杠杆效应）或分布假设。</p>

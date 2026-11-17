@@ -8,7 +8,6 @@ categories:
 tags:
   - R
   - VaR
-markup: html
 ---
 
 
@@ -65,79 +64,130 @@ F(-VaR) = \alpha \cdot \Phi\left(-VaR; \mu_1, \sigma_1^2\right) + (1-\alpha) \cd
 <ol style="list-style-type: decimal">
 <li>加载所需包</li>
 </ol>
-<pre class="r"><code># 安装并加载包
-if (!require(&quot;quantmod&quot;)) install.packages(&quot;quantmod&quot;)
-if (!require(&quot;mixtools&quot;)) install.packages(&quot;mixtools&quot;)
-if (!require(&quot;ggplot2&quot;)) install.packages(&quot;ggplot2&quot;)
+
+``` r
+# 安装并加载包
+if (!require("quantmod")) install.packages("quantmod")
+if (!require("mixtools")) install.packages("mixtools")
+if (!require("ggplot2")) install.packages("ggplot2")
 library(quantmod)
 library(mixtools)
-library(ggplot2)</code></pre>
+library(ggplot2)
+```
+
 <ol start="2" style="list-style-type: decimal">
 <li>获取金融数据并计算收益率</li>
 </ol>
 <p>以特斯拉公司的股价为例，计算其对数收益率：</p>
-<pre class="r"><code># 获取数据（近5年）
-getSymbols(&quot;TSLA&quot;, from = &quot;2023-01-01&quot;, to = &quot;2025-01-01&quot;)</code></pre>
-<pre><code>## [1] &quot;TSLA&quot;</code></pre>
-<pre class="r"><code>tsla &lt;- na.omit(Cl(TSLA))  # 提取收盘价并去除缺失值
+
+``` r
+# 获取数据（近5年）
+getSymbols("TSLA", from = "2023-01-01", to = "2025-01-01")
+```
+
+```
+## [1] "TSLA"
+```
+
+``` r
+tsla <- na.omit(Cl(TSLA))  # 提取收盘价并去除缺失值
 
 # 计算对数收益率
-returns &lt;- diff(log(tsla))
-returns &lt;- na.omit(returns)  # 去除NA值
-colnames(returns) &lt;- &quot;收益率&quot;</code></pre>
+returns <- diff(log(tsla))
+returns <- na.omit(returns)  # 去除NA值
+colnames(returns) <- "收益率"
+```
+
 <ol start="3" style="list-style-type: decimal">
 <li>拟合混合正态模型</li>
 </ol>
 <p>使用 mixtools::normalmixEM<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> 拟合两成分混合正态分布：</p>
-<pre class="r"><code># 拟合混合正态模型（2个成分）
+
+``` r
+# 拟合混合正态模型（2个成分）
 set.seed(123)  # 设置随机种子，保证结果可复现
-mix_model &lt;- normalmixEM(returns, k = 2, maxit = 1000)</code></pre>
-<pre><code>## number of iterations= 146</code></pre>
-<pre class="r"><code># 输出参数估计结果
-cat(&quot;混合正态模型参数估计：\n&quot;)</code></pre>
-<pre><code>## 混合正态模型参数估计：</code></pre>
-<pre class="r"><code>cat(paste(&quot;权重 α =&quot;, round(mix_model$lambda[1], 4), &quot;\n&quot;))</code></pre>
-<pre><code>## 权重 α = 0.839</code></pre>
-<pre class="r"><code>cat(paste(&quot;成分1：均值 μ1 =&quot;, round(mix_model$mu[1], 6), 
-          &quot;，标准差 σ1 =&quot;, round(mix_model$sigma[1], 6), &quot;\n&quot;))</code></pre>
-<pre><code>## 成分1：均值 μ1 = 0.001422 ，标准差 σ1 = 0.027839</code></pre>
-<pre class="r"><code>cat(paste(&quot;成分2：均值 μ2 =&quot;, round(mix_model$mu[2], 6), 
-          &quot;，标准差 σ2 =&quot;, round(mix_model$sigma[2], 6), &quot;\n&quot;))</code></pre>
-<pre><code>## 成分2：均值 μ2 = 0.008931 ，标准差 σ2 = 0.063941</code></pre>
+mix_model <- normalmixEM(returns, k = 2, maxit = 1000)
+```
+
+```
+## number of iterations= 146
+```
+
+``` r
+# 输出参数估计结果
+cat("混合正态模型参数估计：\n")
+```
+
+```
+## 混合正态模型参数估计：
+```
+
+``` r
+cat(paste("权重 α =", round(mix_model$lambda[1], 4), "\n"))
+```
+
+```
+## 权重 α = 0.839
+```
+
+``` r
+cat(paste("成分1：均值 μ1 =", round(mix_model$mu[1], 6), 
+          "，标准差 σ1 =", round(mix_model$sigma[1], 6), "\n"))
+```
+
+```
+## 成分1：均值 μ1 = 0.001422 ，标准差 σ1 = 0.027839
+```
+
+``` r
+cat(paste("成分2：均值 μ2 =", round(mix_model$mu[2], 6), 
+          "，标准差 σ2 =", round(mix_model$sigma[2], 6), "\n"))
+```
+
+```
+## 成分2：均值 μ2 = 0.008931 ，标准差 σ2 = 0.063941
+```
+
 <ol start="4" style="list-style-type: decimal">
 <li>定义混合正态分布的 CDF 及 VaR 计算函数</li>
 </ol>
-<pre class="r"><code># 混合正态分布的累积分布函数（CDF）
-mix_normal_cdf &lt;- function(x, alpha, mu1, sigma1, mu2, sigma2) {
+
+``` r
+# 混合正态分布的累积分布函数（CDF）
+mix_normal_cdf <- function(x, alpha, mu1, sigma1, mu2, sigma2) {
   alpha * pnorm(x, mean = mu1, sd = sigma1) + 
   (1 - alpha) * pnorm(x, mean = mu2, sd = sigma2)
 }
 
 # 用二分法求解VaR
-var_mixture_normal &lt;- function(conf_level, alpha, mu1, sigma1, mu2, sigma2, data) {
-  beta &lt;- 1 - conf_level  # 尾概率
+var_mixture_normal <- function(conf_level, alpha, mu1, sigma1, mu2, sigma2, data) {
+  beta <- 1 - conf_level  # 尾概率
   # 确定搜索区间（基于数据的极值）
-  lower &lt;- min(data) * 2
-  upper &lt;- 0  # VaR为损失，对应收益率分布的左侧尾部
+  lower <- min(data) * 2
+  upper <- 0  # VaR为损失，对应收益率分布的左侧尾部
   # 二分法迭代求解
   for (i in 1:1000) {
-    mid &lt;- (lower + upper) / 2
-    cdf_val &lt;- mix_normal_cdf(mid, alpha, mu1, sigma1, mu2, sigma2)
-    if (cdf_val &lt; beta) {
-      lower &lt;- mid
+    mid <- (lower + upper) / 2
+    cdf_val <- mix_normal_cdf(mid, alpha, mu1, sigma1, mu2, sigma2)
+    if (cdf_val < beta) {
+      lower <- mid
     } else {
-      upper &lt;- mid
+      upper <- mid
     }
-    if (abs(cdf_val - beta) &lt; 1e-6) break  # 精度满足时停止
+    if (abs(cdf_val - beta) < 1e-6) break  # 精度满足时停止
   }
   return(-upper)  # 返回VaR（损失值为正）
-}</code></pre>
+}
+```
+
 <ol start="5" style="list-style-type: decimal">
 <li>计算 VaR 并与传统方法对比</li>
 </ol>
-<pre class="r"><code># 计算95%和99%置信水平下的VaR
-conf_levels &lt;- c(0.95, 0.99)
-var_results &lt;- sapply(conf_levels, function(cl) {
+
+``` r
+# 计算95%和99%置信水平下的VaR
+conf_levels <- c(0.95, 0.99)
+var_results <- sapply(conf_levels, function(cl) {
   var_mixture_normal(conf_level = cl,
                      alpha = mix_model$lambda[1],
                      mu1 = mix_model$mu[1],
@@ -148,34 +198,65 @@ var_results &lt;- sapply(conf_levels, function(cl) {
 })
 
 # 输出VaR结果
-cat(&quot;\n混合正态模型VaR计算结果：\n&quot;)</code></pre>
-<pre><code>## 
-## 混合正态模型VaR计算结果：</code></pre>
-<pre class="r"><code>for (i in 1:length(conf_levels)) {
-  cat(paste(conf_levels[i] * 100, &quot;%置信水平下的VaR =&quot;, 
-            round(var_results[i], 6), &quot;\n&quot;))
-}</code></pre>
-<pre><code>## 95 %置信水平下的VaR = 0.052193 
-## 99 %置信水平下的VaR = 0.090665</code></pre>
-<pre class="r"><code># 与传统正态分布假设下的VaR对比
-var_normal_95 &lt;- quantile(returns, probs = 0.05)  # 正态假设下95% VaR
-var_normal_99 &lt;- quantile(returns, probs = 0.01)  # 正态假设下99% VaR
-cat(&quot;\n传统正态分布假设下的VaR：\n&quot;)</code></pre>
-<pre><code>## 
-## 传统正态分布假设下的VaR：</code></pre>
-<pre class="r"><code>cat(paste(&quot;95%置信水平下的VaR =&quot;, round(-as.numeric(var_normal_95), 6), &quot;\n&quot;))</code></pre>
-<pre><code>## 95%置信水平下的VaR = 0.051618</code></pre>
-<pre class="r"><code>cat(paste(&quot;99%置信水平下的VaR =&quot;, round(-as.numeric(var_normal_99), 6), &quot;\n&quot;))</code></pre>
-<pre><code>## 99%置信水平下的VaR = 0.091924</code></pre>
+cat("\n混合正态模型VaR计算结果：\n")
+```
+
+```
+## 
+## 混合正态模型VaR计算结果：
+```
+
+``` r
+for (i in 1:length(conf_levels)) {
+  cat(paste(conf_levels[i] * 100, "%置信水平下的VaR =", 
+            round(var_results[i], 6), "\n"))
+}
+```
+
+```
+## 95 %置信水平下的VaR = 0.052193 
+## 99 %置信水平下的VaR = 0.090665
+```
+
+``` r
+# 与传统正态分布假设下的VaR对比
+var_normal_95 <- quantile(returns, probs = 0.05)  # 正态假设下95% VaR
+var_normal_99 <- quantile(returns, probs = 0.01)  # 正态假设下99% VaR
+cat("\n传统正态分布假设下的VaR：\n")
+```
+
+```
+## 
+## 传统正态分布假设下的VaR：
+```
+
+``` r
+cat(paste("95%置信水平下的VaR =", round(-as.numeric(var_normal_95), 6), "\n"))
+```
+
+```
+## 95%置信水平下的VaR = 0.051618
+```
+
+``` r
+cat(paste("99%置信水平下的VaR =", round(-as.numeric(var_normal_99), 6), "\n"))
+```
+
+```
+## 99%置信水平下的VaR = 0.091924
+```
+
 <ol start="6" style="list-style-type: decimal">
 <li>可视化结果</li>
 </ol>
-<pre class="r"><code># 绘制收益率分布直方图及混合正态模型拟合曲线
-p &lt;- ggplot(data = as.data.frame(returns), aes(x = 收益率)) +
+
+``` r
+# 绘制收益率分布直方图及混合正态模型拟合曲线
+p <- ggplot(data = as.data.frame(returns), aes(x = 收益率)) +
   geom_histogram(aes(y = after_stat(density)), 
                  bins = 50, 
-                 fill = &quot;lightblue&quot;, 
-                 color = &quot;black&quot;, 
+                 fill = "lightblue", 
+                 color = "black", 
                  alpha = 0.7) +
   stat_function(fun = function(x) {  # 混合正态模型密度曲线
     mix_model$lambda[1] * dnorm(x, 
@@ -184,19 +265,21 @@ p &lt;- ggplot(data = as.data.frame(returns), aes(x = 收益率)) +
     mix_model$lambda[2] * dnorm(x, 
                                 mean = mix_model$mu[2], 
                                 sd = mix_model$sigma[2])
-  }, color = &quot;red&quot;, linewidth = 1) +
+  }, color = "red", linewidth = 1) +
   geom_vline(xintercept = -var_results[1], 
-             color = &quot;blue&quot;, 
-             linetype = &quot;dashed&quot;, 
+             color = "blue", 
+             linetype = "dashed", 
              linewidth = 1) +
   geom_vline(xintercept = -var_results[2], 
-             color = &quot;purple&quot;, 
-             linetype = &quot;dashed&quot;, 
+             color = "purple", 
+             linetype = "dashed", 
              linewidth = 1) +
-  labs(title = &quot;特斯拉收益率分布与混合正态模型拟合&quot;,
-       x = &quot;对数收益率&quot;, y = &quot;密度&quot;) +
+  labs(title = "特斯拉收益率分布与混合正态模型拟合",
+       x = "对数收益率", y = "密度") +
   theme_minimal()
-print(p)</code></pre>
+print(p)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="四结论" class="section level1">

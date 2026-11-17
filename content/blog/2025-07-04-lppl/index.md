@@ -8,7 +8,6 @@ categories:
 tags:
   - 股票
   - LPPL
-markup: html
 ---
 
 
@@ -79,64 +78,75 @@ markup: html
 <div id="r-语言实现-lppl-模型分析" class="section level1">
 <h1>R 语言实现 LPPL 模型分析</h1>
 <p>下面是使用 R 语言实现 LPPL 模型分析纳斯达克指数的完整代码：</p>
-<pre class="r"><code># 加载必要的包
+
+``` r
+# 加载必要的包
 library(quantmod)
 library(DEoptim)
 library(ggplot2)
 library(reshape2)
 library(showtext)
-font_add(&quot;SimHei&quot;, regular=&quot;SimHei.ttf&quot;)
+font_add("SimHei", regular="SimHei.ttf")
 showtext_auto()
 
 # 获取纳斯达克指数数据
-getSymbols(&quot;^IXIC&quot;, from = &quot;2024-01-01&quot;, to = Sys.Date())</code></pre>
-<pre><code>## [1] &quot;IXIC&quot;</code></pre>
-<pre class="r"><code>nasdaq &lt;- IXIC$IXIC.Close
-names(nasdaq) &lt;- &quot;Close&quot;
+getSymbols("^IXIC", from = "2024-01-01", to = Sys.Date())
+```
+
+```
+## [1] "IXIC"
+```
+
+``` r
+nasdaq <- IXIC$IXIC.Close
+names(nasdaq) <- "Close"
 
 # 数据预处理
-prices &lt;- as.numeric(nasdaq)
-dates &lt;- index(nasdaq)
-t &lt;- seq_along(prices)
+prices <- as.numeric(nasdaq)
+dates <- index(nasdaq)
+t <- seq_along(prices)
 
 # LPPL模型函数（优化数值稳定性）
-lppl &lt;- function(t, tc, beta, omega, phi, A, B, C) {
-  safe_diff &lt;- pmax(tc - t, 1e-10)
-  power_term &lt;- safe_diff^beta
-  cos_term &lt;- cos(omega * log(safe_diff) + phi)
-  result &lt;- A + B * power_term + C * power_term * cos_term
-  result &lt;- pmax(pmin(result, 20), -20)
+lppl <- function(t, tc, beta, omega, phi, A, B, C) {
+  safe_diff <- pmax(tc - t, 1e-10)
+  power_term <- safe_diff^beta
+  cos_term <- cos(omega * log(safe_diff) + phi)
+  result <- A + B * power_term + C * power_term * cos_term
+  result <- pmax(pmin(result, 20), -20)
   return(result)
 }
 
 # 残差平方和函数
-lppl_sse &lt;- function(params, t, y) {
-  tc &lt;- params[1]
-  beta &lt;- params[2]
-  omega &lt;- params[3]
-  phi &lt;- params[4]
-  A &lt;- params[5]
-  B &lt;- params[6]
-  C &lt;- params[7]
+lppl_sse <- function(params, t, y) {
+  tc <- params[1]
+  beta <- params[2]
+  omega <- params[3]
+  phi <- params[4]
+  A <- params[5]
+  B <- params[6]
+  C <- params[7]
   
-  if (tc &lt;= max(t) + 1 || beta &lt;= 0 || beta &gt;= 1 || omega &lt;= 0 || A &lt; 0) {
+  if (tc <= max(t) + 1 || beta <= 0 || beta >= 1 || omega <= 0 || A < 0) {
     return(1e10)
   }
   
-  y_pred &lt;- lppl(t, tc, beta, omega, phi, A, B, C)
+  y_pred <- lppl(t, tc, beta, omega, phi, A, B, C)
   sum((log(y) - y_pred)^2)
 }
 
 # 定义参数优化边界
-lower &lt;- c(max(t) + 5, 0.1, 2 * pi, 0, min(log(prices)), -100, -100)
-upper &lt;- c(max(t) + 365, 0.9, 10 * pi, 2 * pi, max(log(prices)), 100, 100)
+lower <- c(max(t) + 5, 0.1, 2 * pi, 0, min(log(prices)), -100, -100)
+upper <- c(max(t) + 365, 0.9, 10 * pi, 2 * pi, max(log(prices)), 100, 100)
 
 # 差分进化算法优化
 set.seed(123)
-result &lt;- DEoptim(lppl_sse, lower, upper,
+result <- DEoptim(lppl_sse, lower, upper,
                   control = list(itermax = 200, NP = 100, strategy = 2, trace = TRUE),
-                  t = t, y = prices)</code></pre>
-<pre><code>## Iteration: 1 bestvalit: 39895.714279 bestmemit:  476.249449    0.558294   18.948798    5.937831    9.814416   68.908510  -38.291566
+                  t = t, y = prices)
+```
+
+```
+## Iteration: 1 bestvalit: 39895.714279 bestmemit:  476.249449    0.558294   18.948798    5.937831    9.814416   68.908510  -38.291566
 ## Iteration: 2 bestvalit: 29497.840447 bestmemit:  434.050449    0.319333   13.766252    6.139294    9.924482    5.318016   -6.565053
 ## Iteration: 3 bestvalit: 29497.840447 bestmemit:  434.050449    0.319333   13.766252    6.139294    9.924482    5.318016   -6.565053
 ## Iteration: 4 bestvalit: 29497.840447 bestmemit:  434.050449    0.319333   13.766252    6.139294    9.924482    5.318016   -6.565053
@@ -335,117 +345,149 @@ result &lt;- DEoptim(lppl_sse, lower, upper,
 ## Iteration: 197 bestvalit: 1.232035 bestmemit:  464.938535    0.105270    6.670577    4.162642    9.899531   -0.058988   -0.048299
 ## Iteration: 198 bestvalit: 1.232035 bestmemit:  464.938535    0.105270    6.670577    4.162642    9.899531   -0.058988   -0.048299
 ## Iteration: 199 bestvalit: 1.232035 bestmemit:  464.938535    0.105270    6.670577    4.162642    9.899531   -0.058988   -0.048299
-## Iteration: 200 bestvalit: 1.232035 bestmemit:  464.938535    0.105270    6.670577    4.162642    9.899531   -0.058988   -0.048299</code></pre>
-<pre class="r"><code>best_params &lt;- result$optim$bestmem
-names(best_params) &lt;- c(&quot;tc&quot;, &quot;beta&quot;, &quot;omega&quot;, &quot;phi&quot;, &quot;A&quot;, &quot;B&quot;, &quot;C&quot;)
+## Iteration: 200 bestvalit: 1.232035 bestmemit:  464.938535    0.105270    6.670577    4.162642    9.899531   -0.058988   -0.048299
+```
+
+``` r
+best_params <- result$optim$bestmem
+names(best_params) <- c("tc", "beta", "omega", "phi", "A", "B", "C")
 
 # 计算拟合值
-fitted_values &lt;- lppl(t, best_params[&quot;tc&quot;], best_params[&quot;beta&quot;],
-                      best_params[&quot;omega&quot;], best_params[&quot;phi&quot;],
-                      best_params[&quot;A&quot;], best_params[&quot;B&quot;], best_params[&quot;C&quot;])
-predicted_prices &lt;- exp(fitted_values)
+fitted_values <- lppl(t, best_params["tc"], best_params["beta"],
+                      best_params["omega"], best_params["phi"],
+                      best_params["A"], best_params["B"], best_params["C"])
+predicted_prices <- exp(fitted_values)
 
 # 预测未来120天（修正行数不一致问题）
-future_t &lt;- seq(max(t), max(t) + 119)  # 改为119确保总天数120
-future_fitted &lt;- sapply(future_t, function(x) {
-  if (x &gt;= best_params[&quot;tc&quot;] - 1e-5) {
-    best_params[&quot;A&quot;]
+future_t <- seq(max(t), max(t) + 119)  # 改为119确保总天数120
+future_fitted <- sapply(future_t, function(x) {
+  if (x >= best_params["tc"] - 1e-5) {
+    best_params["A"]
   } else {
-    lppl(x, best_params[&quot;tc&quot;], best_params[&quot;beta&quot;],
-         best_params[&quot;omega&quot;], best_params[&quot;phi&quot;],
-         best_params[&quot;A&quot;], best_params[&quot;B&quot;], best_params[&quot;C&quot;])
+    lppl(x, best_params["tc"], best_params["beta"],
+         best_params["omega"], best_params["phi"],
+         best_params["A"], best_params["B"], best_params["C"])
   }
 })
-future_prices &lt;- exp(future_fitted)
-future_dates &lt;- seq(max(dates), by = &quot;day&quot;, length.out = 120)
+future_prices <- exp(future_fitted)
+future_dates <- seq(max(dates), by = "day", length.out = 120)
 
 # 可视化结果（确保数据长度一致）
-plot_data &lt;- data.frame(
+plot_data <- data.frame(
   Date = c(dates, future_dates),
   Price = c(prices, future_prices),
-  Type = c(rep(&quot;Actual&quot;, length(prices)), rep(&quot;Predicted&quot;, length(future_prices)))
+  Type = c(rep("Actual", length(prices)), rep("Predicted", length(future_prices)))
 )
 
-p1 &lt;- ggplot(plot_data, aes(x = Date, y = Price, color = Type)) +
+p1 <- ggplot(plot_data, aes(x = Date, y = Price, color = Type)) +
   geom_line() +
-  geom_vline(xintercept = as.Date(dates[1]) + best_params[&quot;tc&quot;], linetype = &quot;dashed&quot;) +
-  labs(title = &quot;纳斯达克指数LPPL模型拟合与预测&quot;,
-       y = &quot;指数值&quot;,
-       x = &quot;日期&quot;) +
-  scale_color_manual(values = c(&quot;Actual&quot; = &quot;blue&quot;, &quot;Predicted&quot; = &quot;red&quot;)) +
+  geom_vline(xintercept = as.Date(dates[1]) + best_params["tc"], linetype = "dashed") +
+  labs(title = "纳斯达克指数LPPL模型拟合与预测",
+       y = "指数值",
+       x = "日期") +
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
   theme_minimal()
 
 # 分析对数周期振荡
-oscillations &lt;- best_params[&quot;C&quot;] * (best_params[&quot;tc&quot;] - t)^best_params[&quot;beta&quot;] * 
-  cos(best_params[&quot;omega&quot;] * log(best_params[&quot;tc&quot;] - t) + best_params[&quot;phi&quot;])
+oscillations <- best_params["C"] * (best_params["tc"] - t)^best_params["beta"] * 
+  cos(best_params["omega"] * log(best_params["tc"] - t) + best_params["phi"])
 
 # 可视化振荡部分
-osc_data &lt;- data.frame(
+osc_data <- data.frame(
   Date = dates,
   Oscillation = oscillations
 )
 
-p2 &lt;- ggplot(osc_data, aes(x = Date, y = Oscillation)) +
-  geom_line(color = &quot;blue&quot;) +
-  geom_hline(yintercept = 0, linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
-  labs(title = &quot;LPPL模型中的对数周期振荡&quot;,
-       y = &quot;振荡幅度&quot;,
-       x = &quot;日期&quot;) +
+p2 <- ggplot(osc_data, aes(x = Date, y = Oscillation)) +
+  geom_line(color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  labs(title = "LPPL模型中的对数周期振荡",
+       y = "振荡幅度",
+       x = "日期") +
   theme_minimal()
 
 # 预测未来价格走势（增加稳定性检查）
-future_t &lt;- seq(max(t), max(t) + 120, by = 1)  # 预测未来120天
-future_fitted &lt;- numeric(length(future_t))
+future_t <- seq(max(t), max(t) + 120, by = 1)  # 预测未来120天
+future_fitted <- numeric(length(future_t))
 
 for(i in seq_along(future_t)) {
-  if(future_t[i] &gt;= best_params[&quot;tc&quot;] - 1) {
-    future_fitted[i] &lt;- fitted_values[length(fitted_values)]
+  if(future_t[i] >= best_params["tc"] - 1) {
+    future_fitted[i] <- fitted_values[length(fitted_values)]
   } else {
-    future_fitted[i] &lt;- lppl(future_t[i], best_params[&quot;tc&quot;], best_params[&quot;beta&quot;], 
-                             best_params[&quot;omega&quot;], best_params[&quot;phi&quot;], 
-                             best_params[&quot;A&quot;], best_params[&quot;B&quot;], best_params[&quot;C&quot;])
+    future_fitted[i] <- lppl(future_t[i], best_params["tc"], best_params["beta"], 
+                             best_params["omega"], best_params["phi"], 
+                             best_params["A"], best_params["B"], best_params["C"])
   }
 }
 
-future_prices &lt;- exp(future_fitted)
-future_prices &lt;- ifelse(is.finite(future_prices), future_prices, NA)
+future_prices <- exp(future_fitted)
+future_prices <- ifelse(is.finite(future_prices), future_prices, NA)
 
-future_dates &lt;- seq(max(dates), by = &quot;day&quot;, length.out = length(future_t))
+future_dates <- seq(max(dates), by = "day", length.out = length(future_t))
 
 # 合并历史与预测数据
-prediction_data &lt;- data.frame(
+prediction_data <- data.frame(
   Date = c(as.Date(dates), future_dates),
   Price = c(prices, future_prices),
-  Type = c(rep(&quot;历史&quot;, length(prices)), rep(&quot;预测&quot;, length(future_prices)))
+  Type = c(rep("历史", length(prices)), rep("预测", length(future_prices)))
 )
 
 # 可视化预测结果
-p3 &lt;- ggplot(prediction_data, aes(x = Date, y = Price, color = Type)) +
+p3 <- ggplot(prediction_data, aes(x = Date, y = Price, color = Type)) +
   geom_line() +
-  geom_vline(xintercept = as.numeric(max(dates)), linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
-  labs(title = &quot;纳斯达克指数LPPL模型预测&quot;,
-       y = &quot;指数值&quot;,
-       x = &quot;日期&quot;) +
-  scale_color_manual(values = c(&quot;历史&quot; = &quot;black&quot;, &quot;预测&quot; = &quot;red&quot;)) +
+  geom_vline(xintercept = as.numeric(max(dates)), linetype = "dashed", color = "gray") +
+  labs(title = "纳斯达克指数LPPL模型预测",
+       y = "指数值",
+       x = "日期") +
+  scale_color_manual(values = c("历史" = "black", "预测" = "red")) +
   theme_minimal()
 
-print(p1)</code></pre>
+print(p1)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/LPPL-1.png" width="672" /></p>
-<pre class="r"><code>print(p2)</code></pre>
+
+``` r
+print(p2)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/LPPL-2.png" width="672" /></p>
-<pre class="r"><code>print(p3)</code></pre>
+
+``` r
+print(p3)
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/LPPL-3.png" width="672" /></p>
-<pre class="r"><code># 输出关键参数
-cat(&quot;LPPL模型参数估计结果:\n&quot;)</code></pre>
-<pre><code>## LPPL模型参数估计结果:</code></pre>
-<pre class="r"><code>print(best_params)</code></pre>
-<pre><code>##           tc         beta        omega          phi            A            B 
+
+``` r
+# 输出关键参数
+cat("LPPL模型参数估计结果:\n")
+```
+
+```
+## LPPL模型参数估计结果:
+```
+
+``` r
+print(best_params)
+```
+
+```
+##           tc         beta        omega          phi            A            B 
 ## 464.93853499   0.10526956   6.67057660   4.16264248   9.89953086  -0.05898808 
 ##            C 
-##  -0.04829888</code></pre>
-<pre class="r"><code>cat(&quot;\n预测的临界时间点:&quot;, as.character(as.Date(dates[1] + round(best_params[&quot;tc&quot;]))), &quot;\n&quot;)</code></pre>
-<pre><code>## 
-## 预测的临界时间点: 2025-04-11</code></pre>
+##  -0.04829888
+```
+
+``` r
+cat("\n预测的临界时间点:", as.character(as.Date(dates[1] + round(best_params["tc"]))), "\n")
+```
+
+```
+## 
+## 预测的临界时间点: 2025-04-11
+```
+
 </div>
 <div id="实证分析结果" class="section level1">
 <h1>实证分析结果</h1>

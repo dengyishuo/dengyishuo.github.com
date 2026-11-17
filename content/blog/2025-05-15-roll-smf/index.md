@@ -8,7 +8,6 @@ categories:
 tags:
   - R
   - 量化投资
-markup: html
 ---
 
 
@@ -21,64 +20,66 @@ markup: html
 </div>
 <div id="滚动单因子模型的-r-代码" class="section level2">
 <h2>滚动单因子模型的 R 代码</h2>
-<pre class="r"><code># 获取最新市场数据(2024-01-01至2025-05-15)
-getSymbols(c(&quot;TSLA&quot;, &quot;^IXIC&quot;), from=&quot;2024-01-01&quot;, src=&quot;yahoo&quot;)
-tsla_ret &lt;- dailyReturn(Ad(TSLA))
-nasdaq_ret &lt;- dailyReturn(Ad(IXIC))
+
+``` r
+# 获取最新市场数据(2024-01-01至2025-05-15)
+getSymbols(c("TSLA", "^IXIC"), from="2024-01-01", src="yahoo")
+tsla_ret <- dailyReturn(Ad(TSLA))
+nasdaq_ret <- dailyReturn(Ad(IXIC))
 
 # 改进版滚动SFM函数
 # 高效版滚动SFM函数
-rollSFM &lt;- function(Ra, Rb, window = 60) {
+rollSFM <- function(Ra, Rb, window = 60) {
   # 输入验证
-  n &lt;- length(Ra)
-  if (n != length(Rb)) stop(&quot;Ra和Rb的长度必须相同&quot;)
-  if (n &lt; window) stop(&quot;数据长度必须大于或等于窗口大小&quot;)
+  n <- length(Ra)
+  if (n != length(Rb)) stop("Ra和Rb的长度必须相同")
+  if (n < window) stop("数据长度必须大于或等于窗口大小")
   
   # 预计算累积量用于快速计算
-  cum_sum_x &lt;- cumsum(Rb)
-  cum_sum_y &lt;- cumsum(Ra)
-  cum_sum_xy &lt;- cumsum(Ra * Rb)
-  cum_sum_x2 &lt;- cumsum(Rb^2)
+  cum_sum_x <- cumsum(Rb)
+  cum_sum_y <- cumsum(Ra)
+  cum_sum_xy <- cumsum(Ra * Rb)
+  cum_sum_x2 <- cumsum(Rb^2)
   
   # 初始化结果向量
-  result_size &lt;- n - window + 1
-  alpha &lt;- numeric(result_size)
-  beta &lt;- numeric(result_size)
-  r_squared &lt;- numeric(result_size)
+  result_size <- n - window + 1
+  alpha <- numeric(result_size)
+  beta <- numeric(result_size)
+  r_squared <- numeric(result_size)
   
   # 计算每个窗口的统计量
   for (i in 1:result_size) {
-    end_idx &lt;- i + window - 1
-    start_idx &lt;- end_idx - window + 1
+    end_idx <- i + window - 1
+    start_idx <- end_idx - window + 1
     
     # 快速计算窗口内的统计量
-    sum_x &lt;- cum_sum_x[end_idx] - if(start_idx &gt; 1) cum_sum_x[start_idx - 1] else 0
-    sum_y &lt;- cum_sum_y[end_idx] - if(start_idx &gt; 1) cum_sum_y[start_idx - 1] else 0
-    sum_xy &lt;- cum_sum_xy[end_idx] - if(start_idx &gt; 1) cum_sum_xy[start_idx - 1] else 0
-    sum_x2 &lt;- cum_sum_x2[end_idx] - if(start_idx &gt; 1) cum_sum_x2[start_idx - 1] else 0
+    sum_x <- cum_sum_x[end_idx] - if(start_idx > 1) cum_sum_x[start_idx - 1] else 0
+    sum_y <- cum_sum_y[end_idx] - if(start_idx > 1) cum_sum_y[start_idx - 1] else 0
+    sum_xy <- cum_sum_xy[end_idx] - if(start_idx > 1) cum_sum_xy[start_idx - 1] else 0
+    sum_x2 <- cum_sum_x2[end_idx] - if(start_idx > 1) cum_sum_x2[start_idx - 1] else 0
     
     # 计算均值
-    mean_x &lt;- sum_x / window
-    mean_y &lt;- sum_y / window
+    mean_x <- sum_x / window
+    mean_y <- sum_y / window
     
     # 计算回归系数
-    numerator &lt;- sum_xy - sum_x * mean_y
-    denominator &lt;- sum_x2 - sum_x * mean_x
+    numerator <- sum_xy - sum_x * mean_y
+    denominator <- sum_x2 - sum_x * mean_x
     
     # 避免除以零
     if (denominator == 0) {
-      beta[i] &lt;- NA
-      alpha[i] &lt;- NA
-      r_squared[i] &lt;- NA
+      beta[i] <- NA
+      alpha[i] <- NA
+      r_squared[i] <- NA
     } else {
-      beta[i] &lt;- numerator / denominator
-      alpha[i] &lt;- mean_y - beta[i] * mean_x
+      beta[i] <- numerator / denominator
+      alpha[i] <- mean_y - beta[i] * mean_x
       
       # 计算R²
-      pred_y &lt;- alpha[i] + beta[i] * Rb[start_idx:end_idx]
-      ss_total &lt;- sum((Ra[start_idx:end_idx] - mean_y)^2)
-      ss_residual &lt;- sum((Ra[start_idx:end_idx] - pred_y)^2)
-      r_squared[i] &lt;- 1 - (ss_residual / ss_total)
+      pred_y <- alpha[i] + beta[i] * Rb[start_idx:end_idx]
+      ss_total <- sum((Ra[start_idx:end_idx] - mean_y)^2)
+      ss_residual <- sum((Ra[start_idx:end_idx] - pred_y)^2)
+      r_squared[i] <- 1 - (ss_residual / ss_total)
     }
   }
   
@@ -92,37 +93,39 @@ rollSFM &lt;- function(Ra, Rb, window = 60) {
 }
 
 # 计算滚动参数
-results &lt;- rollSFM(tsla_ret, nasdaq_ret)
+results <- rollSFM(tsla_ret, nasdaq_ret)
 tail(results)  # 查看最近6个窗口结果
 
 
 
 # 创建绘图主题
-finance_theme &lt;- theme_minimal() +
+finance_theme <- theme_minimal() +
   theme(
-    plot.title = element_text(size=14, face=&quot;bold&quot;),
+    plot.title = element_text(size=14, face="bold"),
     axis.title = element_text(size=12),
     panel.grid.minor = element_blank(),
-    legend.position = &quot;top&quot;
+    legend.position = "top"
   )
 
 # Beta系数时序图
 ggplot(results, aes(x=Date, y=Beta)) +
-  geom_line(color=&quot;#2b8cbe&quot;, size=1) +
-  geom_hline(yintercept=1, linetype=&quot;dashed&quot;, color=&quot;#e34a33&quot;) +
-  labs(title=&quot;TSLA相对NASDAQ的60日滚动Beta系数&quot;,
-       x=&quot;日期&quot;, y=&quot;Beta系数&quot;) +
-  scale_x_date(labels=date_format(&quot;%Y-%m&quot;)) +
+  geom_line(color="#2b8cbe", size=1) +
+  geom_hline(yintercept=1, linetype="dashed", color="#e34a33") +
+  labs(title="TSLA相对NASDAQ的60日滚动Beta系数",
+       x="日期", y="Beta系数") +
+  scale_x_date(labels=date_format("%Y-%m")) +
   finance_theme
 
 # Alpha-Beta联合分布图
 ggplot(results, aes(x=Beta, y=Alpha)) +
   geom_point(aes(color=R_squared), size=3) +
-  scale_color_gradient(low=&quot;#fee8c8&quot;, high=&quot;#e34a33&quot;, 
-                      name=&quot;R平方值&quot;) +
-  geom_vline(xintercept=1, linetype=&quot;dotted&quot;) +
-  geom_hline(yintercept=0, linetype=&quot;dotted&quot;) +
-  labs(title=&quot;TSLA Alpha-Beta分布（60日窗口）&quot;,
-       x=&quot;系统性风险(Beta)&quot;, y=&quot;超额收益(Alpha)&quot;) +
-  finance_theme</code></pre>
+  scale_color_gradient(low="#fee8c8", high="#e34a33", 
+                      name="R平方值") +
+  geom_vline(xintercept=1, linetype="dotted") +
+  geom_hline(yintercept=0, linetype="dotted") +
+  labs(title="TSLA Alpha-Beta分布（60日窗口）",
+       x="系统性风险(Beta)", y="超额收益(Alpha)") +
+  finance_theme
+```
+
 </div>

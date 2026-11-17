@@ -9,7 +9,6 @@ tags:
   - R
   - 量化投资
   - MACD
-markup: html
 ---
 
 
@@ -17,13 +16,15 @@ markup: html
 <p>MACD（移动平均收敛散度）是量化交易中经典的趋势与动量结合指标，其核心价值在于通过短期与长期价格趋势的差异，捕捉市场动量变化与潜在趋势转折。</p>
 <p>MACD 的构成包括四个部分：快速 EMA（指数移动平均线，通常为 12 日）、慢速 EMA（通常为 26 日）、MACD 线（快速 EMA 与慢速 EMA 的差值）、信号线（MACD 线的 9 日 EMA，用于平滑波动）。在实际应用中，MACD 的主要用途包括：判断趋势方向（MACD 线在零轴上方为多头趋势，下方为空头趋势）、识别动量变化（MACD 线与价格的背离暗示趋势可能反转）、确认趋势确立（信号线穿越零轴标志趋势形成）。</p>
 <p>本文解析的代码基于 quantstrat 包实现了一套简单的 MACD 趋势跟踪策略，以 AAPL 为标的，核心逻辑为：当信号线从下方穿越零轴（上穿）时，视为多头趋势确立，触发买入信号；当信号线从上方穿越零轴（下穿）时，视为趋势转弱，触发卖出信号，通过这种方式跟踪中长期趋势并捕获收益。</p>
-<pre class="r"><code># Simple MACD strategy
+
+``` r
+# Simple MACD strategy
 #
 # MACD可通过多种方式应用，本策略展示其作为趋势指标的用法。
 # 
 # 传统上，当MACD信号线穿越零时，标志着正向趋势的确立。
 #
-# 本策略将在信号线&quot;signal&quot;上穿零轴时买入，下穿零轴时卖出。
+# 本策略将在信号线"signal"上穿零轴时买入，下穿零轴时卖出。
 # 
 # Author: brian
 ###############################################################################
@@ -33,202 +34,302 @@ markup: html
 require(quantstrat)
 
 # 清理旧策略数据，确保回测环境纯净（避免残留的订单、账户数据干扰结果）
-suppressWarnings(rm(&quot;order_book.macd&quot;, pos=.strategy))
-suppressWarnings(rm(&quot;account.macd&quot;, &quot;portfolio.macd&quot;, pos=.blotter))
-suppressWarnings(rm(&quot;account.st&quot;, &quot;portfolio.st&quot;, &quot;stock.str&quot;, &quot;stratMACD&quot;, &quot;startDate&quot;, &quot;initEq&quot;, &#39;start_t&#39;, &#39;end_t&#39;))
+suppressWarnings(rm("order_book.macd", pos=.strategy))
+suppressWarnings(rm("account.macd", "portfolio.macd", pos=.blotter))
+suppressWarnings(rm("account.st", "portfolio.st", "stock.str", "stratMACD", "startDate", "initEq", 'start_t', 'end_t'))
 
 # 处理时区问题：若当前时区未设置，默认设为GMT，避免日期处理异常
-oldtz &lt;- Sys.getenv(&#39;TZ&#39;)
-if (oldtz == &#39;&#39;) {
-    Sys.setenv(TZ = &quot;GMT&quot;)
+oldtz <- Sys.getenv('TZ')
+if (oldtz == '') {
+    Sys.setenv(TZ = "GMT")
 }
 
 
 # 设定交易标的为苹果公司股票（AAPL）
-stock.str &lt;- &#39;AAPL&#39;
+stock.str <- 'AAPL'
 
 # MACD指标参数设置
 fastMA = 12  # 快速EMA周期（传统参数12日）
 slowMA = 26  # 慢速EMA周期（传统参数26日）
 signalMA = 9  # 信号线周期（传统参数9日）
-maType = &quot;EMA&quot;  # 均线类型为指数移动平均（EMA）
+maType = "EMA"  # 均线类型为指数移动平均（EMA）
 
 # 定义货币单位与标的属性：AAPL以美元计价，合约乘数为1（股票交易通常乘数为1）
-currency(&#39;USD&#39;)</code></pre>
-<pre><code>## [1] &quot;USD&quot;</code></pre>
-<pre class="r"><code>stock(stock.str, currency = &#39;USD&#39;, multiplier = 1)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 回测基础参数
-startDate = &#39;2006-12-31&#39;  # 数据起始日期
+currency('USD')
+```
+
+```
+## [1] "USD"
+```
+
+``` r
+stock(stock.str, currency = 'USD', multiplier = 1)
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 回测基础参数
+startDate = '2006-12-31'  # 数据起始日期
 initEq = 1000000  # 初始资金100万美元
-portfolio.st = &#39;macd&#39;  # 投资组合名称
-account.st = &#39;macd&#39;  # 账户名称
+portfolio.st = 'macd'  # 投资组合名称
+account.st = 'macd'  # 账户名称
 
 # 初始化回测环境
-initPortf(portfolio.st, symbols = stock.str)  # 创建包含AAPL的投资组合</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>initAcct(account.st, portfolios = portfolio.st)  # 初始化账户，关联投资组合</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>initOrders(portfolio = portfolio.st)  # 初始化订单簿，记录交易订单
+initPortf(portfolio.st, symbols = stock.str)  # 创建包含AAPL的投资组合
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+initAcct(account.st, portfolios = portfolio.st)  # 初始化账户，关联投资组合
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+initOrders(portfolio = portfolio.st)  # 初始化订单簿，记录交易订单
 
 # 定义策略对象，名称与组合一致，并存入环境
-strat.st &lt;- portfolio.st
+strat.st <- portfolio.st
 strategy(strat.st, store = TRUE)
 
 # 添加MACD指标：基于收盘价计算，参数为快速EMA、慢速EMA
 add.indicator(
   strat.st, 
-  name = &quot;MACD&quot;,  # 使用TTR包中的MACD函数
+  name = "MACD",  # 使用TTR包中的MACD函数
   arguments = list(
     x = quote(Cl(mktdata)),  # 输入为收盘价（Cl(mktdata)）
     nFast = fastMA,  # 快速EMA周期12日
     nSlow = slowMA  # 慢速EMA周期26日
   ),
-  label = &#39;_&#39;  # 指标标签，用于后续信号引用
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 生成交易信号：基于信号线与零轴的交叉
+  label = '_'  # 指标标签，用于后续信号引用
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 生成交易信号：基于信号线与零轴的交叉
 # 信号1：信号线上穿零轴（大于零且交叉），视为买入信号
 add.signal(
   strat.st,
-  name = &quot;sigThreshold&quot;,  # 阈值型信号函数
+  name = "sigThreshold",  # 阈值型信号函数
   arguments = list(
-    column = &quot;signal._&quot;,  # 引用MACD指标中的信号线（因指标标签为&#39;_&#39;，故列名为signal._）
-    relationship = &quot;gt&quot;,  # 大于（greater than）
+    column = "signal._",  # 引用MACD指标中的信号线（因指标标签为'_'，故列名为signal._）
+    relationship = "gt",  # 大于（greater than）
     threshold = 0,  # 阈值为0（零轴）
     cross = TRUE  # 必须穿越阈值（避免持续触发）
   ),
-  label = &quot;signal.gt.zero&quot;  # 信号标签：上穿零轴
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 信号2：信号线下穿零轴（小于零且交叉），视为卖出信号
+  label = "signal.gt.zero"  # 信号标签：上穿零轴
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 信号2：信号线下穿零轴（小于零且交叉），视为卖出信号
 add.signal(
   strat.st,
-  name = &quot;sigThreshold&quot;,
+  name = "sigThreshold",
   arguments = list(
-    column = &quot;signal._&quot;,
-    relationship = &quot;lt&quot;,  # 小于（less than）
+    column = "signal._",
+    relationship = "lt",  # 小于（less than）
     threshold = 0,
     cross = TRUE
   ),
-  label = &quot;signal.lt.zero&quot;  # 信号标签：下穿零轴
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 定义交易规则：将信号转化为具体交易动作
+  label = "signal.lt.zero"  # 信号标签：下穿零轴
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 定义交易规则：将信号转化为具体交易动作
 ####
 # 入场规则：当买入信号触发时，以市价单买入100股
 add.rule(
   strat.st,
-  name = &#39;ruleSignal&#39;,  # 基于信号的规则函数
+  name = 'ruleSignal',  # 基于信号的规则函数
   arguments = list(
-    sigcol = &quot;signal.gt.zero&quot;,  # 触发信号列：上穿零轴
+    sigcol = "signal.gt.zero",  # 触发信号列：上穿零轴
     sigval = TRUE,  # 信号值为TRUE时执行
     orderqty = 100,  # 订单数量：100股
-    ordertype = &#39;market&#39;,  # 市价单（确保及时入场）
-    orderside = &#39;long&#39;,  # 做多方向
+    ordertype = 'market',  # 市价单（确保及时入场）
+    orderside = 'long',  # 做多方向
     threshold = NULL  # 无额外阈值
   ),
-  type = &#39;enter&#39;,  # 入场规则
-  label = &#39;enter&#39;,
+  type = 'enter',  # 入场规则
+  label = 'enter',
   storefun = FALSE  # 不存储规则函数结果
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 可选的风险止损规则（注释未启用）：
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 可选的风险止损规则（注释未启用）：
 # 1. 止损限价单：当价格回落5%时触发止损
-# add.rule(strat.st,name=&#39;ruleSignal&#39;, arguments = list(sigcol=&quot;signal.gt.zero&quot;,sigval=TRUE, orderqty=&#39;all&#39;, ordertype=&#39;stoplimit&#39;, orderside=&#39;long&#39;, threshold=-.05,tmult=TRUE, orderset=&#39;exit2&#39;),type=&#39;chain&#39;, parent=&#39;enter&#39;, label=&#39;risk&#39;,storefun=FALSE)
+# add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero",sigval=TRUE, orderqty='all', ordertype='stoplimit', orderside='long', threshold=-.05,tmult=TRUE, orderset='exit2'),type='chain', parent='enter', label='risk',storefun=FALSE)
 # 2. 追踪止损单：当价格从高点回落1单位时触发止损
-# add.rule(strat.st,name=&#39;ruleSignal&#39;, arguments = list(sigcol=&quot;signal.gt.zero&quot;,sigval=TRUE, orderqty=&#39;all&#39;, ordertype=&#39;stoptrailing&#39;, orderside=&#39;long&#39;, threshold=-1,tmult=FALSE, orderset=&#39;exit2&#39;),	type=&#39;chain&#39;, parent=&#39;enter&#39;, label=&#39;trailingexit&#39;)
+# add.rule(strat.st,name='ruleSignal', arguments = list(sigcol="signal.gt.zero",sigval=TRUE, orderqty='all', ordertype='stoptrailing', orderside='long', threshold=-1,tmult=FALSE, orderset='exit2'),	type='chain', parent='enter', label='trailingexit')
 
 # 出场规则：当卖出信号触发时，以市价单平仓所有持仓
 add.rule(
   strat.st,
-  name = &#39;ruleSignal&#39;,
+  name = 'ruleSignal',
   arguments = list(
-    sigcol = &quot;signal.lt.zero&quot;,  # 触发信号列：下穿零轴
+    sigcol = "signal.lt.zero",  # 触发信号列：下穿零轴
     sigval = TRUE,
-    orderqty = &#39;all&#39;,  # 平仓全部持仓
-    ordertype = &#39;market&#39;,  # 市价单（确保及时离场）
-    orderside = &#39;long&#39;,  # 针对多头持仓
+    orderqty = 'all',  # 平仓全部持仓
+    ordertype = 'market',  # 市价单（确保及时离场）
+    orderside = 'long',  # 针对多头持仓
     threshold = NULL,
-    orderset = &#39;exit2&#39;  # 订单集标签，用于管理出场订单
+    orderset = 'exit2'  # 订单集标签，用于管理出场订单
   ),
-  type = &#39;exit&#39;,  # 出场规则
-  label = &#39;exit&#39;
-)</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code># 结束规则定义
+  type = 'exit',  # 出场规则
+  label = 'exit'
+)
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+# 结束规则定义
 ####
 
 # 获取历史数据：从雅虎财经下载AAPL的历史数据（2006-12-31至2014-06-01）
-getSymbols(stock.str, from = startDate, to = &#39;2014-06-01&#39;, src = &#39;yahoo&#39;)</code></pre>
-<pre><code>## [1] &quot;AAPL&quot;</code></pre>
-<pre class="r"><code># 执行策略回测并记录时间
-start_t &lt;- Sys.time()  # 回测开始时间
-out &lt;- applyStrategy(
+getSymbols(stock.str, from = startDate, to = '2014-06-01', src = 'yahoo')
+```
+
+```
+## [1] "AAPL"
+```
+
+``` r
+# 执行策略回测并记录时间
+start_t <- Sys.time()  # 回测开始时间
+out <- applyStrategy(
   strat.st, 
   portfolios = portfolio.st,
   parameters = list(nFast = fastMA, nSlow = slowMA, nSig = signalMA, maType = maType),  # 传递MACD参数
   verbose = TRUE  # 输出详细过程
-)</code></pre>
-<pre><code>## [1] &quot;2007-03-16 00:00:00 AAPL 100 @ 3.19964289665222&quot;
-## [1] &quot;2007-08-17 00:00:00 AAPL -100 @ 4.35928583145142&quot;
-## [1] &quot;2007-09-05 00:00:00 AAPL 100 @ 4.88428592681885&quot;
-## [1] &quot;2008-01-16 00:00:00 AAPL -100 @ 5.70142889022827&quot;
-## [1] &quot;2008-03-31 00:00:00 AAPL 100 @ 5.125&quot;
-## [1] &quot;2008-06-26 00:00:00 AAPL -100 @ 6.00928592681885&quot;
-## [1] &quot;2008-08-20 00:00:00 AAPL 100 @ 6.28000020980835&quot;
-## [1] &quot;2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199&quot;
-## [1] &quot;2009-02-06 00:00:00 AAPL 100 @ 3.56142902374268&quot;
-## [1] &quot;2009-03-04 00:00:00 AAPL -100 @ 3.25607109069824&quot;
-## [1] &quot;2009-03-19 00:00:00 AAPL 100 @ 3.62928605079651&quot;
-## [1] &quot;2009-12-15 00:00:00 AAPL -100 @ 6.93464279174805&quot;
-## [1] &quot;2009-12-29 00:00:00 AAPL 100 @ 7.46785688400269&quot;
-## [1] &quot;2010-02-03 00:00:00 AAPL -100 @ 7.11535692214966&quot;
-## [1] &quot;2010-03-04 00:00:00 AAPL 100 @ 7.52535676956177&quot;
-## [1] &quot;2010-07-16 00:00:00 AAPL -100 @ 8.92500019073486&quot;
-## [1] &quot;2010-08-03 00:00:00 AAPL 100 @ 9.35464286804199&quot;
-## [1] &quot;2010-08-17 00:00:00 AAPL -100 @ 8.99892902374268&quot;
-## [1] &quot;2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326&quot;
-## [1] &quot;2011-03-22 00:00:00 AAPL -100 @ 12.1857137680054&quot;
-## [1] &quot;2011-05-03 00:00:00 AAPL 100 @ 12.4357137680054&quot;
-## [1] &quot;2011-05-23 00:00:00 AAPL -100 @ 11.9428567886353&quot;
-## [1] &quot;2011-07-11 00:00:00 AAPL 100 @ 12.6428565979004&quot;
-## [1] &quot;2011-11-16 00:00:00 AAPL -100 @ 13.7417860031128&quot;
-## [1] &quot;2011-12-27 00:00:00 AAPL 100 @ 14.518928527832&quot;
-## [1] &quot;2012-05-09 00:00:00 AAPL -100 @ 20.3278560638428&quot;
-## [1] &quot;2012-06-20 00:00:00 AAPL 100 @ 20.9192867279053&quot;
-## [1] &quot;2012-10-12 00:00:00 AAPL -100 @ 22.4896430969238&quot;
-## [1] &quot;2013-05-09 00:00:00 AAPL 100 @ 16.3132133483887&quot;
-## [1] &quot;2013-06-19 00:00:00 AAPL -100 @ 15.1071434020996&quot;
-## [1] &quot;2013-07-26 00:00:00 AAPL 100 @ 15.7496433258057&quot;
-## [1] &quot;2014-01-22 00:00:00 AAPL -100 @ 19.6967868804932&quot;
-## [1] &quot;2014-01-24 00:00:00 AAPL 100 @ 19.5025005340576&quot;
-## [1] &quot;2014-01-29 00:00:00 AAPL -100 @ 17.8839282989502&quot;
-## [1] &quot;2014-03-26 00:00:00 AAPL 100 @ 19.2778568267822&quot;
-## [1] &quot;2014-04-15 00:00:00 AAPL -100 @ 18.498571395874&quot;
-## [1] &quot;2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025&quot;</code></pre>
-<pre class="r"><code>end_t &lt;- Sys.time()  # 回测结束时间
-print(end_t - start_t)  # 打印回测耗时</code></pre>
-<pre><code>## Time difference of 0.4202731 secs</code></pre>
-<pre class="r"><code># 更新组合与账户数据
-start_t &lt;- Sys.time()
-updatePortf(Portfolio = portfolio.st, Dates = paste(&#39;::&#39;, as.Date(Sys.time()), sep = &#39;&#39;))  # 更新至当前日期</code></pre>
-<pre><code>## [1] &quot;macd&quot;</code></pre>
-<pre class="r"><code>end_t &lt;- Sys.time()
-print(&quot;trade blotter portfolio update:&quot;)</code></pre>
-<pre><code>## [1] &quot;trade blotter portfolio update:&quot;</code></pre>
-<pre class="r"><code>print(end_t - start_t)  # 打印数据更新耗时</code></pre>
-<pre><code>## Time difference of 0.032722 secs</code></pre>
-<pre class="r"><code># 可视化回测结果
-chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 绘制AAPL的持仓变化图</code></pre>
+)
+```
+
+```
+## [1] "2007-03-16 00:00:00 AAPL 100 @ 3.19964289665222"
+## [1] "2007-08-17 00:00:00 AAPL -100 @ 4.35928583145142"
+## [1] "2007-09-05 00:00:00 AAPL 100 @ 4.88428592681885"
+## [1] "2008-01-16 00:00:00 AAPL -100 @ 5.70142889022827"
+## [1] "2008-03-31 00:00:00 AAPL 100 @ 5.125"
+## [1] "2008-06-26 00:00:00 AAPL -100 @ 6.00928592681885"
+## [1] "2008-08-20 00:00:00 AAPL 100 @ 6.28000020980835"
+## [1] "2008-09-09 00:00:00 AAPL -100 @ 5.41714286804199"
+## [1] "2009-02-06 00:00:00 AAPL 100 @ 3.56142902374268"
+## [1] "2009-03-04 00:00:00 AAPL -100 @ 3.25607109069824"
+## [1] "2009-03-19 00:00:00 AAPL 100 @ 3.62928605079651"
+## [1] "2009-12-15 00:00:00 AAPL -100 @ 6.93464279174805"
+## [1] "2009-12-29 00:00:00 AAPL 100 @ 7.46785688400269"
+## [1] "2010-02-03 00:00:00 AAPL -100 @ 7.11535692214966"
+## [1] "2010-03-04 00:00:00 AAPL 100 @ 7.52535676956177"
+## [1] "2010-07-16 00:00:00 AAPL -100 @ 8.92500019073486"
+## [1] "2010-08-03 00:00:00 AAPL 100 @ 9.35464286804199"
+## [1] "2010-08-17 00:00:00 AAPL -100 @ 8.99892902374268"
+## [1] "2010-09-15 00:00:00 AAPL 100 @ 9.65071392059326"
+## [1] "2011-03-22 00:00:00 AAPL -100 @ 12.1857137680054"
+## [1] "2011-05-03 00:00:00 AAPL 100 @ 12.4357137680054"
+## [1] "2011-05-23 00:00:00 AAPL -100 @ 11.9428567886353"
+## [1] "2011-07-11 00:00:00 AAPL 100 @ 12.6428565979004"
+## [1] "2011-11-16 00:00:00 AAPL -100 @ 13.7417860031128"
+## [1] "2011-12-27 00:00:00 AAPL 100 @ 14.518928527832"
+## [1] "2012-05-09 00:00:00 AAPL -100 @ 20.3278560638428"
+## [1] "2012-06-20 00:00:00 AAPL 100 @ 20.9192867279053"
+## [1] "2012-10-12 00:00:00 AAPL -100 @ 22.4896430969238"
+## [1] "2013-05-09 00:00:00 AAPL 100 @ 16.3132133483887"
+## [1] "2013-06-19 00:00:00 AAPL -100 @ 15.1071434020996"
+## [1] "2013-07-26 00:00:00 AAPL 100 @ 15.7496433258057"
+## [1] "2014-01-22 00:00:00 AAPL -100 @ 19.6967868804932"
+## [1] "2014-01-24 00:00:00 AAPL 100 @ 19.5025005340576"
+## [1] "2014-01-29 00:00:00 AAPL -100 @ 17.8839282989502"
+## [1] "2014-03-26 00:00:00 AAPL 100 @ 19.2778568267822"
+## [1] "2014-04-15 00:00:00 AAPL -100 @ 18.498571395874"
+## [1] "2014-04-29 00:00:00 AAPL 100 @ 21.1546421051025"
+```
+
+``` r
+end_t <- Sys.time()  # 回测结束时间
+print(end_t - start_t)  # 打印回测耗时
+```
+
+```
+## Time difference of 0.4202731 secs
+```
+
+``` r
+# 更新组合与账户数据
+start_t <- Sys.time()
+updatePortf(Portfolio = portfolio.st, Dates = paste('::', as.Date(Sys.time()), sep = ''))  # 更新至当前日期
+```
+
+```
+## [1] "macd"
+```
+
+``` r
+end_t <- Sys.time()
+print("trade blotter portfolio update:")
+```
+
+```
+## [1] "trade blotter portfolio update:"
+```
+
+``` r
+print(end_t - start_t)  # 打印数据更新耗时
+```
+
+```
+## Time difference of 0.032722 secs
+```
+
+``` r
+# 可视化回测结果
+chart.Posn(Portfolio = portfolio.st, Symbol = stock.str)  # 绘制AAPL的持仓变化图
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-1.png" width="672" /></p>
-<pre class="r"><code>plot(add_MACD(fast = fastMA, slow = slowMA, signal = signalMA, maType = &quot;EMA&quot;))  # 叠加MACD指标</code></pre>
+
+``` r
+plot(add_MACD(fast = fastMA, slow = slowMA, signal = signalMA, maType = "EMA"))  # 叠加MACD指标
+```
+
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/SimpleMACD-2.png" width="672" /></p>
-<pre class="r"><code># 查看订单簿（包含所有交易订单详情，用于调试与分析）
-obook &lt;- getOrderBook(&#39;macd&#39;)
+
+``` r
+# 查看订单簿（包含所有交易订单详情，用于调试与分析）
+obook <- getOrderBook('macd')
 
 # 恢复初始时区设置
-Sys.setenv(TZ = oldtz)</code></pre>
+Sys.setenv(TZ = oldtz)
+```
+
 <p><strong>策略核心思路</strong></p>
 <p>该策略以 “趋势跟踪” 为核心，通过 MACD 信号线与零轴的交叉信号构建完整的交易逻辑。</p>
 <p>代码首先清理旧有策略数据，避免残留信息干扰回测；通过时区设置确保日期处理准确；定义交易标的（AAPL）、初始资金（100 万美元）及 MACD 核心参数（12/26/9 日 EMA），为策略运行奠定基础。这一步的关键是确保回测环境的纯净性与参数的明确性，避免后续结果出现偏差。</p>
