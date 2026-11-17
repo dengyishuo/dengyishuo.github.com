@@ -1,0 +1,11 @@
+{{- /*
+    关于我页的页内目录条目（只输出 <ul>，不带外壳）。
+    文内折叠条与右栏 widget 共用同一份，避免两处各写一份后不同步。
+*/ -}}
+{{- $about := hugo.Data.about -}}
+<ul>
+    {{- range $about.sections }}
+    <li><a href="#{{ anchorize .title }}">{{ .title }}</a></li>
+    {{- end }}
+    <li><a href="#{{ anchorize "我的作品" }}">我的作品</a></li>
+</ul>

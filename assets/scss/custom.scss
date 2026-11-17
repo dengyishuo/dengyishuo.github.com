@@ -1238,23 +1238,33 @@ html {
     opacity: 0.72;
 }
 
-/* 无右栏：作品页给到 920px，纯文本行过长会难读 */
+/* 正文限宽：纯文本行过长会难读。
+   宽屏有右栏时（lg 以上）交给 flex 分配宽度，不再限死 920，
+   否则右侧会留一条空档、和右栏对不齐。 */
+.gt-about-page .main-container main.main,
 .gt-works-page .main-container main.main {
     max-width: 920px;
     margin-left: auto;
     margin-right: auto;
+
+    @media (min-width: 1024px) {
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 /* 关于 / 作品两页的页内目录。
-   复用博客文章页的 .article-toc 折叠条，但这两页右栏为空，
-   主题默认在 lg 以上 display:none（把目录让给右栏 widget），
-   这里强制全程显示。
-   间距交给 main 的 flex gap（40px），主题自带的 margin-top 要去掉，
-   否则会和 gap 叠加，目录与下方首个分区之间被撑到 70px。
+   行为与博客文章页完全一致：
+     - 窄屏：文内 .article-toc 折叠条（主题默认 flex）
+     - 宽屏（lg 以上）：主题把 .article-toc 设为 display:none，
+       目录改由右栏 widget 呈现（见 layouts/{about,page/works}.html 的
+       right-sidebar block）
+   所以这里不再覆盖 display，只清掉主题自带的 margin-top：
+   间距交给 main 的 flex gap（40px），否则叠加后会被撑到 70px。
    锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘。 */
 .gt-about-page .article-toc,
 .gt-works-page .article-toc {
-    display: flex;
     margin-top: 0;
     margin-bottom: 0;
 }

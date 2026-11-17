@@ -1,0 +1,23 @@
+{{- /*
+    右栏目录 widget（页面层自建版）。
+    与主题 widget/toc.html 同构，只是内容不用 .TableOfContents，
+    而是接收调用方传入的 ul（这些页面的标题来自 data/*.yaml，
+    Hugo 不会为它们生成 TableOfContents）。
+
+    参数 dict：
+      Context 当前页面
+      List    已渲染好的 <ul> HTML 字符串
+*/ -}}
+{{- $list := .List -}}
+<section class="widget archives">
+    <div class="widget-icon">
+        {{ partial "helper/icon" "hash" }}
+    </div>
+    <h2 class="widget-title section-title">{{ T "article.tableOfContents" }}</h2>
+
+    <div class="widget--toc">
+        <nav class="toc-nav" id="TableOfContents">
+            {{ $list | safeHTML }}
+        </nav>
+    </div>
+</section>

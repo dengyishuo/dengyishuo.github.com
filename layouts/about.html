@@ -1,20 +1,24 @@
 {{- /*
     格物堂 · 关于我（与作品页同一套版式）
     数据来自 data/about.yaml：开场一段 + 分区列表（事项在左，时间在右）。
-    无右栏、限宽 920，与 /works/ 保持一致的阅读节奏。
+    限宽 920，与 /works/ 保持一致的阅读节奏。
+    目录：窄屏是文内折叠条，宽屏（lg 以上）移到右栏 widget，
+    与博客文章页行为一致。
 */ -}}
 {{ define "body-class" }}gt-about-page{{ end }}
 
 {{ define "main" }}
     {{- $about := hugo.Data.about -}}
+    {{- $tocList := partial "about/toc-list" . -}}
 
     <header class="gt-page-head">
         <h1 class="gt-page-title">{{ .Title }}</h1>
         {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
     </header>
 
-    {{- /* 页内目录：与博客文章页同款（article-toc 折叠条），
-         目标是各分区标题；本页右栏为空，样式里强制在桌面端也显示 */ -}}
+    {{- /* 窄屏目录：与博客文章页同款折叠条。
+           主题在 lg 以上对 .article-toc 设 display:none，
+           此时目录由右栏 widget 接管（见文件底部 right-sidebar）。 */ -}}
     <aside class="article-toc">
         <details>
             <summary>
@@ -24,12 +28,7 @@
                 </div>
             </summary>
             <nav class="toc-nav">
-                <ul>
-                    {{- range $about.sections }}
-                    <li><a href="#{{ anchorize .title }}">{{ .title }}</a></li>
-                    {{- end }}
-                    <li><a href="#{{ anchorize "我的作品" }}">我的作品</a></li>
-                </ul>
+                {{ $tocList | safeHTML }}
             </nav>
         </details>
     </aside>
@@ -83,4 +82,11 @@
     {{ partial "footer/footer" . }}
 {{ end }}
 
-{{ define "right-sidebar" }}{{ end }}
+{{ define "right-sidebar" }}
+    {{- /* 宽屏目录：与博客文章页同一个右栏 widget 版式。
+           本页标题来自 data/about.yaml，Hugo 不生成 .TableOfContents，
+           所以列表由 about/toc-list 提供。 */ -}}
+    <aside class="sidebar right-sidebar sticky">
+        {{ partial "page/toc-widget" (dict "Context" . "List" (partial "about/toc-list" .)) }}
+    </aside>
+{{ end }}
