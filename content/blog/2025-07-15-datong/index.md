@@ -6,7 +6,6 @@ slug: datong
 categories:
 - 随笔
 tags: []
-markup: html
 ---
 
 
@@ -86,8 +85,8 @@ markup: html
 区运用文字、实物以及声光电等技术，展示浑源凉粉的历史、传承和发展，同时设置有浑源凉粉及浑源美食体验区。</p></li>
 </ul>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/hunyuan-1.png" width="672" /></p>
-<div id="第一天云冈区之旅" class="section level3">
-<h3><strong>第一天：云冈区之旅</strong></h3>
+
+### 第一天：云冈区之旅
 <ul>
 <li><p><strong>上午</strong>：前往<strong>云冈石窟</strong>，这是云冈区的核心景点，可花费 3 - 4 小时仔细参观，欣赏精美的佛像雕刻，重点参观第 5 窟、第 6 窟等经典洞窟，感受千年佛教艺术的魅力。</p></li>
 <li><p><strong>中午</strong>：在云冈石窟附近的餐厅用餐，品尝大同特色美食，如刀削面、羊杂等。</p></li>
@@ -96,9 +95,8 @@ markup: html
 <li><p><strong>晚上</strong>：如果还有精力，可前往<strong>魏都水世界</strong>，享受亲水娱乐、药浴理疗等项目，放松身心，也可在此享用晚餐。若
 感觉疲惫，可直接返回住处休息。</p></li>
 </ul>
-</div>
-<div id="第二天平城区之行" class="section level3">
-<h3><strong>第二天：平城区之行</strong></h3>
+
+### 第二天：平城区之行
 <ul>
 <li><p><strong>上午</strong>：参观<strong>华严寺</strong>，欣赏辽代建筑风格和精美的佛教造像，尤其是薄伽教藏殿内的华严经柜和 “天宫楼阁”，游玩时间约 2 小时。接
 着前往相邻的<strong>善化寺</strong>，这是中国现存规模最大、最为完整的辽金时期建筑，参观时间约 1.5 小时4。</p></li>
@@ -108,9 +106,8 @@ markup: html
 后前往<strong>北魏明堂遗址公园</strong>，了解北魏文化，参观明堂建筑，游玩时间约 1.5 小时2。</p></li>
 <li><p><strong>晚上</strong>：前往平城区的特色街区，如鼓楼东街，逛逛古街，参观<strong>古代铜造艺术博物馆</strong>，感受大同的历史文化氛围，还可在此享用晚餐，品尝小吃。</p></li>
 </ul>
-</div>
-<div id="第三天浑源县之旅" class="section level3">
-<h3><strong>第三天：浑源县之旅</strong></h3>
+
+### 第三天：浑源县之旅
 <ul>
 <li><p><strong>上午</strong>：前往浑源县，先参观<strong>悬空寺</strong>，这是一处独特的建筑奇观，可花费 2 小时左右参观，体验 “天下巨观” 的震撼，感受 “三教合一” 的文化内涵。</p></li>
 <li><p><strong>中午</strong>：在悬空寺附近就餐，品尝浑源当地美食，如浑源凉粉等。</p></li>
@@ -118,4 +115,3 @@ markup: html
 果时间充裕，还可顺道参观<strong>浑源古城</strong>，感受古城的历史韵味，参观圆觉寺砖塔、永安寺等古迹。</p></li>
 <li><p><strong>晚上</strong>：结束行程，返回出发地或前往下一个目的地。</p></li>
 </ul>
-</div>
