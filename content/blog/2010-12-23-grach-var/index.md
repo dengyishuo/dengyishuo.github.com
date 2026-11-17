@@ -9,19 +9,16 @@ tags:
   - VaR
   - GARCH
 ---
+# 一、引言
 
-
-
-<div id="一引言" class="section level1">
-<h1>一、引言</h1>
 <p>风险价值（VaR）是衡量金融资产潜在损失的核心指标，但传统方法假设收益率服从独立同分布的正态分布，难以捕捉金融时间序列的 “波动聚类”（volatility clustering）和 “尖峰厚尾” 特性。</p>
 <p>ARCH（自回归条件异方差）模型及扩展的 GARCH（广义自回归条件异方差）模型通过刻画波动率的动态变化，能更精准地拟合收益率分布，从而提升 VaR 估计的可靠性。</p>
 <p>本文以特斯拉（TSLA）股票收益率为例，详细介绍 GARCH 模型的构建、参数估计及 VaR 计算流程，并通过 R 语言quantmod和rgarch包实现实证分析。</p>
-</div>
-<div id="二garch-模型理论" class="section level1">
-<h1>二、GARCH 模型理论</h1>
-<div id="arch-模型基础" class="section level2">
-<h2>ARCH 模型基础</h2>
+
+# 二、GARCH 模型理论
+
+## ARCH 模型基础
+
 <p>ARCH 模型假设资产收益率的条件方差依赖于过去的平方残差，其核心是波动率的动态性。</p>
 <p>均值方程：</p>
 <p><span class="math display">\[
@@ -35,9 +32,9 @@ r_t = \mu + \epsilon_t \tag{1}
 <p><span class="math display">\[\sigma_t^2 = \omega + \alpha_1 \epsilon_{t-1}^2 + \alpha_2 \epsilon_{t-2}^2 + ... + \alpha_q \epsilon_{t-q}^2 \tag{2}
 \]</span></p>
 <p>其中，<span class="math inline">\(\sigma_t^2\)</span> 为 t 时刻的条件方差，<span class="math inline">\(\omega &gt; 0\)</span> ，<span class="math inline">\(\alpha_i \geq 0\)</span> （保证方差非负），q为 ARCH 阶数。</p>
-</div>
-<div id="garch-模型扩展" class="section level2">
-<h2>GARCH 模型扩展</h2>
+
+## GARCH 模型扩展
+
 <p>GARCH 模型在 ARCH 基础上引入过去的条件方差项，简化了高阶 ARCH 模型的参数估计。最常用的 GARCH (p,q) 模型形式为：</p>
 <p>均值方程：同式（1）</p>
 <p>条件方差方程（GARCH (p,q)）：</p>
@@ -51,9 +48,9 @@ r_t = \mu + \epsilon_t \tag{1}
 \]</span></p>
 <p>模型扩展与分布假设变种模型：通过修改条件方差方程可得到 EGARCH（指数 GARCH，捕捉杠杆效应）、IGARCH（积分 GARCH，非平稳波动率）等。</p>
 <p>分布假设：为捕捉 “尖峰厚尾”，可假设扰动项 <span class="math inline">\(z_t\)</span> 服从学生 t 分布（GARCH-t）、广义误差分布（GARCH-GED）等，而非正态分布。</p>
-</div>
-<div id="基于-garch-模型的-var-计算" class="section level2">
-<h2>基于 GARCH 模型的 VaR 计算</h2>
+
+## 基于 GARCH 模型的 VaR 计算
+
 <p>给定置信水平 <span class="math inline">\(1-\alpha\)</span> （如 95%、99%），VaR 定义为：</p>
 <p><span class="math display">\[
 VaR_t = \mu_t + \sigma_t \cdot z_\alpha \tag{5}
@@ -62,10 +59,9 @@ VaR_t = \mu_t + \sigma_t \cdot z_\alpha \tag{5}
 <p><span class="math inline">\(\mu_t\)</span> 为 t 时刻的条件均值（通常假设为 0 或常数）；</p>
 <p><span class="math inline">\(\sigma_t\)</span> 为 GARCH 模型预测的条件标准差；</p>
 <p><span class="math inline">\(z_\alpha\)</span> 为扰动项分布的 <span class="math inline">\(\alpha\)</span> 分位数（如正态分布下 95% 置信水平的 <span class="math inline">\(z_\alpha = -1.645\)</span> ）。</p>
-</div>
-</div>
-<div id="三r-语言实证分析tsla-数据" class="section level1">
-<h1>三、R 语言实证分析（TSLA 数据）</h1>
+
+# 三、R 语言实证分析（TSLA 数据）
+
 <ol style="list-style-type: decimal">
 <li>数据准备与预处理使用 quantmod 获取 TSLA 股票数据并计算对数收益率：</li>
 </ol>
@@ -319,4 +315,3 @@ vaR_95_t <- abs(sigma_t * z_95_t)
 <p>实证显示：TSLA 收益率存在明显的波动聚类特性，GARCH (1,1) 能有效拟合；基于 t 分布或 GED 分布的 GARCH 模型计算的 VaR 更能反映尾部风险，失败率更接近理论置信水平；实际应用中可根据资产特性选择模型变种（如 EGARCH 捕捉杠杆效应）或分布假设。</p>
 <p>未来可结合滚动窗口预测或压力测试，进一步优化 VaR 的动态跟踪能力。</p>
 <p>注：代码中rugarch包的ugarchspec和ugarchfit函数需注意模型收敛性，若不收敛可调整初始值或模型阶数；回测失败率若显著偏离理论值（如 95% 置信水平下失败率 &gt; 7%），需重新调整模型。​</p>
-</div>

@@ -20,13 +20,12 @@ tags:
 <link href="{{< blogdown/postref >}}index_files/reactable/reactable.css" rel="stylesheet" />
 <script src="{{< blogdown/postref >}}index_files/reactable-binding/reactable.js"></script>
 
+# 引言
 
-<div id="引言" class="section level1">
-<h1>引言</h1>
 <p>XGBoost（eXtreme Gradient Boosting）是一种高效的梯度提升算法，在数据科学和机器学习领域广泛应用，尤其擅长处理结构化数据的回归和分类问题。以下从数学原理、发展历程、使用方法和竞争算法四个方面进行详细介绍：</p>
-</div>
-<div id="一数学原理" class="section level1">
-<h1>一、数学原理</h1>
+
+# 一、数学原理
+
 <p>XGBoost 是梯度提升框架（Gradient Boosting）的优化实现，其核心思想是迭代地训练多个弱学习器（通常是决策树），并将它们组合成一个强学习器。</p>
 <p>具体数学原理如下：</p>
 <p>1.目标函数</p>
@@ -59,18 +58,18 @@ tags:
 <li><strong>缺失值处理</strong>：自动学习缺失值的最优分裂方向。</li>
 <li><strong>正则化剪枝</strong>：通过正则化项控制树的复杂度，避免过拟合。</li>
 </ul>
-</div>
-<div id="二发展历程" class="section level1">
-<h1>二、发展历程</h1>
+
+# 二、发展历程
+
 <ul>
 <li><p>2014 年：陈天奇（Tianqi Chen）在华盛顿大学读博期间开发了 XGBoost 的原型，最初作为研究项目用于解决大规模机器学习问题。</p></li>
 <li><p>2015 年：XGBoost 作为开源项目发布，因其在 Kaggle 竞赛中的优异表现迅速走红，成为数据科学领域的主流算法之一。</p></li>
 <li><p>2016 年：陈天奇加入微软，带领团队进一步优化 XGBoost，支持分布式计算和云计算平台。</p></li>
 <li><p>2017 年至今：XGBoost 持续更新，增加了更多功能（如 DART、GPU 加速、特征重要性分析等），并被集成到多种编程语言和工具中（如 Python、R、Scala 等）。</p></li>
 </ul>
-</div>
-<div id="三如何使用" class="section level1">
-<h1>三、如何使用</h1>
+
+# 三、如何使用
+
 <p>我们将用联邦基金有效利率和失业率为输入参数，按照 xgboost 模型对纳斯达克 100 指数月度数据进行建模。</p>
 
 ``` r
@@ -445,12 +444,13 @@ calibration_tbl %>%
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
-</div>
-<div id="四竞争算法" class="section level1">
-<h1>四、竞争算法</h1>
+
+# 四、竞争算法
+
 <p>XGBoost 的主要竞争对手包括：</p>
-<div id="lightgbm" class="section level2">
-<h2>1. LightGBM</h2>
+
+## 1. LightGBM
+
 <p>开发者：微软（2017 年发布）。</p>
 <p>特点：</p>
 <ul>
@@ -459,9 +459,9 @@ calibration_tbl %>%
 <li>内存占用更小，适合大规模数据集。</li>
 <li>适用场景：超大规模数据集、需要快速迭代的场景。</li>
 </ul>
-</div>
-<div id="catboost" class="section level2">
-<h2>2. CatBoost</h2>
+
+## 2. CatBoost
+
 <p>开发者：Yandex（2017 年发布）。</p>
 <p>特点：</p>
 <ul>
@@ -470,9 +470,9 @@ calibration_tbl %>%
 <li>支持 GPU 加速和分布式训练。</li>
 </ul>
 <p>适用场景：包含大量类别特征的数据集（如推荐系统、广告点击预测）。</p>
-</div>
-<div id="random-forest" class="section level2">
-<h2>3. Random Forest</h2>
+
+## 3. Random Forest
+
 <p>特点：</p>
 <ul>
 <li>基于 Bagging 思想的集成学习算法，并行训练多棵决策树。</li>
@@ -480,9 +480,9 @@ calibration_tbl %>%
 <li>计算复杂度较低，但预测精度可能低于 Boosting 算法。</li>
 </ul>
 <p>适用场景：快速 baseline 模型、对解释性要求较高的场景。</p>
-</div>
-<div id="neural-networks神经网络" class="section level2">
-<h2>4. Neural Networks（神经网络）</h2>
+
+## 4. Neural Networks（神经网络）
+
 <p>特点：</p>
 <ul>
 <li>适用于非结构化数据（如图像、文本、语音）。</li>
@@ -490,10 +490,9 @@ calibration_tbl %>%
 <li>计算资源消耗大，训练时间长。</li>
 </ul>
 <p>适用场景：深度学习擅长的领域（如计算机视觉、自然语言处理）。</p>
-</div>
-</div>
-<div id="五算法选择建议" class="section level1">
-<h1>五、算法选择建议</h1>
+
+# 五、算法选择建议
+
 <ul>
 <li>数据规模较小：可尝试 Random Forest 或 CatBoost（处理类别特征更方便）。</li>
 <li>数据规模中等：XGBoost 和 LightGBM 均可，XGBoost 更成熟，LightGBM 速度更快。</li>
@@ -502,4 +501,3 @@ calibration_tbl %>%
 <li>非结构化数据：考虑神经网络（如 CNN、Transformer）。</li>
 </ul>
 <p>XGBoost 的优势在于其高效性、灵活性和广泛的应用场景，尤其在 Kaggle 竞赛和工业界的结构化数据分析中表现突出。</p>
-</div>

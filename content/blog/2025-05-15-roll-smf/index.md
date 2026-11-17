@@ -9,17 +9,12 @@ tags:
   - R
   - 量化投资
 ---
+## 引言
 
+## 单因子模型
 
+## 滚动单因子模型的 R 代码
 
-<div id="引言" class="section level2">
-<h2>引言</h2>
-</div>
-<div id="单因子模型" class="section level2">
-<h2>单因子模型</h2>
-</div>
-<div id="滚动单因子模型的-r-代码" class="section level2">
-<h2>滚动单因子模型的 R 代码</h2>
 
 ``` r
 # 获取最新市场数据(2024-01-01至2025-05-15)
@@ -128,4 +123,3 @@ ggplot(results, aes(x=Beta, y=Alpha)) +
   finance_theme
 ```
 
-</div>

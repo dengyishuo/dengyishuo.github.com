@@ -11,11 +11,8 @@ tags:
   - R包
   - 技术指标
 ---
+# 引言
 
-
-
-<div id="引言" class="section level1">
-<h1>引言</h1>
 <p>俗话说，巧妇难为无米之炊。绘图的前提是得有数据在手。下面是获取数据的代码：</p>
 
 ``` r
@@ -135,4 +132,3 @@ walk2(stock_list, names(stock_list), function(data, name) {
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
 <p>呐，有了R语言，尤其是eTTR包和ggplot2包之后，计算技术指标并进行可视化就是这么简单。欢迎收藏本网站，关注微信公众号<strong>ruijiao007</strong>。</p>
-</div>

@@ -11,21 +11,18 @@ tags:
   - 机器学习
   - 回归
 ---
+# 引言
 
-
-
-<div id="引言" class="section level1">
-<h1>引言</h1>
 <p>在金融市场中，准确预测股票未来涨幅对投资者至关重要。本文以双汇发展（000895.sz）为研究对象，收集并深度剖析其历史累积涨幅及历史成交量数据，探寻二者与未来涨幅之间潜在的规律与关系。通过相关性分析揭示各变量的内在联系，并以相关系数热图直观呈现。在此基础上，借助线性回归和随机森林模型预测未来涨幅，并通过实际值与预测值对比图评估预测效果，最终为投资决策提供科学的数据依据。</p>
-</div>
-<div id="一研究思路" class="section level1">
-<h1>一、研究思路</h1>
+
+# 一、研究思路
+
 <p>本文基于线性回归模型和随机森林模型，以历史阶段性涨幅和成交量为自变量去预测未来数日阶段性涨幅。具体而言，以过去 1 日、3 日、5 日、10 日、20 日累计涨幅和累计成交量作为自变量，去预测未来 5 日、10 日、20 日的涨幅。</p>
-</div>
-<div id="二数据收集与处理" class="section level1">
-<h1>二、数据收集与处理</h1>
-<div id="数据获取" class="section level2">
-<h2>2.1 数据获取</h2>
+
+# 二、数据收集与处理
+
+## 2.1 数据获取
+
 <p>本文选取双汇发展股票（代码 <code>000895.sz</code>）作为研究样本，利用 <code>quantmod</code> 包的 <code>getSymbols</code> 函数获取其历史行情数据。</p>
 
 ``` r
@@ -44,9 +41,8 @@ SHX <- readRDS("SHX.rds")
 dates <- index(SHX)
 ```
 
-</div>
-<div id="收益率与成交量计算" class="section level2">
-<h2>2.2 收益率与成交量计算</h2>
+## 2.2 收益率与成交量计算
+
 <p>运用 TTR 包中的 <code>dailyReturn</code> 函数计算每日收益率，并通过 <code>rollapply</code> 函数分别计算三日、五日、十日及二十日的阶段收益率与成交量。这些不同周期的指标有助于从多个时间维度捕捉股票价格和成交量的变化特征。</p>
 
 ``` r
@@ -71,9 +67,8 @@ ten_day_volume    <- calc_roll(Vo(SHX), 10, sum)
 twenty_day_volume <- calc_roll(Vo(SHX), 20, sum)
 ```
 
-</div>
-<div id="数据整合与清理" class="section level2">
-<h2>2.3 数据整合与清理</h2>
+## 2.3 数据整合与清理
+
 <p>将日期、各阶段收益率及成交量数据整理至数据框 <code>data</code> 中。在计算未来不同周期涨幅时，通过反转每日收益率序列，运用 <code>rollapply</code> 函数计算滚动和，再反转回来并处理缺失值。</p>
 
 ``` r
@@ -172,10 +167,8 @@ head(data)
 ## 2007-02-07                     0                        0
 ```
 
-</div>
-</div>
-<div id="三相关性分析" class="section level1">
-<h1>三、相关性分析</h1>
+# 三、相关性分析
+
 <p>为了深入理解各变量之间的关系，提取数据框中的数值型变量，通过 <code>cor</code> 函数计算相关系数矩阵，并利用 <code>corrplot</code> 包绘制相关系数热图。</p>
 
 ``` r
@@ -259,14 +252,14 @@ corrplot(correlation_matrix,
 <p class="caption">
 Figure 1: 变量相关性热图
 </p>
-</div>
 <p>热图中，坐标轴标签以黑色显示并旋转 45 度，同时添加黑色的相关系数数值，字体大小设为 0.7，清晰呈现各变量间的线性相关程度，为后续模型构建提供参考。</p>
 <p>从热图中可以看出，历史各周期的收益率之间存在较强相关性，而成交量与收益率之间的相关性较弱，这暗示成交量可能为模型提供差异化的信息。</p>
 </div>
-<div id="四预测模型构建与评估" class="section level1">
-<h1>四、预测模型构建与评估</h1>
-<div id="线性回归模型" class="section level2">
-<h2>4.1 线性回归模型</h2>
+
+# 四、预测模型构建与评估
+
+## 4.1 线性回归模型
+
 <p>分别构建预测未来五日、十日及二十日涨幅的线性回归模型。以 <code>data</code> 中的所有变量作为自变量，相应的未来涨幅作为因变量，使用 <code>lm</code> 函数建模。</p>
 
 ``` r
@@ -391,9 +384,8 @@ summary(model_twenty_day)
 prediction_twenty_day <- predict(model_twenty_day, newdata = data)
 ```
 
-</div>
-<div id="随机森林模型" class="section level2">
-<h2>4.2 随机森林模型</h2>
+## 4.2 随机森林模型
+
 <p>同样针对未来五日、十日及二十日涨幅构建随机森林模型。随机森林模型因其对复杂非线性关系的捕捉能力，为预测提供了另一种有效的视角。</p>
 
 ``` r
@@ -410,9 +402,8 @@ rf_model_twenty_day <- randomForest(future_twenty_day_return ~ ., data = data, n
 rf_prediction_twenty_day <- predict(rf_model_twenty_day, newdata = data)
 ```
 
-</div>
-<div id="模型评估与可视化" class="section level2">
-<h2>4.3 模型评估与可视化</h2>
+## 4.3 模型评估与可视化
+
 <p>对于随机森林模型预测的未来不同周期涨幅，分别绘制实际值与预测值的对比图。通过 <code>patchwork</code> 包将每个周期涨幅的对比图和差值图合并展示，全面评估模型的预测效果。</p>
 
 ``` r
@@ -469,10 +460,9 @@ twenty_day_plot <- plot_prediction(data$date, data$future_twenty_day_return,
 <p>预测效果分别如下：</p>
 <p><img src="index_files/figure-html/visResult-1.png" alt="" width="672" /><img src="index_files/figure-html/visResult-2.png" alt="" width="672" /><img src="index_files/figure-html/visResult-3.png" alt="" width="672" /></p>
 <p>从图中可以看出，五日涨幅的预测跟踪效果较好，差值波动相对较小；而随着预测周期的增长（十日、二十日），预测误差逐渐增大。这是由于长期走势受更多复杂因素影响，仅凭历史量价信息难以完全捕捉。</p>
-</div>
-</div>
-<div id="五模型表现对比" class="section level1">
-<h1>五、模型表现对比</h1>
+
+# 五、模型表现对比
+
 <p>为更清晰地评估模型的预测效果，我们计算各模型的 R 方指标：</p>
 
 ``` r
@@ -544,9 +534,9 @@ cat("二十日涨幅 R²: ", rf_r2(data$future_twenty_day_return, rf_prediction_
 ```
 
 <p>可以看出，随机森林模型的拟合能力明显优于线性回归模型，尤其在短期预测（五日）上表现突出。这说明历史量价与未来涨幅之间存在较强的非线性关系，随机森林模型能够更好地捕捉这种关系。</p>
-</div>
-<div id="六结论" class="section level1">
-<h1>六、结论</h1>
+
+# 六、结论
+
 <p>本文通过对双汇发展股票历史量价数据的系统分析，综合运用相关性分析、线性回归及随机森林模型等方法，构建了一个完整的量化分析体系。主要发现如下：</p>
 <ol style="list-style-type: decimal">
 <li>历史阶段性涨幅之间存在较强的自相关性，不同周期（3 日、5 日、10 日、20 日）的回报率高度相关；</li>
@@ -555,4 +545,3 @@ cat("二十日涨幅 R²: ", rf_r2(data$future_twenty_day_return, rf_prediction_
 <li>短期预测（5 日）效果明显优于中长期预测（10 日、20 日），随着预测周期的拉长，模型预测能力迅速下降。</li>
 </ol>
 <p>此外，金融市场复杂多变，单只股票的分析结果存在一定局限性。未来可进一步扩展到多只股票、纳入更多宏观因子和情绪指标，以构建更稳健的预测体系。</p>
-</div>

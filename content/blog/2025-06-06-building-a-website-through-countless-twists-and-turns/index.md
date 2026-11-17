@@ -16,8 +16,9 @@ tags:
 <p>转机就在最近。我在学习Hugo搭建网站的过程中，发现github和netlify结合可以很便捷地搭建网站。加之Hugo提供的主题非常丰富，完全可以满足我的网站需求。无需再等，我决定尝试一下。</p>
 <p>这次搭建网站我使用的基础工具是Rstudio以及R包bolgdown。有了工具之后，我开始在脑海中构思网站的结构，并在茫茫模板之海中打捞自己中意的模板。终于天不负我，我找到一个叫 <a href="https://github.com/Vimux/Mainroad">mainroad</a>的主题，简介大方，十分贴合我的想象。</p>
 <p>以下是我的建站步骤，十分丝滑。</p>
-<div id="创建和克隆github库" class="section level1">
-<h1>创建和克隆github库</h1>
+
+# 创建和克隆github库
+
 <p>我先在github上建立一个名为<a href="https://github.com/dengyishuo/r-finance">r-finance</a>的库。创建库时选择自动生成readme文件、gitignore文件和license文件，同时选择master作为默认分支。之后，在Rstudio中操作克隆项目到本地。具体操作为：</p>
 <blockquote>
 <p>Rstudio -&gt;&gt; tools -&gt;&gt; Terminal -&gt;&gt; New Terminal</p>
@@ -91,9 +92,8 @@ git commit -m "fix:include theme direct"
 git push origin master
 ```
 
-</div>
-<div id="配置config.toml" class="section level1">
-<h1>配置config.toml</h1>
+# 配置config.toml
+
 <p>在r-finance目录下创建一个config.toml文件，内容如下：</p>
 
 ```
@@ -138,9 +138,8 @@ googleAnalytics = "" # Enable Google Analytics by entering your tracking id
   avatar = "img/avatar.png"
 ```
 
-</div>
-<div id="验证网站" class="section level1">
-<h1>验证网站</h1>
+# 验证网站
+
 <p>下面来验证hugo是否可以正确生成网站，命令如下：</p>
 
 ```
@@ -150,9 +149,9 @@ hugo --gc --minify
 ```
 
 <p>如果一切顺利，就可以将文件推送至github了。</p>
-</div>
-<div id="推送到github" class="section level1">
-<h1>推送到github</h1>
+
+# 推送到github
+
 <p>推送至github之前，先将r-finance目录下的所有文件添加到git中，命令如下：</p>
 
 ```
@@ -161,9 +160,8 @@ git commit -m "build website"
 git push origin master
 ```
 
-</div>
-<div id="配置netlify" class="section level1">
-<h1>配置netlify</h1>
+# 配置netlify
+
 <p>在r-finance目录下配置netlify.toml，内容如下：</p>
 
 ```
@@ -200,9 +198,9 @@ HUGO_ENV = 'production'
 ```
 
 <p>选择 <code>deploy</code> 即可。此时已经可以用<a href="https://r-finance.netlify.app">https://r-finance.netlify.app</a> 访问网站了。</p>
-</div>
-<div id="设置个性化域名" class="section level1">
-<h1>设置个性化域名</h1>
+
+# 设置个性化域名
+
 <p>去阿里云购买一个自己中意的域名，我购买的域名是<a href="https://rfinance.org.cn">rfinance.org.cn</a>。接下来在阿里云控制台中进入域名解析设置：</p>
 <p>选择<code>快速添加解析</code>：</p>
 <ul>
@@ -226,4 +224,3 @@ HUGO_ENV = 'production'
 </ol>
 <p>接下来在netlify上配置SSL证书，选择Let’s Encrypt证书即可。</p>
 <p>等待一些时间，网站就可以正常访问了。</p>
-</div>

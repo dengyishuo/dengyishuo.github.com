@@ -9,11 +9,8 @@ tags:
   - R
   - VaR
 ---
+# 理论基础概述
 
-
-
-<div id="理论基础概述" class="section level1">
-<h1>理论基础概述</h1>
 <p>在金融风险管理领域，风险价值（VaR）是一种广泛使用的风险度量工具，它衡量在一定置信水平下，某一金融资产或投资组合在未来特定时期内可能遭受的最大损失。然而，VaR 存在一些局限性，主要体现在以下几个方面：</p>
 <ul>
 <li>缺乏次可加性：在某些情况下，投资组合的 VaR 可能大于其各组成部分 VaR 之和，这与分散投资降低风险的直觉相悖。</li>
@@ -22,11 +19,11 @@ tags:
 </ul>
 <p>为了克服 VaR 的这些局限性，条件风险价值（CVaR）和预期短缺（ES）作为更高级的风险度量方法被提出。CVaR 与 ES 的基本概念条件风险价值（Conditional Value at Risk, CVaR），也称为平均短缺（Average Shortfall, AS）或预期短缺（Expected Shortfall, ES），是指在给定置信水平下，超过 VaR 的损失的期望值。</p>
 <p>它不仅考虑了损失超过 VaR 的概率，还考虑了超过部分的大小，因此能更全面地反映尾部风险。</p>
-</div>
-<div id="数学公式解析" class="section level1">
-<h1>数学公式解析</h1>
-<div id="var-的数学定义" class="section level2">
-<h2>VaR 的数学定义</h2>
+
+# 数学公式解析
+
+## VaR 的数学定义
+
 <p>对于给定的投资组合收益率 R 和置信水平 <span class="math inline">\(\alpha\)</span>，VaR 可以定义为：</p>
 <p><span class="math display">\[
 \text{VaR}_\alpha = -\inf \{ x \in \mathbb{R} : F_R(x) \geq \alpha \}
@@ -36,9 +33,9 @@ tags:
 <p><span class="math display">\[
 P(R \leq -\text{VaR}_\alpha) = 1 - \alpha
 \]</span></p>
-</div>
-<div id="cvares-的数学定义" class="section level2">
-<h2>CVaR/ES 的数学定义</h2>
+
+## CVaR/ES 的数学定义
+
 <p>CVaR/ES 在置信水平 <span class="math inline">\(\alpha\)</span> 下的定义为：</p>
 <p><span class="math display">\[
 \text{CVaR}_\alpha = \text{ES}_\alpha = \mathbb{E}[-R | R \leq -\text{VaR}_\alpha]
@@ -48,13 +45,13 @@ P(R \leq -\text{VaR}_\alpha) = 1 - \alpha
 \text{ES}_\alpha = \frac{1}{1-\alpha} \int_{0}^{1-\alpha} \text{VaR}_p \, dp
 \]</span></p>
 <p>这个公式表明，ES 是所有低于 <span class="math inline">\(\alpha\)</span> 置信水平的 VaR 的平均值。</p>
-</div>
-</div>
-<div id="r-语言实现示例" class="section level1">
-<h1>R 语言实现示例</h1>
+
+# R 语言实现示例
+
 <p>下面通过 R 语言实现基于纳斯达克数据的 VaR、CVaR 和 ES 计算，使用 quantmod 包获取数据，并对比不同 R 包的计算方法。</p>
-<div id="使用-quantmod-获取数据" class="section level2">
-<h2>使用 quantmod 获取数据</h2>
+
+## 使用 quantmod 获取数据
+
 
 ``` r
 # 加载必要的包
@@ -92,11 +89,10 @@ alpha <- 0.95
 risk_results <- list()
 ```
 
-</div>
-<div id="使用不同-r-包计算-escvar" class="section level2">
-<h2>使用不同 R 包计算 ES/CVaR</h2>
-<div id="performanceanalytics-包" class="section level3">
-<h3>PerformanceAnalytics 包</h3>
+## 使用不同 R 包计算 ES/CVaR
+
+### PerformanceAnalytics 包
+
 
 ``` r
 # 使用PerformanceAnalytics包计算ES
@@ -154,9 +150,8 @@ risk_results[["performance"]] <- list(
 )
 ```
 
-</div>
-<div id="fgarch-包" class="section level3">
-<h3>fGarch 包</h3>
+### fGarch 包
+
 
 ``` r
 # 使用fGarch包计算ES
@@ -197,9 +192,8 @@ risk_results[["fgarch"]] <- list(
 )
 ```
 
-</div>
-<div id="cvar包针对连续分布的vares计算" class="section level3">
-<h3>cvar包（针对连续分布的VaR/ES计算）</h3>
+### cvar包（针对连续分布的VaR/ES计算）
+
 
 ``` r
 if (!require("cvar")) install.packages("cvar")
@@ -437,11 +431,8 @@ ES_t <- (dt(qt(alpha, df = df), df = df) / alpha) *
 risk_results[["VaRES"]] <- list(VaR = VaR_t, ES = ES_t)
 ```
 
-</div>
-</div>
-</div>
-<div id="结果对比与可视化" class="section level1">
-<h1>结果对比与可视化</h1>
+# 结果对比与可视化
+
 
 ``` r
 # 从risk_results中提取各方法的VaR和ES（统一格式：保留数值，处理符号）
@@ -608,4 +599,3 @@ results %>%
 
 <p>结论CVaR 和 ES 作为 VaR 的补充工具，能够更全面地度量金融风险，尤其是在处理尾部风险时表现更为出色。通过结合使用 VaR、CVaR 和 ES，风险管理者可以获得更完整的风险图景，从而做出更明智的风险管理决策。在实际应用中，应根据投资组合的特性和市场环境选择合适的风险度量方法。</p>
 <p>不同 R 包提供了多种计算 ES/CVaR 的方法，各有特点：PerformanceAnalytics：简单易用，支持多种分布假设RiskPortfolios：专注投资组合风险分析fGarch/rugarch：适合结合 GARCH 模型处理时变波动率ExpectedShortfall：提供 ES 回测功能建议结合数据特性（如是否存在厚尾、波动聚类等）选择合适的模型，并对比不同方法的结果以确保对极端风险的充分考虑。</p>
-</div>

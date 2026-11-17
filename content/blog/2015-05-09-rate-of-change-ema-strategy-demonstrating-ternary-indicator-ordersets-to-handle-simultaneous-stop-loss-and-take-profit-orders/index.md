@@ -16,19 +16,20 @@ tags:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = here::here())
 ```
 
-<div id="引言" class="section level1">
-<h1>引言</h1>
+# 引言
+
 <p>该回测系统采用三重技术指标组合策略，主要逻辑架构如下：</p>
-<div id="核心策略逻辑" class="section level2">
-<h2>核心策略逻辑</h2>
+
+## 核心策略逻辑
+
 <ul>
 <li><p>趋势判断层：通过EMA(12)与EMA(26)双均线组合识别中期趋势方向，当快线上穿慢线时判定为上升趋势。</p></li>
 <li><p>动量验证层：计算快线EMA(12)的ROC(9)指标，确保价格变动具备持续动能。</p></li>
 <li><p>趋势过滤层：引入SMA(200)作为长期趋势基准，要求价格必须位于年线上方才允许做多。</p></li>
 </ul>
-</div>
-<div id="信号生成机制" class="section level2">
-<h2>信号生成机制</h2>
+
+## 信号生成机制
+
 <p>多头信号触发条件（同时满足）：</p>
 <ul>
 <li>EMA(12) &gt; EMA(26)（双均线金叉）</li>
@@ -41,19 +42,18 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = he
 <li>ROC(9) &lt; 0（负向动量确认）</li>
 <li>收盘价 &lt; SMA(200)（处于长期下降趋势）</li>
 </ul>
-</div>
-<div id="风险控制设计" class="section level2">
-<h2>风险控制设计</h2>
+
+## 风险控制设计
+
 <ul>
 <li>采用固定100股交易量简化头寸管理。</li>
 <li>通过quantstrat的ruleSignal机制实现市价单即时成交。</li>
 <li>绩效分析模块自动计算夏普比率、最大回撤等关键指标57</li>
 </ul>
 <p>该策略通过多指标协同验证，既保留EMA对趋势的敏感度，又利用SMA过滤假突破信号，同时ROC指标确保入场时点具备足够动能。回测框架严格遵循事件驱动原则，模拟真实交易中的订单撮合流程</p>
-</div>
-</div>
-<div id="r代码实现" class="section level1">
-<h1>R代码实现</h1>
+
+# R代码实现
+
 
 ``` r
 # 加载必要的包
@@ -2844,4 +2844,3 @@ tradeStats(portfolio.st, "AAPL")
 ## AAPL      595.2789       -0.2127435       -0.2211782      5711.09     590.4887         5911.599         288.1137   15.33608    -14471503           1.690648          27233.09            2691.4   35072536  -37.67239   24466225
 ```
 
-</div>

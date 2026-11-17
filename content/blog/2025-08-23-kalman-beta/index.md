@@ -9,21 +9,19 @@ tags:
   - R
   - 投资组合
 ---
+# 引言
 
-
-
-<div id="引言" class="section level1">
-<h1>引言</h1>
 <p>在金融领域，贝塔（β）系数是资本资产定价模型（CAPM）中的核心参数，用于衡量单个资产或证券组合相对于整个市场（通常以市场指数代表）的系统性风险或波动性。具体而言，贝塔反映了市场收益率变动一个单位时，个体资产收益率的预期变动幅度。准确估计贝塔对于投资组合管理、风险控制、资产定价以及绩效评估都具有重要意义。例如，投资者可通过贝值判断资产的风险属性，进行合理的资产配置；基金经理也可依据贝塔调整投资组合的市场暴露程度。</p>
 <p>传统的贝塔估计方法主要依赖于最小二乘（OLS）回归。通过在给定时间窗口（如1年、3年或5年）内对资产收益率与市场收益率进行线性回归，所得斜率系数即为贝塔估计值。此外，为降低短期波动带来的误差，也常采用滚动窗口回归或调整贝塔（Adjusted Beta）等方法。</p>
 <p>然而，这些传统方法存在明显不足。首先，它们隐含假设贝塔在估计期间内是固定不变的，但事实上，受公司资本结构、经营策略、行业竞争及宏观经济环境等因素影响，资产的系统性风险可能随时间变化，即贝塔具有时变性。其次，滚动窗口回归中窗口长度的选择缺乏统一标准，较短窗口对噪声敏感，较长窗口则可能无法及时捕捉最新变化。再者，这些方法无法提供实时更新的贝塔估计，难以满足动态风险管理的需求。</p>
 <p>为克服上述不足，本研究引入卡尔曼滤波（Kalman Filter）方法进行时变贝塔的估计。卡尔曼滤波是一种递归状态估计算法，能够从带有噪声的观测数据中最优地估计动态系统的内部状态。其核心优势在于能够实时更新状态估计，并通过建模状态变量的动态演化过程（如随机游走）来捕捉参数的时变特性。将卡尔曼滤波应用于贝塔估计，不仅可以得到随时间平滑变化的贝塔序列，还能通过状态空间模型灵活描述贝塔的动态行为，从而提供更准确、适应性的风险度量。</p>
-</div>
-<div id="卡尔曼滤波原理及其在计算贝塔中的应用" class="section level1">
-<h1>卡尔曼滤波原理及其在计算贝塔中的应用</h1>
+
+# 卡尔曼滤波原理及其在计算贝塔中的应用
+
 <p>卡尔曼滤波是一种最优递归数据处理算法，用于从一系列存在噪声的观测数据中估计动态系统的内部状态。其基本思想是通过结合系统模型的预测（先验估计）和当前观测值的更新，递归地得到状态的最优估计（后验估计）。该算法主要包含两个步骤：预测（时间更新）和更新（测量更新）。</p>
-<div id="基本原理" class="section level2">
-<h2>基本原理</h2>
+
+## 基本原理
+
 <ol style="list-style-type: decimal">
 <li><strong>状态空间模型</strong><br />
 卡尔曼滤波建立在状态空间模型之上，包括状态方程和观测方程：
@@ -53,9 +51,9 @@ tags:
 <span class="math display">\[P_t = (I - K_t H_t) P_t^{-}\]</span></li>
 </ul></li>
 </ol>
-</div>
-<div id="在计算贝塔时的应用" class="section level2">
-<h2>在计算贝塔时的应用</h2>
+
+## 在计算贝塔时的应用
+
 <p>在时变贝塔估计中，我们将CAPM模型置于状态空间框架下。假设在时刻<span class="math inline">\(t\)</span>，资产超额收益<span class="math inline">\(r_{a,t}\)</span>与市场超额收益<span class="math inline">\(r_{m,t}\)</span>满足：<br />
 <span class="math display">\[r_{a,t} = \alpha_t + \beta_t r_{m,t} + \epsilon_t\]</span><br />
 其中，<span class="math inline">\(\alpha_t\)</span>和<span class="math inline">\(\beta_t\)</span>为时变参数，<span class="math inline">\(\epsilon_t\)</span>为观测噪声。</p>
@@ -67,10 +65,9 @@ tags:
 <span class="math display">\[z_t = H_t x_t + v_t\]</span><br />
 其中，<span class="math inline">\(z_t = r_{a,t}\)</span>，<span class="math inline">\(H_t = [1, r_{m,t}]\)</span>，<span class="math inline">\(v_t = \epsilon_t\)</span>为观测噪声，方差为<span class="math inline">\(R\)</span>。</p>
 <p>通过卡尔曼滤波递归处理数据，可得到状态向量（即<span class="math inline">\(\alpha_t\)</span>和<span class="math inline">\(\beta_t\)</span>）的最优估计。滤波结果（Filtered）基于当前及过去信息，适用于实时估计；平滑结果（Smoothed）利用全部样本信息，适用于事后分析。</p>
-</div>
-</div>
-<div id="r代码实例" class="section level1">
-<h1>R代码实例</h1>
+
+# R代码实例
+
 
 ``` r
 # 安装必要的包（如果尚未安装）
@@ -199,4 +196,3 @@ ggplot(returns, aes(x = Date)) +
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
-</div>

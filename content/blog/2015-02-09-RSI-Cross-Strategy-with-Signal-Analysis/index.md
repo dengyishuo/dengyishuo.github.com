@@ -339,8 +339,9 @@ distributional.boxplot(
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<div id="核心逻辑流程图解" class="section level2">
-<h2>核心逻辑流程图解</h2>
+
+## 核心逻辑流程图解
+
 <p>graph TD
 A[环境初始化] –&gt; B[加载历史数据]
 B –&gt; C[定义RSI策略]
@@ -354,12 +355,11 @@ forward.days=10 信号触发后跟踪天数 根据策略持仓周期调整
 n=seq(2,10,1) RSI参数扫描范围 扩大范围可探索更多可能性
 threshold=30/70 超买超卖阈值 根据资产波动性调整
 obj.fun=slope 优化目标函数（收益曲线斜率） 可改为夏普比率等指标</p>
-</div>
-<div id="代码运行结果解读" class="section level2">
-<h2>代码运行结果解读</h2>
+
+## 代码运行结果解读
+
 <ul>
 <li>柱状图：展示不同RSI参数对应的10日累计收益，柱体越高表示该参数效果越好</li>
 <li>箱线图：显示特定参数下收益的分布情况，箱体越紧凑说明策略稳定性越高</li>
 </ul>
 <p>建议优先选择 高收益柱体且箱线图波动小的参数组合作为最终策略参数。可通过修改.n序列扩大参数扫描范围，例如seq(5,20,5)测试更长周期的RSI效果。</p>
-</div>

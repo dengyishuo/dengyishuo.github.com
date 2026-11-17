@@ -30,13 +30,13 @@ font_add("SimHei", "SimHei.ttf")
 showtext_auto()
 ```
 
-<div id="引言" class="section level2">
-<h2>引言</h2>
+## 引言
+
 <p>现代金融领域的计量工作分为两大块，即资产定价和风险度量。而资产定价又是以度量风险并为风险定价为基础，由此可见，风险度量工作实际上是现代金融计量领域的核心。金融领域度量风险的方法有很多，其中应用最多的是方差、最大回撤和 VaR 等。</p>
 <p>在业界，VaR 不仅单纯作为风险管理的工具，在进行投资组合优化时，也会将 VaR 作为重要的过滤指标之一。</p>
-</div>
-<div id="var-的定义" class="section level2">
-<h2>VaR 的定义</h2>
+
+## VaR 的定义
+
 <p>VaR 是 Value at Risk 的简称，中文译作“在险价值”。它是指在市场正常波动情况下，投资者所持有的投资组合在未来一定时期 <span class="math inline">\(T\)</span> 内，在一定置信水平 <span class="math inline">\(\alpha\)</span> 下所可能产生的最大可能损失。</p>
 <p>假设投资者持有的投资组合的初始价值为 <span class="math inline">\(P_{0}\)</span> ，<span class="math inline">\(r\)</span> 为未来一定时期 <span class="math inline">\(T\)</span> 对应的收益率。那么，该组合的期末价值为：</p>
 <p><span class="math display">\[
@@ -51,12 +51,13 @@ P_{T}^*=P_{0}(1+r_{T}^*)
 VaR_{\alpha}=-P_{0}r_{\alpha}^*
 \]</span>
 可见，计算 VaR 值等价于计算一定置信水平下的投资组合的最低价值 <span class="math inline">\(P^*\)</span> 或最低收益率 <span class="math inline">\(r^*\)</span> 。而计算最低价值或最低收益率则需依赖于价格序列或收益率序列的分布或概率密度函数。换句话说，计算金融资产序列的分布函数或概率密度函数正是计算 VaR 值的核心之处。</p>
-</div>
-<div id="var-的算法" class="section level1">
-<h1>VaR 的算法</h1>
+
+# VaR 的算法
+
 <p>清楚了 VaR 的定义，计算 VaR 的方法也就呼之欲出了。目前，常用的 VaR 算法可以分为参数法即方差-协方差法、蒙特卡洛模拟法以及非参数方法即历史模拟法。在 VaR 的应用过程中，人们也对 VaR 的上述算法进行了扩展。比如，在方差-协方差方法下人们提出了指数级权平均模型计算方差或者结合 Garch 类模型计算方差进而计算 VaR 的方法。</p>
-<div id="历史模拟法" class="section level2">
-<h2>历史模拟法</h2>
+
+## 历史模拟法
+
 <p>历史模拟法是最简单的计算 VaR 的方法。它假设投资组合未来的波动与投资组合的历史数据完全一致，因此，计算投资组合的未来 VaR 就等同于计算历史数据的既有 VaR 。</p>
 <p>历史模拟法的步骤为：</p>
 <ul>
@@ -64,9 +65,9 @@ VaR_{\alpha}=-P_{0}r_{\alpha}^*
 <li>计算历史数据的几何收益率</li>
 <li>对收益率进行排序并计算给定置信水平的下分位数</li>
 </ul>
-</div>
-<div id="单资产-var-的计算及其r实现" class="section level2">
-<h2>单资产 VaR 的计算及其R实现</h2>
+
+## 单资产 VaR 的计算及其R实现
+
 <p>下面以计算单个资产的VaR为例：</p>
 
 ``` r
@@ -182,9 +183,9 @@ text(x = -historical_var, y = par("usr")[4]*0.9,
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-</div>
-<div id="多资产投资组合的-var-计算及其-r-实现" class="section level2">
-<h2>多资产投资组合的 VaR 计算及其 R 实现</h2>
+
+## 多资产投资组合的 VaR 计算及其 R 实现
+
 <p>用历史模拟法计算多资产投资组合的 VaR 与单资产思路类似，唯一不同的是要按照当前投资组合中各资产的权重计算投资组合的历史收益率。</p>
 <p>具体R代码如下:</p>
 
@@ -341,5 +342,3 @@ ggplot(data.frame(Return = portfolio_returns), aes(x = Return)) +
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-</div>
-</div>

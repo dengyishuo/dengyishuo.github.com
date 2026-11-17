@@ -11,17 +11,14 @@ tags:
   - 风险管理
   - 极值理论
 ---
+# 一、引言
 
-
-
-<div id="一引言" class="section level1">
-<h1>一、引言</h1>
 <p>风险价值（VaR）作为衡量金融资产极端损失的核心指标，传统方法（如 GARCH 模型）虽能捕捉波动聚类特性，但对尾部风险的刻画仍依赖于整体分布假设。</p>
 <p><strong>极值理论（Extreme Value Theory, EVT）</strong> 则直接聚焦于收益率序列的尾部行为，通过对极端值建模突破整体分布限制，更精准地估计极端市场条件下的潜在损失。</p>
 <p>本文以特斯拉（TSLA）股票收益率为例，系统介绍极值理论的核心模型（广义极值分布 GEV、广义帕累托分布 GPD）、参数估计及 VaR 计算流程，并通过 R 语言<code>fExtremes</code>和<code>evd</code>包实现实证分析。</p>
-</div>
-<div id="二极值理论核心模型" class="section level1">
-<h1>二、极值理论核心模型</h1>
+
+# 二、极值理论核心模型
+
 <p>极值理论通过两类方法刻画极端值分布：<strong>分块最大值法（Block Maxima Method, BMM）</strong> 基于广义极值分布（GEV），<strong>超限峰值法（Peaks Over Threshold, POT）</strong> 基于广义帕累托分布（GPD）。其中，POT 因灵活利用数据尾部信息而更常用于 VaR 计算。</p>
 <ol style="list-style-type: decimal">
 <li>广义极值分布（GEV）</li>
@@ -98,13 +95,13 @@ VaR_{1-\alpha} = u + \frac{\sigma}{\xi} \left[ \left( \frac{n}{N_u} (1 - \alpha)
 </ul></li>
 <li>阈值稳定性检验：确保参数 <span class="math inline">\(\xi\)</span> 和 <span class="math inline">\(\sigma\)</span> 在 <span class="math inline">\(u\)</span> 增大时趋于稳定。</li>
 </ul>
-</div>
-<div id="三r-语言实证分析tsla-数据" class="section level1">
-<h1>三、R 语言实证分析（TSLA 数据）
-</h1>
+
+# 三、R 语言实证分析（TSLA 数据）
+
 <p>以 TSLA 股票收益率为例，采用 POT 方法（GPD）计算极端风险 VaR，步骤如下：</p>
-<div id="数据准备与预处理" class="section level2">
-<h2>1. 数据准备与预处理</h2>
+
+## 1. 数据准备与预处理
+
 <p>使用<code>quantmod</code>获取数据并计算对数收益率（保留损失数据，即负收益率的绝对值）：</p>
 
 ``` r
@@ -135,9 +132,8 @@ loss <- na.omit(loss)
 colnames(loss) <- "TSLA_Loss"
 ```
 
-</div>
-<div id="阈值选择mean-excess-plot" class="section level2">
-<h2>2. 阈值选择（Mean Excess Plot）</h2>
+## 2. 阈值选择（Mean Excess Plot）
+
 <p>通过平均超出量函数确定阈值 <span class="math inline">\(u\)</span> ：</p>
 
 ``` r
@@ -164,10 +160,8 @@ u <- 0.03
 excess <- as.numeric(loss[loss > u] - u)  # 超出量序列
 ```
 
-</div>
-<div id="gpd-参数估计" class="section level2">
-<h2>3. GPD 参数估计
-</h2>
+## 3. GPD 参数估计
+
 <p>使用<code>evd</code>包的<code>fpot</code>函数估计 GPD 的形状参数 <span class="math inline">\(\xi\)</span> 和尺度参数 <span class="math inline">\(\sigma\)</span> ：</p>
 
 ``` r
@@ -218,9 +212,8 @@ N <- length(loss)  # 总样本量
 Nu <- length(excess)  # 超限值数量
 ```
 
-</div>
-<div id="计算-var-与回测" class="section level2">
-<h2>4. 计算 VaR 与回测</h2>
+## 4. 计算 VaR 与回测
+
 <p>基于 GPD 参数计算高置信水平（如 99%、99.5%）的 VaR：</p>
 
 ``` r
@@ -263,9 +256,8 @@ cat("99% VaR失败率：", round(fail_99 * 100, 2), "%\n")
 ## 99% VaR失败率： 6.15 %
 ```
 
-</div>
-<div id="结果可视化" class="section level2">
-<h2>5. 结果可视化</h2>
+## 5. 结果可视化
+
 <p>对比实际极端损失与 VaR 阈值：</p>
 
 ``` r
@@ -290,10 +282,9 @@ theme_minimal()
 ```
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-</div>
-</div>
-<div id="四结论" class="section level1">
-<h1>四、结论</h1>
+
+# 四、结论
+
 <p>极值理论通过直接建模尾部极端值，避免了对整体分布的依赖，在高置信水平下的 VaR 估计更具优势。实证分析显示：</p>
 <ol style="list-style-type: decimal">
 <li>TSLA 股票的极端损失呈现明显厚尾特性（ <span class="math inline">\(\xi &gt; 0\)</span> ），适合用 GPD 建模；</li>
@@ -302,4 +293,3 @@ theme_minimal()
 </ol>
 <p>未来可结合动态阈值调整或贝叶斯估计，进一步提升 EVT 模型对极端风险的动态跟踪能力。</p>
 <p><strong>注</strong>：代码中<code>fpot</code>函数需确保阈值<span class="math inline">\(u\)</span>合理（超限值数量建议占总样本的 5%-10%）；若<span class="math inline">\(\xi\)</span>接近 0，可简化为指数分布计算 VaR。</p>
-</div>
