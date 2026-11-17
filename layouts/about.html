@@ -13,6 +13,27 @@
         {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
     </header>
 
+    {{- /* 页内目录：与博客文章页同款（article-toc 折叠条），
+         目标是各分区标题；本页右栏为空，样式里强制在桌面端也显示 */ -}}
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    {{ partial "helper/icon" "chevron-right" }}
+                    <span>{{ T "article.tableOfContents" }}</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                <ul>
+                    {{- range $about.sections }}
+                    <li><a href="#{{ anchorize .title }}">{{ .title }}</a></li>
+                    {{- end }}
+                    <li><a href="#{{ anchorize "我的作品" }}">我的作品</a></li>
+                </ul>
+            </nav>
+        </details>
+    </aside>
+
     {{- with $about.lead }}
     <section class="gt-wlist-section">
         <p class="gt-about-lead">{{ . | markdownify }}</p>
@@ -21,7 +42,7 @@
 
     {{- range $about.sections }}
     <section class="gt-wlist-section">
-        <h2 class="gt-wlist-head">{{ .title }}</h2>
+        <h2 class="gt-wlist-head" id="{{ anchorize .title }}">{{ .title }}</h2>
         <ul class="gt-wlist gt-about-list">
             {{- range .items }}
             <li class="gt-wlist-item">
@@ -41,7 +62,7 @@
 
     {{- /* 结尾：指向作品页，做成一行可点条目，与上方列表同构 */ -}}
     <section class="gt-wlist-section">
-        <h2 class="gt-wlist-head">我的作品</h2>
+        <h2 class="gt-wlist-head" id="{{ anchorize "我的作品" }}">我的作品</h2>
         <ul class="gt-wlist">
             <li class="gt-wlist-item gt-about-cta">
                 <a href="{{ "/works/" | relLangURL }}">

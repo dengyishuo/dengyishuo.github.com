@@ -9,7 +9,7 @@
 
 {{ if $books }}
 <section class="gt-wlist-section">
-    <h2 class="gt-wlist-head">图书</h2>
+    <h2 class="gt-wlist-head" id="{{ anchorize "图书" }}">图书</h2>
 
     {{- range $groups := slice
         (dict "key" "published" "label" "已出版")
@@ -19,7 +19,7 @@
         {{- $items := where $books "status" $groups.key -}}
         {{- with $items }}
         <div class="gt-wlist-group">
-            <h3 class="gt-wlist-label">{{ $groups.label }}</h3>
+            <h3 class="gt-wlist-label" id="{{ anchorize $groups.label }}">{{ $groups.label }}</h3>
             <ul class="gt-wlist">
                 {{- range . }}
                 <li class="gt-wlist-item">
@@ -45,7 +45,7 @@
 
 {{ if $packages }}
 <section class="gt-wlist-section">
-    <h2 class="gt-wlist-head">开源软件包</h2>
+    <h2 class="gt-wlist-head" id="{{ anchorize "开源软件包" }}">开源软件包</h2>
     <ul class="gt-wlist">
         {{- range $packages }}
         <li class="gt-wlist-item">

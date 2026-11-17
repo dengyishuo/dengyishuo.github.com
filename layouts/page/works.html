@@ -2,10 +2,51 @@
 {{ define "body-class" }}gt-works-page{{ end }}
 
 {{ define "main" }}
+    {{- $works := hugo.Data.works -}}
+    {{- $books := $works.books -}}
+    {{- $packages := $works.packages -}}
+
     <header class="gt-page-head">
         <h1 class="gt-page-title">{{ .Title }}</h1>
         {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
     </header>
+
+    {{- /* 页内目录：与博客文章页同款（article-toc 折叠条）。
+         图书下按状态嵌套（已出版 / 撰写中 / 计划内），
+         只收录非空分组，与正文实际渲染的小标题一一对应 */ -}}
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    {{ partial "helper/icon" "chevron-right" }}
+                    <span>{{ T "article.tableOfContents" }}</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                <ul>
+                    {{- if $books }}
+                    <li>
+                        <a href="#{{ anchorize "图书" }}">图书</a>
+                        <ul>
+                            {{- range $groups := slice
+                                (dict "key" "published" "label" "已出版")
+                                (dict "key" "writing" "label" "撰写中")
+                                (dict "key" "planned" "label" "计划内")
+                            }}
+                                {{- with where $books "status" $groups.key }}
+                            <li><a href="#{{ anchorize $groups.label }}">{{ $groups.label }}</a></li>
+                                {{- end }}
+                            {{- end }}
+                        </ul>
+                    </li>
+                    {{- end }}
+                    {{- if $packages }}
+                    <li><a href="#{{ anchorize "开源软件包" }}">开源软件包</a></li>
+                    {{- end }}
+                </ul>
+            </nav>
+        </details>
+    </aside>
 
     {{ .Content }}
 

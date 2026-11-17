@@ -1257,6 +1257,26 @@ html {
     margin-right: auto;
 }
 
+/* 关于 / 作品两页的页内目录。
+   复用博客文章页的 .article-toc 折叠条，但这两页右栏为空，
+   主题默认在 lg 以上 display:none（把目录让给右栏 widget），
+   这里强制全程显示。
+   间距交给 main 的 flex gap（40px），主题自带的 margin-top 要去掉，
+   否则会和 gap 叠加，目录与下方首个分区之间被撑到 70px。
+   锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘。 */
+.gt-about-page .article-toc,
+.gt-works-page .article-toc {
+    display: flex;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.gt-about-page .gt-wlist-head,
+.gt-works-page .gt-wlist-head,
+.gt-works-page .gt-wlist-label {
+    scroll-margin-top: 24px;
+}
+
 /* 窄屏：书名换行时把角色推到下一行，避免挤压标题 */
 @media (max-width: 767px) {
     .gt-wlist-item {
