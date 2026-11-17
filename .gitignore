@@ -19,3 +19,7 @@ index_cache/
 /index.html
 _drafts/
 _site/
+
+# 文章目录里的 index.html：Hugo 只读 index.md，html 是 knitr::render 的冗余产物
+# （33 篇正文为 HTML 的文章已转存为 index.md 并标注 markup: html，不要再生成 html）
+content/**/index.html
