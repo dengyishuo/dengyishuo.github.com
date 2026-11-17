@@ -20,11 +20,11 @@ tags:
 <link href="{{< blogdown/postref >}}index_files/reactable/reactable.css" rel="stylesheet" />
 <script src="{{< blogdown/postref >}}index_files/reactable-binding/reactable.js"></script>
 
-# 引言
+## 引言
 
 <p>XGBoost（eXtreme Gradient Boosting）是一种高效的梯度提升算法，在数据科学和机器学习领域广泛应用，尤其擅长处理结构化数据的回归和分类问题。以下从数学原理、发展历程、使用方法和竞争算法四个方面进行详细介绍：</p>
 
-# 一、数学原理
+## 一、数学原理
 
 <p>XGBoost 是梯度提升框架（Gradient Boosting）的优化实现，其核心思想是迭代地训练多个弱学习器（通常是决策树），并将它们组合成一个强学习器。</p>
 <p>具体数学原理如下：</p>
@@ -59,7 +59,7 @@ tags:
 <li><strong>正则化剪枝</strong>：通过正则化项控制树的复杂度，避免过拟合。</li>
 </ul>
 
-# 二、发展历程
+## 二、发展历程
 
 <ul>
 <li><p>2014 年：陈天奇（Tianqi Chen）在华盛顿大学读博期间开发了 XGBoost 的原型，最初作为研究项目用于解决大规模机器学习问题。</p></li>
@@ -68,7 +68,7 @@ tags:
 <li><p>2017 年至今：XGBoost 持续更新，增加了更多功能（如 DART、GPU 加速、特征重要性分析等），并被集成到多种编程语言和工具中（如 Python、R、Scala 等）。</p></li>
 </ul>
 
-# 三、如何使用
+## 三、如何使用
 
 <p>我们将用联邦基金有效利率和失业率为输入参数，按照 xgboost 模型对纳斯达克 100 指数月度数据进行建模。</p>
 
@@ -445,11 +445,11 @@ calibration_tbl %>%
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 
-# 四、竞争算法
+## 四、竞争算法
 
 <p>XGBoost 的主要竞争对手包括：</p>
 
-## 1. LightGBM
+### 1. LightGBM
 
 <p>开发者：微软（2017 年发布）。</p>
 <p>特点：</p>
@@ -460,7 +460,7 @@ calibration_tbl %>%
 <li>适用场景：超大规模数据集、需要快速迭代的场景。</li>
 </ul>
 
-## 2. CatBoost
+### 2. CatBoost
 
 <p>开发者：Yandex（2017 年发布）。</p>
 <p>特点：</p>
@@ -471,7 +471,7 @@ calibration_tbl %>%
 </ul>
 <p>适用场景：包含大量类别特征的数据集（如推荐系统、广告点击预测）。</p>
 
-## 3. Random Forest
+### 3. Random Forest
 
 <p>特点：</p>
 <ul>
@@ -481,7 +481,7 @@ calibration_tbl %>%
 </ul>
 <p>适用场景：快速 baseline 模型、对解释性要求较高的场景。</p>
 
-## 4. Neural Networks（神经网络）
+### 4. Neural Networks（神经网络）
 
 <p>特点：</p>
 <ul>
@@ -491,7 +491,7 @@ calibration_tbl %>%
 </ul>
 <p>适用场景：深度学习擅长的领域（如计算机视觉、自然语言处理）。</p>
 
-# 五、算法选择建议
+## 五、算法选择建议
 
 <ul>
 <li>数据规模较小：可尝试 Random Forest 或 CatBoost（处理类别特征更方便）。</li>

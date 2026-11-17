@@ -16,11 +16,11 @@ tags:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = here::here())
 ```
 
-# 引言
+## 引言
 
 <p>该回测系统采用三重技术指标组合策略，主要逻辑架构如下：</p>
 
-## 核心策略逻辑
+### 核心策略逻辑
 
 <ul>
 <li><p>趋势判断层：通过EMA(12)与EMA(26)双均线组合识别中期趋势方向，当快线上穿慢线时判定为上升趋势。</p></li>
@@ -28,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = he
 <li><p>趋势过滤层：引入SMA(200)作为长期趋势基准，要求价格必须位于年线上方才允许做多。</p></li>
 </ul>
 
-## 信号生成机制
+### 信号生成机制
 
 <p>多头信号触发条件（同时满足）：</p>
 <ul>
@@ -43,7 +43,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = he
 <li>收盘价 &lt; SMA(200)（处于长期下降趋势）</li>
 </ul>
 
-## 风险控制设计
+### 风险控制设计
 
 <ul>
 <li>采用固定100股交易量简化头寸管理。</li>
@@ -52,7 +52,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, cache = FALSE, root.dir = he
 </ul>
 <p>该策略通过多指标协同验证，既保留EMA对趋势的敏感度，又利用SMA过滤假突破信号，同时ROC指标确保入场时点具备足够动能。回测框架严格遵循事件驱动原则，模拟真实交易中的订单撮合流程</p>
 
-# R代码实现
+## R代码实现
 
 
 ``` r

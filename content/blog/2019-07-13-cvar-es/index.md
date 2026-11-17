@@ -9,7 +9,7 @@ tags:
   - R
   - VaR
 ---
-# 理论基础概述
+## 理论基础概述
 
 <p>在金融风险管理领域，风险价值（VaR）是一种广泛使用的风险度量工具，它衡量在一定置信水平下，某一金融资产或投资组合在未来特定时期内可能遭受的最大损失。然而，VaR 存在一些局限性，主要体现在以下几个方面：</p>
 <ul>
@@ -20,9 +20,9 @@ tags:
 <p>为了克服 VaR 的这些局限性，条件风险价值（CVaR）和预期短缺（ES）作为更高级的风险度量方法被提出。CVaR 与 ES 的基本概念条件风险价值（Conditional Value at Risk, CVaR），也称为平均短缺（Average Shortfall, AS）或预期短缺（Expected Shortfall, ES），是指在给定置信水平下，超过 VaR 的损失的期望值。</p>
 <p>它不仅考虑了损失超过 VaR 的概率，还考虑了超过部分的大小，因此能更全面地反映尾部风险。</p>
 
-# 数学公式解析
+## 数学公式解析
 
-## VaR 的数学定义
+### VaR 的数学定义
 
 <p>对于给定的投资组合收益率 R 和置信水平 <span class="math inline">\(\alpha\)</span>，VaR 可以定义为：</p>
 <p><span class="math display">\[
@@ -34,7 +34,7 @@ tags:
 P(R \leq -\text{VaR}_\alpha) = 1 - \alpha
 \]</span></p>
 
-## CVaR/ES 的数学定义
+### CVaR/ES 的数学定义
 
 <p>CVaR/ES 在置信水平 <span class="math inline">\(\alpha\)</span> 下的定义为：</p>
 <p><span class="math display">\[
@@ -46,11 +46,11 @@ P(R \leq -\text{VaR}_\alpha) = 1 - \alpha
 \]</span></p>
 <p>这个公式表明，ES 是所有低于 <span class="math inline">\(\alpha\)</span> 置信水平的 VaR 的平均值。</p>
 
-# R 语言实现示例
+## R 语言实现示例
 
 <p>下面通过 R 语言实现基于纳斯达克数据的 VaR、CVaR 和 ES 计算，使用 quantmod 包获取数据，并对比不同 R 包的计算方法。</p>
 
-## 使用 quantmod 获取数据
+### 使用 quantmod 获取数据
 
 
 ``` r
@@ -89,9 +89,9 @@ alpha <- 0.95
 risk_results <- list()
 ```
 
-## 使用不同 R 包计算 ES/CVaR
+### 使用不同 R 包计算 ES/CVaR
 
-### PerformanceAnalytics 包
+#### PerformanceAnalytics 包
 
 
 ``` r
@@ -150,7 +150,7 @@ risk_results[["performance"]] <- list(
 )
 ```
 
-### fGarch 包
+#### fGarch 包
 
 
 ``` r
@@ -192,7 +192,7 @@ risk_results[["fgarch"]] <- list(
 )
 ```
 
-### cvar包（针对连续分布的VaR/ES计算）
+#### cvar包（针对连续分布的VaR/ES计算）
 
 
 ``` r
@@ -431,7 +431,7 @@ ES_t <- (dt(qt(alpha, df = df), df = df) / alpha) *
 risk_results[["VaRES"]] <- list(VaR = VaR_t, ES = ES_t)
 ```
 
-# 结果对比与可视化
+## 结果对比与可视化
 
 
 ``` r

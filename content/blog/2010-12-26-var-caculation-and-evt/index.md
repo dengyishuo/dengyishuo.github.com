@@ -11,13 +11,13 @@ tags:
   - 风险管理
   - 极值理论
 ---
-# 一、引言
+## 一、引言
 
 <p>风险价值（VaR）作为衡量金融资产极端损失的核心指标，传统方法（如 GARCH 模型）虽能捕捉波动聚类特性，但对尾部风险的刻画仍依赖于整体分布假设。</p>
 <p><strong>极值理论（Extreme Value Theory, EVT）</strong> 则直接聚焦于收益率序列的尾部行为，通过对极端值建模突破整体分布限制，更精准地估计极端市场条件下的潜在损失。</p>
 <p>本文以特斯拉（TSLA）股票收益率为例，系统介绍极值理论的核心模型（广义极值分布 GEV、广义帕累托分布 GPD）、参数估计及 VaR 计算流程，并通过 R 语言<code>fExtremes</code>和<code>evd</code>包实现实证分析。</p>
 
-# 二、极值理论核心模型
+## 二、极值理论核心模型
 
 <p>极值理论通过两类方法刻画极端值分布：<strong>分块最大值法（Block Maxima Method, BMM）</strong> 基于广义极值分布（GEV），<strong>超限峰值法（Peaks Over Threshold, POT）</strong> 基于广义帕累托分布（GPD）。其中，POT 因灵活利用数据尾部信息而更常用于 VaR 计算。</p>
 <ol style="list-style-type: decimal">
@@ -96,11 +96,11 @@ VaR_{1-\alpha} = u + \frac{\sigma}{\xi} \left[ \left( \frac{n}{N_u} (1 - \alpha)
 <li>阈值稳定性检验：确保参数 <span class="math inline">\(\xi\)</span> 和 <span class="math inline">\(\sigma\)</span> 在 <span class="math inline">\(u\)</span> 增大时趋于稳定。</li>
 </ul>
 
-# 三、R 语言实证分析（TSLA 数据）
+## 三、R 语言实证分析（TSLA 数据）
 
 <p>以 TSLA 股票收益率为例，采用 POT 方法（GPD）计算极端风险 VaR，步骤如下：</p>
 
-## 1. 数据准备与预处理
+### 1. 数据准备与预处理
 
 <p>使用<code>quantmod</code>获取数据并计算对数收益率（保留损失数据，即负收益率的绝对值）：</p>
 
@@ -132,7 +132,7 @@ loss <- na.omit(loss)
 colnames(loss) <- "TSLA_Loss"
 ```
 
-## 2. 阈值选择（Mean Excess Plot）
+### 2. 阈值选择（Mean Excess Plot）
 
 <p>通过平均超出量函数确定阈值 <span class="math inline">\(u\)</span> ：</p>
 
@@ -160,7 +160,7 @@ u <- 0.03
 excess <- as.numeric(loss[loss > u] - u)  # 超出量序列
 ```
 
-## 3. GPD 参数估计
+### 3. GPD 参数估计
 
 <p>使用<code>evd</code>包的<code>fpot</code>函数估计 GPD 的形状参数 <span class="math inline">\(\xi\)</span> 和尺度参数 <span class="math inline">\(\sigma\)</span> ：</p>
 
@@ -212,7 +212,7 @@ N <- length(loss)  # 总样本量
 Nu <- length(excess)  # 超限值数量
 ```
 
-## 4. 计算 VaR 与回测
+### 4. 计算 VaR 与回测
 
 <p>基于 GPD 参数计算高置信水平（如 99%、99.5%）的 VaR：</p>
 
@@ -256,7 +256,7 @@ cat("99% VaR失败率：", round(fail_99 * 100, 2), "%\n")
 ## 99% VaR失败率： 6.15 %
 ```
 
-## 5. 结果可视化
+### 5. 结果可视化
 
 <p>对比实际极端损失与 VaR 阈值：</p>
 
@@ -283,7 +283,7 @@ theme_minimal()
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 
-# 四、结论
+## 四、结论
 
 <p>极值理论通过直接建模尾部极端值，避免了对整体分布的依赖，在高置信水平下的 VaR 估计更具优势。实证分析显示：</p>
 <ol style="list-style-type: decimal">

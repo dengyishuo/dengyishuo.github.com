@@ -9,13 +9,13 @@ tags:
   - R
   - VaR
 ---
-# 一、引言
+## 一、引言
 
 <p>风险价值（Value at Risk, 简称 VaR ）是金融风险管理中衡量市场风险的核心指标，其定义为：在一定置信水平下，某一金融资产或组合在未来特定时间段内可能遭受的最大潜在损失。传统 VaR 计算多假设资产收益率服从正态分布，但实际金融时间序列往往呈现 “尖峰厚尾” 特性（峰度高于正态分布，尾部概率更大），导致正态分布假设下的 VaR 低估尾部风险。</p>
 <p>混合正态模型（Mixture of Normals Model）通过将收益率分布拟合为多个正态分布的加权组合，能够有效捕捉尖峰厚尾特征，从而更精准地估计 VaR。</p>
 <p>本文详细介绍混合正态模型的构建、参数估计及 VaR 计算方法，并通过 R 语言进行实现。</p>
 
-# 二、混合正态模型理论模型定义
+## 二、混合正态模型理论模型定义
 
 <p>假设金融资产收益率X服从两成分混合正态分布，其概率密度函数（PDF）为：</p>
 <p><span class="math display">\[
@@ -42,7 +42,7 @@ L(\Theta) = \prod_{i=1}^n \left[ \alpha \cdot \phi(x_i; \mu_1, \sigma_1^2) + (1-
 \]</span></p>
 <p>实际求解中，通常采用 EM 算法（期望最大化算法）迭代计算参数估计值。</p>
 
-## 基于混合正态模型的 VaR 计算
+### 基于混合正态模型的 VaR 计算
 
 <p>对于置信水平 <span class="math inline">\(1-\beta\)</span> （如 95%、99%），VaR 定义为满足以下条件的损失阈值：</p>
 <p><span class="math display">\[
@@ -55,7 +55,7 @@ F(-VaR) = \alpha \cdot \Phi\left(-VaR; \mu_1, \sigma_1^2\right) + (1-\alpha) \cd
 <p>其中 <span class="math inline">\(\Phi(\cdot)\)</span> 为正态分布的 CDF。</p>
 <p>通过数值方法（如二分法）求解式 <span class="math inline">\(\eqref{eq:mix-normal}\)</span> ，即可得到混合正态模型下的 VaR。</p>
 
-# 三、R 语言实证分析
+## 三、R 语言实证分析
 
 <p>以下通过 R 语言实现基于混合正态模型的 VaR 计算，使用quantmod获取金融数据，mixtools拟合混合正态模型。</p>
 <ol style="list-style-type: decimal">
@@ -279,7 +279,7 @@ print(p)
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 
-# 四、结论
+## 四、结论
 
 <p>混合正态模型通过捕捉金融数据的尖峰厚尾特性，能够更准确地估计 VaR，相比传统正态分布假设更贴合实际风险特征。</p>
 <p>实证结果显示，在高置信水平（如 99%）下，混合模型计算的 VaR 通常更高，更能反映极端损失的可能性，为风险管理提供更稳健的参考。实际应用中，可根据数据特征调整混合成分数量（如 3 个成分），或结合其他统计方法（如 GARCH 模型）进一步优化波动率的动态特性。</p>

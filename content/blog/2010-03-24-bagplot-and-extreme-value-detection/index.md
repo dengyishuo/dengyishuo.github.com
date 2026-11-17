@@ -71,15 +71,15 @@ title(paste("seed: ",seed,"/ n: ",n))
 
 像一颗海胆。
 
-# 其他异常值检测方法
+## 其他异常值检测方法
 
 除了布袋图之外，还有很多异常值的识别方法，这些方法大致可以分为可视化方法、模型方法和经验方法三类。
 
-## 可视化方法
+### 可视化方法
 
 可视化方法识别异常值是最直观的一种方法了。常用的图形主要包括箱线图、QQ图、直方图、密度图、小提琴图、布袋图、散点图、热力图以及局部离群因子（LOF）得分图。
 
-### 箱线图
+#### 箱线图
 
 
 ``` r
@@ -92,7 +92,7 @@ points(rep(1, length(outliers)), outliers, col = "red", pch = 19)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 
-### QQ图
+#### QQ图
 
 
 ``` r
@@ -105,7 +105,7 @@ points(which(data %in% qq_outliers), qq_outliers, col = "red", pch = 19)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 
-### 直方图
+#### 直方图
 
 
 ``` r
@@ -115,7 +115,7 @@ abline(v = outliers, col = "red", lwd = 2)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
 
-### 密度图
+#### 密度图
 
 
 ``` r
@@ -127,7 +127,7 @@ rug(outliers, col = "red", lwd = 2)
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 
-### 小提琴图
+#### 小提琴图
 
 
 ``` r
@@ -141,11 +141,11 @@ ggplot(data.frame(value = data), aes(x = "", y = value)) +
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 
-### 布袋图
+#### 布袋图
 
 见本文开篇内容，不赘述。
 
-### 散点图/分布图
+#### 散点图/分布图
 
 
 ``` r
@@ -195,7 +195,7 @@ ggtitle("Matrix Scatter Plot for Multivariate Outliers")
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-3.png" width="672" />
 
-### 热力图
+#### 热力图
 
 
 ``` r
@@ -208,7 +208,7 @@ heatmap(mat, Colv = NA, Rowv = NA, col = heat.colors(256),
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="672" />
 
-### 局部离群因子（LOF）得分图
+#### 局部离群因子（LOF）得分图
 
 
 ``` r
@@ -232,15 +232,15 @@ legend("topright", legend = c("Outlier", "Normal"),
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" />
 
-## 模型方法
+### 模型方法
 
 模型方法主要包括统计分析方法和机器学习方法。统计分析方法主要是利用一些常见的统计量作为指标来生成一些正常值的甄别标准，以此标准来甄别异常值。
 
-### 统计分析法
+#### 统计分析法
 
 常用的统计分析方法主要包括$3\sigma$方法和四分位距。
 
-#### 3西格玛准则
+##### 3西格玛准则
 
 `\(3\sigma\)` 准则的应用十分简明，即将超过均值三个标准差的数据全都视为异常值。下面看一个例子：
 
@@ -262,7 +262,7 @@ cat("3西格玛准则识别的异常值：", outliers_3sigma, "\n")
 ## 3西格玛准则识别的异常值： 10
 ```
 
-#### 四分位距
+##### 四分位距
 
 四分位距方法是根据上四分之一分位数和下四分之一分位数生成一个正常域，把超出正常域的数值视为异常值，具体算法见代码：
 
@@ -282,11 +282,11 @@ cat("IQR法识别的异常值：", outliers_iqr)
 ## IQR法识别的异常值： 10
 ```
 
-### 机器学习方法
+#### 机器学习方法
 
 最常用的甄别异常值的机器学习方法是聚类分析。
 
-#### 聚类分析 
+##### 聚类分析 
 
 
 ``` r
@@ -299,7 +299,7 @@ distances <- sqrt(rowSums((data - cluster_centers[kmeans_model$cluster])^2))
 outliers_cluster <- data[distances > quantile(distances, 0.95),]
 ```
 
-# 异常值的意义和处理
+## 异常值的意义和处理
 
 识别异常值只是万里长征第一步。更重要的是找到异常值出现的原因，到底是录入错误还是背后有深刻的原因。如果是录入错误可以重新补正或者干脆删除了之，当然也可以进行插值处理。值得注意的是背后有驱动原因的异常值。譬如，对于上市公司的股票价格而言，每一个异常的股票价格背后可能都对应了一个值得研究学习的事件，而类似的事件如果经常发生的话，就可以利用它构建一个事件驱动策略。
 

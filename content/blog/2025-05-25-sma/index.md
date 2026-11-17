@@ -16,7 +16,7 @@ tags:
 
 <p>常有人问我能用几分钟时间写一段代码进行一个简易的量化投资策略的开发和回测吗，答案是当然可以。对于量化投资而言，门槛永远不是编程和代码，而是投资思路和模型解读。下面我们用五分钟左右的时间来开发一个基于 SMA 指标的量化投资策略并进行回测。</p>
 
-# 引言
+## 引言
 
 <p>本文的代码基于<a href="https://r-project.org">R</a>软件和 <a href="https://posit.co">Rstuido</a> 软件运行，如果未安装上述软件，请自行安装。</p>
 <p>策略开发还需要基于以下 R 包来实现，可以运行如下代码安装并加载相关 R 包。</p>
@@ -37,7 +37,7 @@ suppressMessages({
 })
 ```
 
-# 清理环境
+## 清理环境
 
 <p>第一步，先清理历史环境，避免历史环境的干扰。</p>
 
@@ -47,11 +47,11 @@ rm(list=ls(.blotter), envir=.blotter)
 rm(list=ls(.strategy), envir=.strategy)
 ```
 
-# 策略开发
+## 策略开发
 
 <p>下面进入正式开发流程。</p>
 
-## 初始化设置
+### 初始化设置
 
 
 ``` r
@@ -65,7 +65,7 @@ fastMA <- 5
 slowMA <- 20
 ```
 
-## 获取数据
+### 获取数据
 
 <p>使用quantmod获取贵州茅台数据</p>
 
@@ -83,7 +83,7 @@ maotai <- `600519.SS`
 colnames(maotai) <- c("Open","High","Low","Close","Volume","Adjusted")
 ```
 
-## 初始化策略
+### 初始化策略
 
 
 ``` r
@@ -133,7 +133,7 @@ initOrders(portfolio.st, initDate=initDate)
 strategy(strategy.st, store=TRUE)
 ```
 
-## 添加指标
+### 添加指标
 
 <p>这里添加的简单移动平均线(SMA)：</p>
 
@@ -164,7 +164,7 @@ add.indicator(
 ## [1] "maotai_sma"
 ```
 
-## 添加信号 - 金叉死叉
+### 添加信号 - 金叉死叉
 
 
 ``` r
@@ -194,7 +194,7 @@ add.signal(
 ## [1] "maotai_sma"
 ```
 
-## 添加交易规则
+### 添加交易规则
 
 
 ``` r
@@ -239,7 +239,7 @@ add.rule(
 ## [1] "maotai_sma"
 ```
 
-# 策略回测
+## 策略回测
 
 
 ``` r
@@ -470,7 +470,7 @@ applyStrategy(strategy.st,
 ## [1] "2025-05-27 00:00:00 600519.SS -100 @ 1543.90002441406"
 ```
 
-# 更新组合和账户
+## 更新组合和账户
 
 
 ``` r
@@ -497,7 +497,7 @@ updateEndEq(account.st)
 ## [1] "maotai_account"
 ```
 
-# 分析结果
+## 分析结果
 
 
 ``` r
@@ -855,6 +855,6 @@ chart.Posn(portfolio.st, Symbol=symbol, TA="add_SMA(n=fastMA,col='blue');add_SMA
 
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/ana-2.png" width="672" /></p>
 
-# 结语
+## 结语
 
 <p>基于 R 软件进行量化回测一件极度舒适的事情。但由于本文未对回测指标（即 SMA ）的参数做优化，因此，本文仅供技术探讨，不构成策略或投资建议。</p>
