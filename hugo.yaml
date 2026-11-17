@@ -11,6 +11,13 @@ security:
     - "text/markdown"
     - "text/org"
 
+# R 源码不进构建产物。Hugo 会把 bundle 里非内容文件当页面资源发布，
+# 不加这条 index.Rmd 会被复制到 public/ 下，任何人都能直接从站上下载。
+# 只影响构建产物，本地文件和 git 里的 Rmd 不受影响。
+ignoreFiles:
+  - '\.Rmd$'
+  - '\.Rmd\.lock~$'
+
 pagination:
   pagerSize: 12
 
