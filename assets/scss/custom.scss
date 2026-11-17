@@ -390,88 +390,76 @@
 
 /* ============================================================
    4. 友情链接页
+   版式与作品页/关于页同构：gt-wlist 文本列表，一行一条，
+   行间一条细线（分隔线由 .gt-wlist-item 的 border-bottom 提供，
+   最后一条自动去掉）。不再用卡片网格。
    ============================================================ */
-.gt-links {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 12px;
-    margin: 1.5em 0;
+.gt-links-page .main-container main.main {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.gt-link-card {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 14px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--card-separator-color);
-    background: var(--card-background);
-    text-decoration: none !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+/* 列表整体：与页头之间留出和关于页一致的呼吸 */
+.gt-links-list {
+    margin-top: 4px;
+}
 
-    &:hover {
-        border-color: var(--accent-color);
-        box-shadow: var(--shadow-l1);
-        transform: translateY(-1px);
-    }
-
-    .gt-link-name {
-        font-size: 1.55rem;
-        font-weight: 600;
-        color: var(--card-text-color-main);
-        line-height: 1.4;
-    }
-
-    .gt-link-desc {
-        font-size: 1.25rem;
-        color: var(--card-text-color-secondary);
-        line-height: 1.5;
-    }
-
-    .gt-link-host {
-        font-size: 1.1rem;
-        color: var(--card-text-color-tertiary);
-        font-family: var(--code-font-family);
-        margin-top: 2px;
+/* 有 url 的条目：整行可点，沿用 gt-about-cta 的布局
+   （整行撑满的规则在 .gt-about-cta 里统一定义），
+   这里只补悬停时名字变色，替代原卡片的边框反馈 */
+.gt-links-row {
+    a:hover {
+        .gt-wlist-title {
+            color: var(--accent-color);
+        }
     }
 }
 
-.gt-link-card--text {
-    opacity: 0.75;
-    cursor: default;
-
-    &:hover {
-        transform: none;
-        border-color: var(--card-separator-color);
-        box-shadow: none;
-    }
+/* 右侧域名 / 账号名：等宽字体，弱化颜色 */
+.gt-links-host {
+    font-family: var(--code-font-family);
+    font-size: 1.16rem;
+    color: var(--card-text-color-tertiary);
+    white-space: nowrap;
 }
 
-/* 二维码卡片（公众号等无网站场景） */
-.gt-link-card--qr {
-    cursor: default;
-    align-items: flex-start;
+/* 无 url、无二维码的条目整体淡一点，视觉上区分"不可点" */
+.gt-links-row--text {
+    opacity: 0.78;
+}
 
-    &:hover {
-        transform: none;
-        border-color: var(--card-separator-color);
-        box-shadow: none;
+/* 二维码条目：右侧放图，垂直居中于条目 */
+.gt-links-row--qr {
+    align-items: center;
+
+    .gt-wlist-meta {
+        align-items: center;
     }
 
-    /* 二维码固定为正方形，避免被主题 .article-content img{height:auto} 拉变形
+    /* 固定正方形，避免被主题 .article-content img{height:auto} 拉变形
        （变形会导致扫不出来，故用 !important 兜底） */
-    .gt-link-qr {
-        width: 132px !important;
-        height: 132px !important;
+    .gt-links-qr {
+        width: 112px !important;
+        height: 112px !important;
         max-width: none !important;
         aspect-ratio: 1 / 1;
         object-fit: contain;
-        margin-top: 8px;
         padding: 6px;
         border-radius: 6px;
         background: #fff;
-        border: 1px solid var(--card-separator-color);
+        border: 1px solid var(--gt-rule);
     }
+}
+
+/* 账号名作为补充说明时，比简介再弱一档 */
+.gt-links-note {
+    font-size: 1.18rem;
+    color: var(--card-text-color-tertiary);
+}
+
+.gt-links-empty {
+    color: var(--card-text-color-tertiary);
 }
 
 /* ============================================================
@@ -1349,8 +1337,7 @@ html {
 
 /* ---- 链接：下划线离文字远一点，细一点 ---- */
 .article-content a,
-.gt-page-desc a,
-.gt-link-card .gt-link-name {
+.gt-page-desc a {
     text-underline-offset: 0.22em;
     text-decoration-thickness: 1px;
 }
@@ -1507,17 +1494,6 @@ footer.site-footer {
     }
 }
 
-/* ---- 友情链接卡片：与侧栏 chip 同一套色阶 ---- */
-.gt-link-card {
-    .gt-link-name {
-        transition: color 0.18s ease;
-    }
-
-    &:hover .gt-link-name {
-        color: var(--accent-color);
-    }
-}
-
 /* ---- 首页入口卡片：图标底色与侧栏统一 ---- */
 .gt-door .gt-door__icon {
     background: var(--gt-tag-bg);
@@ -1595,6 +1571,11 @@ footer.site-footer {
         gap: 10px 20px;
         padding: 14px 8px 14px 0;
         text-decoration: none;
+        /* flex item 默认 flex: 0 1 auto，宽度只到内容自然宽度：
+           可点区域只有左边一截，右侧按钮也贴不到头、与上方日期列对不齐。
+           撑满才符合"一行一条、整行可点"。 */
+        flex: 1 1 auto;
+        width: 100%;
     }
 
     .gt-wlist-title {

@@ -1,0 +1,60 @@
+{{- /*
+    格物堂 · 友情链接列表（文本列表版）
+    与作品页/关于页同构：gt-wlist 一行一条，行间一条细线。
+    三种形态：
+      1) 有 url    → 整行可点（沿用 gt-about-cta 的做法），右侧域名
+      2) 有 qrcode → 右侧二维码，不可点
+      3) 都没有    → 右侧账号名，弱化
+*/ -}}
+{{- $links := hugo.Data.links -}}
+
+{{- with $links }}
+<ul class="gt-wlist gt-links-list">
+    {{- range . }}
+        {{- $url := .url -}}
+        {{- $name := .name -}}
+        {{- $desc := .desc -}}
+        {{- $qrcode := .qrcode -}}
+        {{- $account := .account -}}
+
+        {{- if $url }}
+        <li class="gt-wlist-item gt-about-cta gt-links-row">
+            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer nofollow">
+                <div class="gt-wlist-main">
+                    <div class="gt-wlist-title">{{ $name }}</div>
+                    {{- with $desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+                </div>
+                <span class="gt-wlist-meta">
+                    <span class="gt-links-host">{{ (urls.Parse $url).Host }}</span>
+                </span>
+            </a>
+        </li>
+
+        {{- else if $qrcode }}
+        <li class="gt-wlist-item gt-links-row gt-links-row--qr">
+            <div class="gt-wlist-main">
+                <div class="gt-wlist-title">{{ $name }}</div>
+                {{- with $desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+                {{- with $account }}<p class="gt-wlist-desc gt-links-note">{{ . }}</p>{{ end }}
+            </div>
+            <span class="gt-wlist-meta">
+                <img class="gt-links-qr" src="{{ $qrcode | relURL }}" alt="{{ $name }} 二维码" loading="lazy">
+            </span>
+        </li>
+
+        {{- else }}
+        <li class="gt-wlist-item gt-links-row gt-links-row--text">
+            <div class="gt-wlist-main">
+                <div class="gt-wlist-title">{{ $name }}</div>
+                {{- with $desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+            </div>
+            <span class="gt-wlist-meta">
+                {{- with $account }}<span class="gt-links-host">{{ . }}</span>{{ end }}
+            </span>
+        </li>
+        {{- end }}
+    {{- end }}
+</ul>
+{{- else }}
+<p class="gt-links-empty">暂未添加友链。</p>
+{{- end }}

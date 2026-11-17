@@ -1,0 +1,27 @@
+{{- /*
+    格物堂 · 友情链接页
+    版式与 /about/ 一致：gt-page-head 页头 + gt-wlist 文本列表，
+    一行一条、行间一条细线，不再用卡片网格。
+    数据来自 data/links.yaml，三种形态：
+      1) 有 url    → 整行可点，右侧显示域名
+      2) 有 qrcode → 右侧显示二维码
+      3) 都没有    → 右侧显示账号名（弱化）
+*/ -}}
+{{ define "body-class" }}gt-links-page{{ end }}
+
+{{ define "main" }}
+    {{- $links := hugo.Data.links -}}
+
+    <header class="gt-page-head">
+        <h1 class="gt-page-title">{{ .Title }}</h1>
+        {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
+    </header>
+
+    {{ .Content }}
+
+    {{ partial "links/list" . }}
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}
