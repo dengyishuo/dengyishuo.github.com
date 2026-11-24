@@ -1238,37 +1238,18 @@ html {
     opacity: 0.72;
 }
 
-/* 正文限宽：纯文本行过长会难读。
-   宽屏有右栏时（lg 以上）交给 flex 分配宽度，不再限死 920，
-   否则右侧会留一条空档、和右栏对不齐。 */
-.gt-about-page .main-container main.main,
-.gt-works-page .main-container main.main {
-    max-width: 920px;
-    margin-left: auto;
-    margin-right: auto;
-
-    @media (min-width: 1024px) {
-        max-width: none;
-        margin-left: 0;
-        margin-right: 0;
-    }
+/* 关于 / 作品两页：正文进白卡片（.main-article），与博客文章页同一套版式。
+   卡片本身的背景、圆角、阴影来自主题，body 上已挂 .article-page；
+   这里只补卡片内正文的内边距——数值与主题 .article-content 对齐
+   （margin: card-padding 0; padding: 0 card-padding）。
+   不直接复用 .article-content：它会把卡内 h2 加上左侧色条并负边距，
+   那是文章正文小标题的样式，会盖掉列表自己的小标题设计。 */
+.gt-card-body {
+    margin: var(--card-padding) 0;
+    padding: 0 var(--card-padding);
 }
 
-/* 关于 / 作品两页的页内目录。
-   行为与博客文章页完全一致：
-     - 窄屏：文内 .article-toc 折叠条（主题默认 flex）
-     - 宽屏（lg 以上）：主题把 .article-toc 设为 display:none，
-       目录改由右栏 widget 呈现（见 layouts/{about,page/works}.html 的
-       right-sidebar block）
-   所以这里不再覆盖 display，只清掉主题自带的 margin-top：
-   间距交给 main 的 flex gap（40px），否则叠加后会被撑到 70px。
-   锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘。 */
-.gt-about-page .article-toc,
-.gt-works-page .article-toc {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
+/* 锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘 */
 .gt-about-page .gt-wlist-head,
 .gt-works-page .gt-wlist-head,
 .gt-works-page .gt-wlist-label {
@@ -1520,14 +1501,9 @@ footer.site-footer {
    11. 关于我（沿用作品页的版式语言）
    与 /works/ 共用 .gt-wlist-* 骨架，只补三处专属：
    开场段、时间列、结尾跳转行。
+   注意：这两页的宽度不再单独限死，交给 .article-page 的版式
+   （正文卡片 + 右侧目录）与文章页保持一致。
    ============================================================ */
-
-/* 与作品页同样的无右栏限宽，保证两页切换时列宽不跳 */
-.gt-about-page .main-container main.main {
-    max-width: 920px;
-    margin-left: auto;
-    margin-right: auto;
-}
 
 /* 开场一段：比正文稍大、颜色稍淡，像作品页的导语 */
 .gt-about-lead {

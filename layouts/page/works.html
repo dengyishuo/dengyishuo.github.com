@@ -1,41 +1,56 @@
 {{- /*
-    格物堂 · 作品页（文本列表版，无卡片）
-    目录：窄屏是文内折叠条，宽屏（lg 以上）移到右栏 widget，
-    与博客文章页行为一致。
+    格物堂 · 作品页（文本列表版）
+    数据来自 data/works.yaml：图书（已出版 / 撰写中 / 计划内）+ 开源软件包。
+
+    版式与博客文章页一致：
+      body 挂 .article-page → 正文进 .main-article 白卡片（圆角 + 阴影）
+      页头复用 article-header / article-details / article-title
+      窄屏目录是卡内折叠条，宽屏（lg 以上）移到右栏 widget
+      site-footer 留在卡片外，与文章页一致
 */ -}}
-{{ define "body-class" }}gt-works-page{{ end }}
+{{ define "body-class" }}article-page gt-works-page{{ end }}
 
 {{ define "main" }}
     {{- $tocList := partial "works/toc-list" . -}}
 
-    <header class="gt-page-head">
-        <h1 class="gt-page-title">{{ .Title }}</h1>
-        {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
-    </header>
-
-    {{- /* 窄屏目录：与博客文章页同款折叠条。
-           主题在 lg 以上对 .article-toc 设 display:none，
-           此时目录由右栏 widget 接管（见文件底部 right-sidebar）。
-           图书下按状态嵌套，只收录非空分组。 */ -}}
-    <aside class="article-toc">
-        <details>
-            <summary>
-                <div class="article-toc-title">
-                    {{ partial "helper/icon" "chevron-right" }}
-                    <span>{{ T "article.tableOfContents" }}</span>
+    <article class="main-article">
+        <header class="article-header">
+            <div class="article-details">
+                <div class="article-title-wrapper">
+                    <h1 class="article-title">{{ .Title }}</h1>
+                    {{- with .Params.description }}<p class="article-subtitle">{{ . }}</p>{{ end }}
                 </div>
-            </summary>
-            <nav class="toc-nav">
-                {{ $tocList | safeHTML }}
-            </nav>
-        </details>
-    </aside>
+            </div>
+        </header>
 
-    {{ .Content }}
+        {{- /* 窄屏目录：与博客文章页同款折叠条，位置也在卡片内、页头之后。
+               主题在 lg 以上对它设 display:none，此时目录由右栏 widget 接管。
+               图书下按状态嵌套，只收录非空分组。 */ -}}
+        <aside class="article-toc">
+            <details>
+                <summary>
+                    <div class="article-toc-title">
+                        {{ partial "helper/icon" "chevron-right" }}
+                        <span>{{ T "article.tableOfContents" }}</span>
+                    </div>
+                </summary>
+                <nav class="toc-nav">
+                    {{ $tocList | safeHTML }}
+                </nav>
+            </details>
+        </aside>
 
-    <div class="gt-works-body">
-        {{ partial "works/list" . }}
-    </div>
+        {{- /* 卡片正文：内边距与文章页 .article-content 一致，
+               但不套 .article-content 类，否则小标题会被主题的
+               左侧色条规则覆盖，破坏列表自己的标题样式。 */ -}}
+        <div class="gt-card-body">
+            {{ .Content }}
+
+            <div class="gt-works-body">
+                {{ partial "works/list" . }}
+            </div>
+        </div>
+    </article>
 
     {{ partial "footer/footer" . }}
 {{ end }}
