@@ -2,101 +2,90 @@
     格物堂 · 关于我（与作品页同一套版式）
     数据来自 data/about.yaml：开场一段 + 分区列表（事项在左，时间在右）。
 
-    版式与博客文章页一致：
-      body 挂 .article-page → 正文进 .main-article 白卡片（圆角 + 阴影）
-      页头复用 article-header / article-details / article-title
-      窄屏目录是卡内折叠条，宽屏（lg 以上）移到右栏 widget
-      site-footer 留在卡片外，与文章页一致
+    版式参考博客列表页：页头在卡片外，下面每个分区一张卡片往下流
+    （.gt-card-flow / .gt-card，见 custom.scss），右侧是目录 widget。
+    窄屏右侧栏隐藏，目录改用卡片流上方的折叠条。
 */ -}}
-{{ define "body-class" }}article-page gt-about-page{{ end }}
+{{ define "body-class" }}gt-about-page{{ end }}
 
 {{ define "main" }}
     {{- $about := hugo.Data.about -}}
     {{- $tocList := partial "about/toc-list" . -}}
 
-    <article class="main-article">
-        <header class="article-header">
-            <div class="article-details">
-                <div class="article-title-wrapper">
-                    <h1 class="article-title">{{ .Title }}</h1>
-                    {{- with .Params.description }}<p class="article-subtitle">{{ . }}</p>{{ end }}
+    <header class="gt-page-head">
+        <h1 class="gt-page-title">{{ .Title }}</h1>
+        {{- with .Params.description }}<p class="gt-page-desc">{{ . }}</p>{{ end }}
+    </header>
+
+    {{- /* 窄屏目录：与博客文章页同款折叠条。
+           主题在 lg 以上对它设 display:none，此时目录由右栏 widget 接管。 */ -}}
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    {{ partial "helper/icon" "chevron-right" }}
+                    <span>{{ T "article.tableOfContents" }}</span>
                 </div>
-            </div>
-        </header>
+            </summary>
+            <nav class="toc-nav">
+                {{ $tocList | safeHTML }}
+            </nav>
+        </details>
+    </aside>
 
-        {{- /* 窄屏目录：与博客文章页同款折叠条，位置也在卡片内、页头之后。
-               主题在 lg 以上对它设 display:none，此时目录由右栏 widget 接管。 */ -}}
-        <aside class="article-toc">
-            <details>
-                <summary>
-                    <div class="article-toc-title">
-                        {{ partial "helper/icon" "chevron-right" }}
-                        <span>{{ T "article.tableOfContents" }}</span>
+    <section class="gt-card-flow">
+        {{- with $about.lead }}
+        <section class="gt-wlist-section gt-card">
+            <p class="gt-about-lead">{{ . | markdownify }}</p>
+        </section>
+        {{- end }}
+
+        {{- range $about.sections }}
+        <section class="gt-wlist-section gt-card">
+            <h2 class="gt-wlist-head" id="{{ anchorize .title }}">{{ .title }}</h2>
+            <ul class="gt-wlist gt-about-list">
+                {{- range .items }}
+                <li class="gt-wlist-item">
+                    <div class="gt-wlist-main">
+                        <div class="gt-wlist-title gt-wlist-title--plain">{{ .text | markdownify }}</div>
                     </div>
-                </summary>
-                <nav class="toc-nav">
-                    {{ $tocList | safeHTML }}
-                </nav>
-            </details>
-        </aside>
-
-        {{- /* 卡片正文：内边距与文章页 .article-content 一致，
-               但不套 .article-content 类，否则小标题会被主题的
-               左侧色条规则覆盖，破坏列表自己的标题样式。 */ -}}
-        <div class="gt-card-body">
-            {{- with $about.lead }}
-            <section class="gt-wlist-section">
-                <p class="gt-about-lead">{{ . | markdownify }}</p>
-            </section>
-            {{- end }}
-
-            {{- range $about.sections }}
-            <section class="gt-wlist-section">
-                <h2 class="gt-wlist-head" id="{{ anchorize .title }}">{{ .title }}</h2>
-                <ul class="gt-wlist gt-about-list">
-                    {{- range .items }}
-                    <li class="gt-wlist-item">
-                        <div class="gt-wlist-main">
-                            <div class="gt-wlist-title gt-wlist-title--plain">{{ .text | markdownify }}</div>
-                        </div>
-                        {{- with .period }}
-                        <span class="gt-wlist-meta">
-                            <span class="gt-about-period">{{ . }}</span>
-                        </span>
-                        {{- end }}
-                    </li>
+                    {{- with .period }}
+                    <span class="gt-wlist-meta">
+                        <span class="gt-about-period">{{ . }}</span>
+                    </span>
                     {{- end }}
-                </ul>
-            </section>
-            {{- end }}
+                </li>
+                {{- end }}
+            </ul>
+        </section>
+        {{- end }}
 
-            {{- /* 结尾：指向作品页，做成一行可点条目，与上方列表同构 */ -}}
-            <section class="gt-wlist-section">
-                <h2 class="gt-wlist-head" id="{{ anchorize "我的作品" }}">我的作品</h2>
-                <ul class="gt-wlist">
-                    <li class="gt-wlist-item gt-about-cta">
-                        <a href="{{ "/works/" | relLangURL }}">
-                            <div class="gt-wlist-main">
-                                <div class="gt-wlist-title">我翻译与撰写的图书，以及两个开源 R 包</div>
-                                <p class="gt-wlist-desc">已出版的译著、撰写中的新书，以及 eTTR、eTushare 两个包，都在作品页。</p>
-                            </div>
-                            <span class="gt-wlist-meta">
-                                <span class="gt-about-go">前往「作品」</span>
-                            </span>
-                        </a>
-                    </li>
-                </ul>
-            </section>
+        {{- /* 结尾：指向作品页，做成一行可点条目，与上方列表同构 */ -}}
+        <section class="gt-wlist-section gt-card">
+            <h2 class="gt-wlist-head" id="{{ anchorize "我的作品" }}">我的作品</h2>
+            <ul class="gt-wlist">
+                <li class="gt-wlist-item gt-about-cta">
+                    <a href="{{ "/works/" | relLangURL }}">
+                        <div class="gt-wlist-main">
+                            <div class="gt-wlist-title">我翻译与撰写的图书，以及两个开源 R 包</div>
+                            <p class="gt-wlist-desc">已出版的译著、撰写中的新书，以及 eTTR、eTushare 两个包，都在作品页。</p>
+                        </div>
+                        <span class="gt-wlist-meta">
+                            <span class="gt-about-go">前往「作品」</span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </section>
 
-            {{ .Content }}
-        </div>
-    </article>
+    {{ .Content }}
 
     {{ partial "footer/footer" . }}
 {{ end }}
 
 {{ define "right-sidebar" }}
-    {{- /* 宽屏目录：与博客文章页同一个右栏 widget 版式。
+    {{- /* 右侧目录：与博客文章页同一个右栏 widget 版式（保持不变）。
            本页标题来自 data/about.yaml，Hugo 不生成 .TableOfContents，
            所以列表由 about/toc-list 提供。 */ -}}
     <aside class="sidebar right-sidebar sticky">

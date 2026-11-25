@@ -1061,18 +1061,28 @@ html {
 }
 
 /* ============================================================
-   9. 作品页（文本列表）
-   不用卡片：一行一条，书名在左、角色与出处靠右，
-   用细线分隔，读起来像目录而不是货架。
+   9. 作品页 / 关于我（卡片流）
+   每个分区一张卡，卡片外观与博客列表页 .article-list article 完全一致：
+   半透明底 + 1px 细边 + 零投影，卡间距收到 section-separation 的 1/4。
+   卡片内部仍是一行一条、细线分隔的列表。
    ============================================================ */
-.gt-works-body {
-    margin-top: 4px;
+
+/* 卡片流容器：卡与卡之间 10px（与 /blog/ 的 .article-list 同值），
+   与页头之间保持 main 的 40px gap。 */
+.gt-card-flow {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--section-separation) / 4);
 }
 
-.gt-wlist-section {
-    & + & {
-        margin-top: 34px;
-    }
+/* 卡片：直接对齐列表页那套"浮在纸上"的取向，
+   不给 hover 变化——卡片本身不可点，只有卡内的跳转行可点。 */
+.gt-card {
+    background-color: var(--gt-card-bg);
+    border: 1px solid var(--gt-card-edge);
+    border-radius: var(--card-border-radius);
+    box-shadow: none;
+    padding: var(--card-padding);
 }
 
 /* 一级标题：图书 / 开源软件包 */
@@ -1238,18 +1248,19 @@ html {
     opacity: 0.72;
 }
 
-/* 关于 / 作品两页：正文进白卡片（.main-article），与博客文章页同一套版式。
-   卡片本身的背景、圆角、阴影来自主题，body 上已挂 .article-page；
-   这里只补卡片内正文的内边距——数值与主题 .article-content 对齐
-   （margin: card-padding 0; padding: 0 card-padding）。
-   不直接复用 .article-content：它会把卡内 h2 加上左侧色条并负边距，
-   那是文章正文小标题的样式，会盖掉列表自己的小标题设计。 */
-.gt-card-body {
-    margin: var(--card-padding) 0;
-    padding: 0 var(--card-padding);
+/* 关于 / 作品两页：左侧卡片流（每个分区一张卡），右侧目录。
+   卡片样式见 .gt-card；这里补两处页面级细节。
+
+   1) 窄屏折叠目录：它作为 main 的直接子项，主题自带的
+      padding / margin 是为"卡内"场景写的，单独成块时要清掉，
+      否则会比其它卡片窄一圈、和卡片间距错位。
+   2) 锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘。 */
+.gt-about-page .article-toc,
+.gt-works-page .article-toc {
+    margin: 0;
+    padding: 0;
 }
 
-/* 锚点跳转目标补 scroll-margin-top，标题不会顶到视口边缘 */
 .gt-about-page .gt-wlist-head,
 .gt-works-page .gt-wlist-head,
 .gt-works-page .gt-wlist-label {

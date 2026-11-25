@@ -8,7 +8,7 @@
 {{- $packages := $works.packages -}}
 
 {{ if $books }}
-<section class="gt-wlist-section">
+<section class="gt-wlist-section gt-card">
     <h2 class="gt-wlist-head" id="{{ anchorize "图书" }}">图书</h2>
 
     {{- range $groups := slice
@@ -44,7 +44,7 @@
 {{ end }}
 
 {{ if $packages }}
-<section class="gt-wlist-section">
+<section class="gt-wlist-section gt-card">
     <h2 class="gt-wlist-head" id="{{ anchorize "开源软件包" }}">开源软件包</h2>
     <ul class="gt-wlist">
         {{- range $packages }}
