@@ -1097,32 +1097,6 @@ html {
     border-bottom: 1px solid var(--gt-rule);
 }
 
-/* 二级分组：已出版 / 撰写中 / 计划内 */
-.gt-wlist-group {
-    & + & {
-        margin-top: 20px;
-    }
-}
-
-.gt-wlist-label {
-    margin: 0 0 2px;
-    font-size: 1.14rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    color: var(--gt-ink-soft);
-
-    &::before {
-        content: "";
-        display: inline-block;
-        width: 5px;
-        height: 5px;
-        margin-right: 7px;
-        border-radius: 50%;
-        vertical-align: 2px;
-        background: var(--gt-rule);
-    }
-}
-
 /* 列表本体 */
 .gt-wlist {
     margin: 0;
@@ -1262,8 +1236,7 @@ html {
 }
 
 .gt-about-page .gt-wlist-head,
-.gt-works-page .gt-wlist-head,
-.gt-works-page .gt-wlist-label {
+.gt-works-page .gt-wlist-head {
     scroll-margin-top: 24px;
 }
 

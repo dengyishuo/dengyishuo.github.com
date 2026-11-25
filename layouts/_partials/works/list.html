@@ -1,47 +1,44 @@
 {{- /*
     格物堂 · 作品页（文本列表版）
     数据来自 data/works.yaml：图书（已出版 / 撰写中 / 计划内）+ 开源软件包。
-    每条：书名 + 主要内容 + 适合谁读，右侧保留"译/著"标签。无卡片。
+    每条：书名 + 主要内容 + 适合谁读，右侧保留"译/著"标签。
+
+    卡片粒度与 /about/ 一致：一个分组一张卡，卡内只有一级 h2 标题，
+    不再用 h3 在卡里再分层。这样右侧目录也是平铺一级，两页同构。
 */ -}}
 {{- $works := hugo.Data.works -}}
 {{- $books := $works.books -}}
 {{- $packages := $works.packages -}}
 
-{{ if $books }}
+{{- range $groups := slice
+    (dict "key" "published" "label" "已出版")
+    (dict "key" "writing" "label" "撰写中")
+    (dict "key" "planned" "label" "计划内")
+}}
+    {{- $items := where $books "status" $groups.key -}}
+    {{- with $items }}
 <section class="gt-wlist-section gt-card">
-    <h2 class="gt-wlist-head" id="{{ anchorize "图书" }}">图书</h2>
-
-    {{- range $groups := slice
-        (dict "key" "published" "label" "已出版")
-        (dict "key" "writing" "label" "撰写中")
-        (dict "key" "planned" "label" "计划内")
-    }}
-        {{- $items := where $books "status" $groups.key -}}
-        {{- with $items }}
-        <div class="gt-wlist-group">
-            <h3 class="gt-wlist-label" id="{{ anchorize $groups.label }}">{{ $groups.label }}</h3>
-            <ul class="gt-wlist">
-                {{- range . }}
-                <li class="gt-wlist-item">
-                    <div class="gt-wlist-main">
-                        <div class="gt-wlist-title">{{ .title }}</div>
-                        {{- with .desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
-                        {{- with .suit }}
-                        <p class="gt-wlist-suit"><span class="gt-wlist-suit__k">适合</span><span class="gt-wlist-suit__v">{{ . }}</span></p>
-                        {{- end }}
-                    </div>
-                    <span class="gt-wlist-meta">
-                        <span class="gt-wlist-role">{{ .role }}</span>
-                        {{- with .note }}<span class="gt-wlist-note">{{ . }}</span>{{ end }}
-                    </span>
-                </li>
+    <h2 class="gt-wlist-head" id="{{ anchorize $groups.label }}">{{ $groups.label }}</h2>
+    <ul class="gt-wlist">
+        {{- range . }}
+        <li class="gt-wlist-item">
+            <div class="gt-wlist-main">
+                <div class="gt-wlist-title">{{ .title }}</div>
+                {{- with .desc }}<p class="gt-wlist-desc">{{ . }}</p>{{ end }}
+                {{- with .suit }}
+                <p class="gt-wlist-suit"><span class="gt-wlist-suit__k">适合</span><span class="gt-wlist-suit__v">{{ . }}</span></p>
                 {{- end }}
-            </ul>
-        </div>
+            </div>
+            <span class="gt-wlist-meta">
+                <span class="gt-wlist-role">{{ .role }}</span>
+                {{- with .note }}<span class="gt-wlist-note">{{ . }}</span>{{ end }}
+            </span>
+        </li>
         {{- end }}
-    {{- end }}
+    </ul>
 </section>
-{{ end }}
+    {{- end }}
+{{- end }}
 
 {{ if $packages }}
 <section class="gt-wlist-section gt-card">

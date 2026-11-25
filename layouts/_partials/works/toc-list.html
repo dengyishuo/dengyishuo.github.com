@@ -1,27 +1,21 @@
 {{- /*
     作品页的页内目录条目（只输出 <ul>，不带外壳）。
-    图书下按状态嵌套，只收录非空分组，与正文实际渲染的小标题一一对应。
+    与 /about/ 的目录同构：平铺一级，一个分组一项，只收录非空分组，
+    与正文实际渲染的卡片标题一一对应。
     文内折叠条与右栏 widget 共用同一份，避免两处各写一份后不同步。
 */ -}}
 {{- $works := hugo.Data.works -}}
 {{- $books := $works.books -}}
 {{- $packages := $works.packages -}}
 <ul>
-    {{- if $books }}
-    <li>
-        <a href="#{{ anchorize "图书" }}">图书</a>
-        <ul>
-            {{- range $groups := slice
-                (dict "key" "published" "label" "已出版")
-                (dict "key" "writing" "label" "撰写中")
-                (dict "key" "planned" "label" "计划内")
-            }}
-                {{- with where $books "status" $groups.key }}
-            <li><a href="#{{ anchorize $groups.label }}">{{ $groups.label }}</a></li>
-                {{- end }}
-            {{- end }}
-        </ul>
-    </li>
+    {{- range $groups := slice
+        (dict "key" "published" "label" "已出版")
+        (dict "key" "writing" "label" "撰写中")
+        (dict "key" "planned" "label" "计划内")
+    }}
+        {{- with where $books "status" $groups.key }}
+    <li><a href="#{{ anchorize $groups.label }}">{{ $groups.label }}</a></li>
+        {{- end }}
     {{- end }}
     {{- if $packages }}
     <li><a href="#{{ anchorize "开源软件包" }}">开源软件包</a></li>
