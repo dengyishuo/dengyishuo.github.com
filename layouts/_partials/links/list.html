@@ -1,15 +1,18 @@
 {{- /*
-    格物堂 · 友情链接列表（文本列表版）
-    与作品页/关于页同构：gt-wlist 一行一条，行间一条细线。
-    三种形态：
+    格物堂 · 友情链接列表（卡片版）
+    外观与 /about/ 的卡片完全一致：.gt-card 承载整个清单，
+    卡内仍是一行一条、细线分隔。
+    数据来自 data/links.yaml，三种形态：
       1) 有 url    → 整行可点（沿用 gt-about-cta 的做法），右侧域名
       2) 有 qrcode → 右侧二维码，不可点
       3) 都没有    → 右侧账号名，弱化
+    注意：本页不生成目录（友链只有一组，目录没有信息量）。
 */ -}}
 {{- $links := hugo.Data.links -}}
 
 {{- with $links }}
-<ul class="gt-wlist gt-links-list">
+<section class="gt-wlist-section gt-card">
+    <ul class="gt-wlist gt-links-list">
     {{- range . }}
         {{- $url := .url -}}
         {{- $name := .name -}}
@@ -54,7 +57,8 @@
         </li>
         {{- end }}
     {{- end }}
-</ul>
+    </ul>
+</section>
 {{- else }}
 <p class="gt-links-empty">暂未添加友链。</p>
 {{- end }}
