@@ -173,8 +173,8 @@
 
 /* ============================================================
    3. 右侧栏
-   设计取向：icon 与标题并排、用细分隔线代替白色卡片堆叠，
-              让侧栏退到背景层，不与正文争视觉重量。
+   设计取向：每个 widget 是一张卡片（与正文卡片同一套取值），
+              icon 与标题并排放在卡内首行，卡内用细分隔线/淡底 chip。
    ============================================================ */
 
 /* 侧栏专用色阶（明暗各一套） */
@@ -241,6 +241,38 @@
     &:hover > .widget-icon svg {
         color: var(--accent-color);
     }
+}
+
+/* ---- 内容类 widget 做成卡片 ----
+   取值与正文的 .gt-card 完全一致（半透明底 + 1px 细边 + 零投影 + 10px 圆角），
+   这样侧栏和左栏是同一套视觉语言。
+   用 :has 精确命中「归档」「目录」各自的内容容器，而不是靠 widget.archives
+   这个类名 —— 主题的目录 widget 复用了 archives 类，直接按类名套会双层卡片。
+   搜索框不套卡：它本身就是个填充底的输入框，再包一层是多余的一个盒子。 */
+.right-sidebar .widget:has(> .widget-archive--list),
+.right-sidebar .widget:has(> .widget--toc),
+.right-sidebar .widget.tagCloud {
+    background-color: var(--gt-card-bg);
+    border: 1px solid var(--gt-card-edge);
+    border-radius: var(--card-border-radius);
+    box-shadow: none;
+    padding: var(--spacing-lg);
+}
+
+/* 目录 widget 内部原来那张白卡退掉，避免卡片套卡片；
+   标题与列表现在同在一张卡里，与其他 widget 一致。 */
+.right-sidebar .widget .widget--toc {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+/* 卡与卡的间距：主题默认沿用 --section-separation(40px)，
+   那是给「无卡片的平铺 widget」留的。现在每块都是卡，40px 在 310 宽的
+   侧栏里显得松散，收到 20px 与卡片的体量相称。 */
+.right-sidebar {
+    gap: var(--spacing-lg);
 }
 
 /* ---- 归档：改为细分隔线列表 ---- */
