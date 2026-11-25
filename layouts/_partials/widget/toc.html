@@ -1,0 +1,21 @@
+{{- /*
+    站点层覆盖主题的 widget/toc.html —— 只改一处：图标由 hash(#) 换成自绘的
+    toc 图标（assets/icons/toc.svg）。
+    原因：# 与「分类」widget 共用同一个图标，语义重复；目录用「条目列表」更贴切。
+
+    其余结构与主题完全一致，主题升级时对照本文件同步即可。
+*/ -}}
+{{ if (.Context.Scratch.Get "TOCEnabled") }}
+    <section class="widget archives">
+        <div class="widget-icon">
+            {{ partial "helper/icon" "toc" }}
+        </div>
+        <h2 class="widget-title section-title">{{ T "article.tableOfContents" }}</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                {{ partial "article/components/toc" .Context | safeHTML }}
+            </nav>
+        </div>
+    </section>
+{{ end }}
