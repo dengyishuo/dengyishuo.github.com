@@ -1,6 +1,6 @@
 ---
 title: 自动下载财务套表
-author: MatriSpk
+author: 揖光尘
 date: '2013-05-27'
 slug: download-financial-sheets
 categories:

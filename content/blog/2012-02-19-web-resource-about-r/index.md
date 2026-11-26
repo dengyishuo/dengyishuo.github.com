@@ -1,6 +1,6 @@
 ---
 title: R语言在线资源列表
-author: admin
+author: 揖光尘
 date: '2012-02-19'
 slug: web-resource-about-r
 categories:

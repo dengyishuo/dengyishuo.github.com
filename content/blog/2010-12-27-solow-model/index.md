@@ -1,6 +1,6 @@
 ---
 title: 索罗模型模拟
-author: admin
+author: 揖光尘
 date: '2010-12-25'
 slug: solow-model
 categories:

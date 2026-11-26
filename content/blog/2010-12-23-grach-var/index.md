@@ -1,6 +1,6 @@
 ---
 title: 基于GRACH模型计算VaR
-author: DengYishuo
+author: 揖光尘
 date: '2010-12-23'
 slug: grach-var
 categories:

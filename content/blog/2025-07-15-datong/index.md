@@ -1,6 +1,6 @@
 ---
 title: 大同
-author: Simon Urbanek
+author: 揖光尘
 date: '2025-07-15'
 slug: datong
 categories:

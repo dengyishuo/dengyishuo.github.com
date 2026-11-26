@@ -1,6 +1,6 @@
 ---
 title: 基于混合正态分布的 VaR 计算
-author: DengYishuo
+author: 揖光尘
 date: '2010-12-21'
 slug: var-mixture-of-norms
 categories:

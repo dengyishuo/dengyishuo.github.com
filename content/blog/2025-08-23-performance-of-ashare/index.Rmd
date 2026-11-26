@@ -1,6 +1,6 @@
 ---
 title: A 股最近的表现怎么样
-author: DengYishuo
+author: 揖光尘
 date: '2025-08-23'
 slug: performance-of-ashare
 categories:

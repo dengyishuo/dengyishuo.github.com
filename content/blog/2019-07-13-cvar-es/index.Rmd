@@ -1,6 +1,6 @@
 ---
 title: CVaR 和 ES 补充 VaR 的风险度量方法解析（含 R 包应用）
-author: DengYishuo
+author: 揖光尘
 date: '2019-07-13'
 slug: cvar-es
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 交易策略的 MFE 分析与可视化：评估盈利潜力的关键工具
-author: DengYishuo
+author: 揖光尘
 date: '2016-01-12'
 slug: luxor-sample-mae-stop-trailing
 categories:

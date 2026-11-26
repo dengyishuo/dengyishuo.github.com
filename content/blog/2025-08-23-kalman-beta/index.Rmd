@@ -1,6 +1,6 @@
 ---
 title: 使用卡尔曼滤波计算个股的动态贝塔
-author: DengYishuo
+author: 揖光尘
 date: '2025-08-23'
 slug: kalman-beta
 categories:
