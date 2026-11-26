@@ -16,6 +16,12 @@ index_cache/
 *.lock~
 
 # blogdown / knit 在根目录误生成的产物
+#
+# 例外：根目录的 index.html 现在是 GitHub Pages 的跳转页
+# （dengyishuo.github.io → gewutang.cn），该仓库以 username.github.com
+# 命名，GitHub 不允许停用 Pages（DELETE /pages 返回 422），只能留作导流口。
+# 该文件已用 `git add -f` 强制纳入版本控制，被跟踪的文件不受下面的规则影响；
+# 改动它之后若 git status 不显示，用 `git add -f index.html` 重新登记。
 /index.html
 _drafts/
 _site/
