@@ -1,6 +1,6 @@
 ---
 title: 大旗如果扛不动，就先插在地上
-author: MatrixSpk
+author: 揖光尘
 date: '2011-07-18'
 slug: about-translate-books
 categories:

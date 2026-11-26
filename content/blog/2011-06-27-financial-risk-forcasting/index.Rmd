@@ -1,6 +1,6 @@
 ---
 title: 新书：Financial Risk Forecasting
-author: MatrixSpk
+author: 揖光尘
 date: '2011-06-27'
 slug: financial-risk-forcasting
 categories:

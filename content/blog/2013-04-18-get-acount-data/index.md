@@ -1,6 +1,6 @@
 ---
 title: 从东方财富网获取股票开户数据
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-18'
 slug: get-acount-data
 categories:

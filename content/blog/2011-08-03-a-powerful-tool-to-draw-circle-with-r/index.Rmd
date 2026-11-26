@@ -1,6 +1,6 @@
 ---
 title: draw.circle:R中的绘圆利器
-author: MatrixSpk
+author: 揖光尘
 date: '2011-08-03'
 slug: a-powerful-tool-to-draw-circle-with-r
 categories:

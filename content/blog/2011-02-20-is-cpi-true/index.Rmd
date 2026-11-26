@@ -1,6 +1,6 @@
 ---
 title: CPI数据经过调整吗
-author: MatrixSpk
+author: 揖光尘
 date: '2011-02-20'
 slug: is-cpi-true
 categories:

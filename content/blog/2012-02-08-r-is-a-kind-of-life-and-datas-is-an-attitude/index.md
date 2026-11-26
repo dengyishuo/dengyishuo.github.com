@@ -1,6 +1,6 @@
 ---
 title: R是一种生活，数据是一种态度
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-08'
 slug: r-is-a-kind-of-life-and-data-is-an-attitude
 categories:

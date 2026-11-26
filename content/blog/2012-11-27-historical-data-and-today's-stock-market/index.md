@@ -1,6 +1,6 @@
 ---
 title: 从历史数据看今日股市
-author: MatrixSpk
+author: 揖光尘
 date: '2012-11-27'
 slug: historical-data-and-today's-stock-market
 categories:

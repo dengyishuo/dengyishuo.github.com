@@ -1,6 +1,6 @@
 ---
 title: BEKK模型
-author: MatrixSpk
+author: 揖光尘
 date: '2010-04-15'
 slug: about-bekk-model
 categories:

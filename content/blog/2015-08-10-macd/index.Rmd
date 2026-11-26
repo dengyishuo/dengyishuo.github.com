@@ -1,6 +1,6 @@
 ---
 title: MACD 指标解析与策略实现：基于 AAPL 的趋势跟踪逻辑
-author: MatrixSpk
+author: 揖光尘
 date: '2015-08-10'
 slug: macd
 categories:

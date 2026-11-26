@@ -1,6 +1,6 @@
 ---
 title: apply函数族入门
-author: MatrixSpk
+author: 揖光尘
 date: '2011-11-09'
 slug: apply-family
 categories:

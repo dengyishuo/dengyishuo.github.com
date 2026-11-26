@@ -1,6 +1,6 @@
 ---
 title: 安装RMySQL
-author: MatrixSpk
+author: 揖光尘
 date: '2013-09-28'
 slug: notes-on-rmysql
 categories:

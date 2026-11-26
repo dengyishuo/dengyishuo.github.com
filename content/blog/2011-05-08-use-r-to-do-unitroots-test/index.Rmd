@@ -1,6 +1,6 @@
 ---
 title: R与单位根检验
-author: MatrixSpk
+author: 揖光尘
 date: '2011-05-08'
 slug: use-r-to-do-unitroots-test
 categories:

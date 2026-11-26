@@ -1,6 +1,6 @@
 ---
 title: 几本关于R的书籍
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-18'
 slug: some-books-on-r
 categories:

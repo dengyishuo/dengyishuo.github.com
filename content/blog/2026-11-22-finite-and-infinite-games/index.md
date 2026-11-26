@@ -1,6 +1,6 @@
 ---
 title: 《有限与无限的游戏》读书笔记：人生不是定输赢的比赛
-author: MatrixSpk
+author: 揖光尘
 date: '2026-11-22'
 slug: finite-and-infinite-games
 categories:

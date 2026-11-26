@@ -1,6 +1,6 @@
 ---
 title: 基于 LPPL 模型的纳斯达克指数泡沫检测与预测分析
-author: MatrixSpk
+author: 揖光尘
 date: '2025-07-04'
 slug: lppl
 categories:

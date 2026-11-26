@@ -1,6 +1,6 @@
 ---
 title: Luxor 交易策略中 SMA 参数的三维可视化
-author: MatrixSpk
+author: 揖光尘
 date: '2015-01-10'
 slug: luxor-sample-trade-graphs-sma
 categories:

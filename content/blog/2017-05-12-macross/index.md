@@ -1,6 +1,6 @@
 ---
 title: "基于双均线交叉的交易策略实现与回测分析"
-author: MatrixSpk
+author: 揖光尘
 date: '2017-05-12'
 slug: macross
 categories:

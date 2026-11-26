@@ -1,6 +1,6 @@
 ---
 title: 前进测试可视化策略评估的重要工具
-author: MatrixSpk
+author: 揖光尘
 date: 2017-10-10
 slug: luxor-sample-walk-forward
 categories:

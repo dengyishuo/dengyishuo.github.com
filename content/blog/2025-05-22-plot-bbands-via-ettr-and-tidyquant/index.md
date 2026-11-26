@@ -1,6 +1,6 @@
 ---
 title: 用R中的eTTR包和tidyquant包绘制布林带
-author: MatrixSpk
+author: 揖光尘
 date: '2025-05-22'
 slug: plot-bbands-via-ettr-and-tidyquant
 categories:

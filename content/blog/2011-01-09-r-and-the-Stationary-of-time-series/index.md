@@ -1,6 +1,6 @@
 ---
 title: R与时间序列的平稳性
-author: MatrixSpk
+author: 揖光尘
 date: '2011-01-09'
 slug: r-and-the-stationary-of-time-series
 categories:

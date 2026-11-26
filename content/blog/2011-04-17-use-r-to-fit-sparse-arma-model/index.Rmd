@@ -1,6 +1,6 @@
 ---
 title: 用R拟合缺项的ARIMA模型
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-17'
 slug: use-r-to-fit-sparse-arma-model
 categories:

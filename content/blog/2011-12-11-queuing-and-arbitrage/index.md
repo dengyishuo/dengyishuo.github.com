@@ -1,6 +1,6 @@
 ---
 title: 套利与排队
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-11'
 slug: queuing-and-arbitrage
 categories:

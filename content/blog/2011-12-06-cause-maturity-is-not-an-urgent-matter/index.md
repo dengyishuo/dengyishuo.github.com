@@ -1,6 +1,6 @@
 ---
 title: 成熟不是一件急迫的事情
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-07'
 slug: cause-maturity-is-not-an-urgent-matter
 categories:

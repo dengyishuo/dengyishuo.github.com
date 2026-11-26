@@ -1,6 +1,6 @@
 ---
 title: R中的斯皮尔曼等级相关检验与异方差
-author: MatrixSpk
+author: 揖光尘
 date: '2012-08-16'
 slug: spearman-test-in-r
 categories:

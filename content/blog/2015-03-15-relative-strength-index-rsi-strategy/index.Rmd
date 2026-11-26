@@ -1,6 +1,6 @@
 ---
 title: "基于 RSI 指标的双向交易策略：实现与回测分析"
-author: MatrixSpk
+author: 揖光尘
 date: '2015-03-15'
 slug: relative-strength-index-rsi-strategy
 categories:

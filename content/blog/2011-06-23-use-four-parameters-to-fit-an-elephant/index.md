@@ -1,6 +1,6 @@
 ---
 title: 用四个参数拟合大象
-author: MatrixSpk
+author: 揖光尘
 date: '2011-06-23'
 slug: use-four-parameters-to-fit-an-elephant
 categories:

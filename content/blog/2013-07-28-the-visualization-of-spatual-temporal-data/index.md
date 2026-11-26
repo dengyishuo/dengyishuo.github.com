@@ -1,6 +1,6 @@
 ---
 title: 时空数据可视化
-author: MatrixSpk
+author: 揖光尘
 date: '2013-07-28'
 slug: the-visualization-of-spatual-temporal-data
 categories:

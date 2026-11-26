@@ -1,6 +1,6 @@
 ---
 title: "用R进行Jarque-Bera检验"
-author: "MatrixSpk"
+author: 揖光尘
 date: "2011-05-06"
 slug: use-r-to-do-jb-test
 tags:

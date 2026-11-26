@@ -1,6 +1,6 @@
 ---
 title: "基于双均线交叉与追踪止损的交易策略"
-author: MatrixSpk
+author: 揖光尘
 date: '2018-07-27'
 slug: macross-stoptrailing
 categories:

@@ -1,6 +1,6 @@
 ---
 title: quantmod：R中的金融分析包
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-10'
 slug: notes-about-quantmod
 categories:

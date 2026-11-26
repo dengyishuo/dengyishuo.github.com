@@ -1,6 +1,6 @@
 ---
 title: 乱码，又见乱码
-author: MatrixSpk
+author: 揖光尘
 date: '2012-09-13'
 slug: junk-code-again
 categories:

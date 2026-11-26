@@ -1,6 +1,6 @@
 ---
 title: 烟火众生
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-05'
 slug: the-girls-we-loved-before
 categories:

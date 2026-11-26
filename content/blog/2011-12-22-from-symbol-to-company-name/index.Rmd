@@ -1,6 +1,6 @@
 ---
 title: 从股票代码到公司名
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-12'
 slug: from-symbol-to-company-name
 categories:

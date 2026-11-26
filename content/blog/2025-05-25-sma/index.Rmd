@@ -1,6 +1,6 @@
 ---
 title: 五分钟搞定 SMA 指标的量化策略开发和回测
-author: MatrixSpk
+author: 揖光尘
 date: '2025-05-25'
 slug: sma
 categories:

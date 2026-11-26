@@ -1,6 +1,6 @@
 ---
 title: MACD 趋势跟踪策略的实现与解析：基于 AAPL 的量化回测
-author: MatrixSpk
+author: 揖光尘
 date: '2017-07-10'
 slug: macdrebalancing
 categories:

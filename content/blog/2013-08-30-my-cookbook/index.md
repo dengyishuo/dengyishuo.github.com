@@ -1,6 +1,6 @@
 ---
 title: 美食记：椰奶鸡蛋羹
-author: MatrixSpk
+author: 揖光尘
 date: '2012-08-30'
 slug: my-cookbook
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 房价上涨的逻辑
-author: MatrixSpk
+author: 揖光尘
 date: '2014-07-04'
 slug: the-history-of-china's-bloom-of-real-eastate
 categories:

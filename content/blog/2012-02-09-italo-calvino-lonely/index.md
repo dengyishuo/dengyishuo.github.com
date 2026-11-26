@@ -1,6 +1,6 @@
 ---
 title: 伊塔洛·卡尔维诺的《孤独》真是荒诞的黑色幽默
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-09'
 slug: italo-calvino-lonely
 categories:

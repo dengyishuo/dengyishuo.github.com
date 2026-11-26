@@ -1,6 +1,6 @@
 ---
 title: 杂
-author: MatrixSpk
+author: 揖光尘
 date: '2011-08-08'
 slug: young-people-are-undergoing-changes
 categories:

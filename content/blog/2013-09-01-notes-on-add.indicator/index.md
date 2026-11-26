@@ -1,6 +1,6 @@
 ---
 title: add.indicator函数笔记
-author: MatrixSpk
+author: 揖光尘
 date: '2013-09-01'
 slug: notes-on-add.indicator
 categories:

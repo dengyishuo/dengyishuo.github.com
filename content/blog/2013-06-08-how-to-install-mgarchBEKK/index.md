@@ -1,6 +1,6 @@
 ---
 title: 安装mgarchBEKK包
-author: MatrixSpk
+author: 揖光尘
 date: '2013-06-08'
 slug: how-to-install-mgarchbekk
 categories:

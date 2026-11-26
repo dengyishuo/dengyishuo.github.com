@@ -1,6 +1,6 @@
 ---
 title: 技术指标在量化投资中的应用：以SMA指标为例
-author: MatrixSpk
+author: 揖光尘
 date: '2015-01-08'
 slug: a-simple-moving-average-strategy-for-evaluating-signal
 categories:

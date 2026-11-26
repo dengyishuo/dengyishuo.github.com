@@ -1,6 +1,6 @@
 ---
 title: 基于 MFE 指标的交易策略绩效分析：GBP/USD 交易的最大有利波动可视化
-author: MatrixSpk
+author: 揖光尘
 date: '2015-12-10'
 slug: luxor-sample-mfe-takeprofit
 categories:

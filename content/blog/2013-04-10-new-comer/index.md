@@ -1,6 +1,6 @@
 ---
 title: 初来乍到
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-10'
 slug: new-comer
 categories:

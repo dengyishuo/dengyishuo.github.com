@@ -1,6 +1,6 @@
 ---
 title: 布袋图与异常值检测
-author: MatrixSpk
+author: 揖光尘
 date: '2010-03-24'
 slug: bagplot-and-extreme-value-detection
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 在时间序列的线图上添加垂线
-author: MatrixSpk
+author: 揖光尘
 date: '2011-05-08'
 slug: add-vertical-lines-to-timeseries-plot
 categories:

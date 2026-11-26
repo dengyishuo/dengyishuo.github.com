@@ -1,6 +1,6 @@
 ---
 title: 符号偏误检验
-author: MatrixSpk
+author: 揖光尘
 date: '2011-05-02'
 slug: use-r-to-do-sign-bias-test
 categories:

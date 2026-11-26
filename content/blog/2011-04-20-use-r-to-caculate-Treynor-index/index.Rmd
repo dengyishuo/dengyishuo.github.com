@@ -1,6 +1,6 @@
 ---
 title: 用R计算Treynor系数
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-20'
 slug: use-r-to-caculate-treynor-index
 categories:

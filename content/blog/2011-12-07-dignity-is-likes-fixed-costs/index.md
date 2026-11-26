@@ -1,6 +1,6 @@
 ---
 title: 尊严是人的固定成本
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-07'
 slug: dignity-is-likes-fixed-costs
 categories:

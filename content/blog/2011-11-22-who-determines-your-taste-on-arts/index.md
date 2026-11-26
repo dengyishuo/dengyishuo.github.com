@@ -1,6 +1,6 @@
 ---
 title: 什么培养了你的品味
-author: MatrixSpk
+author: 揖光尘
 date: '2011-11-22'
 slug: who-determines-your-taste-on-arts
 categories:

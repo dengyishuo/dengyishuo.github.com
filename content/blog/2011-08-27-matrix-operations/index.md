@@ -1,6 +1,6 @@
 ---
 title: R与矩阵运算总结
-author: MatrixSpk
+author: 揖光尘
 date: '2011-08-27'
 slug: matrix-operations
 categories:

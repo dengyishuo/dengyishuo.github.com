@@ -1,6 +1,6 @@
 ---
 title: 读柯文《在中国发现历史》
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-17'
 slug: find-history-on-china
 categories:

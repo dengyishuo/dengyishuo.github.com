@@ -1,6 +1,6 @@
 ---
 title: VaR和历史模拟法及R语言
-author: MatrixSpk
+author: 揖光尘
 date: '2010-12-15'
 slug: var-calculation-using-historical-simulation
 categories:

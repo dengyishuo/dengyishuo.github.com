@@ -1,6 +1,6 @@
 ---
 title: 不放肝胆，如何成行？
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-11'
 slug: taking-a-change-on-a-new-road
 categories:

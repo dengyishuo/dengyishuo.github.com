@@ -1,6 +1,6 @@
 ---
 title: VaR和方差协方差方法及R语言
-author: MatrixSpk
+author: 揖光尘
 date: '2010-12-17'
 slug: var-caculation-via-variance-covariance-method
 categories:

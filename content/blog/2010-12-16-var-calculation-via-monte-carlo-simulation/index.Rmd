@@ -1,6 +1,6 @@
 ---
 title: VaR和蒙特卡洛模拟法
-author: MatrixSpk
+author: 揖光尘
 date: '2010-12-16'
 slug: var-calculation-via-montecarlo-simulation
 categories:

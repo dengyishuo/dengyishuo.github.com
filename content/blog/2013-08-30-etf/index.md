@@ -1,6 +1,6 @@
 ---
 title: ETF的跨市场套利交易
-author: MatrixSpk
+author: 揖光尘
 date: '2013-08-30'
 slug: etf
 categories:

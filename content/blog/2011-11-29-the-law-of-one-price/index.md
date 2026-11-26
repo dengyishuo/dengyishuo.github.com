@@ -1,6 +1,6 @@
 ---
 title: 一价定律
-author: MatrixSpk
+author: 揖光尘
 date: '2011-11-29'
 slug: the-law-of-one-price
 categories:

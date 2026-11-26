@@ -1,6 +1,6 @@
 ---
 title: 孤独的投资者卡洛·坎奈尔
-author: MatrixSpk
+author: 揖光尘
 date: '2013-08-05'
 slug: lonely-investor-carlo-cannell
 categories:

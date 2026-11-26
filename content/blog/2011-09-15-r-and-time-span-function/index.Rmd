@@ -1,6 +1,6 @@
 ---
 title: R与月跨度函数，理论与应用的差距
-author: MatrixSpk
+author: 揖光尘
 date: '2011-09-15'
 slug: r-and-time-span-function
 categories:

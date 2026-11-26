@@ -1,6 +1,6 @@
 ---
 title: 修改chartSeries绘图结果的x轴标签
-author: MatrixSpk
+author: 揖光尘
 date: '2013-06-26'
 slug: change-xlabels-in-chartseries
 categories:

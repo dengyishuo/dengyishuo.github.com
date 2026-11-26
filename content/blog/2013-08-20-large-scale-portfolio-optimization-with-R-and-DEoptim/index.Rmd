@@ -1,6 +1,6 @@
 ---
 title: 使用R和DEoptim求解大规模投资组合
-author: MatrixSpk
+author: 揖光尘
 date: '2013-08-20'
 slug: large-scale-portfolio-optimization-with-r-and-deoptim
 categories:

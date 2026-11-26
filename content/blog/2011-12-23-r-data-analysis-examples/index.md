@@ -1,6 +1,6 @@
 ---
 title: R数据分析实例
-author: MatrixSpk
+author: 揖光尘
 date: '2011-12-23'
 slug: r-data-analysis-examples
 categories:

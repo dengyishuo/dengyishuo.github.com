@@ -1,6 +1,6 @@
 ---
 title: 使用blotter包绘制最大不利偏移（MAE）图
-author: MatrixSpk
+author: 揖光尘
 date: '2016-02-10'
 slug: luxor-sample-mae-stoploss
 categories:

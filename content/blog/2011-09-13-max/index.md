@@ -1,6 +1,6 @@
 ---
 title: 非线性模型极大似然估计方法
-author: MatrixSpk
+author: 揖光尘
 date: '2011-09-13'
 slug: max-likelyho
 categories:

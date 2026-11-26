@@ -1,6 +1,6 @@
 ---
 title: 音乐及语言
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-20'
 slug: language
 categories:

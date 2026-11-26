@@ -1,6 +1,6 @@
 ---
 title: setSymbolLookup
-author: MatrixSpk
+author: 揖光尘
 date: '2011-06-02'
 slug: setsymbollookup
 categories:

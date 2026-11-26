@@ -1,6 +1,6 @@
 ---
 title: 分级基金笔记：复杂分级产品
-author: MatrixSpk
+author: 揖光尘
 date: '2014-09-14'
 slug: notes-on-grade-fund-part-one
 categories:

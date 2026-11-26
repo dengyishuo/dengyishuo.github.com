@@ -1,6 +1,6 @@
 ---
 title: 可转债计算细节
-author: MatrixSpk
+author: 揖光尘
 date: '2014-03-24'
 slug: notes on CB
 categories:

@@ -1,6 +1,6 @@
 ---
 title: Lee Hachadoorian 加入 Supstat
-author: MatrixSpk
+author: 揖光尘
 date: '2013-08-02'
 slug: lee-hachadoorian-joins-supstat
 categories:

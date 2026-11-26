@@ -1,6 +1,6 @@
 ---
 title: R与金融时间序列分析常见问题集
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-03'
 slug: r-and-questions-in-financial-timeseries-analysing
 categories:

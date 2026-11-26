@@ -1,6 +1,6 @@
 ---
 title: 投资笔记 1 ：先立认知，再选策略
-author: MatrixSpk
+author: 揖光尘
 date: '2025-11-14'
 slug: notes-on-investments
 categories:

@@ -1,6 +1,6 @@
 ---
 title: R中的3维HCPC图
-author: MatrixSpk
+author: 揖光尘
 date: '2011-11-28'
 slug: 3d-graph-of-hcpc-in-r
 categories:

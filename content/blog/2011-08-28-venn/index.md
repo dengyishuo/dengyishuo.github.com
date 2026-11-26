@@ -1,6 +1,6 @@
 ---
 title: R语言绘制维恩图
-author: MatrixSpk
+author: 揖光尘
 date: '2011-08-27'
 slug: venn
 categories:

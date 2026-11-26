@@ -1,6 +1,6 @@
 ---
 title: 用R拟合Vasicek模型
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-10'
 slug: use-r-to-fit-vasicek-model
 categories:

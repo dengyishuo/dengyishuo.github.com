@@ -1,6 +1,6 @@
 ---
 title: 从Tsay的书看R的未来
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-09'
 slug: predict-r-based-on-the-change-of-tsays-book
 categories:

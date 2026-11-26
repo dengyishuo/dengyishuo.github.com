@@ -1,6 +1,6 @@
 ---
 title: 《并非有效的市场》笔记
-author: MatrixSpk
+author: 揖光尘
 date: '2025-12-22'
 slug: inefficient-markets
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 说说风险均摊投资组合的构建方法
-author: MatrixSpk
+author: 揖光尘
 date: '2014-01-14'
 slug: construct-pairty-risk-portfolio
 categories:

@@ -1,6 +1,6 @@
 ---
 title: R获取股票数据
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-14'
 slug: use-r-to-get-trading-data
 categories:

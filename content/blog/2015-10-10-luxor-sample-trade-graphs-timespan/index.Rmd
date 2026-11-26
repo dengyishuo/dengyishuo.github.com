@@ -1,6 +1,6 @@
 ---
 title: '日内时间窗口绩效分析与可视化'
-author: 'MatrixSpk'
+author: 揖光尘
 date: '2015-10-10'
 slug: luxor-sample-trade-graphs-timespan
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 与佛教有关的一点事儿
-author: MatrixSpk
+author: 揖光尘
 date: '2014-01-01'
 slug: something about buddhism
 categories:

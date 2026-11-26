@@ -1,6 +1,6 @@
 ---
 title: 2010年各地房价排行榜揭晓
-author: MatrixSpk
+author: 揖光尘
 date: '2011-02-10'
 slug: house-price
 categories:

@@ -1,6 +1,6 @@
 ---
 title: Rattle:R中的数据挖掘GUI第4章试读
-author: MatrixSpk
+author: 揖光尘
 date: '2014-04-16'
 slug: rattle-chap-4
 categories:

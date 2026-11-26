@@ -1,6 +1,6 @@
 ---
 title: R语言书籍的学习路线图
-author: MatrixSpk
+author: 揖光尘
 date: '2012-01-19'
 slug: how-to-learn-r-by-reading-books
 categories:

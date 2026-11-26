@@ -1,6 +1,6 @@
 ---
 title: "基于 quantstrat 的配对交易策略实现与解析"
-author: "MatrixSpk"
+author: 揖光尘
 date: '2015-04-10'
 slug: pair-trade
 categories:

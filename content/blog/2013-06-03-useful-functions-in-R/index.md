@@ -1,6 +1,6 @@
 ---
 title: 有用但不易被发现的R函数：file.choose
-author: MatrixSpk
+author: 揖光尘
 date: '2013-06-03'
 slug: useful-functions-in-r
 categories:

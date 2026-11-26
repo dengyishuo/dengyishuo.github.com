@@ -1,6 +1,6 @@
 ---
 title: 融资融券业务的会计处理
-author: MatrixSpk
+author: 揖光尘
 date: '2014-05-18'
 slug: securities-margin-trading
 categories:

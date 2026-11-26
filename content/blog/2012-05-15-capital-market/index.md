@@ -1,6 +1,6 @@
 ---
 title: 资本市场的先知先觉
-author: MatrixSpk
+author: 揖光尘
 date: '2012-05-15'
 slug: capital-market
 categories:

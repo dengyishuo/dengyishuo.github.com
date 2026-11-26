@@ -1,6 +1,6 @@
 ---
 title: 如何根据事件研究来推测市场上涨幅度
-author: MatrixSpk
+author: 揖光尘
 date: '2025-07-26'
 slug: casestudy-etf-up
 categories:

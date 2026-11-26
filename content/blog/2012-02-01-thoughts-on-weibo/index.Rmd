@@ -1,6 +1,6 @@
 ---
 title: weibo数据开发思路
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-01'
 slug: thoughts-on-weibo
 categories:

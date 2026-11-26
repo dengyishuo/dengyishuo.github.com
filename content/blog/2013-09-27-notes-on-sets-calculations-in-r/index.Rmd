@@ -1,6 +1,6 @@
 ---
 title: R软件中的集合计算操作
-author: MatrixSpk
+author: 揖光尘
 date: '2013-09-27'
 slug: notes-on-sets-caculations-in-r
 categories:

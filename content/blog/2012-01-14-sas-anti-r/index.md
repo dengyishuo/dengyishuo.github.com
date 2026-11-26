@@ -1,6 +1,6 @@
 ---
 title: 为对抗新兴软件R，SAS或对国内高校免费
-author: MatrixSpk
+author: 揖光尘
 date: '2012-01-14'
 slug: sas-anti-r
 categories:

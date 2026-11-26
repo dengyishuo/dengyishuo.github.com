@@ -1,6 +1,6 @@
 ---
 title: 万历十五年
-author: MatrixSpk
+author: 揖光尘
 date: '2011-04-27'
 categories:
 - 随笔

@@ -1,6 +1,6 @@
 ---
 title: 使用R语言构造投资组合的有效前沿
-author: MatrixSpk
+author: 揖光尘
 date: '2013-08-09'
 slug: use-r-to-do-portfolio-optimization
 categories:

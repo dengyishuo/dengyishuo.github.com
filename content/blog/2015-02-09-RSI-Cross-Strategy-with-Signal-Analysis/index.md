@@ -1,6 +1,6 @@
 ---
 title: 技术指标在量化投资中的应用：以RSI指标为例
-author: MatrixSpk
+author: 揖光尘
 date: '2015-02-09'
 slug: rsi-cross-strategy-with-signal-analysis
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 男人通常在想什么
-author: MatrixSpk
+author: 揖光尘
 date: '2011-03-07'
 slug: what-every-man-thinks-about-apart-from-sex
 categories:

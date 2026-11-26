@@ -1,6 +1,6 @@
 ---
 title: "基于历史量价数据的未来涨幅预测"
-author: MatrixSpk
+author: 揖光尘
 date: "2026-07-23"
 slug: predicting-volume
 categories:

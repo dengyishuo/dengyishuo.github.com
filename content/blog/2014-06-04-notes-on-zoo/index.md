@@ -1,6 +1,6 @@
 ---
 title: R时间序列笔记：zoo包
-author: MatrixSpk
+author: 揖光尘
 date: '2014-06-04'
 slug: notes-on-zoo
 categories:

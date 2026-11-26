@@ -1,6 +1,6 @@
 ---
 title: 黄牛党是价格管制体制下的需求调节器
-author: MatrixSpk
+author: 揖光尘
 date: '2012-01-11'
 slug: ticket-scalper
 categories:

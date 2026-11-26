@@ -1,6 +1,6 @@
 ---
 title: R中的金融数据接口
-author: MatrixSpk
+author: 揖光尘
 date: '2013-11-05'
 slug: financial-data-accessible-from-r
 categories:

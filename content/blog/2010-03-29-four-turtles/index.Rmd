@@ -1,6 +1,6 @@
 ---
 title: 四龟追逐问题
-author: MatrixSpk
+author: 揖光尘
 date: '2010-03-29'
 slug: four-turtles
 categories:

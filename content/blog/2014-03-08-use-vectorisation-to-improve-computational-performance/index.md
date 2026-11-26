@@ -1,6 +1,6 @@
 ---
 title: 善用向量化提升R语言的计算性能
-author: MatrixSpk
+author: 揖光尘
 date: '2014-03-08'
 slug: use-vectorisation-to-improve-computational-performance
 categories:

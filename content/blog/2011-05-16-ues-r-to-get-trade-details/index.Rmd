@@ -1,6 +1,6 @@
 ---
 title: 获取交易明细数据
-author: MatrixSpk
+author: 揖光尘
 date: '2011-05-16'
 slug: use-r-to-get-trade-details
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 支持向量机
-author: MatrixSpk
+author: 揖光尘
 date: '2010-05-05'
 slug: support-vector-machine
 categories:

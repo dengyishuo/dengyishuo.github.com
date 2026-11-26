@@ -1,6 +1,6 @@
 ---
 title: 全天候动量ETF策略
-author: MatrixSpk
+author: 揖光尘
 date: '2025-12-23'
 slug: all-weather-momentum
 categories:

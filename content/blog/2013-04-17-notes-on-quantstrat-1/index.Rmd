@@ -1,6 +1,6 @@
 ---
 title: R中的量化投资包：quantstrat
-author: MatrixSpk
+author: 揖光尘
 date: '2013-04-17'
 categories:
 - 量化投资

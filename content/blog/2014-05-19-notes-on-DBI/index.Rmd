@@ -1,6 +1,6 @@
 ---
 title: R数据库交互系列笔记：DBI包
-author: MatrixSpk
+author: 揖光尘
 date: '2014-05-19'
 slug: notes-on-dbi
 categories:

@@ -1,6 +1,6 @@
 ---
 title: COS能带领统计学创造历史么
-author: MatrixSpk
+author: 揖光尘
 date: '2011-06-13'
 slug: will-we-creat-history
 categories:

@@ -1,6 +1,6 @@
 ---
 title: R中的魔方矩阵
-author: MatrixSpk
+author: 揖光尘
 date: '2011-08-29'
 slug: magic
 categories:

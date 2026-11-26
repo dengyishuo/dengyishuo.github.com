@@ -1,6 +1,6 @@
 ---
 title: 脸谱图
-author: MatrixSpk
+author: 揖光尘
 date: '2010-03-20'
 slug: chernoff
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 科斯对现代经济学的批评
-author: MatrixSpk
+author: 揖光尘
 date: '2012-12-13'
 slug: coase-on-economics
 categories:

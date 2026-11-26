@@ -1,6 +1,6 @@
 ---
 title: 《征服市场的人》读书笔记：用系统战胜人性
-author: MatrixSpk
+author: 揖光尘
 date: '2026-11-16'
 slug: the-man-who-solved-the-market
 categories:

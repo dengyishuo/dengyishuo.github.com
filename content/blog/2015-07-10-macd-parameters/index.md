@@ -1,6 +1,6 @@
 ---
 title: "MACD 策略的参数优化与有效性验证：基于 quantstrat 的实现"
-author: MatrixSpk
+author: 揖光尘
 date: '2015-07-10'
 slug: macd-parameters
 categories:

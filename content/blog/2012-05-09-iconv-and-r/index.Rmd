@@ -1,6 +1,6 @@
 ---
 title: 棘手的R乱码和给力的iconv函数
-author: MatrixSpk
+author: 揖光尘
 date: '2012-05-09'
 slug: iconv-and-r
 categories:

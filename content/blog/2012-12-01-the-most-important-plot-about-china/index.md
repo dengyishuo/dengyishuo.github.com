@@ -1,6 +1,6 @@
 ---
 title: 里昂证券最重要的图表：中国外储增长表
-author: MatrixSpk
+author: 揖光尘
 date: '2012-12-01'
 slug: the-most-importtant-plot-about-china
 categories:

@@ -1,6 +1,6 @@
 ---
 title: NASDAQ有泡沫吗
-author: MatrixSpk
+author: 揖光尘
 date: '2011-09-06'
 slug: demo-about-lppl
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 货币的省际贬值
-author: MatrixSpk
+author: 揖光尘
 date: '2012-02-01'
 slug: devaluation-caused-by-different-places
 categories:

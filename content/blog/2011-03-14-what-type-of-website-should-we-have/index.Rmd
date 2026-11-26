@@ -1,6 +1,6 @@
 ---
 title: 应该建立怎样的网站
-author: MatrixSpk
+author: 揖光尘
 date: '2011-03-14'
 slug: what-type-of-website-should-we-have
 categories:

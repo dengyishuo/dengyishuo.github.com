@@ -1,6 +1,6 @@
 ---
 title: R与量化投资分析入门书单（更新....）
-author: MatrixSpk
+author: 揖光尘
 date: '2011-05-31'
 slug: books-on-quantative-investment
 categories:

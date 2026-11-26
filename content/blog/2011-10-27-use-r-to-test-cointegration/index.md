@@ -1,6 +1,6 @@
 ---
 title: 用R检验股票的协整关系
-author: MatrixSpk
+author: 揖光尘
 date: '2011-10-27'
 slug: use-r-to-test-cointegration
 categories:

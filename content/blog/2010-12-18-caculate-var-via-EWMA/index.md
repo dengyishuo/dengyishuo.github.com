@@ -1,6 +1,6 @@
 ---
 title: 指数加权移动平均法计算VaR
-author: MatrixSpk
+author: 揖光尘
 date: '2010-12-18'
 slug: caculate-var-via-ewma
 categories:

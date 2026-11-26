@@ -1,6 +1,6 @@
 ---
 title: fAssets包学习笔记
-author: MatrixSpk
+author: 揖光尘
 date: '2011-06-21'
 slug: notes-on-fassets
 categories:

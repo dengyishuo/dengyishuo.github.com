@@ -1,6 +1,6 @@
 ---
 title: 2010年中国与美国经济对比
-author: MatrixSpk
+author: 揖光尘
 date: '2011-02-12'
 slug: china-vs-usa
 categories:

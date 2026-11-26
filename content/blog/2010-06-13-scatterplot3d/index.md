@@ -1,6 +1,6 @@
 ---
 title: scatterplot3d:一个特立独行的R包
-author: MatrixSpk
+author: 揖光尘
 date: '2010-06-13'
 slug: scatterplot3d
 categories:

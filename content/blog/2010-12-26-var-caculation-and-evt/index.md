@@ -1,6 +1,6 @@
 ---
 title: 基于极值理论的 VaR 计算及实证分析
-author: MatrixSpk
+author: 揖光尘
 date: '2010-12-29'
 slug: var-caculation-and-evt
 categories:

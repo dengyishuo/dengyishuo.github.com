@@ -1,6 +1,6 @@
 ---
 title: 用R实现滚动单因子模型
-author: MatrixSpk
+author: 揖光尘
 date: '2025-05-15'
 slug: roll-smf
 categories:

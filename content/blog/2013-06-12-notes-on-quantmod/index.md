@@ -1,6 +1,6 @@
 ---
 title: R中的金融分析包：quantmod学习笔记补充版
-author: MatrixSpk
+author: 揖光尘
 date: '2013-06-12'
 slug: notes-on-quantmod
 categories:

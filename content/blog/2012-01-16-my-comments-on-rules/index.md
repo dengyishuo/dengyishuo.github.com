@@ -1,6 +1,6 @@
 ---
 title: 规则这件事情
-author: MatrixSpk
+author: 揖光尘
 date: '2012-01-16'
 slug: my-comments-on-rules
 categories:

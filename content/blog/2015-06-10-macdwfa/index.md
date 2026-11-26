@@ -1,6 +1,6 @@
 ---
 title: "MACD 策略的前进测试（Walk Forward）实现与解析"
-author: 'MatrixSpk'
+author: 揖光尘
 date: '2015-06-10'
 slug: macdwfa
 categories:

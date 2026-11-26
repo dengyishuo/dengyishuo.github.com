@@ -1,6 +1,6 @@
 ---
 title: RSI指标可以作为量化投资的信号因子吗
-author: MatrixSpk
+author: 揖光尘
 date: '2025-05-04'
 slug: rsi
 categories:

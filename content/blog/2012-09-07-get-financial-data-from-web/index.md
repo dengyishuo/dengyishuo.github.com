@@ -1,6 +1,6 @@
 ---
 title: 获取上市公司主要财务指标
-author: MatrixSpk
+author: 揖光尘
 date: '2012-09-07'
 slug: get-financial-data-from-web
 categories:

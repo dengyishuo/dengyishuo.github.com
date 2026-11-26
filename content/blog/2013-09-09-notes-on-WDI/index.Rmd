@@ -1,6 +1,6 @@
 ---
 title: WDI包：从世界银行获取世界发展指标数据
-author: MatrixSpk
+author: 揖光尘
 date: '2013-09-09'
 slug: notes-on-wdi
 categories:
